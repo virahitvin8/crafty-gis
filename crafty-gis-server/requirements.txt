@@ -23,8 +23,8 @@ rioxarray==0.17.0
 xarray==2024.9.0
 
 # Data Download
-sentinelsat==1.2.0
-landsatxplore==0.21.0
+sentinelsat==1.2.1
+# landsatxplore removed - incompatible with shapely 2.0+ and unmaintained since 2023
 
 # Report Generation
 reportlab==4.2.2
