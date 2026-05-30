@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* CRAFTY GIS — Global Theme
+   Professional dark dashboard with Earth-tone accents
+*/
+
+@theme {
+  --color-crafty-50: #f0f7ff;
+  --color-crafty-100: #e0effe;
+  --color-crafty-200: #b9dffd;
+  --color-crafty-300: #7cc6fb;
+  --color-crafty-400: #36a9f5;
+  --color-crafty-500: #0c8ee7;
+  --color-crafty-600: #0070c4;
+  --color-crafty-700: #01599f;
+  --color-crafty-800: #064c83;
+  --color-crafty-900: #0b406d;
+  --color-crafty-950: #07284a;
+
+  --color-earth-50: #f6f6ef;
+  --color-earth-100: #eaead9;
+  --color-earth-200: #d5d5b2;
+  --color-earth-300: #baba83;
+  --color-earth-400: #a09f5d;
+  --color-earth-500: #888745;
+  --color-earth-600: #6d6b36;
+  --color-earth-700: #56532d;
+  --color-earth-800: #484529;
+  --color-earth-900: #3e3b25;
+  --color-earth-950: #211f12;
+
+  --font-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', 'Fira Code', monospace;
+
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-pulse-glow: pulse-glow 2s infinite;
+  --animate-spin-slow: spin 3s linear infinite;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(12, 142, 231, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(12, 142, 231, 0.6); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* MapLibre overrides */
+.maplibregl-map {
+  width: 100%;
+  height: 100%;
+}
+.maplibregl-ctrl-top-right {
+  top: 10px;
+  right: 10px;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, opacity, transform;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}

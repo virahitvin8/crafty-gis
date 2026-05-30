@@ -1,0 +1,33 @@
+# CRAFTY GIS Frontend — .dockerignore
+
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Tests
+coverage/
+.nyc_output/
+
+# Cache
+.eslintcache
+.tsbuildinfo

@@ -1,0 +1,23 @@
+# Ignore all downloaded repositories under biological systems to keep the git footprint lightweight
+git_star_gains/sensory_system/*/
+git_star_gains/nervous_system/*/
+git_star_gains/muscular_system/*/
+git_star_gains/circulatory_system/*/
+git_star_gains/digestive_system/*/
+git_star_gains/immune_system/*/
+git_star_gains/respiratory_endocrine_system/*/
+git_star_gains/skeletal_reproductive_system/*/
+git_star_gains/lymphatic_system/*/
+git_star_gains/integumentary_system/*/
+git_star_gains/excretory_system/*/
+git_star_gains/genetic_replication_system/*/
+git_star_gains/genetic_system/*/
+git_star_gains/endocrine_glands/*/
+git_star_gains/endocrine_system/*/
+git_star_gains/communication_system/*/
+
+# Ignore temporary and system files
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

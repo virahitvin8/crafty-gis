@@ -160,7 +160,8 @@ CRAFTY GIS can handle a wide range of geospatial analyses, including:
 git clone https://github.com/virahitvin8/crafty-gis.git
 cd crafty-gis
 
-# Run the one-click setup script
+# Navigate to the project and run the one-click setup script
+cd crafty-gis
 chmod +x setup.sh
 ./setup.sh
 ```
@@ -199,8 +200,9 @@ npm run dev
 ### Option 3: Docker Deployment
 
 ```bash
-# Start all services with one command
-docker-compose up -d
+# Navigate to the project directory and start all services
+cd crafty-gis
+docker compose up -d
 ```
 
 ### 🌐 Access the Platform
@@ -401,7 +403,7 @@ The name *Crafty* implies intelligent, resourceful, and skilled problem-solving 
 | **v2.0** 🟡 | **Orbis** | Multi-modal AI agents, real-time collaboration, mobile app | Q3 2026 |
 | **v3.0** 🔴 | **Sage** | Full desktop app (Tauri), OSGeo incubation, ML pipeline | Q1 2027 |
 
-See [ROADMAP.md](ROADMAP.md) for full details.
+See [ROADMAP.md](crafty-gis/ROADMAP.md) for full details.
 
 ---
 
@@ -449,10 +451,10 @@ If CRAFTY GIS helps your work or research, consider supporting the project:
   </p>
   <p>
     <a href="https://github.com/virahitvin8/crafty-gis"><b>GitHub</b></a> ·
-    <a href="ROADMAP.md"><b>Roadmap</b></a> ·
-    <a href="CHANGELOG.md"><b>Changelog</b></a> ·
+    <a href="crafty-gis/ROADMAP.md"><b>Roadmap</b></a> ·
+    <a href="crafty-gis/CHANGELOG.md"><b>Changelog</b></a> ·
     <a href="CONTRIBUTING.md"><b>Contributing</b></a> ·
-    <a href="SECURITY.md"><b>Security</b></a>
+    <a href="crafty-gis/SECURITY.md"><b>Security</b></a>
   </p>
   <br/>
   <sub>© 2024-2026 <a href="https://github.com/virahitvin8">Akshit Kumar</a> and CRAFTY GIS Contributors</sub>

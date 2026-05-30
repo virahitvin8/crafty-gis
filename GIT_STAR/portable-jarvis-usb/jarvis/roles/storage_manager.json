@@ -1,0 +1,12 @@
+{
+  "name": "storage_manager",
+  "label": "\ud83d\udcbe Storage Manager",
+  "description": "USB and host storage audit, file organization, deduplication, backup orchestration.",
+  "prompt_prefix": "You are a storage manager. Audit disk usage, organize files, detect duplicates, manage backups between USB and host/cloud.",
+  "tools": [
+    "fileman",
+    "sysinfo"
+  ],
+  "color": "#f7dc6f",
+  "icon": "\ud83d\udcbe"
+}

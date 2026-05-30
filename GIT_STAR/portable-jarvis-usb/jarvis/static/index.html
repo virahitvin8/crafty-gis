@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS USB</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🔌</span>
+      <div>
+        <h1>PORTABLE JARVIS</h1>
+        <small id="host-info">Detecting host...</small>
+      </div>
+    </div>
+    <div class="role-selector">
+      <label>ROLE:</label>
+      <select id="role-select"></select>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <main>
+    <!-- LEFT: DASHBOARD -->
+    <section class="panel" id="dashboard">
+      <h2>📊 System Dashboard</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="stat-label">OS</span><span class="stat-value" id="stat-os">—</span></div>
+        <div class="stat-card"><span class="stat-label">CPU</span><span class="stat-value" id="stat-cpu">—</span></div>
+        <div class="stat-card"><span class="stat-label">RAM</span><span class="stat-value" id="stat-ram">—</span></div>
+        <div class="stat-card"><span class="stat-label">USB Free</span><span class="stat-value" id="stat-usb">—</span></div>
+      </div>
+      <div class="disk-bars" id="disk-bars"></div>
+    </section>
+
+    <!-- CENTER: MEMORY / CHAT -->
+    <section class="panel" id="memory-panel">
+      <h2>🧠 Persistent Memory</h2>
+      <div class="memory-controls">
+        <input type="text" id="mem-key" placeholder="Key (e.g., field_site_12_coords)">
+        <input type="text" id="mem-value" placeholder="Value / Notes">
+        <select id="mem-category">
+          <option value="general">General</option>
+          <option value="gis">GIS Data</option>
+          <option value="agriculture">Agriculture</option>
+          <option value="remote_sensing">Remote Sensing</option>
+          <option value="network">Network</option>
+          <option value="system">System</option>
+        </select>
+        <button onclick="addMemory()">💾 Save</button>
+      </div>
+      <div class="memory-search">
+        <input type="text" id="mem-search" placeholder="🔍 Search memory..." onkeyup="searchMemory()">
+      </div>
+      <div class="memory-list" id="memory-list"></div>
+    </section>
+
+    <!-- RIGHT: TOOLS -->
+    <section class="panel" id="tools-panel">
+      <h2>🛠️ Tools</h2>
+      <div class="tool-tabs">
+        <button class="tab-btn active" onclick="switchTab('files')">📁 Files</button>
+        <button class="tab-btn" onclick="switchTab('net')">🌐 Network</button>
+        <button class="tab-btn" onclick="switchTab('aggis')">🌾 AG/GIS</button>
+      </div>
+
+      <!-- FILE MANAGER -->
+      <div class="tab-content active" id="tab-files">
+        <div class="breadcrumb" id="breadcrumb">USB_ROOT /</div>
+        <div class="file-list" id="file-list"></div>
+      </div>
+
+      <!-- NETWORK -->
+      <div class="tab-content" id="tab-net">
+        <div class="net-tools">
+          <input type="text" id="ping-target" value="8.8.8.8" placeholder="IP or domain">
+          <button onclick="doPing()">📡 Ping</button>
+          <button onclick="scanNet()">🔍 Scan Local</button>
+        </div>
+        <pre class="terminal" id="net-output">Ready...</pre>
+      </div>
+
+      <!-- AG/GIS -->
+      <div class="tab-content" id="tab-aggis">
+        <button onclick="checkGdal()">🛰️ Check GDAL</button>
+        <button onclick="listRepos()">📚 Index Repos</button>
+        <pre class="terminal" id="aggis-output">AG/GIS tools ready...</pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <span id="status-bar">🟢 Connected | Memory: 0 entries | Role: System Admin</span>
+    <span id="usb-path"></span>
+  </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
