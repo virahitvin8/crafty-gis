@@ -1,283 +1,77 @@
 """
-CRAFTY GIS — Analysis API
-Analysis execution, workflow management, progress tracking, and report generation.
+CRAFTY GIS — Simple Analysis API
+Essential endpoints for running geospatial analyses.
 """
-
-import json
-import logging
-import uuid
-from datetime import datetime
-from typing import Any, Dict, List, Optional
-
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
+from typing import Dict, Any, Optional
+import uuid
+import json
+import os
+from pathlib import Path
 
-from app.core.workflow_engine import WorkflowEngine
 from app.core.gis_processor import GISProcessor
-from app.core.report_generator import ReportGenerator
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/analysis", tags=["analysis"])
 
-# In-memory stores
-analyses_db: Dict[str, Dict[str, Any]] = {}
-workflow_engine = WorkflowEngine()
+# In-memory storage for analysis results (in production, use a proper database or file storage)
+analysis_results: Dict[str, Dict[str, Any]] = {}
 gis_processor = GISProcessor()
-report_generator = ReportGenerator()
 
+# Supported analysis types and their required parameters
+ANALYSIS_TYPES = {
+    "ndvi": {
+        "name": "Normalized Difference Vegetation Index",
+        "description": "Calculate NDVI for vegetation health assessment",
+        "parameters": {
+            "nir_band": {"type": "int", "default": 8, "description": "Near-infrared band number"},
+            "red_band": {"type": "int", "default": 4, "description": "Red band number"}
+        }
+    },
+    "mndwi": {
+        "name": "Modified Normalized Difference Water Index",
+        "description": "Detect water bodies using green and SWIR bands",
+        "parameters": {
+            "green_band": {"type": "int", "default": 3, "description": "Green band number"},
+            "swir_band": {"type": "int", "default": 11, "description": "SWIR band number"}
+        }
+    },
+    "built_up": {
+        "name": "Built-up Index",
+        "description": "Detect urban areas using NIR and SWIR bands",
+        "parameters": {
+            "nir_band": {"type": "int", "default": 8, "description": "Near-infrared band number"},
+            "swir_band": {"type": "int", "default": 11, "description": "SWIR band number"}
+        }
+    },
+    "methane": {
+        "name": "Methane Detection",
+        "description": "Detect methane plumes using SWIR bands",
+        "parameters": {
+            "swir1_band": {"type": "int", "default": 11, "description": "First SWIR band"},
+            "swir2_band": {"type": "int", "default": 12, "description": "Second SWIR band"}
+        }
+    },
+    "lulc": {
+        "name": "Land Use/Land Cover Classification",
+        "description": "Classify land cover using satellite bands (K-means clustering)",
+        "parameters": {
+            "num_classes": {"type": "int", "default": 5, "description": "Number of land cover classes"},
+            "bands": {"type": "list", "default": [2, 3, 4, 8], "description": "Band indices to use for classification"}
+        }
+    }
+}
 
-class AnalysisCreate(BaseModel):
-    project_id: str
-    session_id: str
+class AnalysisRequest(BaseModel):
     analysis_type: str
-    title: str = ""
-    description: str = ""
     parameters: Dict[str, Any] = {}
-    intent: Dict[str, Any] = {}
-
 
 class AnalysisResponse(BaseModel):
     id: str
-    project_id: str
-    session_id: str
     analysis_type: str
-    title: str
     status: str
-    workflow_id: Optional[str] = None
-    created_at: str
-    completed_at: Optional[str] = None
-    progress: float = 0.0
-    message: str = ""
-
-
-@router.post("", response_model=AnalysisResponse)
-async def create_analysis(request: AnalysisCreate):
-    """Create and start a new analysis."""
-    analysis_id = str(uuid.uuid4())[:8]
-    now = datetime.utcnow().isoformat()
-
-    # Create workflow
-    workflow = await workflow_engine.create_workflow(
-        project_id=request.project_id,
-        session_id=request.session_id,
-        user_input=request.description or request.analysis_type,
-        context=request.intent,
-    )
-
-    analysis = {
-        "id": analysis_id,
-        "project_id": request.project_id,
-        "session_id": request.session_id,
-        "analysis_type": request.analysis_type,
-        "title": request.title or f"{request.analysis_type.replace('_', ' ').title()} Analysis",
-        "description": request.description,
-        "parameters": request.parameters,
-        "intent": request.intent,
-        "status": "created",
-        "workflow_id": workflow.id,
-        "workflow": workflow.to_dict(),
-        "created_at": now,
-        "completed_at": None,
-        "progress": 0.0,
-        "outputs": [],
-    }
-    analyses_db[analysis_id] = analysis
-
-    return AnalysisResponse(
-        id=analysis_id,
-        project_id=request.project_id,
-        session_id=request.session_id,
-        analysis_type=request.analysis_type,
-        title=analysis["title"],
-        status="created",
-        workflow_id=workflow.id,
-        created_at=now,
-        progress=0.0,
-        message=f"Analysis created with {len(workflow.tasks)} tasks in the workflow",
-    )
-
-
-@router.post("/{analysis_id}/execute")
-async def execute_analysis(analysis_id: str, background_tasks: BackgroundTasks):
-    """Execute an analysis workflow."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    if analysis["status"] not in ["created", "interrupted", "failed"]:
-        raise HTTPException(status_code=400, detail=f"Analysis in state: {analysis['status']}")
-
-    analysis["status"] = "running"
-    workflow = workflow_engine.get_workflow(analysis["workflow_id"])
-
-    if not workflow:
-        raise HTTPException(status_code=404, detail="Workflow not found")
-
-    # Execute in background
-    background_tasks.add_task(_execute_workflow_bg, analysis, workflow)
-
-    return AnalysisResponse(
-        id=analysis_id,
-        project_id=analysis["project_id"],
-        session_id=analysis["session_id"],
-        analysis_type=analysis["analysis_type"],
-        title=analysis["title"],
-        status="running",
-        workflow_id=analysis["workflow_id"],
-        created_at=analysis["created_at"],
-        progress=0.0,
-        message=f"Analysis execution started with {len(workflow.tasks)} tasks",
-    )
-
-
-async def _execute_workflow_bg(analysis: Dict, workflow: Any):
-    """Background task to execute workflow with progress updates."""
-    try:
-        async def status_callback(workflow_dict: Dict):
-            analysis["workflow"] = workflow_dict
-            completed = len([t for t in workflow.tasks if t.status.value == "completed"])
-            total = len(workflow.tasks)
-            analysis["progress"] = round((completed / total) * 100, 1) if total > 0 else 0
-
-        result = await workflow_engine.execute_workflow(workflow.id, status_callback)
-
-        analysis["status"] = "completed"
-        analysis["completed_at"] = datetime.utcnow().isoformat()
-        analysis["progress"] = 100.0
-        analysis["results"] = result
-
-        # Generate report automatically
-        report = await report_generator.generate_report(
-            analysis_type=analysis["analysis_type"],
-            data=analysis,
-            format="html",
-            title=f"{analysis['title']} — CRAFTY GIS Report",
-        )
-        analysis["report"] = report
-
-        logger.info(f"Analysis {analysis['id']} completed")
-
-    except Exception as e:
-        analysis["status"] = "failed"
-        analysis["error"] = str(e)
-        logger.error(f"Analysis {analysis['id']} failed: {e}")
-
-
-@router.get("/{analysis_id}", response_model=AnalysisResponse)
-async def get_analysis(analysis_id: str):
-    """Get analysis status and details."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    return AnalysisResponse(
-        id=analysis_id,
-        project_id=analysis["project_id"],
-        session_id=analysis["session_id"],
-        analysis_type=analysis["analysis_type"],
-        title=analysis["title"],
-        status=analysis["status"],
-        workflow_id=analysis.get("workflow_id"),
-        created_at=analysis["created_at"],
-        completed_at=analysis.get("completed_at"),
-        progress=analysis.get("progress", 0.0),
-        message=analysis.get("error", f"Analysis is {analysis['status']}"),
-    )
-
-
-@router.get("/{analysis_id}/workflow")
-async def get_workflow(analysis_id: str):
-    """Get the full workflow for an analysis."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    workflow = workflow_engine.get_workflow(analysis.get("workflow_id", ""))
-    if not workflow:
-        raise HTTPException(status_code=404, detail="Workflow not found")
-
-    return workflow.to_dict()
-
-
-@router.get("/workflow/{workflow_id}")
-async def get_workflow_by_id(workflow_id: str):
-    """Get workflow by direct workflow ID (used by frontend polling)."""
-    workflow = workflow_engine.get_workflow(workflow_id)
-    if not workflow:
-        raise HTTPException(status_code=404, detail="Workflow not found")
-    return workflow.to_dict()
-
-
-@router.get("/{analysis_id}/report")
-async def get_report(analysis_id: str):
-    """Get the generated report for an analysis."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    report = analysis.get("report")
-    if not report:
-        raise HTTPException(status_code=404, detail="Report not yet generated")
-
-    return report
-
-
-@router.get("/{analysis_id}/outputs")
-async def get_outputs(analysis_id: str):
-    """Get all outputs from an analysis."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    return {"outputs": analysis.get("outputs", [])}
-
-
-@router.post("/{analysis_id}/interrupt")
-async def interrupt_analysis(analysis_id: str):
-    """Interrupt a running analysis."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    if analysis["status"] != "running":
-        raise HTTPException(status_code=400, detail="Analysis is not running")
-
-    workflow_id = analysis.get("workflow_id", "")
-    interrupted = await workflow_engine.interrupt_workflow(workflow_id)
-
-    if interrupted:
-        analysis["status"] = "interrupted"
-        return {
-            "message": "Analysis interrupted. Provide new instructions to adjust.",
-            "analysis_id": analysis_id,
-            "workflow_id": workflow_id,
-        }
-    
-    raise HTTPException(status_code=400, detail="Could not interrupt workflow")
-
-
-@router.post("/{analysis_id}/regenerate")
-async def regenerate_analysis(analysis_id: str, new_input: Dict[str, Any]):
-    """Regenerate analysis plan with new input."""
-    analysis = analyses_db.get(analysis_id)
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Analysis not found")
-
-    workflow = await workflow_engine.regenerate_plan(
-        analysis["workflow_id"],
-        new_input.get("message", ""),
-        new_input.get("context", {}),
-    )
-
-    analysis["workflow"] = workflow.to_dict()
-    analysis["status"] = "regenerated"
-
-    return {
-        "message": "Plan regenerated with new requirements",
-        "workflow": workflow.to_dict(),
-    }
-
+    result: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
 
 @router.get("/types")
 async def get_analysis_types():
@@ -285,88 +79,229 @@ async def get_analysis_types():
     return {
         "analysis_types": [
             {
-                "id": "lulc_classification",
-                "name": "LULC Classification",
-                "description": "Land Use/Land Cover classification using satellite imagery",
-                "tools": ["python", "gdal", "rasterio"],
-                "data_sources": ["sentinel-2", "landsat"],
-            },
-            {
-                "id": "ndvi_analysis",
-                "name": "Vegetation Index Analysis",
-                "description": "NDVI, EVI, SAVI, NDWI computation and analysis",
-                "tools": ["python", "rasterio"],
-                "data_sources": ["sentinel-2", "landsat", "modis"],
-            },
-            {
-                "id": "change_detection",
-                "name": "Change Detection",
-                "description": "Multi-temporal change detection analysis",
-                "tools": ["python", "gdal", "rasterio"],
-                "data_sources": ["sentinel-2", "landsat"],
-            },
-            {
-                "id": "terrain_analysis",
-                "name": "Terrain Analysis",
-                "description": "DEM-based terrain analysis (slope, aspect, hillshade, hydrology)",
-                "tools": ["gdal", "saga_gis", "grass_gis"],
-                "data_sources": ["srtm"],
-            },
-            {
-                "id": "crop_health",
-                "name": "Crop Health Assessment",
-                "description": "Multi-index crop health and stress analysis",
-                "tools": ["python", "rasterio"],
-                "data_sources": ["sentinel-2", "landsat", "modis"],
-            },
-            {
-                "id": "urban_sprawl",
-                "name": "Urban Sprawl Analysis",
-                "description": "Urban expansion and land use conversion analysis",
-                "tools": ["python", "geopandas", "fragstats"],
-                "data_sources": ["landsat", "sentinel-2", "osm"],
-            },
-            {
-                "id": "watershed_delineation",
-                "name": "Watershed Delineation",
-                "description": "Hydrological watershed analysis from DEM",
-                "tools": ["saga_gis", "grass_gis", "gdal"],
-                "data_sources": ["srtm"],
-            },
-            {
-                "id": "flood_mapping",
-                "name": "Flood Mapping",
-                "description": "Flood extent mapping from SAR and optical imagery",
-                "tools": ["python", "gdal", "rasterio"],
-                "data_sources": ["sentinel-1", "sentinel-2"],
-            },
-            {
-                "id": "land_surface_temperature",
-                "name": "Land Surface Temperature",
-                "description": "LST retrieval from thermal infrared bands",
-                "tools": ["python", "rasterio"],
-                "data_sources": ["landsat", "modis"],
-            },
-            {
-                "id": "landscape_metrics",
-                "name": "Landscape Metrics & Fragmentation",
-                "description": "Landscape pattern and fragmentation analysis",
-                "tools": ["fragstats", "python", "geopandas"],
-                "data_sources": ["landsat", "sentinel-2"],
-            },
-            {
-                "id": "biomass_estimation",
-                "name": "Biomass & Carbon Stock Estimation",
-                "description": "Above-ground biomass and carbon stock estimation",
-                "tools": ["python", "rasterio"],
-                "data_sources": ["sentinel-2", "landsat", "gedi"],
-            },
-            {
-                "id": "soil_moisture",
-                "name": "Soil Moisture Estimation",
-                "description": "Surface soil moisture retrieval from SAR data",
-                "tools": ["python", "gdal"],
-                "data_sources": ["sentinel-1"],
-            },
+                "id": analysis_id,
+                "name": info["name"],
+                "description": info["description"],
+                "parameters": info["parameters"]
+            }
+            for analysis_id, info in ANALYSIS_TYPES.items()
         ]
     }
+
+@router.post("/run", response_model=AnalysisResponse)
+async def run_analysis(request: AnalysisRequest):
+    """Run a geospatial analysis."""
+    analysis_type = request.analysis_type
+    parameters = request.parameters
+
+    if analysis_type not in ANALYSIS_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported analysis type: {analysis_type}")
+
+    analysis_id = str(uuid.uuid4())
+
+    try:
+        # Run the analysis using the GIS processor
+        result = await _run_analysis_by_type(analysis_type, parameters)
+
+        # Store the result
+        analysis_results[analysis_id] = {
+            "analysis_type": analysis_type,
+            "parameters": parameters,
+            "result": result,
+            "status": "completed"
+        }
+
+        return AnalysisResponse(
+            id=analysis_id,
+            analysis_type=analysis_type,
+            status="completed",
+            result=result
+        )
+    except Exception as e:
+        # Store the error
+        analysis_results[analysis_id] = {
+            "analysis_type": analysis_type,
+            "parameters": parameters,
+            "error": str(e),
+            "status": "failed"
+        }
+        return AnalysisResponse(
+            id=analysis_id,
+            analysis_type=analysis_type,
+            status="failed",
+            error=str(e)
+        )
+
+@router.get("/result/{analysis_id}", response_model=AnalysisResponse)
+async def get_analysis_result(analysis_id: str):
+    """Get the result of a previously run analysis."""
+    if analysis_id not in analysis_results:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+    result_data = analysis_results[analysis_id]
+    return AnalysisResponse(
+        id=analysis_id,
+        analysis_type=result_data["analysis_type"],
+        status=result_data["status"],
+        result=result_data.get("result"),
+        error=result_data.get("error")
+    )
+
+async def _run_analysis_by_type(analysis_type: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    """Run the specific analysis type using the GIS processor."""
+    # For now, we'll use sample data. In a real app, we'd accept user-uploaded data.
+    # We'll create a sample GeoTIFF file for demonstration.
+    sample_data_path = Path(__file__).resolve().parent.parent.parent / "sample_data" / "sample.tif"
+
+    # Ensure sample data directory exists
+    sample_data_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # If sample data doesn't exist, create a simple dummy file
+    if not sample_data_path.exists():
+        # Create a dummy GeoTIFF for demonstration purposes
+        # In a real implementation, you would use actual satellite data
+        await _create_sample_data(sample_data_path)
+
+    # Run the analysis based on type
+    if analysis_type == "ndvi":
+        nir_band = parameters.get("nir_band", 8)
+        red_band = parameters.get("red_band", 4)
+        output_path = Path(__file__).resolve().parent.parent.parent / "outputs" / f"ndvi_{analysis_id}.tif"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        result = await gis_processor.compute_ndvi(
+            input_path=str(sample_data_path),
+            output_path=str(output_path),
+            nir_band=nir_band,
+            red_band=red_band
+        )
+        return {
+            "type": "ndvi",
+            "output_file": str(output_path),
+            "statistics": result.get("results", [{}])[0] if result.get("results") else {},
+            "description": "NDVI analysis completed successfully"
+        }
+
+    elif analysis_type == "mndwi":
+        green_band = parameters.get("green_band", 3)
+        swir_band = parameters.get("swir_band", 11)
+        output_path = Path(__file__).resolve().parent.parent.parent / "outputs" / f"mndwi_{analysis_id}.tif"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # For MNDWI, we'll use a similar approach but with different bands
+        # We'll create a custom function or use rasterio directly
+        result = await gis_processor._execute_rasterio("mndwi", {
+            "input_path": str(sample_data_path),
+            "output_path": str(output_path),
+            "operations": ["mndwi"],
+            "green_band": green_band,
+            "swir_band": swir_band
+        })
+        return {
+            "type": "mndwi",
+            "output_file": str(output_path),
+            "statistics": result.get("results", [{}])[0] if result.get("results") else {},
+            "description": "MNDWI analysis completed successfully"
+        }
+
+    elif analysis_type == "built_up":
+        nir_band = parameters.get("nir_band", 8)
+        swir_band = parameters.get("swir_band", 11)
+        output_path = Path(__file__).resolve().parent.parent.parent / "outputs" / f"built_up_{analysis_id}.tif"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Built-up index: (SWIR - NIR) / (SWIR + NIR)
+        result = await gis_processor._execute_rasterio("built_up", {
+            "input_path": str(sample_data_path),
+            "output_path": str(output_path),
+            "operations": ["built_up"],
+            "nir_band": nir_band,
+            "swir_band": swir_band
+        })
+        return {
+            "type": "built_up",
+            "output_file": str(output_path),
+            "statistics": result.get("results", [{}])[0] if result.get("results") else {},
+            "description": "Built-up index analysis completed successfully"
+        }
+
+    elif analysis_type == "methane":
+        swir1_band = parameters.get("swir1_band", 11)
+        swir2_band = parameters.get("swir2_band", 12)
+        output_path = Path(__file__).resolve().parent.parent.parent / "outputs" / f"methane_{analysis_id}.tif"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Methane detection: simple ratio or difference of SWIR bands
+        result = await gis_processor._execute_rasterio("methane", {
+            "input_path": str(sample_data_path),
+            "output_path": str(output_path),
+            "operations": ["methane"],
+            "swir1_band": swir1_band,
+            "swir2_band": swir2_band
+        })
+        return {
+            "type": "methane",
+            "output_file": str(output_path),
+            "statistics": result.get("results", [{}])[0] if result.get("results") else {},
+            "description": "Methane detection analysis completed successfully"
+        }
+
+    elif analysis_type == "lulc":
+        num_classes = parameters.get("num_classes", 5)
+        bands = parameters.get("bands", [2, 3, 4, 8])
+        output_path = Path(__file__).resolve().parent.parent.parent / "outputs" / f"lulc_{analysis_id}.tif"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        result = await gis_processor.classify_lulc(
+            input_path=str(sample_data_path),
+            n_classes=num_classes,
+            output_path=str(output_path)
+        )
+        return {
+            "type": "lulc",
+            "output_file": str(output_path),
+            "statistics": result.get("results", [{}])[0] if result.get("results") else {},
+            "description": "LULC classification completed successfully"
+        }
+
+    else:
+        raise ValueError(f"Unknown analysis type: {analysis_type}")
+
+async def _create_sample_data(file_path: Path):
+    """Create a sample GeoTIFF file for demonstration purposes."""
+    # We'll use rasterio to create a simple dummy multi-band image
+    code = f"""
+import rasterio
+import numpy as np
+from rasterio.transform import from_origin
+
+# Create a dummy 12-band image (100x100 pixels)
+width, height = 100, 100
+count = 12  # Number of bands
+
+# Create dummy data for each band (simple patterns)
+data = np.zeros((count, height, width), dtype=np.float32)
+for i in range(count):
+    # Create some variation per band
+    data[i] = np.random.rand(height, width) * 10000  # Simulate reflectance values
+
+# Define geotransform (upper left corner, pixel size)
+transform = from_origin(-180, 90, 0.01, 0.01)  # 0.01 degree pixels
+
+# Define CRS (WGS84)
+crs = "EPSG:4326"
+
+# Write the GeoTIFF
+profile = {{
+    'driver': 'GTiff',
+    'width': width,
+    'height': height,
+    'count': count,
+    'dtype': rasterio.float32,
+    'crs': crs,
+    'transform': transform,
+}}
+
+with rasterio.open({{file_path!r}}, 'w', **profile) as dst:
+    dst.write(data.astype(rasterio.float32))
+"""
+    # Replace the file_path placeholder
+    code = code.replace('{file_path!r}', repr(str(file_path)))
+
+    # Execute the code to create the sample data
+    await gis_processor._execute_python({"code": code})

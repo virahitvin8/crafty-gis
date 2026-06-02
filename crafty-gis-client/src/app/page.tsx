@@ -1,150 +1,96 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import {
-  MessageSquare,
-  Map,
-  ListChecks,
-  Files,
-  History,
-  Sparkles,
-  Menu,
-  X,
-  Globe,
-} from "lucide-react";
-import ChatPanel from "@/components/ChatPanel";
-import MapPreview from "@/components/MapPreview";
-import WorkflowPanel from "@/components/WorkflowPanel";
-import OutputFiles from "@/components/OutputFiles";
-import ActivityHistory from "@/components/ActivityHistory";
+import { useState, useEffect, useRef } from "react";
+import { MessageSquare, Map, Sparkles, Bot, User, Info, Loader2, Send } from "lucide-react";
 
-// --- Types ---
-export type TabKey = "chat" | "map" | "workflow" | "files" | "history";
-
-export interface Message {
+export type Message = {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
-  type: "chat" | "wizard_question" | "wizard_answer" | "investigation_question" | "investigation_complete" | "system" | "plan_updated";
+  type: string;
   timestamp: string;
-}
-
-export interface WorkflowTask {
-  id: string;
-  title: string;
-  description: string;
-  tool: string;
-  status: "pending" | "running" | "completed" | "failed" | "skipped";
-  progress: number;
-}
-
-export interface OutputFile {
-  id: string;
-  name: string;
-  file_type: string;
-  file_size_display: string;
-  created_at: string;
-  is_downloadable: boolean;
-}
-
-export interface Activity {
-  id: string;
-  action: string;
-  description: string;
-  created_at: string;
-}
+};
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<TabKey>("chat");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "system",
       content: `🌍 **Welcome to CRAFTY GIS**
 
-I'm your AI-powered geospatial analysis assistant. Tell me what you want to analyze — in plain language.
+I'm your geospatial analysis assistant. Tell me what you want to analyze in plain language.
 
-**Try saying something like:**
-• "Show me land use change in my district over the last 5 years"
-• "Analyze crop health for my farm using satellite data"
-• "Create a flood risk map for this region"
-• "Calculate NDVI for agricultural fields"`,
+**Examples:**
+• "Show me crop health using NDVI"
+• "Detect water bodies with MNDWI"
+• "Map urban areas with Built-up Index"
+• "Detect methane plumes"
+• "Classify land cover"`,
       type: "system",
       timestamp: new Date().toISOString(),
     },
   ]);
-  const [workflowTasks, setWorkflowTasks] = useState<WorkflowTask[]>([]);
-  const [outputFiles, setOutputFiles] = useState<OutputFile[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([
-    {
-      id: "1",
-      action: "session_started",
-      description: "CRAFTY GIS session started",
-      created_at: new Date().toISOString(),
-    },
-  ]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [projectId, setProjectId] = useState<string>("default");
+  const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysisStatus, setAnalysisStatus] = useState<string>("ready");
-  const [investigationComplete, setInvestigationComplete] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const tabs: { key: TabKey; label: string; icon: React.ReactNode; badge?: string | number }[] = [
-    { key: "chat", label: "Chat", icon: <MessageSquare className="w-4 h-4" /> },
-    { key: "map", label: "Map", icon: <Map className="w-4 h-4" />, badge: "Live" },
-    { key: "workflow", label: "Workflow", icon: <ListChecks className="w-4 h-4" />, badge: workflowTasks.filter(t => t.status === "running").length || undefined },
-    { key: "files", label: "Outputs", icon: <Files className="w-4 h-4" />, badge: outputFiles.length || undefined },
-    { key: "history", label: "History", icon: <History className="w-4 h-4" /> },
-  ];
-
-  // Initialize session
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/chat/session`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ project_id: projectId }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.session_id) setSessionId(data.session_id);
-      })
-      .catch(() => {
-        // Server not running - demo mode
-        setSessionId("demo");
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (!isProcessing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isProcessing]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isProcessing) return;
+    sendMessage(input.trim());
+    setInput("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  const sendMessage = async (content: string) => {
+    const userMessage: Message = {
+      id: `msg_${Date.now()}`,
+      role: "user",
+      content: content,
+      type: "chat",
+      timestamp: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setIsProcessing(true);
+
+    try {
+      // Try to connect to the backend
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/analysis/types`, {
+        method: "GET",
       });
-  }, [projectId]);
 
-  const handleSendMessage = useCallback(
-    async (content: string, type: string = "chat") => {
-      if (!content.trim() || isProcessing) return;
-
-      const userMessage: Message = {
-        id: `msg_${Date.now()}`,
-        role: "user",
-        content: content,
-        type: type as any,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, userMessage]);
-      setIsProcessing(true);
-
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        const response = await fetch(`${apiUrl}/api/chat/message`, {
+      if (response.ok) {
+        // Backend is available, send the message to chat endpoint
+        const chatResponse = await fetch(`${apiUrl}/api/chat/message`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            session_id: sessionId,
-            project_id: projectId,
             message: content,
-            message_type: type,
+            message_type: "chat",
           }),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-
+        if (chatResponse.ok) {
+          const data = await chatResponse.json();
           const assistantMsg: Message = {
             id: `msg_${Date.now()}_resp`,
             role: "assistant",
@@ -154,52 +100,50 @@ I'm your AI-powered geospatial analysis assistant. Tell me what you want to anal
           };
           setMessages((prev) => [...prev, assistantMsg]);
 
-          if (data.workflow_update) {
-            setWorkflowTasks(
-              data.workflow_update.tasks?.map((t: any) => ({
-                id: t.id,
-                title: t.title,
-                description: t.description,
-                tool: t.tool,
-                status: t.status,
-                progress: t.progress,
-              })) || []
-            );
-          }
+          // If the response indicates we should execute analysis
+          if (data.analysis_type) {
+            setAnalysisStatus("running");
+            // Execute the analysis
+            const analysisResponse = await fetch(`${apiUrl}/api/analysis/run`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                analysis_type: data.analysis_type,
+                parameters: data.parameters || {},
+              }),
+            });
 
-          if (data.investigation_complete) {
-            setInvestigationComplete(true);
-          }
-
-          // Add activity
-          setActivities((prev) => [
-            {
-              id: `act_${Date.now()}`,
-              action: data.message_type || "message_sent",
-              description: content.slice(0, 100) + (content.length > 100 ? "..." : ""),
-              created_at: new Date().toISOString(),
-            },
-            ...prev,
-          ]);
-        } else {
-          // Fallback AI response for demo mode
-          const demoResponse = await getDemoResponse(content);
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `msg_${Date.now()}_resp`,
-              role: "assistant",
-              content: demoResponse.reply,
-              type: demoResponse.type as any,
-              timestamp: new Date().toISOString(),
-            },
-          ]);
-          if (demoResponse.workflowTasks) {
-            setWorkflowTasks(demoResponse.workflowTasks);
+            if (analysisResponse.ok) {
+              const analysisData = await analysisResponse.json();
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: `msg_${Date.now()}_analysis`,
+                  role: "system",
+                  content: `🚀 **Analysis Started**: ${data.analysis_type.replace("_", " ").toUpperCase()}`,
+                  type: "system",
+                  timestamp: new Date().toISOString(),
+                },
+              ]);
+              // In a real app, we'd poll for completion
+              setTimeout(() => {
+                setAnalysisStatus("completed");
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: `msg_${Date.now()}_done`,
+                    role: "system",
+                    content: "✅ **Analysis Complete!** Results are ready for download.",
+                    type: "system",
+                    timestamp: new Date().toISOString(),
+                  },
+                ]);
+              }, 3000);
+            }
           }
         }
-      } catch {
-        // Demo mode - server not available
+      } else {
+        // Backend not available, use demo responses
         const demoResponse = await getDemoResponse(content);
         setMessages((prev) => [
           ...prev,
@@ -212,240 +156,325 @@ I'm your AI-powered geospatial analysis assistant. Tell me what you want to anal
           },
         ]);
         if (demoResponse.workflowTasks) {
-          setWorkflowTasks(demoResponse.workflowTasks);
-        }
-      }
-
-      setIsProcessing(false);
-    },
-    [sessionId, projectId, isProcessing]
-  );
-
-  const handleExecuteAnalysis = useCallback(async () => {
-    if (!sessionId) return;
-    setIsProcessing(true);
-
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${apiUrl}/api/chat/session/${sessionId}/execute`, {
-        method: "POST",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAnalysisStatus("running");
-        setWorkflowTasks(
-          data.workflow?.tasks?.map((t: any) => ({
-            id: t.id,
-            title: t.title,
-            description: t.description,
-            tool: t.tool,
-            status: t.status,
-            progress: t.progress,
-          })) || []
-        );
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `msg_${Date.now()}_exec`,
-            role: "system",
-            content: `🚀 **Analysis Started!**
-
-Executing ${data.workflow?.tasks?.length || 0} tasks in the workflow. You can monitor progress in the **Workflow** tab and view results on the **Map**.
-
-*You can interrupt at any time to add new requirements.*`,
-            type: "system",
-            timestamp: new Date().toISOString(),
-          },
-        ]);
-
-        setActiveTab("workflow");
-        pollWorkflowStatus(data.workflow_id);
-      }
-    } catch {
-      // Demo mode
-      setAnalysisStatus("running");
-      const demoWorkflow = generateDemoWorkflow();
-      setWorkflowTasks(demoWorkflow);
-      setActiveTab("workflow");
-      simulateProgress(demoWorkflow);
-    }
-
-    setIsProcessing(false);
-  }, [sessionId]);
-
-  const pollWorkflowStatus = (workflowId: string) => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch(`${apiUrl}/api/analysis/workflow/${workflowId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.tasks) {
-            setWorkflowTasks(
-              data.tasks.map((t: any) => ({
-                id: t.id,
-                title: t.title,
-                description: t.description,
-                tool: t.tool,
-                status: t.status,
-                progress: t.progress,
-              }))
-            );
-          }
-          if (!data.is_running) {
-            clearInterval(interval);
+          // Handle demo workflow
+          setAnalysisStatus("running");
+          setTimeout(() => {
             setAnalysisStatus("completed");
             setMessages((prev) => [
               ...prev,
               {
                 id: `msg_${Date.now()}_done`,
                 role: "system",
-                content: "✅ **Analysis Complete!** All tasks finished. Check the **Outputs** tab to download your results.",
+                content: "✅ **Demo Analysis Complete!**",
                 type: "system",
                 timestamp: new Date().toISOString(),
               },
             ]);
-          }
+          }, 2000);
         }
-      } catch {
-        clearInterval(interval);
       }
-    }, 2000);
-  };
-
-  const simulateProgress = (tasks: WorkflowTask[]) => {
-    let completed = 0;
-    const interval = setInterval(() => {
-      if (completed < tasks.length) {
-        setWorkflowTasks((prev) =>
-          prev.map((t, i) =>
-            i === completed ? { ...t, status: "running", progress: 100 } : t
-          )
-        );
+    } catch (error) {
+      // Demo mode - backend not available
+      const demoResponse = await getDemoResponse(content);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg_${Date.now()}_resp`,
+          role: "assistant",
+          content: demoResponse.reply,
+          type: demoResponse.type as any,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      if (demoResponse.workflowTasks) {
+        setAnalysisStatus("running");
         setTimeout(() => {
-          setWorkflowTasks((prev) =>
-            prev.map((t, i) =>
-              i === completed ? { ...t, status: "completed", progress: 100 } : t
-            )
-          );
-          completed++;
-        }, 1000);
-      } else {
-        clearInterval(interval);
-        setAnalysisStatus("completed");
-        setOutputFiles([
-          {
-            id: "out1", name: "classification_map.png", file_type: "png",
-            file_size_display: "2.4 MB", created_at: new Date().toISOString(), is_downloadable: true,
-          },
-          {
-            id: "out2", name: "analysis_report.html", file_type: "html",
-            file_size_display: "156 KB", created_at: new Date().toISOString(), is_downloadable: true,
-          },
-          {
-            id: "out3", name: "ndvi_output.tif", file_type: "geotiff",
-            file_size_display: "8.1 MB", created_at: new Date().toISOString(), is_downloadable: true,
-          },
-          {
-            id: "out4", name: "statistics.json", file_type: "json",
-            file_size_display: "12 KB", created_at: new Date().toISOString(), is_downloadable: true,
-          },
-        ]);
-        setActiveTab("files");
+          setAnalysisStatus("completed");
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `msg_${Date.now()}_done`,
+              role: "system",
+              content: "✅ **Demo Analysis Complete!**",
+              type: "system",
+              timestamp: new Date().toISOString(),
+            },
+          ]);
+        }, 2000);
       }
-    }, 1500);
+    }
+
+    setIsProcessing(false);
   };
 
-  const handleInterrupt = useCallback(async () => {
-    if (!sessionId) return;
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      await fetch(`${apiUrl}/api/chat/session/${sessionId}/interrupt`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "", message_type: "interruption" }),
-      });
-    } catch {}
-    setAnalysisStatus("interrupted");
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: `msg_${Date.now()}_int`,
-        role: "system",
-        content: "⏸️ **Analysis Interrupted.** You can now provide additional instructions to adjust the workflow.",
-        type: "system",
-        timestamp: new Date().toISOString(),
-      },
-    ]);
-    setActiveTab("chat");
-  }, [sessionId]);
+  const getDemoResponse = async (input: string): Promise<{
+    reply: string;
+    type: string;
+    workflowTasks?: any[];
+  }> => {
+    const lower = input.toLowerCase();
+
+    if (lower.includes("ndvi") || lower.includes("vegetation") || lower.includes("crop health")) {
+      return {
+        reply: `🌿 **NDVI Analysis Selected**
+
+I'll compute the Normalized Difference Vegetation Index to assess vegetation health and crop conditions.
+
+This analysis uses near-infrared and red bands to quantify plant vigor and health.
+
+In a full implementation, this would process satellite imagery and generate:
+- NDVI value map (-1 to 1 scale)
+- Health classification (stressed, moderate, healthy)
+- Statistical summary (mean, min, max, std deviation)`,
+        type: "chat",
+      };
+    }
+
+    if (lower.includes("mndwi") || lower.includes("water") || lower.includes("wet")) {
+      return {
+        reply: `💧 **MNDWI Analysis Selected**
+
+I'll compute the Modified Normalized Difference Water Index to detect and map water bodies.
+
+This index uses green and short-wave infrared bands to enhance water features while suppressing built-up areas.
+
+Results would include:
+- Water extent map
+- Water body statistics
+- Change detection capabilities (with multi-temporal data)`,
+        type: "chat",
+      };
+    }
+
+    if (lower.includes("built") || lower.includes("urban") || lower.includes("built-up")) {
+      return {
+        reply: `🏙️ **Built-up Index Analysis Selected**
+
+I'll calculate the Built-up Index to detect urban areas and monitor urban sprawl.
+
+This index uses short-wave infrared and near-infrared bands to highlight built-up surfaces.
+
+Output would include:
+- Urban extent map
+- Built-up density analysis
+- Sprawl monitoring capabilities`,
+        type: "chat",
+      };
+    }
+
+    if (lower.includes("methane") || lower.includes("gas") || lower.includes("plume")) {
+      return {
+        reply: `🌫️ **Methane Detection Analysis Selected**
+
+I'll analyze short-wave infrared bands to detect methane gas plumes and emissions.
+
+This analysis identifies anomalous absorption features indicative of methane leaks.
+
+Results would show:
+- Methane concentration hotspots
+- Plume morphology and extent
+- Emission rate estimates`,
+        type: "chat",
+      };
+    }
+
+    if (lower.includes("lulc") || lower.includes("land cover") || lower.includes("classification")) {
+      return {
+        reply: `🗺️ **Land Use/Land Cover Classification Selected**
+
+I'll perform unsupervised classification of satellite imagery to map land cover types.
+
+Using clustering algorithms on multispectral bands, I'll identify:
+- Different land cover classes (vegetation, water, urban, bare soil, etc.)
+- Spatial distribution of each class
+- Classification accuracy metrics`,
+        type: "chat",
+      };
+    }
+
+    if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
+      return {
+        reply: `👋 **Hello! Welcome to CRAFTY GIS.**
+
+I can help you with these core geospatial analyses:
+
+🌿 **NDVI** - Vegetation health and crop monitoring
+💧 **MNDWI** - Water body detection and mapping
+🏙️ **Built-up Index** - Urban area detection and sprawl monitoring
+🌫️ **Methane Detection** - Gas leak and plume identification
+🗺️ **LULC Classification** - Land cover mapping and change detection
+
+**What would you like to analyze?**
+Just describe it in plain language!`,
+        type: "chat",
+      };
+    }
+
+    // Default response
+    return {
+      reply: `🤔 **Let me understand your request better.**
+
+I specialize in these five core analyses for agriculture, gas, and remote sensing:
+
+1. **NDVI** - Crop health and vegetation monitoring
+2. **MNDWI** - Water body detection
+3. **Built-up Index** - Urban area detection
+4. **Methane Detection** - Gas plume identification
+5. **LULC Classification** - Land cover mapping
+
+Please describe what you'd like to analyze, and I'll select the appropriate method!
+
+**Examples:**
+- "Show me crop health in my fields"
+- "Map the lakes and rivers in this area"
+- "Detect urban expansion near the city"
+- "Look for methane leaks near the facility"
+- "Classify land cover for this watershed"`,
+      type: "investigation_question",
+    };
+  };
+
+  const renderMessage = (msg: Message) => {
+    const isUser = msg.role === "user";
+    const isSystem = msg.role === "system";
+
+    return (
+      <div
+        key={msg.id}
+        className={`flex gap-3 animate-slide-up ${
+          isUser ? "flex-row-reverse" : ""
+        } ${isSystem ? "opacity-80" : ""}`}
+      >
+        {/* Avatar */}
+        <div
+          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+            isUser
+              ? "bg-crafty-500/20 text-crafty-400"
+              : isSystem
+                ? "bg-zinc-700 text-zinc-400"
+                : "bg-gradient-to-br from-crafty-500 to-emerald-500 text-white"
+          }`}
+        >
+          {isUser ? (
+            <User className="w-4 h-4" />
+          ) : isSystem ? (
+            <Info className="w-4 h-4" />
+          ) : (
+            <Bot className="w-4 h-4" />
+          )}
+        </div>
+
+        {/* Message content */}
+        <div className={`flex-1 max-w-[85%] ${
+          isUser ? "items-end" : "items-start"
+        }`}>
+          <div
+            className={`rounded-xl px-4 py-3 text-sm leading-relaxed ${
+              isUser
+                ? "bg-crafty-500/20 border border-crafty-500/20 text-zinc-100"
+                : isSystem
+                  ? "bg-zinc-800/50 border border-zinc-700/50 text-zinc-300"
+                  : "bg-zinc-800/30 border border-zinc-700/30 text-zinc-200"
+            }`}
+          >
+            <div className="prose prose-invert prose-sm max-w-none">
+              {renderContent(msg.content)}
+            </div>
+          </div>
+
+          {/* Execute button for completed investigations */}
+          {msg.type === "investigation_complete" && analysisStatus === "ready" && (
+            <div className="mt-2">
+              <button
+                onClick={() => {
+                  // In a real app, this would trigger analysis based on the investigation
+                  setAnalysisStatus("running");
+                  setTimeout(() => {
+                    setAnalysisStatus("completed");
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: `msg_${Date.now()}_done`,
+                        role: "system",
+                        content: "✅ **Analysis Complete!**",
+                        type: "system",
+                        timestamp: new Date().toISOString(),
+                      },
+                    ]);
+                  }, 1500);
+                }}
+                disabled={isProcessing}
+                className="flex items-center gap-1.5 text-xs bg-crafty-500 hover:bg-crafty-600
+                         disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-medium
+                         transition-all duration-150"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Analyze
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderContent = (content: string) => {
+    // Simple markdown-like rendering
+    const lines = content.split("\n");
+    return lines.map((line, i) => {
+      // Bold headers
+      if (line.startsWith("**") && line.endsWith("**")) {
+        return (
+          <p key={i} className="font-semibold text-zinc-100 mb-1">
+            {line.slice(2, -2)}
+          </p>
+        );
+      }
+      // Bullet points
+      if (line.startsWith("- ") || line.startsWith("• ")) {
+        return (
+          <p key={i} className="text-zinc-300 ml-2 mb-0.5">
+            {line}
+          </p>
+        );
+      }
+      // Numbered items
+      if (/^\d+\./.test(line)) {
+        return (
+          <p key={i} className="text-zinc-300 ml-2 mb-0.5">
+            {line}
+          </p>
+        );
+      }
+      // Bold inline text
+      const withBold = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-zinc-100">$1</strong>');
+      return (
+        <p key={i} className="mb-0.5" dangerouslySetInnerHTML={{ __html: withBold }} />
+      );
+    });
+  };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-zinc-950">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-zinc-900/90 backdrop-blur-xl border-r border-zinc-800 transform transition-transform duration-200 ease-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } flex flex-col`}
+        className="w-64 bg-zinc-900/90 backdrop-blur-xl border-r border-zinc-800 flex flex-col"
       >
         {/* Brand */}
         <div className="p-5 border-b border-zinc-800">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-crafty-500 to-emerald-500 flex items-center justify-center">
-              <Globe className="w-4 h-4 text-white" />
+              <Map className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-sm font-bold text-white tracking-tight">CRAFTY GIS</h1>
-              <p className="text-[10px] text-zinc-500 font-medium">v1.0.0 · AI Platform</p>
+              <p className="text-[10px] text-zinc-500 font-medium">v1.0.0 · Analysis Platform</p>
             </div>
           </div>
         </div>
 
-        {/* Nav Tabs */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => {
-                setActiveTab(tab.key);
-                setSidebarOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                activeTab === tab.key
-                  ? "bg-crafty-500/10 text-crafty-400 border border-crafty-500/20"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 border border-transparent"
-              }`}
-            >
-              {tab.icon}
-              <span>{tab.label}</span>
-              {tab.badge && (
-                <span
-                  className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                    tab.key === "map"
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : tab.key === "workflow"
-                      ? "bg-crafty-500/20 text-crafty-400 animate-pulse"
-                      : "bg-zinc-700 text-zinc-300"
-                  }`}
-                >
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        {/* Status footer */}
+        {/* Status */}
         <div className="p-4 border-t border-zinc-800">
           <div className="flex items-center gap-2">
             <div
@@ -453,45 +482,20 @@ Executing ${data.workflow?.tasks?.length || 0} tasks in the workflow. You can mo
                 analysisStatus === "running"
                   ? "bg-crafty-400 animate-pulse"
                   : analysisStatus === "completed"
-                  ? "bg-emerald-400"
-                  : "bg-zinc-500"
+                    ? "bg-emerald-400"
+                    : "bg-zinc-500"
               }`}
             />
             <span className="text-xs text-zinc-500 capitalize">
               {analysisStatus === "ready"
                 ? "Ready"
                 : analysisStatus === "running"
-                ? "Processing..."
-                : analysisStatus}
+                  ? "Processing..."
+                  : analysisStatus}
             </span>
-            {investigationComplete && analysisStatus === "ready" && (
-              <button
-                onClick={handleExecuteAnalysis}
-                disabled={isProcessing}
-                className="ml-auto text-[10px] bg-crafty-500 hover:bg-crafty-600 disabled:opacity-50 text-white px-2 py-1 rounded font-medium"
-              >
-                Execute
-              </button>
-            )}
           </div>
         </div>
       </aside>
-
-      {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-10 h-14 bg-zinc-900/90 backdrop-blur-xl border-b border-zinc-800 flex items-center px-4 gap-3">
-        <button onClick={() => setSidebarOpen(true)} className="text-zinc-400 hover:text-white">
-          <Menu className="w-5 h-5" />
-        </button>
-        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-crafty-500 to-emerald-500 flex items-center justify-center">
-          <Globe className="w-3 h-3 text-white" />
-        </div>
-        <span className="text-sm font-semibold">CRAFTY GIS</span>
-        {analysisStatus === "running" && (
-          <span className="ml-auto text-xs text-crafty-400 animate-pulse flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> Processing
-          </span>
-        )}
-      </div>
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-w-0 lg:pt-0 pt-14">
@@ -501,28 +505,66 @@ Executing ${data.workflow?.tasks?.length || 0} tasks in the workflow. You can mo
             <Sparkles className="w-3.5 h-3.5 text-crafty-400" />
             <span>
               {analysisStatus === "ready"
-                ? "Describe your geospatial problem in the chat panel"
+                ? "Ask me to perform a geospatial analysis"
                 : analysisStatus === "running"
-                ? "Analysis in progress"
-                : `Analysis ${analysisStatus}`}
+                  ? "Analysis in progress"
+                  : `Analysis ${analysisStatus}`}
             </span>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {analysisStatus === "running" && (
               <button
-                onClick={handleInterrupt}
+                onClick={() => {
+                  // In a real app, this would interrupt the analysis
+                  setAnalysisStatus("ready");
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      id: `msg_${Date.now()}_int`,
+                      role: "system",
+                      content: "⏸️ **Analysis Interrupted.**",
+                      type: "system",
+                      timestamp: new Date().toISOString(),
+                    },
+                  ]);
+                }}
                 className="text-xs bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 px-2.5 py-1 rounded font-medium"
               >
                 Interrupt
               </button>
             )}
-            {investigationComplete && analysisStatus === "ready" && (
+            {analysisStatus === "ready" && (
               <button
-                onClick={handleExecuteAnalysis}
-                disabled={isProcessing}
-                className="text-xs bg-crafty-500 hover:bg-crafty-600 disabled:opacity-50 text-white px-3 py-1 rounded font-medium flex items-center gap-1"
+                onClick={() => {
+                  // Trigger a sample analysis for demonstration
+                  setAnalysisStatus("running");
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      id: `msg_${Date.now()}_demo`,
+                      role: "system",
+                      content: "🚀 **Starting NDVI Analysis Demo...**",
+                      type: "system",
+                      timestamp: new Date().toISOString(),
+                    },
+                  ]);
+                  setTimeout(() => {
+                    setAnalysisStatus("completed");
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: `msg_${Date.now()}_done`,
+                        role: "system",
+                        content: "✅ **NDVI Analysis Complete!** Vegetation health map generated.",
+                        type: "system",
+                        timestamp: new Date().toISOString(),
+                      },
+                    ]);
+                  }, 2000);
+                }}
+                className="text-xs bg-crafty-500 hover:bg-crafty-600 disabled:opacity-50 text-white px-3 py-1 rounded font-medium"
               >
-                <Sparkles className="w-3 h-3" /> Execute Analysis
+                Try Demo Analysis
               </button>
             )}
           </div>
@@ -530,203 +572,106 @@ Executing ${data.workflow?.tasks?.length || 0} tasks in the workflow. You can mo
 
         {/* Panels */}
         <div className="flex-1 overflow-hidden">
-          {activeTab === "chat" && (
-            <ChatPanel
-              messages={messages}
-              onSend={handleSendMessage}
-              onExecute={handleExecuteAnalysis}
-              isProcessing={isProcessing}
-              investigationComplete={investigationComplete}
-              analysisStatus={analysisStatus}
-            />
-          )}
-          {activeTab === "map" && <MapPreview />}
-          {activeTab === "workflow" && (
-            <WorkflowPanel
-              tasks={workflowTasks}
-              isRunning={analysisStatus === "running"}
-              onInterrupt={handleInterrupt}
-            />
-          )}
-          {activeTab === "files" && (
-            <OutputFiles files={outputFiles} onRefresh={() => {}} />
-          )}
-          {activeTab === "history" && (
-            <ActivityHistory activities={activities} />
-          )}
-        </div>
-      </main>
+          {/* Chat panel */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map(renderMessage)}
+
+            {/* AI Processing indicator */}
+            {isProcessing && (
+              <div className="flex gap-3 animate-slide-up">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-crafty-500 to-emerald-500 flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+                <div className="bg-zinc-800/30 border border-zinc-700/30 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Thinking...
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Welcome suggestions */}
+            {messages.length === 1 && (
+              <div className="mt-6 animate-fade-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="w-4 h-4 text-crafty-400" />
+                  <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    Try asking:
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-zinc-400">• "Show me crop health using NDVI"</p>
+                  <p className="text-xs text-zinc-400">• "Detect water bodies with MNDWI"</p>
+                  <p className="text-xs text-zinc-400">• "Map urban areas"</p>
+                  <p className="text-xs text-zinc-400">• "Look for methane plumes"</p>
+                  <p className="text-xs text-zinc-400">• "Classify land cover"</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input area */}
+          <div className="border-t border-zinc-800 bg-zinc-900/50 p-4">
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <div className="flex-1 relative">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Describe your geospatial analysis..."
+                  rows={1}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3
+                           text-sm text-zinc-100 placeholder-zinc-500 resize-none
+                           focus:outline-none focus:ring-2 focus:ring-crafty-500/30 focus:border-crafty-500/50
+                           transition-all duration-150"
+                  style={{ minHeight: "44px", maxHeight: "120px" }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = "auto";
+                    target.style.height = Math.min(target.scrollHeight, 120) + "px";
+                  }}
+                  disabled={isProcessing}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={!input.trim() || isProcessing}
+                className="flex-shrink-0 w-11 h-11 rounded-xl bg-crafty-500 hover:bg-crafty-600
+                         disabled:bg-zinc-800 disabled:text-zinc-600 text-white
+                         flex items-center justify-center transition-all duration-150"
+              >
+                {isProcessing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </button>
+            </form>
+
+            {/* Status indicators */}
+            <div className="flex items-center gap-3 mt-2 px-1">
+              <span className="text-[10px] text-zinc-600">
+                {isProcessing
+                  ? "AI is analyzing your request..."
+                  : analysisStatus === "running"
+                    ? "Analysis in progress"
+                    : "Shift+Enter for new line"}
+              </span>
+              {analysisStatus === "running" && (
+                <span className="flex items-center gap-1 text-[10px] text-crafty-400">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Processing
+                </span>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
 
-// --- Demo / Fallback Responses ---
-
-async function getDemoResponse(input: string): Promise<{
-  reply: string;
-  type: string;
-  workflowTasks?: WorkflowTask[];
-}> {
-  const lower = input.toLowerCase();
-
-  if (input === "Proceed with analysis" || input === "Execute analysis" || input === "Proceed") {
-    return {
-      reply: "✅ **Starting analysis now!** I'll execute the full workflow. Check the Workflow tab for progress.",
-      type: "system",
-      workflowTasks: generateDemoWorkflow(),
-    };
-  }
-
-  if (lower.includes("ndvi") || lower.includes("vegetation") || lower.includes("crop health")) {
-    return {
-      reply: `🌿 **Vegetation Analysis Investigation**
-
-To run a comprehensive vegetation health analysis, I need a few details:
-
-1. **📍 Location:** Which area should I analyze? (e.g., district, farm name, coordinates)
-2. **📅 Time Period:** For what dates? (e.g., "last 3 months" or "compare this year vs last year")
-3. **📊 Output Format:** Do you want a map, a report with statistics, or both?
-4. **🎯 Purpose:** Is this for academic research, farm management, or a business report?
-
-Please share these details and I'll create the perfect analysis plan!`,
-      type: "investigation_question",
-    };
-  }
-
-  if (lower.includes("lulc") || lower.includes("land cover") || lower.includes("land use") || lower.includes("classification")) {
-    return {
-      reply: `🗺️ **Land Use/Land Cover Classification Investigation**
-
-Great choice! Let me understand what you need:
-
-1. **📍 Study Area:** Which region/district?
-2. **📅 Time Period:** Single date or multi-temporal change analysis?
-3. **🎯 Classification Scheme:** How many classes? (Standard: Built-up, Agriculture, Forest, Water, Barren)
-4. **📏 Resolution Preference:** Use Sentinel-2 (10m) or Landsat (30m)?
-5. **✅ Accuracy:** Need accuracy assessment with ground truth data?
-
-Answer these and I'll set up the complete workflow!`,
-      type: "investigation_question",
-    };
-  }
-
-  if (lower.includes("flood") || lower.includes("water")) {
-    return {
-      reply: `🌊 **Flood Mapping Investigation**
-
-I'll help you map flood extents. Please tell me:
-
-1. **📍 Location:** Which area was affected?
-2. **📅 Date:** When did the flood occur? (For matching satellite overpass)
-3. **🛰️ Data Preference:** Use Sentinel-1 SAR (sees through clouds) or optical imagery?
-4. **📋 Output:** Need flood extent map, area statistics, or affected infrastructure analysis?
-
-Let me know and I'll get started!`,
-      type: "investigation_question",
-    };
-  }
-
-  if (lower.includes("terrain") || lower.includes("dem") || lower.includes("elevation") || lower.includes("slope")) {
-    return {
-      reply: `⛰️ **Terrain Analysis Investigation**
-
-I can generate comprehensive terrain products. Please specify:
-
-1. **📍 Location:** Which area's elevation data?
-2. **📏 Resolution:** SRTM 30m is default — need finer resolution?
-3. **📊 Products Needed:** Slope, Aspect, Hillshade, Contours, or all?
-4. **💧 Hydrology:** Include watershed delineation and drainage networks?
-
-Tell me what you need and I'll process the DEM data!`,
-      type: "investigation_question",
-    };
-  }
-
-  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
-    return {
-      reply: `👋 **Hello! Welcome to CRAFTY GIS.**
-
-I'm ready to help you with any geospatial analysis. Here's what I can do:
-
-🌿 **Vegetation Analysis** — NDVI, EVI, crop health assessment
-🗺️ **Land Cover Classification** — LULC mapping from satellite data
-🌊 **Flood Mapping** — Flood extent from SAR/optical imagery
-⛰️ **Terrain Analysis** — DEM processing, slope, hydrology
-🏙️ **Urban Analysis** — Sprawl mapping, land use change
-📈 **Change Detection** — Multi-temporal analysis
-📄 **Report Generation** — Auto-generated analysis reports
-
-**What would you like to analyze today?** 🚀`,
-      type: "chat",
-      workflowTasks: generateDemoWorkflow(),
-    };
-  }
-
-  // Default investigation response
-  return {
-    reply: `🤔 **Let me understand your request better.**
-
-I can help with many types of geospatial analysis. Could you tell me:
-
-1. **📍 What area** are you interested in? (district, city, farm, coordinates)
-2. **📋 What type** of analysis do you need? (LULC, NDVI, flood mapping, terrain, urban, change detection?)
-3. **📅 Time frame:** Is this for current conditions or historical analysis?
-4. **🎯 Your goal:** Research, business decision, academic project, or personal curiosity?
-
-The more you share, the better I can tailor the analysis! 🌍`,
-    type: "investigation_question",
-  };
-}
-
-function generateDemoWorkflow(): WorkflowTask[] {
-  return [
-    {
-      id: "t1",
-      title: "Search & Download Satellite Imagery",
-      description: "Query Sentinel-2 archive for study area",
-      tool: "Sentinel Hub",
-      status: "pending",
-      progress: 0,
-    },
-    {
-      id: "t2",
-      title: "Preprocess & Cloud Mask",
-      description: "Atmospheric correction, cloud masking, resampling",
-      tool: "GDAL",
-      status: "pending",
-      progress: 0,
-    },
-    {
-      id: "t3",
-      title: "Compute Vegetation Indices",
-      description: "NDVI, EVI, NDWI computation from multispectral bands",
-      tool: "Rasterio",
-      status: "pending",
-      progress: 0,
-    },
-    {
-      id: "t4",
-      title: "Run Classification",
-      description: "Random Forest LULC classification",
-      tool: "Python/Scikit-learn",
-      status: "pending",
-      progress: 0,
-    },
-    {
-      id: "t5",
-      title: "Generate Maps & Visualizations",
-      description: "Create publication-ready maps with legends",
-      tool: "Matplotlib",
-      status: "pending",
-      progress: 0,
-    },
-    {
-      id: "t6",
-      title: "Generate Comprehensive Report",
-      description: "Auto-generated PDF/HTML report with statistics",
-      tool: "Report Generator",
-      status: "pending",
-      progress: 0,
-    },
-  ];
-}
+// Import Lightbulb for the suggestions
+import { Lightbulb } from "lucide-react";

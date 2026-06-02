@@ -132,6 +132,27 @@ docs/build/
 # =============================================================================
 src-tauri/target/
 src-tauri/gen/
+desktop/
+build_exe.py
+build-frontend.js
+versions/
+
+# =============================================================================
+# Binary files & large artifacts
+# =============================================================================
+*.db
+*.sqlite
+*.sqlite3
+GIT_STAR/xlsx/scripts/Xlsx
+GIT_STAR/docx/validator/DocumentFormat.OpenXml.dll
+GIT_STAR/*.docx
+GIT_STAR/*.png
+GIT_STAR/*.gif
+GIT_STAR/*.tif
+GIT_STAR/*.tiff
+GIT_STAR/*.geojson
+GIT_STAR/assignment_images/
+GIT_STAR/data_run/
 
 # =============================================================================
 # Graphify & agent memory
