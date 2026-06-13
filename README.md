@@ -112,16 +112,14 @@ Runs on **Ollama** (local) → **LM Studio** → **Hugging Face free API**. Zero
 
 > **Everything works with a single command. That's the whole point.**
 
-### 🐧 Linux
+### 🐧 Linux / macOS (True One-Click Setup)
 ```bash
-git clone https://github.com/virahitvin8/crafty-gis.git
-cd crafty-gis
-chmod +x start.sh
-./start.sh
+curl -fsSL https://raw.githubusercontent.com/virahitvin8/crafty-gis/main/install.sh | bash
 ```
+*This instantly downloads and launches the entire platform in one go!*
 
 ### 🪟 Windows
-```batch
+```bat
 git clone https://github.com/virahitvin8/crafty-gis.git
 cd crafty-gis
 start.bat
