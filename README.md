@@ -118,11 +118,10 @@ curl -fsSL https://raw.githubusercontent.com/virahitvin8/crafty-gis/main/install
 ```
 *This instantly downloads and launches the entire platform in one go!*
 
-### 🪟 Windows
-```bat
-git clone https://github.com/virahitvin8/crafty-gis.git
-cd crafty-gis
-start.bat
+### 🪟 Windows (True One-Click Setup)
+Open **PowerShell** and paste:
+```powershell
+irm https://raw.githubusercontent.com/virahitvin8/crafty-gis/main/install.ps1 | iex
 ```
 
 ### 📱 Android (Install as App)
