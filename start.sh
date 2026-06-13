@@ -45,7 +45,14 @@ cd "$SERVER_DIR"
 
 if [ ! -d "venv" ]; then
     echo "     Creating virtual environment..."
-    python3 -m venv venv
+    if ! python3 -m venv venv; then
+        echo ""
+        echo -e "${RED}❌ Failed to create virtual environment.${NC}"
+        echo -e "${YELLOW}On Debian/Ubuntu systems, you are missing the python3-venv package.${NC}"
+        echo -e "Please run this command in your terminal, then try again:"
+        echo -e "\n    ${GREEN}sudo apt install -y python3-venv python3.12-venv${NC}\n"
+        exit 1
+    fi
 fi
 
 source venv/bin/activate
