@@ -341,6 +341,8 @@ crafty-gis/
 
 <img src="https://github-readme-stats.vercel.app/api?username=virahitvin8&show_icons=true&theme=tokyonight&hide_border=true&bg_color=09090b&title_color=0c8ee7&icon_color=059669&text_color=e4e4e7&ring_color=0c8ee7" height="165"/>
 
+<img src="docs/assets/logo.png" height="165" alt="CRAFTY GIS Logo" style="margin: 0 10px;" />
+
 <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=virahitvin8&layout=compact&theme=tokyonight&hide_border=true&bg_color=09090b&title_color=0c8ee7&text_color=e4e4e7&langs_count=8" height="165"/>
 
 </div>
