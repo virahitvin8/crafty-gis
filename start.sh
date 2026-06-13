@@ -43,8 +43,9 @@ fi
 echo -e "${BLUE}[1/4] Setting up Python backend...${NC}"
 cd "$SERVER_DIR"
 
-if [ ! -d "venv" ]; then
+if [ ! -f "venv/bin/activate" ]; then
     echo "     Creating virtual environment..."
+    rm -rf venv  # Remove broken venv if it exists
     if ! python3 -m venv venv; then
         echo ""
         echo -e "${RED}❌ Failed to create virtual environment.${NC}"
