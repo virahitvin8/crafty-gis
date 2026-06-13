@@ -1,459 +1,489 @@
 <div align="center">
-  <img src="crafty-gis/src-tauri/icons/logo.svg" alt="CRAFTY GIS Logo" width="180" height="180"/>
-  
-  # 🌍 CRAFTY GIS
-  
-  **C**onversational **R**emote **A**nalysis & **F**ield **T**echnology for **G**eographic **I**nformation **S**ystems
-  
-  ### *AI-Powered Geospatial Intelligence Platform*
-  
-  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-  [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
-  [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-  [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)](https://fastapi.tiangolo.com/)
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-  [![GitHub Stars](https://img.shields.io/github/stars/virahitvin8/crafty-gis?style=social)](https://github.com/virahitvin8/crafty-gis)
-  
-  <br/>
-  
-  **You describe the problem. CRAFTY GIS solves it.**
-  
-  *"Making Earth observation intelligence accessible to everyone"*
-  
-  <br/>
+
+<img src="docs/assets/logo.png" width="150" alt="CRAFTY GIS Logo" />
+
+<!-- CAPSULE RENDER header (kyechan99/capsule-render) -->
+<img src="https://capsule-render.vercel.app/api?type=waving&amp;color=0:0c8ee7,50:059669,100:065f46&amp;height=200&amp;section=header&amp;text=CRAFTY%20GIS&amp;fontSize=72&amp;fontColor=fde047&amp;fontAlignY=38&amp;desc=Conversational%20Remote%20Analysis%20and%20Field%20Technology%20for%20GIS&amp;descAlignY=60&amp;descSize=16&amp;animation=fadeIn" width="100%"/>
+
+<!-- PIXEL PROFILE badge row (LuciNyan/pixel-profile style) -->
+<br/>
+
+[![GitHub Stars](https://img.shields.io/github/stars/virahitvin8/crafty-gis?style=for-the-badge&logo=starship&color=0c8ee7&labelColor=09090b)](https://github.com/virahitvin8/crafty-gis/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/virahitvin8/crafty-gis?style=for-the-badge&logo=git&color=059669&labelColor=09090b)](https://github.com/virahitvin8/crafty-gis/network)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg?style=for-the-badge&logo=gnu&labelColor=09090b)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge&logo=github&labelColor=09090b)](CONTRIBUTING.md)
+
+<br/>
+
+<!-- BADGES (alexandresanlim/Badges4-README.md-Profile style) -->
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20AI-FF6B35?style=flat-square&logo=llama&logoColor=white)
+![GDAL](https://img.shields.io/badge/GDAL-Geospatial-5CAD00?style=flat-square&logo=qgis&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-Android%20Ready-5A0FC8?style=flat-square&logo=pwa&logoColor=white)
+![Open Source](https://img.shields.io/badge/100%25-Open%20Source-00b4d8?style=flat-square&logo=opensourceinitiative&logoColor=white)
+
+<br/>
+
+> *"You describe the problem. CRAFTY GIS solves it."*
+> 
+> **The only GIS platform where your expertise is optional — the AI's isn't.**
+
 </div>
 
 ---
 
-## 🎯 What is CRAFTY GIS?
+<!-- CAPSULE RENDER divider (kyechan99/capsule-render) -->
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0c8ee7,100:059669&height=2&section=header" width="100%"/>
 
-**CRAFTY GIS** is an **open-source, AI-powered geospatial intelligence platform** that makes satellite data analysis and GIS problem-solving accessible to **everyone** — researchers, students, farmers, businesses, and government officers.
+## 🌍 What is CRAFTY GIS?
 
-Unlike traditional GIS software that gives you *tools* and expects you to know what to do, CRAFTY GIS listens to your problem in **plain language**, asks smart clarifying questions, and then **automatically orchestrates** the entire analysis workflow — from data download to final report.
+**CRAFTY GIS** stands for **C**onversational **R**emote **A**nalysis & **F**ield **T**echnology for **G**eographic **I**nformation **S**ystems.
 
-### 🗣️ How It Works
+It is a **free, open-source, AI-powered geospatial intelligence platform** that makes satellite data analysis and GIS problem-solving accessible to **everyone** — researchers, students, farmers, businesses, and government officers.
 
-```
-1️⃣ You describe → "Show me how forest cover in my district changed from 2010 to 2024"
-2️⃣ AI investigates → Asks targeted questions to understand exactly what you need
-3️⃣ System orchestrates → Selects tools, downloads data, runs the analysis
-4️⃣ Delivers results → Maps, reports, raw data files — all downloadable
-5️⃣ Adapts mid-workflow → Interrupt anytime to add new requirements
+Unlike traditional GIS software (ArcGIS, QGIS) that gives you *tools* and expects you to know what to do — **CRAFTY GIS listens to your problem**, asks smart clarifying questions, and then **automatically orchestrates** the entire analysis workflow: from data download to final report.
+
+```text
+┌─ You type ─────────────────────────────────────────────────────────────────┐
+│  "Calculate the present NDVI for crop health in Tirupati district"         │
+└────────────────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─ AI Investigates ──────────────────────────────────────────────────────────┐
+│  "Extracting Tirupati coordinates..." → "Latest Sentinel-2 imagery?"       │
+└────────────────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─ System Orchestrates ──────────────────────────────────────────────────────┐
+│  Downloads Sentinel-2 → Preprocesses NIR/Red Bands → Calculates NDVI       │
+└────────────────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─ You Receive ──────────────────────────────────────────────────────────────┐
+│  📄 PDF Report   🗺️ GeoTIFF Maps   📊 CSV Statistics   📦 Raw Files        │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## ✨ Key Capabilities
 
-| Capability | What It Does |
-|-----------|--------------|
-| 🧠 **AI Investigation System** | Hybrid chat + structured wizard that asks smart questions to understand your exact needs — no GIS expertise required |
-| 📋 **Automated Workflow Engine** | Generates task plans from your description, executes them, and lets you interrupt mid-analysis to adjust |
-| 🗺️ **Interactive Map Preview** | Live MapLibre GL map showing study area, data layers, and analysis outputs as they're generated |
-| 🌐 **Multi-Source Data Download** | Automatically fetches satellite data from Sentinel-1/2, Landsat, MODIS, SRTM, CHIRPS, ERA5, OSM, and more |
-| 🔧 **Multi-Tool Processing** | Routes analysis to GDAL, GeoPandas, Rasterio, QGIS, SAGA GIS, GRASS GIS, Fragstats as needed |
-| 📄 **Auto-Report Generator** | Generates professional PDF, HTML, and Markdown reports with maps, statistics, and interpretation |
-| 🔄 **Mid-Workflow Interruption** | Pause at any point, add new requirements, and the system regenerates the plan and continues |
-| 💾 **All Outputs Downloadable** | Maps (PNG/GeoTIFF), reports (PDF/HTML), shapefiles, CSVs — all organized and ready to use |
-| 🤖 **Local AI (Free & Private)** | Runs on Ollama — no API bills, no data leaves your machine |
+<table>
+<tr>
+<td width="50%">
+
+### 🧠 AI Investigation System
+Hybrid chat + structured wizard. Asks ONE question at a time to understand exactly what you need. No GIS expertise required — describe in plain language.
+
+### 📋 Automated Workflow Engine
+Generates a task plan from your description, executes it step-by-step, and lets you **interrupt mid-analysis** to adjust anytime.
+
+### 🌐 Multi-Source Data Download
+Automatically fetches from **Sentinel-1/2, Landsat 8/9, MODIS, SRTM, CHIRPS, ERA5, OSM, Bhoonidhi (ISRO), Survey of India** — all free and open.
+
+### 🔧 Multi-Tool Processing
+Routes analysis to **GDAL, GeoPandas, Rasterio, QGIS, SAGA GIS, GRASS GIS, Fragstats** as needed — automatically.
+
+</td>
+<td width="50%">
+
+### 📄 Auto-Report Generator
+Generates professional **PDF, HTML, and Markdown** reports with maps, statistics, and interpretation text. Ready to submit.
+
+### 🔄 Mid-Workflow Interruption
+At any point, click **"Adjust"**, type new instructions — the system updates the plan, preserves completed work, and continues.
+
+### 💾 All Outputs Downloadable
+Maps (PNG/GeoTIFF), reports (PDF/HTML), shapefiles (.shp), CSVs — organized and downloadable from the dashboard.
+
+### 🤖 100% Free AI — No API Bills
+Runs on **Ollama** (local) → **LM Studio** → **Hugging Face free API**. Zero paid keys. Zero rate limits that stop your work.
+
+</td>
+</tr>
+</table>
 
 ---
 
-## 🧪 Supported Analysis Types
+## 🚀 Quick Start — One Command
 
-CRAFTY GIS can handle a wide range of geospatial analyses, including:
+> **Everything works with a single command. That's the whole point.**
 
-| Analysis Type | Description | Data Sources | Tools |
-|:-------------|:------------|:-------------|:------|
-| 🌿 **LULC Classification** | Land use / land cover mapping | Sentinel-2, Landsat | Random Forest, GDAL |
-| 🌱 **Vegetation Indices** | NDVI, EVI, SAVI, NDWI computation | Sentinel-2, Landsat, MODIS | Rasterio, NumPy |
-| 🔄 **Change Detection** | Multi-temporal land change analysis | Sentinel-2, Landsat | Post-classification, MapAlgebra |
-| ⛰️ **Terrain Analysis** | DEM, slope, aspect, hillshade, hydrology | SRTM | GDAL, SAGA, GRASS |
-| 🌾 **Crop Health** | Agricultural crop vigor assessment | Sentinel-2, Landsat | Vegetation indices |
-| 🏙️ **Urban Sprawl** | Urban expansion and built-up mapping | Landsat, Sentinel, OSM | GeoPandas, Fragstats |
-| 🌊 **Flood Mapping** | Flood extent from SAR / optical imagery | Sentinel-1, Sentinel-2 | GDAL, Rasterio |
-| 🌡️ **Land Surface Temp** | LST from thermal infrared bands | Landsat, MODIS | Split-window algorithm |
-| 💧 **Watershed Delineation** | Hydrological watershed analysis | SRTM | SAGA, GRASS |
-| 📊 **Landscape Metrics** | Fragmentation & pattern analysis | Any classified map | Fragstats, Python |
-| 🌳 **Biomass Estimation** | Above-ground biomass & carbon stock | Sentinel-2, GEDI | Allometric equations |
-| 🧪 **Soil Moisture** | Surface moisture from SAR | Sentinel-1 | Change detection |
+### 🐧 Linux
+```bash
+git clone https://github.com/virahitvin8/crafty-gis.git
+cd crafty-gis
+chmod +x start.sh
+./start.sh
+```
+
+### 🪟 Windows
+```batch
+git clone https://github.com/virahitvin8/crafty-gis.git
+cd crafty-gis
+start.bat
+```
+
+### 📱 Android (Install as App)
+```text
+To access CRAFTY GIS on your phone, both devices must be on the same WiFi.
+1. Find your PC's IP address (e.g., 192.168.1.5).
+2. Open Chrome on your Android device and go to: http://192.168.1.5:3000
+   (Do NOT use localhost:3000 on your phone, it will show an error).
+3. Tap the ⋮ menu → "Add to Home Screen".
+4. CRAFTY GIS is now installed like a native app!
+```
+
+> ✅ The script installs Python deps, Node packages, sets up the database,
+> starts the backend (port 8000) and frontend (port 3000) — all automatically.
+
+### 🌐 Access Points
+
+| Service | URL |
+|:--------|:----|
+| **Dashboard** | http://localhost:3000 |
+| **API** | `http://localhost:8000` *(Must be running `./start.sh` first)* |
+| **API Docs** | `http://localhost:8000/docs` *(Must be running `./start.sh` first)* |
+| **AI Status** | `http://localhost:8000/api/ai/status` *(Must be running `./start.sh` first)* |
+
+---
+
+## 🤖 AI Setup (Free, No Credit Card)
+
+CRAFTY GIS uses **only free and open-source AI**. Pick any one:
+
+### Option 1: Ollama (Recommended — Local, Unlimited)
+```bash
+# 1. Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh     # Linux
+# Windows: download from https://ollama.ai
+
+# 2. Start the server (Keep this running in a separate terminal)
+ollama serve
+
+# 3. Download a free model
+ollama pull llama3
+```
+**How to configure:** Open `crafty-gis-server/.env` and ensure it has:
+`OLLAMA_BASE_URL=http://localhost:11434`
+`OLLAMA_MODEL=llama3`
+
+### Option 2: Hugging Face (Free Cloud — No Install)
+```text
+1. Register for free: https://huggingface.co/join
+2. Get your free token: https://huggingface.co/settings/tokens
+3. Open the file `crafty-gis-server/.env`
+4. Find the line `HUGGINGFACE_TOKEN=` and paste your token:
+   HUGGINGFACE_TOKEN=hf_your_free_token_here
+```
+
+### Option 3: LM Studio (Local GUI — Easiest for Beginners)
+```text
+1. Download free: https://lmstudio.ai
+2. Search and download any model (e.g., "Mistral 7B")
+3. Click the "Start Local Server" button in LM Studio.
+4. Open the file `crafty-gis-server/.env`.
+5. Ensure the LM Studio URL matches:
+   LMSTUDIO_URL=http://localhost:1234/v1/chat/completions
+```
+
+---
+
+## 🛰️ Supported Data Sources
+
+| Satellite / Source | Data | Resolution | Cost | Portal |
+|:------------------|:-----|:-----------|:-----|:-------|
+| 🛰️ **Sentinel-2** | 13-band optical (NDVI, LULC) | 10–60m | Free | [Copernicus](https://dataspace.copernicus.eu) |
+| 🛰️ **Sentinel-1** | SAR all-weather radar | 5–40m | Free | [Copernicus](https://dataspace.copernicus.eu) |
+| 🛰️ **Landsat 8/9** | Multispectral history (1972–) | 30m | Free | [USGS](https://earthexplorer.usgs.gov) |
+| 🛰️ **MODIS** | Daily global coverage | 250m–1km | Free | [NASA](https://earthdata.nasa.gov) |
+| ⛰️ **SRTM DEM** | Digital elevation model | 30m | Free | [NASA](https://earthdata.nasa.gov) |
+| 🇮🇳 **Bhoonidhi** | ISRO Indian satellite data | Variable | Free | [NRSC](https://bhoonidhi.nrsc.gov.in) |
+| 🗺️ **Survey of India** | India topographic maps | Variable | Free | [SOI](https://onlinemaps.surveyofindia.gov.in) |
+| 🌧️ **CHIRPS** | Rainfall (1981–present) | 5km | Free | [CHRS](https://chrs.web.uci.edu) |
+| 🌡️ **ERA5** | Climate reanalysis (1940–) | 31km | Free | [ECMWF](https://cds.climate.copernicus.eu) |
+| 🗺️ **OpenStreetMap** | Roads, buildings, boundaries | Vector | Free | [OSM](https://www.openstreetmap.org) |
+| 🐾 **GBIF** | Biodiversity occurrence records | Point data | Free | [GBIF](https://www.gbif.org) |
+
+---
+
+## 🔬 Supported Analysis Types
+
+<table>
+<tr><th>Analysis</th><th>Description</th><th>Tools Used</th></tr>
+<tr><td>🌿 LULC Classification</td><td>Land use / land cover mapping</td><td>Sentinel-2, Random Forest, GDAL</td></tr>
+<tr><td>🌱 Vegetation Indices</td><td>NDVI, EVI, SAVI, NDWI</td><td>Sentinel-2, Rasterio, NumPy</td></tr>
+<tr><td>🔄 Change Detection</td><td>Multi-temporal land change analysis</td><td>Landsat time series</td></tr>
+<tr><td>⛰️ Terrain Analysis</td><td>DEM, slope, aspect, watershed</td><td>SRTM, SAGA GIS, GRASS GIS</td></tr>
+<tr><td>🌾 Crop Health</td><td>Agricultural crop vigor assessment</td><td>Sentinel-2, Bhoonidhi</td></tr>
+<tr><td>🏙️ Urban Sprawl</td><td>Urban expansion and built-up mapping</td><td>Landsat, Fragstats</td></tr>
+<tr><td>🌊 Flood Mapping</td><td>Flood extent from SAR + optical</td><td>Sentinel-1, GDAL</td></tr>
+<tr><td>🌡️ Land Surface Temp</td><td>LST from thermal infrared bands</td><td>Landsat Band 10, Python</td></tr>
+<tr><td>💧 Watershed Delineation</td><td>Hydrological basin analysis</td><td>SRTM, SAGA GIS</td></tr>
+<tr><td>📊 Landscape Metrics</td><td>Fragmentation & pattern stats</td><td>Classified map, Fragstats</td></tr>
+<tr><td>🌳 Biomass Estimation</td><td>Above-ground carbon stock</td><td>Sentinel-2, GEDI, Python</td></tr>
+<tr><td>🧪 Soil Moisture</td><td>Surface moisture from SAR</td><td>Sentinel-1, Change detection</td></tr>
+</table>
 
 ---
 
 ## 🏗️ Architecture
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                         CRAFTY GIS Platform                           │
-├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  ┌─────────────────────┐       ┌──────────────────────────────┐     │
-│  │   Next.js 16        │       │    FastAPI Python Backend     │     │
-│  │   (React 19, TS)    │──────▶│                                │     │
-│  │                     │       │  ┌─────────────────────────┐  │     │
-│  │  ┌───────────────┐  │       │  │ AI Investigation System │  │     │
-│  │  │ Chat Panel    │  │       │  │ (Ollama / Local LLM)    │  │     │
-│  │  │ Map Preview   │  │       │  └─────────────────────────┘  │     │
-│  │  │ Workflow View │  │       │                               │     │
-│  │  │ Output Files  │  │       │  ┌─────────────────────────┐  │     │
-│  │  │ Activity Log  │  │       │  │   Workflow Engine       │  │     │
-│  │  └───────────────┘  │       │  └─────────────────────────┘  │     │
-│  └─────────────────────┘       │                               │     │
-│                                 │  ┌─────────────────────────┐  │     │
-│  ┌─────────────────────┐       │  │   GIS Processor         │  │     │
-│  │   MapLibre GL JS    │       │  │   (GDAL, Rasterio,      │  │     │
-│  │   Interactive Map   │◀──────│  │    GeoPandas, SAGA,     │  │     │
-│  └─────────────────────┘       │  │    GRASS, Fragstats)    │  │     │
-│                                 │  └─────────────────────────┘  │     │
-│  ┌─────────────────────┐       │                               │     │
-│  │   PostgreSQL +       │       │  ┌─────────────────────────┐  │     │
-│  │   PostGIS / SQLite   │◀──────│  │   Data Downloader       │  │     │
-│  └─────────────────────┘       │  │   Sentinel, Landsat,     │  │     │
-│                                 │  │   MODIS, SRTM, OSM...   │  │     │
-│  ┌─────────────────────┐       │  └─────────────────────────┘  │     │
-│  │   Docker Compose    │       │                               │     │
-│  │   Containerization  │       │  ┌─────────────────────────┐  │     │
-│  └─────────────────────┘       │  │   Report Generator      │  │     │
-│                                 │  │   PDF / HTML / MD      │  │     │
-│  ┌─────────────────────┐       │  └─────────────────────────┘  │     │
-│  │   Tauri Desktop App │       └──────────────────────────────┘     │
-│  │   (Windows/Mac/Linux)│                                            │
-│  └─────────────────────┘                                           │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
+```text
+╔══════════════════════════════════════════════════════════════════╗
+║                     CRAFTY GIS Platform                          ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  ┌──────────────────────┐     ┌───────────────────────────────┐  ║
+║  │  Next.js 16 Frontend │     │   FastAPI Python Backend      │  ║
+║  │  (React 19, TS, PWA) │────▶│                               │  ║
+║  │                      │     │  ┌─────────────────────────┐  │  ║
+║  │  📱 Android PWA      │     │  │ AI Investigation System │  │  ║
+║  │  🪟 Windows          │     │  │ (Ollama / HuggingFace)  │  │  ║
+║  │  🐧 Linux            │     │  └─────────────────────────┘  │  ║
+║  └──────────────────────┘     │                               │  ║
+║                               │  ┌─────────────────────────┐  │  ║
+║  ┌──────────────────────┐     │  │  Workflow Engine        │  │  ║
+║  │  MapLibre GL JS      │◀────│  │  (Task Planner)         │  │  ║
+║  │  Interactive Map     │     │  └─────────────────────────┘  │  ║
+║  └──────────────────────┘     │                               │  ║
+║                               │  ┌─────────────────────────┐  │  ║
+║  ┌──────────────────────┐     │  │  GIS Processor          │  │  ║
+║  │  SQLite (dev)        │◀────│  │  GDAL·Rasterio·GeoPandas│  │  ║
+║  │  PostgreSQL+PostGIS  │     │  │ SAGA GIS·GRASS·Fragstats│  │  ║
+║  │  (production)        │     │  └─────────────────────────┘  │  ║
+║  └──────────────────────┘     │                               │  ║
+║                               │  ┌─────────────────────────┐  │  ║
+║                               │  │  Data Downloader        │  │  ║
+║                               │  │  Sentinel·Landsat·MODIS │  │  ║
+║                               │  │  SRTM·OSM·Bhoonidhi     │  │  ║
+║                               │  └─────────────────────────┘  │  ║
+║                               └───────────────────────────────┘  ║
+╚══════════════════════════════════════════════════════════════════╝
 ```
 
 ---
 
-## 📡 Data Sources
-
-| Source | Data Provided | Resolution | Access |
-|:-------|:-------------|:-----------|:-------|
-| 🛰️ **Copernicus Sentinel-2** | 13-band multispectral imagery | 10–60m | Free & Open |
-| 🛰️ **Copernicus Sentinel-1** | C-band SAR (all-weather) | 5–40m | Free & Open |
-| 🛰️ **NASA/USGS Landsat 8/9** | Multispectral (since 2013) | 30m | Free & Open |
-| 🛰️ **NASA MODIS** | Daily global coverage | 250m–1km | Free & Open |
-| 🏔️ **NASA SRTM** | Digital Elevation Model | 30m | Free & Open |
-| 🗺️ **OpenStreetMap** | Roads, buildings, boundaries | Vector | Free & Open |
-| 🌧️ **CHIRPS** | Rainfall data (1981–present) | 5km | Free & Open |
-| 🌡️ **ERA5** | Climate reanalysis (1940–present) | 31km | Free (registration) |
-| 🐾 **GBIF** | Species occurrence records | Point data | Free & Open |
-| 🌾 **FAO GeoNetwork** | Agriculture & food security | Various | Free & Open |
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-| Requirement | Version | Installation |
-|:------------|:--------|:-------------|
-| **Python** | 3.11+ | [python.org](https://python.org) |
-| **Node.js** | 20+ | [nodejs.org](https://nodejs.org) |
-| **Ollama** | Latest | [ollama.ai](https://ollama.ai) *(for local AI)* |
-| **PostgreSQL + PostGIS** | 15+ | *(optional — SQLite used by default)* |
-
-### Option 1: One-Click Setup (Recommended 🚀)
-
-```bash
-# Clone the repository
-git clone https://github.com/virahitvin8/crafty-gis.git
-cd crafty-gis
-
-# Run the one-click setup script
-chmod +x setup.sh
-./setup.sh
-```
-
-### Option 2: Manual Setup
-
-**Backend:**
-```bash
-cd crafty-gis-server
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Pull AI model
-ollama pull llama3.1:8b
-
-# Start the server
-python -m app.main
-```
-
-**Frontend:**
-```bash
-cd crafty-gis-client
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Option 3: Docker Deployment
-
-```bash
-# Start all services with one command
-docker-compose up -d
-```
-
-### 🌐 Access the Platform
-
-| Service | URL |
-|:--------|:----|
-| **Frontend Dashboard** | [http://localhost:3000](http://localhost:3000) |
-| **Backend API** | [http://localhost:8000](http://localhost:8000) |
-| **API Documentation** | [http://localhost:8000/docs](http://localhost:8000/docs) |
-| **Ollama API** | [http://localhost:11434](http://localhost:11434) |
-
----
-
-## 🗺️ Project Structure
+## 🗂️ Project Structure
 
 ```
 crafty-gis/
-├── crafty-gis-server/          # Python FastAPI backend
+├── 📁 crafty-gis-server/           # Python FastAPI Backend
 │   ├── app/
-│   │   ├── api/                # REST API endpoints
-│   │   │   ├── analysis.py     # Analysis workflow routes
-│   │   │   ├── chat.py         # AI chat & investigation routes
-│   │   │   ├── data.py         # Data download routes
-│   │   │   └── projects.py     # Project management routes
-│   │   ├── core/               # Business logic
-│   │   │   ├── ai_investigator.py   # AI conversation & intent extraction
-│   │   │   ├── gis_processor.py     # Multi-tool GIS processing dispatch
-│   │   │   ├── report_generator.py  # PDF/HTML/MD report generation
-│   │   │   └── workflow_engine.py   # Task planning & execution
-│   │   ├── services/           # External integrations
-│   │   │   ├── data_downloader.py   # Satellite & geospatial data download
-│   │   │   └── ollama_service.py    # Local LLM integration
-│   │   ├── db/                 # Database models & migrations
-│   │   │   └── models.py       # SQLAlchemy ORM models
-│   │   ├── config.py           # Application configuration
-│   │   └── main.py             # FastAPI entry point
-│   ├── requirements.txt        # Python dependencies
-│   └── Dockerfile              # Backend container
+│   │   ├── api/                    # REST endpoints
+│   │   │   ├── chat.py             # AI chat & investigation
+│   │   │   ├── analysis.py         # NDVI, LULC, terrain, etc.
+│   │   │   ├── data.py             # Satellite data download
+│   │   │   └── projects.py         # Project CRUD
+│   │   ├── core/                   # Business logic
+│   │   │   ├── ai_investigator.py  # Hybrid AI conversation
+│   │   │   ├── workflow_engine.py  # Task planning & execution
+│   │   │   ├── gis_processor.py    # Multi-tool GIS dispatch
+│   │   │   └── report_generator.py # PDF/HTML/MD reports
+│   │   ├── services/               # External integrations
+│   │   │   ├── groq_service.py     # Free AI backends
+│   │   │   ├── ollama_service.py   # Ollama local LLM
+│   │   │   └── data_downloader.py  # Satellite download engine
+│   │   └── config.py               # All settings & credentials
+│   ├── requirements.txt
+│   ├── .env                        # Your credentials (gitignored)
+│   └── .env.example                # Safe template (pushed to GitHub)
 │
-├── crafty-gis-client/          # Next.js frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── globals.css     # Global styles & theme
-│   │   │   ├── layout.tsx      # Root layout
-│   │   │   └── page.tsx        # Main dashboard page
-│   │   └── components/
-│   │       ├── ActivityHistory.tsx
-│   │       ├── ChatPanel.tsx
-│   │       ├── MapPreview.tsx
-│   │       ├── OutputFiles.tsx
-│   │       └── WorkflowPanel.tsx
-│   ├── package.json
-│   └── Dockerfile
+├── 📁 crafty-gis-client/           # Next.js Frontend Dashboard
+│   ├── src/app/
+│   │   ├── page.tsx                # Main dashboard (Chat/Workflow/Files)
+│   │   ├── layout.tsx              # PWA meta tags, Inter font
+│   │   └── globals.css             # Design system
+│   └── public/
+│       ├── manifest.json           # Android PWA manifest
+│       └── sw.js                   # Service worker (offline)
 │
-├── data/                       # Runtime data storage
-│   ├── downloads/              # Downloaded satellite data
-│   ├── outputs/                # Generated analysis outputs
-│   ├── uploads/                # User-uploaded files
-│   └── temp/                   # Temporary processing files
+├── 📁 .github/workflows/           # CI/CD (GitHub Actions)
+│   ├── ci.yml                      # Test on push
+│   └── release.yml                 # Build & release
 │
-├── src-tauri/                  # Tauri desktop app configuration
-│   ├── tauri.conf.json         # Desktop window & build config
-│   └── icons/                  # Application icons & logo
-│
-├── docker-compose.yml          # Full-stack Docker deployment
-├── setup.sh                    # One-click installation script
-├── CHANGELOG.md                # Version history
-├── ROADMAP.md                  # Development roadmap
-├── CONTRIBUTING.md             # Contribution guidelines
-├── CODE_OF_CONDUCT.md          # Community standards
-├── SECURITY.md                 # Security policy
-├── CITATION.cff                # Citation metadata
-└── LICENSE                     # GPL v3 license
+├── 🚀 start.sh                     # ONE COMMAND — Linux/Android
+├── 🚀 start.bat                    # ONE COMMAND — Windows
+├── 📋 QUICKSTART.md                # Beginner guide
+├── 🤝 CONTRIBUTING.md
+├── 📜 LICENSE (GPL v3)
+└── 📖 README.md
 ```
 
 ---
 
 ## 💻 Tech Stack
 
-| Layer | Technology | Purpose |
-|:------|:-----------|:--------|
-| **Frontend** | Next.js 16 (React 19, TypeScript) | Dashboard UI |
-| **Styling** | Tailwind CSS v4 | Design system |
-| **Maps** | MapLibre GL JS | Interactive map visualization |
-| **Icons** | Lucide React | Icon library |
-| **Backend** | FastAPI (Python 3.11+) | REST API server |
-| **AI / LLM** | Ollama (Llama 3.1, DeepSeek, Mistral) | Local AI inference |
-| **Database** | PostgreSQL + PostGIS / SQLite | Spatial data storage |
-| **Geospatial** | GDAL, Rasterio, GeoPandas, Shapely, PyProj | Data processing |
-| **Orchestration** | Asyncio, HTTPX | Async task execution |
-| **Reports** | ReportLab, Jinja2, WeasyPrint | Document generation |
-| **Infrastructure** | Docker Compose | Containerization |
-| **Desktop** | Tauri (Rust-based) | Native app packaging |
-| **CI/CD** | GitHub Actions | Automated testing & release |
+| Layer | Technology | Why Free & Open Source |
+|:------|:-----------|:----------------------|
+| **Frontend** | Next.js 16 + React 19 + TypeScript | MIT License |
+| **Styling** | Tailwind CSS v4 | MIT License |
+| **Maps** | MapLibre GL JS | BSD License |
+| **Backend** | FastAPI + Python 3.11 | MIT License |
+| **AI (Local)** | Ollama + Llama 3 / Mistral | MIT + Apache 2.0 |
+| **AI (Cloud)** | Hugging Face free API | Free tier |
+| **AI (GUI)** | LM Studio | Free app |
+| **Database** | SQLite / PostgreSQL+PostGIS | Free & Open Source |
+| **Geospatial** | GDAL, Rasterio, GeoPandas | MIT/LGPL |
+| **GIS Tools** | QGIS, SAGA GIS, GRASS GIS | GPL |
+| **Reports** | ReportLab, WeasyPrint, Jinja2 | BSD/GPL |
+| **Container** | Docker + Docker Compose | Apache 2.0 |
+
+---
+
+## 📊 GitHub Stats
+
+<!-- github-readme-stats (anuraghazra/github-readme-stats) -->
+<div align="center">
+
+<img src="https://github-readme-stats.vercel.app/api?username=virahitvin8&show_icons=true&theme=tokyonight&hide_border=true&bg_color=09090b&title_color=0c8ee7&icon_color=059669&text_color=e4e4e7&ring_color=0c8ee7" height="165"/>
+
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=virahitvin8&layout=compact&theme=tokyonight&hide_border=true&bg_color=09090b&title_color=0c8ee7&text_color=e4e4e7&langs_count=8" height="165"/>
+
+</div>
 
 ---
 
 ## 🔄 How the AI Investigation Works
 
-The core innovation of CRAFTY GIS is its **AI Investigation System** — a conversational layer that acts like a GIS consultant before running any analysis.
+The core of CRAFTY GIS is the **AI Investigation System** — a conversational layer that acts like a GIS consultant **before** running any analysis.
 
-### The Investigation Flow
-
-```
+```text
 User: "I want to analyze forest cover change in my area"
-
-        │
-        ▼
-┌─────────────────────────────────────────────────────┐
-│  PHASE 1: Problem Understanding                      │
-│  ───────────────────────────────────────             │
-│  AI asks: "Which district or region?"                │
-│  AI asks: "What time period?"                        │
-│  AI asks: "Sentinel-2 or Landsat imagery?"           │
-│  AI asks: "PDF report, shapefiles, or both?"         │
-└─────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────────────────────────┐
-│  PHASE 2: Plan Generation                            │
-│  ───────────────────────────────                     │
-│  ✓ Define study area boundary                        │
-│  ✓ Download satellite imagery                        │
-│  ✓ Preprocess & cloud mask                           │
-│  ✓ Run LULC classification                           │
-│  ✓ Calculate change metrics                          │
-│  ✓ Generate report & maps                            │
-└─────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────────────────────────┐
-│  PHASE 3: User Confirmation                          │
-│  ─────────────────────────────                       │
-│  User reviews & approves the plan                    │
-│  OR user adds: "Also include water bodies"           │
-│  → System regenerates plan instantly                 │
-└─────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────────────────────────┐
-│  PHASE 4: Automated Execution                        │
-│  ──────────────────────────────                      │
-│  ▶ Data download (real-time progress)                │
-│  ▶ Preprocessing (cloud masking, resampling)         │
-│  ▶ Classification / Analysis                         │
-│  ▶ Post-processing & statistics                      │
-│  ▶ Report & map generation                           │
-└─────────────────────────────────────────────────────┘
-        │
-        ▼
-  🎉 Results delivered! User can download all files,
-     view maps, and share the analysis.
+  │
+  ▼  PHASE 1 — Problem Understanding
+  │   AI: "Which district or region?"
+  │   AI: "What time period — 2010 to 2024?"
+  │   AI: "Do you need annual maps or start vs end?"
+  │   AI: "Output as PDF report, shapefile, or both?"
+  │
+  ▼  PHASE 2 — Plan Generation (shown in Workflow Panel)
+  │   ✓ Task 1: Download study area boundary (OSM)
+  │   ✓ Task 2: Fetch Sentinel-2 / Landsat imagery
+  │   ✓ Task 3: Preprocess + cloud mask
+  │   ✓ Task 4: LULC classification
+  │   ✓ Task 5: Change detection analysis
+  │   ✓ Task 6: Landscape metrics (Fragstats)
+  │   ✓ Task 7: Generate PDF report + maps
+  │
+  ▼  PHASE 3 — User Confirmation
+  │   User reviews the plan → approves or adjusts
+  │   "Also add water body layer" → Plan updates instantly
+  │
+  ▼  PHASE 4 — Automated Execution + Real-time Progress
+  │   Live progress shown in Workflow Panel
+  │   User can interrupt at any point to add instructions
+  │
+  ▼  Results delivered → Maps, Reports, Raw Files ready to download
 ```
 
-### Mid-Workflow Interruption
-
-At **any point** during execution, the user can:
-
-1. Click **"Adjust My Request"**
-2. Type new instructions (e.g., *"Use 7 classes instead of 5"*)
-3. The system updates the plan, preserves completed work, and continues
-
 ---
 
-## 📊 Dashboard Panels
+## 🧪 Running Tests
 
-| Panel | Description |
-|:------|:------------|
-| 💬 **Chat Panel** | Main conversation interface. Type your problem, respond to AI questions, review plans |
-| 🗺️ **Map Preview** | Interactive MapLibre GL map showing study area, data layers, and live processing results |
-| 📋 **Workflow Panel** | Real-time task list showing each step's status (Pending → Running → Completed/Failed) |
-| 📁 **Output Files** | All generated files with download buttons, organized by type (maps, reports, data) |
-| 📜 **Activity History** | Complete log of all sessions, queries, analyses, and outputs — click to revisit |
+```bash
+cd crafty-gis-server
+pip install pytest pytest-anyio httpx
+python -m pytest tests/ -v
+```
 
----
-
-## 🧠 Name Origins
-
-**CRAFTY GIS** follows the tradition of meaningful GIS acronyms like:
-- **QGIS** → Quantum Geographic Information System
-- **ArcGIS** → Arc Geographic Information System
-- **GRASS GIS** → Geographic Resources Analysis Support System
-- **SAGA GIS** → System for Automated Geoscientific Analyses
-
-**CRAFTY GIS** stands for:
-> **C**onversational **R**emote **A**nalysis & **F**ield **T**echnology for **G**eographic **I**nformation **S**ystems
-
-The name *Crafty* implies intelligent, resourceful, and skilled problem-solving — the platform is *crafty* because it figures things out for the user, orchestrating complex workflows behind the scenes.
+> 28 tests covering health endpoints, analysis API, chat session flow, project CRUD, and data source APIs.
 
 ---
 
 ## 🗺️ Roadmap
 
-| Version | Name | Focus | Target |
-|:--------|:-----|:------|:-------|
-| **v1.0** 🟢 | **Gaia** | Initial release — core AI, GIS processing, dashboard | ✅ **Released** |
-| **v1.5** 🔵 | **Terra** | Plugin system, QGIS/SAGA integration, auth, testing | Q2 2026 |
-| **v2.0** 🟡 | **Orbis** | Multi-modal AI agents, real-time collaboration, mobile app | Q3 2026 |
-| **v3.0** 🔴 | **Sage** | Full desktop app (Tauri), OSGeo incubation, ML pipeline | Q1 2027 |
-
-See [ROADMAP.md](ROADMAP.md) for full details.
+| Version | Codename | Focus | Status |
+|:--------|:---------|:------|:-------|
+| **v1.0** | **Gaia** | Core AI + GIS + Dashboard + PWA | ✅ Current |
+| **v1.5** | **Terra** | QGIS/SAGA plugin integration + Auth | 🔵 Q3 2026 |
+| **v2.0** | **Orbis** | Multi-agent AI + Real-time collab | 🟡 Q4 2026 |
+| **v3.0** | **Sage** | OSGeo incubation + ML pipeline | 🔴 Q1 2027 |
 
 ---
 
 ## 🤝 Contributing
 
-We **warmly welcome** contributions from everyone! Whether you're a:
+We welcome **everyone** — GIS professionals, Python developers, frontend engineers, documentation writers, and researchers.
 
-- 🗺️ **GIS Professional** — Help improve processing algorithms & workflows
-- 🐍 **Python Developer** — Contribute to the backend API & GIS processor
-- ⚛️ **Frontend Developer** — Enhance the dashboard UI & map components
-- 📚 **Documentation Writer** — Improve guides, docs, and examples
-- 🧪 **Researcher** — Add new analysis types or data source integrations
+| Who You Are | How to Help |
+|:------------|:------------|
+| 🗺️ GIS Professional | Improve processing algorithms & add new analysis types |
+| 🐍 Python Developer | Contribute to backend API & GIS processor |
+| ⚛️ Frontend Dev | Enhance dashboard UI, map components & mobile UX |
+| 📚 Documentation | Improve guides, write tutorials, translate docs |
+| 🧪 Researcher | Test analyses, report bugs, validate outputs |
 
-Check out [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+→ Read [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+
+---
+
+## ❓ FAQ
+
+<details>
+<summary><strong>Do I need GIS expertise to use CRAFTY GIS?</strong></summary>
+<br/>
+No. Just describe your problem in plain language. The AI Investigation System asks targeted questions and handles all the technical work. A farmer, a student, and a PhD researcher can all use it equally well.
+</details>
+
+<details>
+<summary><strong>Is it really free? No hidden costs?</strong></summary>
+<br/>
+Yes — 100% free and open-source (GPL v3). The AI runs locally via Ollama (free, unlimited). The satellite data comes from free government portals (ESA, NASA, USGS, ISRO). No subscriptions, no API bills, no rate limits that stop your work mid-analysis.
+</details>
+
+<details>
+<summary><strong>Does it work offline?</strong></summary>
+<br/>
+Yes for AI and analysis (Ollama runs offline). Internet is only required for downloading new satellite imagery from Copernicus/NASA/USGS.
+</details>
+
+<details>
+<summary><strong>Can I use it on Android?</strong></summary>
+<br/>
+Yes! Open http://localhost:3000 in Chrome on your Android device → Tap ⋮ → "Add to Home Screen". CRAFTY GIS installs as a Progressive Web App and works just like a native Android app.
+</details>
+
+<details>
+<summary><strong>What's the difference from Google Earth Engine?</strong></summary>
+<br/>
+Google Earth Engine is a cloud platform for large-scale analysis — you need to code it yourself. CRAFTY GIS is an AI consultant — you describe the problem and it does everything. Think of it as "Earth Engine with a brain that asks the right questions."
+</details>
+
+<details>
+<summary><strong>Can I download and edit the raw output files?</strong></summary>
+<br/>
+Yes. Every generated file (GeoTIFF, shapefile, PDF, CSV) is downloadable from the Outputs panel. You can open them in ArcGIS, QGIS, or any GIS software for manual editing.
+</details>
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **GNU General Public License v3.0** — see [LICENSE](LICENSE) for details.
+This project is licensed under the **GNU General Public License v3.0**.
 
-*This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation.*
+This means you can use, study, modify, and distribute CRAFTY GIS freely — as long as you keep it open source.
 
----
-
-## 💖 Support & Community
-
-If CRAFTY GIS helps your work or research, consider supporting the project:
-
-| How to Help | What to Do |
-|:------------|:-----------|
-| ⭐ **Star the repo** | Click the star button at the top of the page |
-| 🐛 **Report issues** | Open an [issue](https://github.com/virahitvin8/crafty-gis/issues) for bugs or feature requests |
-| 📢 **Share** | Tell your colleagues, students, and network about CRAFTY GIS |
-| 💰 **Sponsor** | [GitHub Sponsors](https://github.com/sponsors/virahitvin8) |
-| 🌍 **Contribute** | Submit PRs, improve docs, add analysis types |
+→ See [LICENSE](LICENSE) for full details.
 
 ---
+
+<!-- CAPSULE RENDER footer wave (kyechan99/capsule-render) -->
+<img src="https://capsule-render.vercel.app/api?type=waving&amp;color=0:065f46,50:059669,100:0c8ee7&amp;height=120&amp;section=footer&amp;text=Conversational%20Remote%20Analysis%20and%20Field%20Technology&amp;fontSize=24&amp;fontColor=fde047" width="100%"/>
 
 <div align="center">
-  <br/>
-  <p>
-    <b>Built with ❤️ for the open-source geospatial community</b><br/>
-    <i>"Making Earth observation intelligence accessible to everyone"</i>
-  </p>
-  <p>
-    <a href="https://github.com/virahitvin8/crafty-gis"><b>GitHub</b></a> ·
-    <a href="ROADMAP.md"><b>Roadmap</b></a> ·
-    <a href="CHANGELOG.md"><b>Changelog</b></a> ·
-    <a href="CONTRIBUTING.md"><b>Contributing</b></a> ·
-    <a href="SECURITY.md"><b>Security</b></a>
-  </p>
-  <br/>
-  <sub>© 2024-2026 <a href="https://github.com/virahitvin8">Akshit Kumar</a> and CRAFTY GIS Contributors</sub>
+
+<img src="docs/assets/logo.png" width="100" alt="CRAFTY GIS Logo" />
+
+**Built with ❤️ for the open-source geospatial community**
+
+*"Making Earth observation intelligence accessible to everyone"*
+
+[GitHub](https://github.com/virahitvin8/crafty-gis) · [Issues](https://github.com/virahitvin8/crafty-gis/issues) · [Discussions](https://github.com/virahitvin8/crafty-gis/discussions) · [Contributing](CONTRIBUTING.md)
+
+<sub>© 2024–2026 <a href="https://github.com/virahitvin8">Neelam Akshit Vinay</a> and CRAFTY GIS Contributors · GPL v3</sub>
+
 </div>

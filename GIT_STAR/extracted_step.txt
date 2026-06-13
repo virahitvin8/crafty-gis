@@ -1,0 +1,75 @@
+Created At: 2026-05-20T16:02:23Z
+Completed At: 2026-05-20T16:02:23Z
+File Path: `file:///c:/Users/akshi/Desktop/GIT_STAR/docx/assets/templates/Example.cs`
+Total Lines: 647
+Total Bytes: 36321
+Showing lines 1 to 647
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: // Example.cs - Complete English business document example
+2: // Color: Morandi Nordic (鼠尾草绿灰) — low saturation, calm, elegant
+3: //
+4: // TRAP comments explain common pitfalls. Copy structure freely.
+5: // For native Word charts (pie/bar/line): see chart-reference.md
+6: // For OMML math equations: see omml-reference.md
+7: 
+8: using DocumentFormat.OpenXml;
+9: using DocumentFormat.OpenXml.Packaging;
+10: using DocumentFormat.OpenXml.Wordprocessing;
+11: using System.Collections.Generic;
+12: using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+13: using A = DocumentFormat.OpenXml.Drawing;
+14: using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
+15: using C = DocumentFormat.OpenXml.Drawing.Charts;
+16: 
+17: namespace Docx;
+18: 
+19: public static class Example
+20: {
+21:     // ========================================================================
+22:     // Color Scheme — Morandi Nordic (低饱和绿灰)
+23:     // Muted sage greens convey calm professionalism.
+24:     // NEVER use pure #FF0000/#0000FF — they look cheap.
+25:     // ========================================================================
+26:     private static class Colors
+27:     {
+28:         public const string Primary = "7C9885";       // Sage green — headings
+29:         public const string Secondary = "8B9DC3";     // Gray blue — accents
+30:         public const string Accent = "9CAF88";        // Grass green — highlights
+31:         public const string Dark = "2d3a35";           // Dark greenish gray — body text
+32:         public const string Mid = "5a6b62";         
+<truncated 35890 bytes>
+================
+615:     // Cross-Reference — hyperlink to a bookmark via REF field
+616:     // Usage: paragraph.Append(CreateCrossReference("Figure1", "Figure 1").ToArray());
+617:     // ========================================================================
+618:     private static IEnumerable<Run> CreateCrossReference(string bookmarkName, string displayText)
+619:     {
+620:         yield return new Run(new FieldChar { FieldCharType = FieldCharValues.Begin });
+621:         yield return new Run(new FieldCode($" REF {bookmarkName} \\h ") { Space = SpaceProcessingModeValues.Preserve });
+622:         yield return new Run(new FieldChar { FieldCharType = FieldCharValues.Separate });
+623:         yield return new Run(new RunProperties(new Color { Val = Colors.Primary }), new Text(displayText));
+624:         yield return new Run(new FieldChar { FieldCharType = FieldCharValues.End });
+625:     }
+626: 
+627:     // --- Settings & Numbering ---
+628:     private static void SetUpdateFieldsOnOpen(MainDocumentPart mp)
+629:     {
+630:         var sp = mp.DocumentSettingsPart ?? mp.AddNewPart<DocumentSettingsPart>();
+631:         sp.Settings = new Settings(new UpdateFieldsOnOpen { Val = true }, new DisplayBackgroundShape());
+632:     }
+633: 
+634:     private static void AddNumbering(MainDocumentPart mp)
+635:     {
+636:         var np = mp.AddNewPart<NumberingDefinitionsPart>();
+637:         np.Numbering = new Numbering(
+638:             new AbstractNum(new Level(
+639:                 new NumberingFormat { Val = NumberFormatValues.Decimal },
+640:                 new LevelText { Val = "%1." },
+641:                 new LevelJustification { Val = LevelJustificationValues.Left },
+642:                 new ParagraphProperties(new Indentation { Left = "720", Hanging = "360" })
+643:             ) { LevelIndex = 0 }) { AbstractNumberId = 1 },
+644:             new NumberingInstance(new AbstractNumId { Val = 1 }) { NumberID = 1 });
+645:     }
+646: }
+647: 
+The above content shows the entire, complete file contents of the requested file.

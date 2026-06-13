@@ -1,0 +1,57 @@
+# CRAFTY GIS Frontend — .dockerignore
+# Keep this file minimal — only exclude what's NOT needed for the build.
+
+# Dependencies (rebuilt inside container)
+node_modules/
+
+# Build outputs (rebuilt inside container)
+.next/
+out/
+build/
+
+# IDE & editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Environment (secrets must be passed via build args or runtime)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Documentation & meta
+*.md
+LICENSE
+CHANGELOG.md
+AGENTS.md
+CLAUDE.md
+
+# Tests & coverage
+coverage/
+.nyc_output/
+__tests__/
+*.test.*
+*.spec.*
+jest.config.*
+
+# Cache
+.eslintcache
+.tsbuildinfo
+npm-debug.log*
+
+# Docker (prevent recursive copy)
+Dockerfile
+.dockerignore

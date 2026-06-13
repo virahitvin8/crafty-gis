@@ -1,161 +1,135 @@
 """
-CRAFTY GIS — Main Application Entry Point
-FastAPI application with all services, middleware, and route registration.
+CRAFTY GIS — Main FastAPI Application Entry Point
+Conversational Remote Analysis & Field Technology for GIS
+
+Start with: uvicorn app.main:app --reload
+Or simply:  python main.py (from crafty-gis-server/ directory)
 """
 
 import logging
 import os
-import sys
 from contextlib import asynccontextmanager
-from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.api import chat, projects, analysis, data
-from app.db import init_db, close_db
 
-# Configure logging
+# ── Logging ────────────────────────────────────────────────────────────────────
 logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
-    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
+    level=getattr(logging, settings.log_level, logging.INFO),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
 
 
+# ── Startup / Shutdown ─────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan: startup and shutdown events."""
+    """Initialize services on startup, clean up on shutdown."""
+    # Create data directories
+    for d in [settings.data_dir, settings.downloads_dir, settings.outputs_dir, settings.projects_dir]:
+        Path(d).mkdir(parents=True, exist_ok=True)
+
     logger.info("=" * 60)
-    logger.info("  CRAFTY GIS — Starting Up")
-    logger.info(f"  Version: {settings.APP_VERSION}")
-    logger.info(f"  Environment: {settings.ENVIRONMENT}")
-    logger.info(f"  Debug Mode: {settings.DEBUG}")
+    logger.info("🌍  CRAFTY GIS — Starting Up")
+    logger.info(f"    Version : {settings.app_version}")
+    logger.info(f"    Env     : {settings.environment}")
+    logger.info(f"    AI      : {'Ollama (' + settings.ollama_model + ')' if settings.has_ollama_configured else 'HuggingFace' if settings.has_huggingface else 'None'}")
+    logger.info(f"    DB      : {settings.database_url.split('///')[0]}")
+    logger.info(f"    Data    : {settings.data_dir}")
     logger.info("=" * 60)
 
-    # Ensure data directories exist
-    os.makedirs(settings.DATA_DIR, exist_ok=True)
-    os.makedirs(os.path.join(settings.DATA_DIR, "downloads"), exist_ok=True)
-    os.makedirs(os.path.join(settings.DATA_DIR, "outputs"), exist_ok=True)
-    os.makedirs(os.path.join(settings.DATA_DIR, "uploads"), exist_ok=True)
-    os.makedirs(os.path.join(settings.DATA_DIR, "outputs", "reports"), exist_ok=True)
-    os.makedirs(os.path.join(settings.DATA_DIR, "temp"), exist_ok=True)
-
-    # Initialize database
-    try:
-        await init_db()
-        logger.info("Database initialized")
-    except Exception as e:
-        logger.warning(f"Database initialization deferred: {e}")
-
-    logger.info("CRAFTY GIS is ready!")
     yield
 
-    # Shutdown
-    await close_db()
-    logger.info("CRAFTY GIS shutting down")
+    logger.info("🛑  CRAFTY GIS — Shutting down.")
 
 
+# ── FastAPI App ─────────────────────────────────────────────────────────────────
 app = FastAPI(
-    title=settings.APP_NAME,
-    description="Conversational Remote Analysis & Field Technology for GIS — AI-powered geospatial problem-solving platform",
-    version=settings.APP_VERSION,
+    title="CRAFTY GIS",
+    description=(
+        "Conversational Remote Analysis & Field Technology for GIS — "
+        "AI-Powered Geospatial Intelligence Platform"
+    ),
+    version=settings.app_version,
     lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-# CORS middleware
+# ── CORS ────────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.cors_origins + ["*"] if settings.debug else settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# Request logging middleware
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    start_time = datetime.utcnow()
-    response = await call_next(request)
-    elapsed = (datetime.utcnow() - start_time).total_seconds()
-    logger.debug(f"{request.method} {request.url.path} -> {response.status_code} ({elapsed:.3f}s)")
-    return response
-
-
-# Register routers
-app.include_router(chat.router)
-app.include_router(projects.router)
-app.include_router(analysis.router)
-app.include_router(data.router)
-
-
-# Root endpoint
-@app.get("/")
-async def root():
-    return {
-        "name": settings.APP_NAME,
-        "tagline": "Conversational Remote Analysis & Field Technology for GIS",
-        "description": "AI-Powered GIS & Remote Sensing Problem-Solving Platform",
-        "version": settings.APP_VERSION,
-        "environment": settings.ENVIRONMENT,
-        "docs": "/docs",
-        "api": "/api",
-        "timestamp": datetime.utcnow().isoformat(),
-    }
-
-
-# API info endpoint
-@app.get("/api")
-async def api_info():
-    return {
-        "name": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "endpoints": {
-            "chat": "/api/chat",
-            "projects": "/api/projects",
-            "analysis": "/api/analysis",
-            "data": "/api/data",
-        },
-        "health": "/api/chat/health",
-        "documentation": "/docs",
-    }
-
-
-# Health check
-@app.get("/health")
+# ── Health Check ────────────────────────────────────────────────────────────────
+@app.get("/health", tags=["System"])
 async def health():
+    """System health check — verifies API is running."""
     return {
-        "status": "healthy",
-        "service": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "timestamp": datetime.utcnow().isoformat(),
+        "status": "ok",
+        "service": "CRAFTY GIS",
+        "version": settings.app_version,
+        "ai_backend": "groq" if settings.has_groq else "ollama",
+        "data_sources": {
+            "copernicus": settings.has_copernicus,
+            "nasa_earthdata": settings.has_nasa,
+            "usgs": bool(settings.usgs_username),
+            "bhoonidhi": bool(settings.bhoonidhi_username),
+        },
     }
 
 
-# Global exception handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": "Internal server error",
-            "detail": str(exc) if settings.DEBUG else "An unexpected error occurred",
-        },
-    )
+@app.get("/api/ai/status", tags=["System"])
+async def ai_status():
+    """Check AI backend connectivity (Groq + Ollama)."""
+    from app.services.groq_service import GroqService
+    from app.services.ollama_service import OllamaService
+
+    groq = GroqService()
+    ollama = OllamaService()
+    groq_health = await groq.check_health()
+    ollama_health = await ollama.check_health()
+    await groq.close()
+    await ollama.close()
+
+    return {
+        "primary": "groq" if settings.has_groq else "ollama",
+        "groq": groq_health,
+        "ollama": ollama_health,
+    }
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.DEBUG,
-        log_level=settings.LOG_LEVEL.lower(),
-    )
+# ── API Routers ─────────────────────────────────────────────────────────────────
+from app.api.analysis import router as analysis_router
+from app.api.chat import router as chat_router
+from app.api.projects import router as projects_router
+from app.api.data import router as data_router
+
+app.include_router(analysis_router)
+app.include_router(chat_router)
+app.include_router(projects_router)
+app.include_router(data_router)
+
+
+# ── Static Frontend (built Next.js) ─────────────────────────────────────────────
+frontend_path = Path(__file__).resolve().parent.parent / "frontend" / "static"
+if frontend_path.exists():
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+else:
+    @app.get("/", tags=["System"])
+    async def root():
+        return {
+            "message": "🌍 CRAFTY GIS API is running.",
+            "docs": "http://localhost:8000/docs",
+            "frontend": "Run `npm run dev` in crafty-gis-client/ (http://localhost:3000)",
+            "hint": "Or run ./start.sh (Linux) / start.bat (Windows) to start everything.",
+        }

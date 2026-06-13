@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from app.core.ai_investigator import AIInvestigator
 from app.core.workflow_engine import WorkflowEngine
-from app.services.ollama_service import OllamaService
+from app.services.groq_service import HybridAIService
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,8 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 # In-memory stores (replace with DB in production)
 sessions: Dict[str, Dict[str, Any]] = {}
 workflows: Dict[str, Any] = {}
-investigator = AIInvestigator()
+_ai_service = HybridAIService()
+investigator = AIInvestigator(_ai_service)
 
 
 class ChatRequest(BaseModel):

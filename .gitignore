@@ -54,10 +54,15 @@ build/
 .eslintcache
 .tsbuildinfo
 
-# Environment files
+# Environment files — NEVER push these (contain credentials)
 .env
 .env.local
 .env.*.local
+crafty-gis-server/.env
+crafty-gis-client/.env.local
+# Safe to push (no real secrets):
+# .env.example  ← this is intentionally NOT in .gitignore
+
 
 # Debug logs
 npm-debug.log*
@@ -105,6 +110,11 @@ data/projects/*
 !data/temp/.gitkeep
 !data/projects/.gitkeep
 
+# crafty-gis-server generated files
+crafty-gis-server/frontend/static/
+crafty-gis-server/outputs/
+crafty-gis-server/sample_data/
+
 # Raster processing intermediates
 *.aux.xml
 *.ovr
@@ -132,6 +142,27 @@ docs/build/
 # =============================================================================
 src-tauri/target/
 src-tauri/gen/
+desktop/
+build_exe.py
+build-frontend.js
+versions/
+
+# =============================================================================
+# Binary files & large artifacts
+# =============================================================================
+*.db
+*.sqlite
+*.sqlite3
+GIT_STAR/xlsx/scripts/Xlsx
+GIT_STAR/docx/validator/DocumentFormat.OpenXml.dll
+GIT_STAR/*.docx
+GIT_STAR/*.png
+GIT_STAR/*.gif
+GIT_STAR/*.tif
+GIT_STAR/*.tiff
+GIT_STAR/*.geojson
+GIT_STAR/assignment_images/
+GIT_STAR/data_run/
 
 # =============================================================================
 # Graphify & agent memory
@@ -139,6 +170,13 @@ src-tauri/gen/
 graphify-out/
 .agent/memory/
 git_star_gains/
+
+# =============================================================================
+# Virtual environments & binaries
+# =============================================================================
+testenv/
+*.pyvenv
+*.pyc
 
 # =============================================================================
 # Misc

@@ -37,7 +37,7 @@ class GISProcessor:
     """
 
     def __init__(self, data_dir: str = None):
-        self.data_dir = data_dir or settings.DATA_DIR
+        self.data_dir = data_dir or settings.data_dir
         self.temp_dir = os.path.join(self.data_dir, "temp")
         os.makedirs(self.temp_dir, exist_ok=True)
 

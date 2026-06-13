@@ -1,0 +1,8 @@
+# Exclude scripts from language stats
+*.sh linguist-vendored
+*.bat linguist-vendored
+
+# Identify core languages
+*.py linguist-detectable=true
+*.ts linguist-detectable=true
+*.tsx linguist-detectable=true

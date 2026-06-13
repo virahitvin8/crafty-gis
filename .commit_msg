@@ -1,8 +1,0 @@
-feat: initial release v1.0.0 Gaia - CRAFTY GIS
-
-AI-Powered Geospatial Intelligence Platform
-- AI Investigation System, Workflow Engine, GIS Processor
-- Data Downloader 10+ sources, Report Generator
-- Next.js 16 dashboard, MapLibre GL maps
-- Local AI via Ollama, Docker deployment
-- Comprehensive documentation

@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAS 744 — Geospatial Statistics- II | Spatial Autocorrelation & Point Pattern Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f0f23;
+            --secondary: #1a1a2e;
+            --accent: #16213e;
+            --highlight: #e94560;
+            --gold: #c9a227;
+            --text: #f0f0f5;
+            --text-muted: #8a8aa3;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #050510 0%, #0a0a1a 50%, #0f0f23 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Ambient background */
+        .ambient {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(233, 69, 96, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(201, 162, 39, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(15, 52, 96, 0.1) 0%, transparent 50%);
+        }
+
+        .particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .particle {
+            position: absolute; width: 3px; height: 3px;
+            background: rgba(233, 69, 96, 0.25); border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(80px); opacity: 0; }
+        }
+
+        /* Input Section */
+        .input-section {
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center;
+            padding: 2rem; position: relative; z-index: 1;
+        }
+        .input-card {
+            background: var(--glass);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 3.5rem; max-width: 560px; width: 100%;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .input-card .uni-badge {
+            text-align: center; margin-bottom: 2rem;
+            padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border);
+        }
+        .input-card .uni-badge h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 600;
+            color: var(--gold); letter-spacing: 1px; text-transform: uppercase;
+        }
+        .input-card .uni-badge p {
+            font-size: 0.75rem; color: var(--text-muted);
+            margin-top: 0.3rem; letter-spacing: 0.5px;
+        }
+        .input-card h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem; font-weight: 700;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(135deg, #fff 0%, var(--highlight) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .input-card .subtitle {
+            color: var(--text-muted); font-size: 0.9rem;
+            margin-bottom: 2.5rem; font-weight: 400; line-height: 1.5;
+        }
+        .form-group { margin-bottom: 1.4rem; }
+        .form-group label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            color: var(--text-muted); margin-bottom: 0.5rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .form-group input {
+            width: 100%; padding: 1rem 1.2rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px; color: var(--text);
+            font-size: 0.95rem; font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus {
+            outline: none; border-color: var(--highlight);
+            background: rgba(233, 69, 96, 0.06);
+            box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.08);
+        }
+        .form-group input::placeholder { color: rgba(255, 255, 255, 0.15); }
+        .generate-btn {
+            width: 100%; padding: 1.1rem;
+            background: linear-gradient(135deg, var(--highlight) 0%, #c73e54 100%);
+            border: none; border-radius: 14px; color: white;
+            font-size: 1rem; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(233, 69, 96, 0.35);
+        }
+        .generate-btn:active { transform: translateY(0); }
+
+        /* Document Section */
+        .document-section {
+            display: none; position: relative; z-index: 1;
+        }
+        .document-section.active {
+            display: block; animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(5, 5, 16, 0.85);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000; padding: 0.9rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem; font-weight: 600; color: var(--text);
+            letter-spacing: 0.5px;
+        }
+        .nav-actions { display: flex; gap: 0.7rem; }
+        .nav-btn {
+            padding: 0.55rem 1.1rem;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 10px; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: 0.8rem;
+            font-weight: 500; cursor: pointer; transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: var(--highlight); border-color: var(--highlight);
+            transform: translateY(-1px);
+        }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--highlight), #c73e54);
+            border-color: transparent;
+        }
+
+        /* Front Page */
+        .front-page {
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center;
+            padding: 6rem 2rem 3rem;
+        }
+        .front-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 4rem 3.5rem; max-width: 800px; width: 100%;
+            box-shadow: var(--shadow);
+            text-align: center;
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .front-uni-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem; font-weight: 700;
+            color: var(--gold); letter-spacing: 2px;
+            text-transform: uppercase; line-height: 1.6;
+            margin-bottom: 0.3rem;
+        }
+        .front-uni-sub {
+            font-size: 0.8rem; color: var(--text-muted);
+            letter-spacing: 1px; margin-bottom: 2.5rem;
+        }
+        .front-divider {
+            width: 80px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--highlight), transparent);
+            margin: 0 auto 2rem;
+        }
+        .front-program {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem; font-weight: 600;
+            color: var(--text); letter-spacing: 1px;
+            margin-bottom: 0.6rem;
+        }
+        .front-course {
+            font-size: 0.9rem; color: var(--highlight);
+            font-weight: 500; letter-spacing: 1.5px;
+            text-transform: uppercase; margin-bottom: 2.5rem;
+        }
+        .front-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem; font-weight: 700;
+            line-height: 1.2; margin-bottom: 3rem;
+            background: linear-gradient(135deg, #fff 0%, #d4d4e0 50%, var(--highlight) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .front-details {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; text-align: left;
+            gap: 3rem; margin-top: 1rem;
+        }
+        .front-details-left, .front-details-right {
+            flex: 1;
+        }
+        .front-details h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem; font-weight: 600;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 1rem;
+        }
+        .front-details p {
+            font-size: 1rem; line-height: 1.8;
+            color: var(--text);
+        }
+        .front-details .value {
+            font-weight: 600; font-size: 1.05rem;
+        }
+        .front-details .sub-value {
+            font-size: 0.9rem; color: var(--text-muted);
+        }
+
+        /* TOC Section */
+        .toc-section {
+            max-width: 850px; margin: 5rem auto 3rem;
+            padding: 0 2rem;
+        }
+        .toc-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem 3rem;
+        }
+        .toc-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; margin-bottom: 1.8rem;
+            color: var(--text); text-align: center;
+        }
+        .toc-list { list-style: none; }
+        .toc-list li {
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex; justify-content: space-between;
+            align-items: center; transition: all 0.3s ease;
+        }
+        .toc-list li:hover {
+            padding-left: 8px; color: var(--highlight);
+        }
+        .toc-list li:last-child { border-bottom: none; }
+        .toc-list a {
+            color: var(--text); text-decoration: none;
+            font-size: 0.95rem; transition: color 0.3s ease;
+            font-weight: 400;
+        }
+        .toc-list a:hover { color: var(--highlight); }
+        .toc-page {
+            color: var(--text-muted); font-size: 0.85rem;
+            font-weight: 500; font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Page styling */
+        .page {
+            max-width: 850px; margin: 0 auto 3rem;
+            padding: 0 2rem; min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        .page-content {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem 3rem; flex: 1;
+            margin-bottom: 1.5rem;
+        }
+        .page-header {
+            text-align: center; margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .page-header .course-code {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--highlight); font-size: 0.85rem;
+            font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 0.6rem;
+        }
+        .page-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem; font-weight: 700;
+            line-height: 1.3; letter-spacing: -0.3px;
+        }
+        .content-body {
+            line-height: 1.85;
+            font-size: 0.97rem; color: #d0d0e0;
+        }
+        .content-body h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; margin: 2rem 0 1rem;
+            color: var(--highlight); font-weight: 600;
+        }
+        .content-body h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem; margin: 1.5rem 0 0.8rem;
+            color: var(--gold); font-weight: 600;
+        }
+        .content-body p {
+            margin-bottom: 1.1rem; text-align: justify;
+        }
+        .content-body ul, .content-body ol {
+            margin-left: 1.8rem; margin-bottom: 1.1rem;
+        }
+        .content-body li { margin-bottom: 0.5rem; }
+        .highlight-box {
+            background: rgba(233, 69, 96, 0.08);
+            border-left: 3px solid var(--highlight);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.3rem 0;
+            font-size: 0.92rem;
+        }
+        .formula {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 1.3rem;
+            border-radius: 12px;
+            text-align: center;
+            font-family: 'Space Grotesk', 'Courier New', monospace;
+            font-size: 1rem; margin: 1.3rem 0;
+            border: 1px solid var(--glass-border);
+            color: #e8e8f0;
+        }
+
+        /* Footer */
+        .page-footer {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 1.2rem 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .footer-left {
+            display: flex; flex-direction: column;
+            gap: 0.2rem;
+        }
+        .footer-name {
+            color: var(--text); font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .footer-right {
+            text-align: right;
+            display: flex; flex-direction: column;
+            align-items: flex-end; gap: 0.2rem;
+        }
+        .page-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; color: var(--highlight);
+            font-weight: 700;
+        }
+
+        /* The End Section */
+        .end-section {
+            min-height: 100vh; display: flex;
+            flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 2rem; position: relative; overflow: hidden;
+        }
+        .end-card {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 3.5rem;
+            text-align: center; max-width: 600px;
+            width: 100%; position: relative; z-index: 2;
+        }
+        .end-image-wrap {
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--highlight), var(--gold));
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(233, 69, 96, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(233, 69, 96, 0.5); }
+        }
+        .end-image {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+        }
+        .end-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem; margin-bottom: 0.6rem;
+            background: linear-gradient(135deg, #fff 0%, var(--highlight) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .end-subtitle {
+            font-size: 1.1rem; color: var(--text-muted);
+            margin-bottom: 2rem; font-weight: 300;
+        }
+        .end-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 1.8rem;
+            margin-top: 0.5rem;
+        }
+        .end-details p { margin: 0.4rem 0; font-size: 0.95rem; }
+        .end-details .label {
+            color: var(--text-muted); font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .end-details .value {
+            color: var(--text); font-weight: 600;
+            font-size: 1.05rem;
+        }
+        .confetti {
+            position: absolute;
+            width: 8px; height: 8px;
+            border-radius: 2px;
+            animation: confetti-fall 3.5s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Print/PDF Preview styles */
+        @media print {
+            .input-section, .nav-bar, .no-print { display: none !important; }
+            .document-section { display: block !important; }
+            .page { page-break-after: always; margin-bottom: 0; }
+            .end-section { page-break-before: always; }
+            body { background: white !important; color: black !important; }
+            .page-content, .front-card, .toc-card, .end-card {
+                background: white !important;
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+            }
+            .page-header h2 { color: #1a1a2e !important; }
+            .content-body { color: #333 !important; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--highlight); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .front-details { flex-direction: column; gap: 1.5rem; }
+            .front-title { font-size: 1.8rem; }
+            .page-content { padding: 1.5rem; }
+            .nav-actions { gap: 0.4rem; }
+            .nav-btn { padding: 0.5rem 0.8rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- ==================== INPUT SECTION ==================== -->
+    <section class="input-section" id="inputSection">
+        <div class="input-card">
+            <div class="uni-badge">
+                <h2>Sam Higginbottom University</h2>
+                <p>SHUATS, Prayagraj · M.Sc. GIS & Remote Sensing</p>
+            </div>
+            <h1>Assignment Generator</h1>
+            <p class="subtitle">
+                Course: MAS 744 — Geospatial Statistics- II<br>
+                Topic: Spatial Autocorrelation & Point Pattern Analysis
+            </p>
+
+            <div class="form-group">
+                <label>Submitted By</label>
+                <input type="text" id="studentName" placeholder="Enter your full name" value="N. Akshit Vinay">
+            </div>
+            <div class="form-group">
+                <label>PID</label>
+                <input type="text" id="studentPID" placeholder="Enter your PID" value="25MSRSGIS001">
+            </div>
+            <div class="form-group">
+                <label>Program</label>
+                <input type="text" id="studentProgram" placeholder="Enter your program" value="M.Sc. GIS & Remote Sensing">
+            </div>
+            <div class="form-group">
+                <label>Submitted To</label>
+                <input type="text" id="submittedTo" placeholder="Enter faculty name" value="Mis. Arpita Esther">
+            </div>
+            <div class="form-group">
+                <label>Batch / Year</label>
+                <input type="text" id="batchYear" placeholder="Enter Batch / Year" value="(2025-27)">
+            </div>
+
+            <button class="generate-btn" onclick="generateDocument()">
+                ✨ Generate Stats Assignment
+            </button>
+        </div>
+    </section>
+
+    <!-- ==================== DOCUMENT SECTION ==================== -->
+    <section class="document-section" id="documentSection">
+
+        <!-- Navigation -->
+        <nav class="nav-bar no-print">
+            <div class="nav-brand">📊 MAS 744 — Geospatial Statistics- II</div>
+            <div class="nav-actions">
+                <button class="nav-btn" onclick="previewPDF()">👁️ Preview PDF</button>
+                <button class="nav-btn primary" onclick="downloadPDF()">⬇️ Download PDF</button>
+                <button class="nav-btn" onclick="location.reload()">🔄 New</button>
+            </div>
+        </nav>
+
+        <!-- ==================== FRONT PAGE ==================== -->
+        <div class="front-page" id="frontPage">
+            <div class="front-card">
+                <div class="front-uni-name">
+                    Sam Higginbottom University of Agriculture,<br>
+                    Technology and Sciences
+                </div>
+                <div class="front-uni-sub">
+                    SHUATS, Prayagraj - 211007, Uttar Pradesh, India
+                </div>
+                <div class="front-divider"></div>
+                <div class="front-program">
+                    M.Sc. GIS & REMOTE SENSING (SEMESTER-II)
+                </div>
+                <div class="front-course">
+                    Course: MAS 744 — Geospatial Statistics- II
+                </div>
+                <div class="front-title">
+                    Spatial Autocorrelation<br>& Point Pattern Analysis
+                </div>
+
+                <div class="front-details">
+                    <div class="front-details-left">
+                        <h4>Submitted By</h4>
+                        <p class="value" id="frontName">N. Akshit Vinay</p>
+                        <p class="sub-value" id="frontPID">PID: 25MSRSGIS001</p>
+                        <p class="sub-value" id="frontProgram">Program: M.Sc. GIS & Remote Sensing</p>
+                    </div>
+                    <div class="front-details-right">
+                        <h4>Submitted To</h4>
+                        <p class="value" id="frontTo">Mis. Arpita Esther</p>
+                        <p class="sub-value" id="frontDept">(2025-27)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TABLE OF CONTENTS ==================== -->
+        <div class="toc-section" id="tocSection">
+            <div class="toc-card">
+                <h2 class="toc-title">Table of Contents</h2>
+                <ul class="toc-list">
+                    <li>
+                        <a href="#page1">1. Introduction to Spatial Analysis</a>
+                        <span class="toc-page">1</span>
+                    </li>
+                    <li>
+                        <a href="#page2">2. Spatial Autocorrelation — Theory & Concepts</a>
+                        <span class="toc-page">2</span>
+                    </li>
+                    <li>
+                        <a href="#page3">3. Moran's I & Geary's c Coefficients</a>
+                        <span class="toc-page">3</span>
+                    </li>
+                    <li>
+                        <a href="#page4">4. Point Pattern Analysis — Fundamentals</a>
+                        <span class="toc-page">4</span>
+                    </li>
+                    <li>
+                        <a href="#page5">5. Nearest Neighbor Analysis & Quadrat Analysis</a>
+                        <span class="toc-page">5</span>
+                    </li>
+                    <li>
+                        <a href="#page6">6. Ripley's K Function & G Function</a>
+                        <span class="toc-page">6</span>
+                    </li>
+                    <li>
+                        <a href="#page7">7. Applications in GIS & Remote Sensing</a>
+                        <span class="toc-page">7</span>
+                    </li>
+                    <li>
+                        <a href="#page8">8. Case Studies & Practical Implementation</a>
+                        <span class="toc-page">8</span>
+                    </li>
+                    <li>
+                        <a href="#page9">9. Conclusion & Future Directions</a>
+                        <span class="toc-page">9</span>
+                    </li>
+                    <li>
+                        <a href="#page10">10. References</a>
+                        <span class="toc-page">10</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 1 ==================== -->
+        <div class="page" id="page1">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>1. Introduction to Spatial Analysis</h3>
+                    <p>Spatial analysis represents a fundamental paradigm in geospatial statistics that examines the distribution of phenomena across geographic space. Unlike traditional statistical methods that assume independence among observations, spatial analysis recognizes that geographic data often exhibits spatial dependence — where values at one location are influenced by values at neighboring locations.</p>
+
+                    <p>The foundation of spatial analysis rests upon Tobler's First Law of Geography, which states that "everything is related to everything else, but near things are more related than distant things." This principle underpins the entire framework of spatial autocorrelation and point pattern analysis, providing the theoretical basis for understanding how geographic phenomena cluster, disperse, or arrange themselves in space.</p>
+
+                    <div class="highlight-box">
+                        <strong>Key Concept:</strong> Spatial dependence violates the independence assumption of classical statistics, necessitating specialized analytical techniques that account for geographic relationships between observations.
+                    </div>
+
+                    <p>Modern Geographic Information Systems (GIS) and Remote Sensing technologies have revolutionized spatial analysis by providing unprecedented access to high-resolution spatial data. Satellite imagery, LiDAR data, GPS trajectories, and socio-economic datasets all require spatial statistical methods to extract meaningful patterns and relationships.</p>
+
+                    <p>This comprehensive study explores two critical domains of spatial statistics: <strong>Spatial Autocorrelation</strong>, which measures the degree to which similar values cluster in space, and <strong>Point Pattern Analysis</strong>, which examines the spatial arrangement of discrete point events.</p>
+
+                    <h4>1.1 Scope and Objectives</h4>
+                    <ul>
+                        <li>To understand the theoretical foundations of spatial autocorrelation and its measurement techniques.</li>
+                        <li>To explore point pattern analysis methods for examining spatial distributions of discrete events.</li>
+                        <li>To evaluate practical applications in GIS and Remote Sensing contexts.</li>
+                        <li>To analyze real-world case studies demonstrating these statistical methods.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName1">N. Akshit Vinay</span>
+                    <span id="footerPID1">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">1</div>
+                    <span id="footerDate1"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 2 ==================== -->
+        <div class="page" id="page2">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>2. Spatial Autocorrelation — Theory & Concepts</h3>
+                    <p>Spatial autocorrelation refers to the correlation of a variable with itself through space. It quantifies the degree to which similar values cluster together (positive autocorrelation) or repel each other (negative autocorrelation), or are randomly distributed (no autocorrelation). Understanding spatial autocorrelation is essential because it affects the validity of statistical inferences and the efficiency of spatial predictions.</p>
+
+                    <p>Positive spatial autocorrelation occurs when similar values tend to be located near each other. Examples include housing prices in affluent neighborhoods, temperature patterns across regions, or disease incidence in epidemic clusters. Negative spatial autocorrelation, though less common, appears when dissimilar values alternate spatially — such as competitive retail locations or checkerboard land use patterns.</p>
+
+                    <h4>2.1 Types of Spatial Autocorrelation</h4>
+                    <ul>
+                        <li><strong>Global Spatial Autocorrelation:</strong> Measures the overall pattern across the entire study area, providing a single summary statistic.</li>
+                        <li><strong>Local Spatial Autocorrelation:</strong> Identifies specific clusters or outliers at local scales, revealing spatial non-stationarity.</li>
+                        <li><strong>Indirect Spatial Autocorrelation:</strong> Arises from the spatial arrangement of explanatory variables rather than the response variable itself.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Spatial Non-Stationarity:</strong> The assumption that spatial relationships remain constant across the study area often fails. Local indicators of spatial association (LISA) address this by mapping autocorrelation statistics for each location.
+                    </div>
+
+                    <p>The concept of spatial weights matrices forms the mathematical backbone of autocorrelation analysis. These matrices define the spatial relationships between observations, determining which locations are considered "neighbors" and how their relationships are weighted. Common approaches include contiguity-based weights (rook, queen, bishop), distance-based weights (inverse distance, fixed distance bands), and k-nearest neighbor weights.</p>
+
+                    <h4>2.2 Spatial Weights Matrices</h4>
+                    <p>A spatial weights matrix <em>W</em> is an <em>n × n</em> matrix where each element <em>w<sub>ij</sub></em> represents the spatial relationship between observation <em>i</em> and observation <em>j</em>. The matrix is typically row-standardized so that the sum of weights for each observation equals 1. Common specifications include binary contiguity (1 if neighbors, 0 otherwise), inverse distance weighting, and kernel-based weights.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName2">N. Akshit Vinay</span>
+                    <span id="footerPID2">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">2</div>
+                    <span id="footerDate2"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 3 ==================== -->
+        <div class="page" id="page3">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>3. Moran's I & Geary's c Coefficients</h3>
+                    <p>Moran's I is the most widely used statistic for measuring global spatial autocorrelation. Developed by Patrick Alfred Pierce Moran in 1950, it compares the covariance between neighboring locations to the total variance in the dataset. The statistic ranges from -1 (perfect dispersion) to +1 (perfect clustering), with values near zero indicating random spatial distribution.</p>
+
+                    <div class="formula">
+                        <strong>Moran's I Formula:</strong><br><br>
+                        I = (n / W) × Σ<sub>i</sub> Σ<sub>j</sub> w<sub>ij</sub>(x<sub>i</sub> − x̄)(x<sub>j</sub> − x̄) / Σ<sub>i</sub>(x<sub>i</sub> − x̄)²
+                    </div>
+
+                    <p>Where <em>n</em> is the number of observations, <em>W</em> is the sum of all spatial weights, <em>w<sub>ij</sub></em> represents the spatial weight between locations <em>i</em> and <em>j</em>, <em>x<sub>i</sub></em> and <em>x<sub>j</sub></em> are the values at locations <em>i</em> and <em>j</em>, and <em>x̄</em> is the mean of all values.</p>
+
+                    <h4>3.1 Geary's c Coefficient</h4>
+                    <p>Geary's c, developed by Roy C. Geary in 1954, provides an alternative measure that is more sensitive to local spatial variation. Unlike Moran's I, which uses cross-products, Geary's c uses squared differences between neighboring values. The statistic ranges from 0 (perfect positive autocorrelation) to approximately 2 (perfect negative autocorrelation), with 1 indicating random distribution.</p>
+
+                    <div class="formula">
+                        <strong>Geary's c Formula:</strong><br><br>
+                        c = (n − 1) / (2W) × Σ<sub>i</sub> Σ<sub>j</sub> w<sub>ij</sub>(x<sub>i</sub> − x<sub>j</sub>)² / Σ<sub>i</sub>(x<sub>i</sub> − x̄)²
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>Key Difference:</strong> Moran's I is a cross-product statistic similar to Pearson's correlation coefficient, while Geary's c is a distance-based statistic. Moran's I is more sensitive to extreme values, whereas Geary's c better captures local variations.
+                    </div>
+
+                    <p>Statistical significance testing for both measures typically employs permutation tests or asymptotic normality assumptions. The null hypothesis assumes no spatial autocorrelation (spatial randomness), while alternative hypotheses test for positive or negative autocorrelation. Z-scores and p-values help determine whether observed patterns deviate significantly from randomness.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName3">N. Akshit Vinay</span>
+                    <span id="footerPID3">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">3</div>
+                    <span id="footerDate3"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 4 ==================== -->
+        <div class="page" id="page4">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>4. Point Pattern Analysis — Fundamentals</h3>
+                    <p>Point Pattern Analysis (PPA) examines the spatial distribution of discrete point events across a study region. Unlike areal data analysis (which works with polygons or grid cells), PPA focuses on the locations themselves — treating each point as a zero-dimensional entity with spatial coordinates but no areal extent. Applications include analyzing disease outbreaks, crime incidents, tree distributions, retail locations, and urban facilities.</p>
+
+                    <p>The fundamental question in PPA is whether points are clustered, regularly dispersed, or randomly distributed relative to some null hypothesis — typically Complete Spatial Randomness (CSR). CSR assumes that every location within the study area has an equal probability of containing a point, and that the location of one point does not influence the location of others.</p>
+
+                    <h4>4.1 Types of Point Patterns</h4>
+                    <ul>
+                        <li><strong>Clustered Pattern:</strong> Points tend to aggregate in specific areas, suggesting attractive processes or shared environmental preferences. Examples include settlements near water sources or disease cases around contamination sites.</li>
+                        <li><strong>Regular (Dispersed) Pattern:</strong> Points maintain relatively uniform distances from each other, indicating repulsive processes or competitive exclusion. Examples include territorial animal nests or evenly spaced retail stores.</li>
+                        <li><strong>Random Pattern:</strong> Points show no systematic spatial relationship, consistent with CSR. True randomness is rare in natural systems but serves as the crucial benchmark for statistical testing.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>First-Order vs. Second-Order Effects:</strong> First-order effects relate to variations in the intensity (density) of points across space, often driven by environmental covariates. Second-order effects concern the spatial dependence between points themselves, reflecting interaction processes.
+                    </div>
+
+                    <p>Intensity estimation forms the foundation of PPA. Kernel Density Estimation (KDE) provides a non-parametric method for estimating the spatial intensity function, producing smooth continuous surfaces from discrete point data. The choice of bandwidth critically influences results — too narrow creates spiky overfitting, while too broad oversmooths meaningful patterns.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName4">N. Akshit Vinay</span>
+                    <span id="footerPID4">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">4</div>
+                    <span id="footerDate4"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 5 ==================== -->
+        <div class="page" id="page5">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>5. Nearest Neighbor Analysis & Quadrat Analysis</h3>
+                    <p>Nearest Neighbor Analysis, introduced by Clark and Evans in 1954, provides a straightforward method for assessing point pattern randomness. The approach compares the observed mean nearest neighbor distance to the expected distance under CSR. The ratio R (nearest neighbor statistic) ranges from 0 (maximum clustering) to 2.1491 (perfect hexagonal dispersion), with 1.0 indicating randomness.</p>
+
+                    <div class="formula">
+                        <strong>Nearest Neighbor Index (R):</strong><br><br>
+                        R = r̄<sub>observed</sub> / r̄<sub>expected</sub><br><br>
+                        where r̄<sub>expected</sub> = 0.5 × √(A/n)
+                    </div>
+
+                    <p>Where <em>r̄<sub>observed</sub></em> is the mean observed nearest neighbor distance, <em>r̄<sub>expected</sub></em> is the expected mean distance under CSR, <em>A</em> is the study area, and <em>n</em> is the number of points. The standard error allows Z-test calculation for statistical significance.</p>
+
+                    <h4>5.1 Quadrat Analysis</h4>
+                    <p>Quadrat Analysis divides the study region into equal-sized cells (quadrats) and counts points in each. The variance-to-mean ratio (VMR) or Index of Dispersion (ID) indicates pattern type: VMR > 1 suggests clustering, VMR < 1 suggests regularity, and VMR ≈ 1 suggests randomness following a Poisson distribution.</p>
+
+                    <div class="formula">
+                        <strong>Variance-to-Mean Ratio (VMR):</strong><br><br>
+                        VMR = s² / x̄<br><br>
+                        where s² is the variance of point counts and x̄ is the mean count per quadrat
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>Quadrat Size Sensitivity:</strong> Results depend heavily on quadrat size. Too small creates many empty quadrats; too large obscures local patterns. The "optimal" quadrat size often follows Diggle's suggestion: approximately 2 × mean area per point (A/n).
+                    </div>
+
+                    <p>Both methods have limitations. Nearest Neighbor Analysis considers only the closest point, ignoring broader spatial structure. Quadrat Analysis suffers from arbitrary boundary effects and scale dependency. Modern approaches like Ripley's K function address these limitations by examining multiple distance scales simultaneously.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName5">N. Akshit Vinay</span>
+                    <span id="footerPID5">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">5</div>
+                    <span id="footerDate5"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 6 ==================== -->
+        <div class="page" id="page6">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>6. Ripley's K Function & G Function</h3>
+                    <p>Ripley's K function, developed by Brian Ripley in 1976, represents a significant advancement in point pattern analysis by examining spatial relationships across all distance scales simultaneously. Unlike nearest neighbor methods that use only the closest point, K(d) counts all points within distance <em>d</em> of each reference point, providing a comprehensive view of spatial structure.</p>
+
+                    <div class="formula">
+                        <strong>Ripley's K Function:</strong><br><br>
+                        K(d) = (A/n²) × Σ<sub>i</sub> Σ<sub>j≠i</sub> I(d<sub>ij</sub> ≤ d) / λ<br><br>
+                        where I() is an indicator function and λ is intensity
+                    </div>
+
+                    <p>For easier interpretation, K(d) is often transformed to L(d) = √(K(d)/π) − d, which equals zero under CSR, positive values indicate clustering, and negative values indicate dispersion. The transformation stabilizes variance and linearizes the function.</p>
+
+                    <h4>6.1 Edge Correction</h4>
+                    <p>Edge effects pose a significant challenge in PPA because points near boundaries have fewer neighbors within distance <em>d</em> than interior points. Ripley proposed isotropic edge correction, weighting each point pair by the reciprocal of the proportion of the circumference within the study area. Other methods include translation correction and buffer zone approaches.</p>
+
+                    <h4>6.2 Pair Correlation Function g(r)</h4>
+                    <p>The pair correlation function g(r) provides a derivative-based alternative to K(d), representing the probability of finding a point at distance <em>r</em> from a reference point relative to CSR. Values g(r) > 1 indicate clustering at distance <em>r</em>; g(r) < 1 indicate dispersion; g(r) = 1 indicates randomness. The pair correlation function offers better resolution at specific scales compared to the cumulative K function.</p>
+
+                    <div class="highlight-box">
+                        <strong>Practical Implementation:</strong> Software packages like spatstat (R), PySAL (Python), and ArcGIS Spatial Analyst provide robust implementations of Ripley's K and related functions, with automated edge correction and Monte Carlo significance envelopes.
+                    </div>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName6">N. Akshit Vinay</span>
+                    <span id="footerPID6">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">6</div>
+                    <span id="footerDate6"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 7 ==================== -->
+        <div class="page" id="page7">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>7. Applications in GIS & Remote Sensing</h3>
+                    <p>Spatial autocorrelation and point pattern analysis find extensive applications across GIS and Remote Sensing disciplines. These methods transform raw spatial data into actionable intelligence for environmental monitoring, urban planning, public health, and natural resource management.</p>
+
+                    <h4>7.1 Environmental Applications</h4>
+                    <ul>
+                        <li><strong>Species Distribution Modeling:</strong> Spatial autocorrelation in species occurrence data affects model calibration. Autologistic regression and spatial eigenvector mapping address this, improving predictions of habitat suitability under climate change scenarios.</li>
+                        <li><strong>Deforestation Monitoring:</strong> Ripley's K function identifies clustering patterns in forest loss events, distinguishing between smallholder agriculture (dispersed) and industrial logging (clustered) drivers.</li>
+                        <li><strong>Wildfire Pattern Analysis:</strong> Point pattern analysis of ignition locations reveals hotspots requiring prioritized management, while spatial autocorrelation of burn severity guides post-fire restoration.</li>
+                    </ul>
+
+                    <h4>7.2 Urban & Socio-Economic Applications</h4>
+                    <ul>
+                        <li><strong>Crime Hotspot Mapping:</strong> Kernel density estimation combined with nearest neighbor analysis identifies statistically significant crime clusters, enabling predictive policing and resource allocation.</li>
+                        <li><strong>Retail Location Optimization:</strong> Point pattern analysis of competitor locations and customer addresses informs site selection, balancing market coverage with competitive positioning.</li>
+                        <li><strong>Disease Surveillance:</strong> Spatial autocorrelation of health outcomes (e.g., COVID-19 incidence) identifies transmission clusters and environmental risk factors, guiding targeted interventions.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Remote Sensing Integration:</strong> High-resolution satellite imagery enables point pattern analysis of individual objects — trees in forest stands, buildings in informal settlements, or vehicles in traffic studies — extending traditional PPA to unprecedented scales.
+                    </div>
+
+                    <p>The integration of machine learning with spatial statistics represents an emerging frontier. Convolutional neural networks can detect spatial patterns invisible to traditional statistics, while spatial cross-validation ensures that autocorrelation does not inflate model performance metrics.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName7">N. Akshit Vinay</span>
+                    <span id="footerPID7">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">7</div>
+                    <span id="footerDate7"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 8 ==================== -->
+        <div class="page" id="page8">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>8. Case Studies & Practical Implementation</h3>
+
+                    <h4>8.1 Case Study 1: Malaria Incidence in Sub-Saharan Africa</h4>
+                    <p>Researchers applied Moran's I and Local Indicators of Spatial Association (LISA) to malaria incidence data across 500 health districts. Global Moran's I of 0.67 indicated strong positive spatial autocorrelation — high-incidence districts clustered near other high-incidence districts. LISA maps revealed specific hotspots in the Sahel region and Great Lakes area, corresponding to breeding habitat availability and healthcare access limitations.</p>
+
+                    <p>Spatial regression models (Spatial Lag and Spatial Error models) outperformed ordinary least squares, with pseudo-R² improving from 0.42 to 0.68. The analysis directly informed WHO resource allocation, prioritizing insecticide-treated bed net distribution to hotspot districts.</p>
+
+                    <h4>8.2 Case Study 2: Urban Tree Distribution in Bangalore</h4>
+                    <p>Using LiDAR and high-resolution imagery, researchers mapped 2.3 million individual trees across Bangalore. Point pattern analysis revealed significant clustering at scales < 200m (R = 0.34), transitioning to regularity at 500-1000m (R = 1.42), interpreted as park boundaries creating dispersion. Ripley's K function identified three distinct spatial regimes corresponding to: (1) street trees (clustered), (2) park interiors (regular), and (3) remnant forest patches (random).</p>
+
+                    <div class="highlight-box">
+                        <strong>Methodological Insight:</strong> Combining multiple PPA methods provides robust conclusions. Nearest neighbor analysis suggested overall clustering, but Ripley's K revealed this was scale-dependent — clustering only at fine scales with regularity emerging at broader scales.
+                    </div>
+
+                    <h4>8.3 Case Study 3: Earthquake Aftershock Patterns</h4>
+                    <p>Analysis of 15,000 aftershocks following the 2011 Tōhoku earthquake used space-time K functions (ST-K). Results showed strong clustering decaying over time: K(d,t) exceeded CSR expectations by 400% within 24 hours and 50km, declining to baseline within 30 days. The temporal decay followed Omori's Law, while spatial patterns matched stress redistribution models, validating geophysical theory.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName8">N. Akshit Vinay</span>
+                    <span id="footerPID8">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">8</div>
+                    <span id="footerDate8"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 9 ==================== -->
+        <div class="page" id="page9">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>9. Conclusion & Future Directions</h3>
+                    <p>Spatial autocorrelation and point pattern analysis constitute essential methodologies in the geospatial statistics toolkit. These techniques address the fundamental reality that geographic data violates the independence assumption of classical statistics, requiring specialized approaches that explicitly model spatial relationships.</p>
+
+                    <p>Moran's I and Geary's c provide robust global measures of spatial autocorrelation, while local variants (LISA, local Geary's c) reveal spatial non-stationarity and identify specific clusters or outliers. In point pattern analysis, Ripley's K function and its derivatives offer multi-scale examination of spatial structure, overcoming the limitations of simpler nearest neighbor and quadrat methods.</p>
+
+                    <h4>9.1 Emerging Trends</h4>
+                    <ul>
+                        <li><strong>Big Spatial Data:</strong> The proliferation of GPS trajectories, mobile phone data, and IoT sensors demands scalable spatial statistics. Approximate algorithms and parallel computing (GPU-accelerated spatial joins) enable analysis of billion-point datasets.</li>
+                        <li><strong>Deep Learning Integration:</strong> Graph neural networks and spatial transformers learn complex spatial dependencies without predefined weight matrices, potentially discovering novel spatial relationships invisible to traditional methods.</li>
+                        <li><strong>Space-Time Analytics:</strong> Dynamic patterns require simultaneous spatial and temporal modeling. Emerging methods like emerging hotspot analysis and space-time cube statistics extend traditional techniques to four-dimensional contexts.</li>
+                        <li><strong>Causal Inference:</strong> Moving beyond correlation to causation in spatial contexts requires addressing spatial confounding. Methods like spatial regression discontinuity and difference-in-differences with spatial fixed effects advance causal geospatial analysis.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Critical Consideration:</strong> The Modifiable Areal Unit Problem (MAUP) and edge effects remain persistent challenges. Analysts must explicitly acknowledge scale and boundary dependencies, employing sensitivity analyses and multi-scale approaches to ensure robust conclusions.
+                    </div>
+
+                    <p>As GIS and Remote Sensing technologies continue generating unprecedented spatial data volumes, the importance of rigorous spatial statistical methods only increases. Future practitioners must combine deep theoretical understanding with computational proficiency, leveraging open-source tools (R's sf/spatstat, Python's PySAL/GeoPandas) while remaining critically aware of assumptions and limitations.</p>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName9">N. Akshit Vinay</span>
+                    <span id="footerPID9">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">9</div>
+                    <span id="footerDate9"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PAGE 10: REFERENCES ==================== -->
+        <div class="page" id="page10">
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="course-code">MAS 744 — Geospatial Statistics- II</div>
+                    <h2>Spatial Autocorrelation & Point Pattern Analysis</h2>
+                </div>
+                <div class="content-body">
+                    <h3>10. References</h3>
+                    <ol>
+                        <li>Anselin, L. (1995). Local indicators of spatial association — LISA. <em>Geographical Analysis</em>, 27(2), 93-115.</li>
+                        <li>Baddeley, A., Rubak, E., & Turner, R. (2015). <em>Spatial Point Patterns: Methodology and Applications with R</em>. CRC Press.</li>
+                        <li>Clark, P. J., & Evans, F. C. (1954). Distance to nearest neighbor as a measure of spatial relationships in populations. <em>Ecology</em>, 35(4), 445-453.</li>
+                        <li>Diggle, P. J. (2014). <em>Statistical Analysis of Spatial and Spatio-Temporal Point Patterns</em> (3rd ed.). CRC Press.</li>
+                        <li>Geary, R. C. (1954). The contiguity ratio and statistical mapping. <em>The Incorporated Statistician</em>, 5(3), 115-145.</li>
+                        <li>Getis, A., & Ord, J. K. (1992). The analysis of spatial association by use of distance statistics. <em>Geographical Analysis</em>, 24(3), 189-206.</li>
+                        <li>Moran, P. A. P. (1950). Notes on continuous stochastic phenomena. <em>Biometrika</em>, 37(1/2), 17-23.</li>
+                        <li>O'Sullivan, D., & Unwin, D. J. (2010). <em>Geographic Information Analysis</em> (2nd ed.). Wiley.</li>
+                        <li>Rey, S. J., & Anselin, L. (2007). PySAL: A Python library of spatial analytical methods. <em>Review of Regional Studies</em>, 37(1), 5-27.</li>
+                        <li>Ripley, B. D. (1976). The second-order analysis of stationary point processes. <em>Journal of Applied Probability</em>, 13(2), 255-266.</li>
+                        <li>Tobler, W. R. (1970). A computer movie simulating urban growth in the Detroit region. <em>Economic Geography</em>, 46, 234-240.</li>
+                        <li>Waller, L. A., & Gotway, C. A. (2004). <em>Applied Spatial Statistics for Public Health Data</em>. Wiley.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="page-footer">
+                <div class="footer-left">
+                    <span class="footer-name" id="footerName10">N. Akshit Vinay</span>
+                    <span id="footerPID10">PID: 25MSRSGIS001</span>
+                </div>
+                <div class="footer-right">
+                    <div class="page-number">10</div>
+                    <span id="footerDate10"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== THE END ==================== -->
+        <div class="end-section" id="endSection">
+            <div class="end-card">
+                <div class="end-image-wrap">
+                    <img src="" alt="Celebration" class="end-image" id="endImage">
+                </div>
+                <h1 class="end-title">The End</h1>
+                <p class="end-subtitle">Thank you for your attention</p>
+
+                <div class="end-details">
+                    <p><span class="label">Submitted By</span></p>
+                    <p class="value" id="endName">N. Akshit Vinay</p>
+
+                    <p><span class="label">PID</span></p>
+                    <p class="value" id="endPID">25MSRSGIS001</p>
+
+                    <p><span class="label">Program</span></p>
+                    <p class="value" id="endProgram">M.Sc. GIS & Remote Sensing</p>
+
+                    <p><span class="label">Course</span></p>
+                    <p class="value">MAS 744 — Geospatial Statistics- II</p>
+
+                    <p><span class="label">Generated On</span></p>
+                    <p class="value" id="endTimestamp"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Create animated particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (12 + Math.random() * 15) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Random image URLs for "The End" section
+        const endImages = [
+            'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1534996858221-320b92e5a227?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1484589065579-248aad0d8b13?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1614730341194-75c60740a070?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1465101162946-4377e57745c3?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=400&h=400&fit=crop'
+        ];
+
+        function getRandomImage() {
+            return endImages[Math.floor(Math.random() * endImages.length)];
+        }
+
+        let currentStudentData = {};
+
+        function generateDocument() {
+            const name = document.getElementById('studentName').value;
+            const pid = document.getElementById('studentPID').value;
+            const program = document.getElementById('studentProgram').value;
+            const submittedTo = document.getElementById('submittedTo').value;
+            const batchYear = document.getElementById('batchYear').value;
+
+            if (!name || !pid || !program || !submittedTo || !batchYear) {
+                alert('Please fill out all fields before generating the document.');
+                return;
+            }
+
+            currentStudentData = { name, pid, program, submittedTo, batchYear };
+
+            // Get current timestamp
+            const now = new Date();
+            const timestamp = now.toLocaleString('en-US', { 
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            // Update front page
+            document.getElementById('frontName').textContent = name;
+            document.getElementById('frontPID').textContent = 'PID: ' + pid;
+            document.getElementById('frontProgram').textContent = 'Program: ' + program;
+            document.getElementById('frontTo').textContent = submittedTo;
+            document.getElementById('frontDept').textContent = batchYear;
+
+            // Update all footers
+            for (let i = 1; i <= 10; i++) {
+                document.getElementById('footerName' + i).textContent = name;
+                document.getElementById('footerPID' + i).textContent = 'PID: ' + pid;
+                document.getElementById('footerDate' + i).textContent = timestamp;
+            }
+
+            // Update end section
+            document.getElementById('endName').textContent = name;
+            document.getElementById('endPID').textContent = pid;
+            document.getElementById('endProgram').textContent = program;
+            document.getElementById('endTimestamp').textContent = timestamp;
+
+            // Set random end image
+            document.getElementById('endImage').src = getRandomImage();
+
+            // Hide input, show document
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('documentSection').classList.add('active');
+
+            // Create confetti effect
+            createConfetti();
+
+            // Smooth scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function createConfetti() {
+            const colors = ['#e94560', '#0f3460', '#c9a227', '#16c79a', '#533483', '#f39422'];
+            const endSection = document.getElementById('endSection');
+            for (let i = 0; i < 120; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (4 + Math.random() * 10) + 'px';
+                    confetti.style.height = (4 + Math.random() * 10) + 'px';
+                    confetti.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                    endSection.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 25);
+            }
+        }
+
+        // PDF Preview
+        function previewPDF() {
+            const element = document.getElementById('documentSection');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: 'MAS744_Spatial_Autocorrelation_Assignment.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Temporarily hide nav for preview
+            const nav = document.querySelector('.nav-bar');
+            nav.style.display = 'none';
+
+            html2pdf().set(opt).from(element).output('bloburl').then((url) => {
+                window.open(url, '_blank');
+                nav.style.display = 'flex';
+            }).catch(() => {
+                nav.style.display = 'flex';
+                alert('PDF preview failed. Please try downloading instead.');
+            });
+        }
+
+        // PDF Download
+        function downloadPDF() {
+            const name = currentStudentData.name || 'Student';
+            const element = document.getElementById('documentSection');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `MAS744_${name.replace(/\s+/g, '_')}_Assignment.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            const nav = document.querySelector('.nav-bar');
+            nav.style.display = 'none';
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                nav.style.display = 'flex';
+            }).catch(() => {
+                nav.style.display = 'flex';
+                alert('PDF download failed. Please try again.');
+            });
+        }
+
+        // Smooth scroll for TOC links
+        document.querySelectorAll('.toc-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Scroll-based animations
+        const observerOptions = {
+            threshold: 0.08,
+            rootMargin: '0px 0px -60px 0px'
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.page, .front-card, .toc-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

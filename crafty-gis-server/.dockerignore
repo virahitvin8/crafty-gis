@@ -1,32 +1,69 @@
 # CRAFTY GIS Backend — .dockerignore
+# Exclude files not needed for the Docker build to reduce context size.
 
-# Python
+# Python runtime (rebuilt inside container)
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *.egg-info/
 *.egg
 venv/
 .venv/
+
+# Environment (secrets via build args or runtime)
 .env
+.env.local
+.env.*.local
 
-# IDE
-.vscode/
-.idea/
+# Build artifacts (rebuilt inside container)
+build/
+dist/
 
-# OS
-.DS_Store
-Thumbs.db
+# Desktop packaging (not needed in Docker)
+CRAFTY-GIS.spec
+desktop_app.py
+requirements-dev.txt
 
-# Git
-.git/
-.gitignore
-
-# Test & Coverage
+# Test & coverage
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 htmlcov/
 coverage.xml
+tests/
+MagicMock/
 
-# Data
+# IDE & editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Data directories (large, not needed for build)
 data/
+sample_data/
+outputs/
+frontend/
+
+# Documentation
+*.md
+LICENSE
+CHANGELOG.md
+CONTRIBUTING.md
+SECURITY.md
+ROADMAP.md
+
+# Docker (prevent recursive copy)
+Dockerfile
+.dockerignore

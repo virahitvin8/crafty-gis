@@ -12,7 +12,7 @@ import json
 import logging
 import re
 from typing import Optional
-from app.services.ollama_service import OllamaService
+from app.services.groq_service import HybridAIService
 
 logger = logging.getLogger(__name__)
 
@@ -141,8 +141,8 @@ class InvestigationState:
 class AIInvestigator:
     """Orchestrates the AI-driven investigation process with hybrid chat + wizard."""
 
-    def __init__(self, ollama_service: OllamaService):
-        self.ollama = ollama_service
+    def __init__(self, ai_service: HybridAIService = None):
+        self.ollama = ai_service or HybridAIService()  # Groq primary, Ollama fallback
         self.active_sessions: dict[str, InvestigationState] = {}
 
     async def start_investigation(self, project_id: str, user_message: str) -> dict:
@@ -258,12 +258,12 @@ class AIInvestigator:
         }
 
     async def _get_hybrid_response(self, state: InvestigationState) -> str:
-        """Get AI response using the hybrid chat + wizard approach."""
+        """Get AI response using Groq (primary) or Ollama (fallback)."""
         messages = [
             {"role": "system", "content": HYBRID_SYSTEM_PROMPT},
         ]
         messages.extend(state.get_context())
-        return await self.ollama.chat(messages)
+        return await self.ollama.chat(messages)  # ollama attr is now HybridAIService
 
     def _extract_plan(self, response: str) -> Optional[dict]:
         """Extract structured plan from AI response if present."""
