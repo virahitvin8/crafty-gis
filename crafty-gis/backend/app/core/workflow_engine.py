@@ -9,7 +9,7 @@ import json
 import logging
 import asyncio
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from app.config import settings
 from app.services.ollama_service import OllamaService
@@ -76,7 +76,7 @@ class WorkflowEngine:
             "total_tasks": len(tasks),
             "completed_tasks": 0,
             "status": "pending",
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
         self.active_workflows[project_id] = workflow
@@ -98,7 +98,7 @@ class WorkflowEngine:
                 continue
 
             task["status"] = "running"
-            task["started_at"] = datetime.utcnow().isoformat()
+            task["started_at"] = datetime.now(timezone.utc).isoformat()
             await self._update_progress(project_id, progress_callback)
 
             try:
@@ -107,7 +107,7 @@ class WorkflowEngine:
                 task["status"] = "completed"
                 task["progress"] = 100.0
                 task["result"] = result
-                task["completed_at"] = datetime.utcnow().isoformat()
+                task["completed_at"] = datetime.now(timezone.utc).isoformat()
                 workflow["completed_tasks"] += 1
 
             except Exception as e:

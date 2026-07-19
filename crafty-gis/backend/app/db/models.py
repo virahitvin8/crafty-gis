@@ -1,7 +1,7 @@
 """SQLAlchemy database models for CRAFTY GIS."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Text, DateTime, JSON, Enum, ForeignKey, Float, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -36,8 +36,8 @@ class Project(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     conversations = relationship("Conversation", back_populates="project", cascade="all, delete-orphan")
@@ -53,7 +53,7 @@ class Conversation(Base):
     role = Column(String(50), nullable=False)  # "user" or "assistant"
     content = Column(Text, nullable=False)
     metadata_json = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     project = relationship("Project", back_populates="conversations")
 
@@ -67,8 +67,8 @@ class Workflow(Base):
     description = Column(Text, nullable=True)
     status = Column(String(50), default="pending")  # pending, running, completed, failed
     task_order = Column(JSON, nullable=True)  # Ordered list of task IDs
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     project = relationship("Project", back_populates="workflows")
     tasks = relationship("Task", back_populates="workflow", cascade="all, delete-orphan")
@@ -88,7 +88,7 @@ class Task(Base):
     result_summary = Column(Text, nullable=True)
     started_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     workflow = relationship("Workflow", back_populates="tasks")
 
@@ -104,6 +104,6 @@ class Output(Base):
     file_size = Column(Float, nullable=True)  # in bytes
     output_type = Column(String(50), nullable=False)  # map, report, shapefile, raster, csv
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     project = relationship("Project", back_populates="outputs")

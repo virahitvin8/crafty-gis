@@ -8,7 +8,7 @@ import asyncio
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -94,8 +94,8 @@ class Workflow:
         self.project_id = project_id
         self.session_id = session_id
         self.tasks: List[Task] = []
-        self.created_at = datetime.utcnow()
-        self.updated_at = datetime.utcnow()
+        self.created_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(timezone.utc)
         self.current_plan: str = ""
         self.is_running = False
         self.is_interrupted = False
@@ -103,11 +103,11 @@ class Workflow:
 
     def add_task(self, task: Task) -> None:
         self.tasks.append(task)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def clear_tasks(self) -> None:
         self.tasks.clear()
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def get_task(self, task_id: str) -> Optional[Task]:
         for t in self.tasks:
@@ -350,7 +350,7 @@ Return a JSON with:
     async def _execute_task(self, workflow: Workflow, task: Task, status_callback=None) -> None:
         """Execute a single task."""
         task.status = TaskStatus.RUNNING
-        task.started_at = datetime.utcnow()
+        task.started_at = datetime.now(timezone.utc)
         if status_callback:
             await status_callback(workflow.to_dict())
 
@@ -366,14 +366,14 @@ Return a JSON with:
                 task.progress = (i + 1) * 20
 
             task.status = TaskStatus.COMPLETED
-            task.completed_at = datetime.utcnow()
+            task.completed_at = datetime.now(timezone.utc)
             task.output = {"status": "completed", "result_path": f"/output/{task.id}"}
             logger.info(f"Task completed: {task.title}")
 
         except Exception as e:
             task.status = TaskStatus.FAILED
             task.error = str(e)
-            task.completed_at = datetime.utcnow()
+            task.completed_at = datetime.now(timezone.utc)
             logger.error(f"Task failed: {task.title}: {e}")
 
         if status_callback:

@@ -4,7 +4,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from app.config import settings
 import json
@@ -41,7 +41,7 @@ async def create_project(project: ProjectCreate):
     """Create a new project."""
     import uuid
     project_id = str(uuid.uuid4())
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
 
     proj = {
         "id": project_id,
@@ -109,6 +109,6 @@ async def get_project_outputs(project_id: str):
                     "path": str(f),
                     "size": f.stat().st_size,
                     "format": f.suffix,
-                    "modified": datetime.fromtimestamp(f.stat().st_mtime).isoformat(),
+                    "modified": datetime.fromtimestamp(f.stat().st_mtime, tz=timezone.utc).isoformat(),
                 })
     return {"outputs": outputs}
