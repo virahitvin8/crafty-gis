@@ -7,7 +7,7 @@ Includes AI investigation, mid-workflow interruption, and plan regeneration.
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
@@ -64,7 +64,7 @@ async def create_session(request: SessionCreate):
         "project_id": request.project_id,
         "messages": [],
         "status": "active",
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "investigation_state": "idle",
         "workflow_id": None,
     }
@@ -87,7 +87,7 @@ async def send_message(request: ChatRequest):
             "project_id": request.project_id,
             "messages": [],
             "status": "active",
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "investigation_state": "idle",
             "workflow_id": None,
         }
@@ -99,7 +99,7 @@ async def send_message(request: ChatRequest):
         "role": "user",
         "content": request.message,
         "message_type": request.message_type,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     })
     
     # Handle mid-workflow interruption
@@ -375,5 +375,5 @@ async def health_check():
         "status": "healthy",
         "service": "CRAFTY GIS Chat API",
         "active_sessions": len(sessions),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }

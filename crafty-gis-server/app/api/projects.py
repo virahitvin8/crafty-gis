@@ -6,7 +6,7 @@ CRUD operations for projects with analysis tracking and output association.
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -57,7 +57,7 @@ class ProjectListResponse(BaseModel):
 async def create_project(request: ProjectCreate):
     """Create a new project."""
     project_id = str(uuid.uuid4())[:8]
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     
     projects_db[project_id] = {
         "id": project_id,
@@ -164,7 +164,7 @@ async def update_project(project_id: str, request: ProjectUpdate):
         if value is not None:
             project[key] = value
     
-    project["updated_at"] = datetime.utcnow().isoformat()
+    project["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     return ProjectResponse(
         id=project["id"],
@@ -218,7 +218,7 @@ async def add_analysis_to_project(project_id: str, analysis_data: Dict[str, Any]
         raise HTTPException(status_code=404, detail="Project not found")
     
     analysis_id = str(uuid.uuid4())[:8]
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     
     analysis = {
         "id": analysis_id,

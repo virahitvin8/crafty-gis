@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 class AnalysisType(str, Enum):
@@ -52,7 +52,7 @@ class InvestigationState(BaseModel):
 class ChatMessage(BaseModel):
     role: str = Field(..., description="Role of the message sender (user or assistant)")
     content: str = Field(..., description="Content of the message")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ChatResponse(BaseModel):
     response: str = Field(..., description="AI's response message")
@@ -63,8 +63,8 @@ class ChatResponse(BaseModel):
 class GISProject(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str = Field(..., description="Project title or description")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     user_id: Optional[str] = None
     status: str = Field(default="created", description="Project status: created, planning, processing, completed, failed")
 

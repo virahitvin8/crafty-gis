@@ -8,7 +8,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode
@@ -69,7 +69,7 @@ class DataDownloader:
         if not handler:
             raise ValueError(f"Unsupported data source: {source}")
 
-        download_id = f"{source}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        download_id = f"{source}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
         self.downloads_in_progress[download_id] = {
             "source": source,
             "params": params,
@@ -97,8 +97,8 @@ class DataDownloader:
     async def _download_sentinel2(self, params: Dict[str, Any], download_id: str) -> Dict[str, Any]:
         """Download Sentinel-2 imagery from Copernicus Data Space Ecosystem."""
         bbox = params.get("bbox", "-180,-90,180,90")
-        date_from = params.get("date_from", (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d"))
-        date_to = params.get("date_to", datetime.utcnow().strftime("%Y-%m-%d"))
+        date_from = params.get("date_from", (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d"))
+        date_to = params.get("date_to", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
         max_cloud = params.get("max_cloud_cover", 30)
         bands = params.get("bands", ["B2", "B3", "B4", "B8"])
 
@@ -148,8 +148,8 @@ class DataDownloader:
     async def _download_sentinel1(self, params: Dict[str, Any], download_id: str) -> Dict[str, Any]:
         """Download Sentinel-1 SAR imagery."""
         bbox = params.get("bbox", "-180,-90,180,90")
-        date_from = params.get("date_from", (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d"))
-        date_to = params.get("date_to", datetime.utcnow().strftime("%Y-%m-%d"))
+        date_from = params.get("date_from", (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d"))
+        date_to = params.get("date_to", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
         polarization = params.get("polarization", "VV,VH")
 
         query = (
@@ -181,7 +181,7 @@ class DataDownloader:
         """Download Landsat imagery from USGS."""
         bbox = params.get("bbox", "-180,-90,180,90")
         date_from = params.get("date_from", "2023-01-01")
-        date_to = params.get("date_to", datetime.utcnow().strftime("%Y-%m-%d"))
+        date_to = params.get("date_to", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
         collection = params.get("collection", "landsat_ot_c2_l2")  # Landsat 8-9 C2 Level 2
 
         # USGS M2M API
@@ -243,8 +243,8 @@ class DataDownloader:
     async def _download_modis(self, params: Dict[str, Any], download_id: str) -> Dict[str, Any]:
         """Download MODIS data from NASA Earthdata."""
         product = params.get("product", "MOD13Q1")  # MODIS Vegetation Indices
-        date_from = params.get("date_from", (datetime.utcnow() - timedelta(days=90)).strftime("%Y-%m-%d"))
-        date_to = params.get("date_to", datetime.utcnow().strftime("%Y-%m-%d"))
+        date_from = params.get("date_from", (datetime.now(timezone.utc) - timedelta(days=90)).strftime("%Y-%m-%d"))
+        date_to = params.get("date_to", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
         tile = params.get("tile", "h25v06")  # MODIS tile identifier
 
         url = f"https://lpdaac.usgs.gov/products/{product.lower()}/"
@@ -333,8 +333,8 @@ class DataDownloader:
 
     async def _download_chirps(self, params: Dict[str, Any], download_id: str) -> Dict[str, Any]:
         """Download CHIRPS rainfall data."""
-        date_from = params.get("date_from", (datetime.utcnow() - timedelta(days=365)).strftime("%Y-%m-%d"))
-        date_to = params.get("date_to", datetime.utcnow().strftime("%Y-%m-%d"))
+        date_from = params.get("date_from", (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%d"))
+        date_to = params.get("date_to", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
         bbox = params.get("bbox", "-180,-90,180,90")
 
         # CHIRPS data available via ICPAC or UCAR

@@ -8,7 +8,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -38,13 +38,13 @@ class ReportGenerator:
         include_statistics: bool = True,
     ) -> Dict[str, Any]:
         """Generate a comprehensive analysis report."""
-        report_id = f"report_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        report_id = f"report_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
         
         # Build report content
         report_content = {
             "report_id": report_id,
             "title": title or f"CRAFTY GIS — {analysis_type.replace('_', ' ').title()} Report",
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "analysis_type": analysis_type,
             "platform": "CRAFTY GIS — Conversational Remote Analysis & Field Technology for GIS",
             "summary": self._generate_executive_summary(analysis_type, data),
@@ -89,9 +89,9 @@ class ReportGenerator:
     ) -> Dict[str, Any]:
         """Generate a comparative analysis report from multiple analyses."""
         comparison_content = {
-            "report_id": f"comparison_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+            "report_id": f"comparison_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
             "title": "CRAFTY GIS — Multi-Analysis Comparison Report",
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "analyses": reports,
             "cross_comparison": self._generate_cross_comparison(reports),
         }
