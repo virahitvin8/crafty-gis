@@ -1,18 +1,15 @@
 # ─── Netlify Configuration – FarmHealth Satellite Crop Monitor ───
-# Deploy the static frontend (Vanilla JS + Leaflet) to Netlify
-# The backend (Node.js GEE proxy + Sentinel Hub auth) runs separately on Render
 
 [build]
-  command = "bash build.sh"
   publish = "www"
 
 [dev]
   framework = "#static"
 
-# SPA redirects: serve index.html for all routes (so the app handles routing)
+# SPA redirects: redirect API calls to farmhealth1 backend
 [[redirects]]
   from = "/api/*"
-  to = "https://farmhealth-backend.onrender.com/api/:splat"
+  to = "https://farmhealth1-backend.onrender.com/api/:splat"
   status = 200
   force = true
 
@@ -21,7 +18,7 @@
   to = "/index.html"
   status = 200
 
-# Headers for security and PWA support
+# Security & PWA Headers
 [[headers]]
   for = "/*"
   [headers.values]
