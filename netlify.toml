@@ -1,8 +1,7 @@
 # ─── Netlify Configuration – FarmHealth Satellite Crop Monitor ───
 
 [build]
-  command = "mkdir -p www && cp -r index.html css js assets www/ 2>/dev/null || true"
-  publish = "www"
+  publish = "."
 
 [dev]
   framework = "#static"
