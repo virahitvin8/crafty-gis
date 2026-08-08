@@ -1,0 +1,4808 @@
+<html>
+ <body>
+  <p>
+   <strong>
+    SAM HIGGINBOTTOM UNIVERSITY OF AGRICULTURE, TECHNOLOGY AND SCIENCES
+   </strong>
+  </p>
+  <p>
+   SHUATS, Prayagraj - 211007, Uttar Pradesh, India
+  </p>
+  <p>
+   <img src="assets/image_1.png"/>
+  </p>
+  <p>
+   <strong>
+    M.Sc. GIS &amp; REMOTE SENSING (SEMESTER-II)
+   </strong>
+  </p>
+  <p>
+   <strong>
+    Course:
+    <em>
+     Geospatial Statistics-II
+    </em>
+   </strong>
+  </p>
+  <p>
+   <strong>
+    SPATIAL AUTOCORRELATION
+   </strong>
+  </p>
+  <p>
+   <strong>
+    &amp;
+    <br/>
+    POINT PATTERN ANALYSIS
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       SUBMITTED BY:
+      </strong>
+     </p>
+     <p>
+      N. Akshit Vinay
+     </p>
+     <p>
+      PID: 25MSRSGIS001
+     </p>
+     <p>
+      Program: M.Sc. GIS &amp; Remote Sensing
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       SUBMITTED TO:
+      </strong>
+     </p>
+     <p>
+      Mis. Arpita Esther
+     </p>
+     <p>
+      Dept. of Mathematics &amp; Statistics
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    TABLE OF CONTENTS
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       §
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Section Title
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Pg
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       1
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Introduction to Geospatial Statistics
+     </p>
+    </td>
+    <td>
+     <p>
+      3
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       2
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial Statistics &amp; GIS
+     </p>
+    </td>
+    <td>
+     <p>
+      4
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       3
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial Autocorrelation — Core Concept
+     </p>
+    </td>
+    <td>
+     <p>
+      5
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       4
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Types of Spatial Autocorrelation
+     </p>
+    </td>
+    <td>
+     <p>
+      6
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       5
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I — Global Measure
+     </p>
+    </td>
+    <td>
+     <p>
+      7
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       6
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Geary's C — Difference-Based Measure
+     </p>
+    </td>
+    <td>
+     <p>
+      9
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       7
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I vs. Geary's C — Comparison
+     </p>
+    </td>
+    <td>
+     <p>
+      10
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       8
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Getis-Ord Gi* — Hotspot Analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      11
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       9
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Kernel Density Estimation (KDE)
+     </p>
+    </td>
+    <td>
+     <p>
+      13
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       10
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Point Pattern Analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      14
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       11
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Nearest Neighbour Index (NNI)
+     </p>
+    </td>
+    <td>
+     <p>
+      15
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       12
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Ripley's K Function
+     </p>
+    </td>
+    <td>
+     <p>
+      17
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       13
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial Interpolation
+     </p>
+    </td>
+    <td>
+     <p>
+      19
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       14
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      GIS &amp; Remote Sensing Applications
+     </p>
+    </td>
+    <td>
+     <p>
+      21
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       15
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Agriculture &amp; Precision Farming
+     </p>
+    </td>
+    <td>
+     <p>
+      22
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       16
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Advantages &amp; Limitations
+     </p>
+    </td>
+    <td>
+     <p>
+      23
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       17
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Analytical Workflow — Putting It All Together
+     </p>
+    </td>
+    <td>
+     <p>
+      24
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       18
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Conclusion
+     </p>
+    </td>
+    <td>
+     <p>
+      25
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       19
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      References
+     </p>
+    </td>
+    <td>
+     <p>
+      26
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    1. Introduction to Geospatial Statistics
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 KEY
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Geospatial statistics is the branch of statistics dealing with spatially referenced data. Unlike classical statistics, it considers geographical location and relationships among nearby features.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   Spatial statistical methods are widely used in agriculture, environmental monitoring, urban planning, public health, disaster management, and remote sensing. Modern GIS platforms such as ArcGIS Pro and QGIS provide powerful built-in tools for these analyses.
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application Domain
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Spatial Analysis Use
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Tools / Platforms
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Agriculture
+     </p>
+    </td>
+    <td>
+     <p>
+      Soil mapping, crop yield, precision farming
+     </p>
+    </td>
+    <td>
+     <p>
+      ArcGIS, QGIS, Google Earth Engine
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Environmental Monitoring
+     </p>
+    </td>
+    <td>
+     <p>
+      Pollution tracking, deforestation, climate
+     </p>
+    </td>
+    <td>
+     <p>
+      Sentinel, Landsat, MODIS
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Urban Planning
+     </p>
+    </td>
+    <td>
+     <p>
+      Land use change, infrastructure planning
+     </p>
+    </td>
+    <td>
+     <p>
+      ArcGIS Pro, AutoCAD
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Public Health
+     </p>
+    </td>
+    <td>
+     <p>
+      Disease mapping, healthcare access
+     </p>
+    </td>
+    <td>
+     <p>
+      R, GeoDa, ArcGIS
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Disaster Management
+     </p>
+    </td>
+    <td>
+     <p>
+      Flood risk, earthquake vulnerability
+     </p>
+    </td>
+    <td>
+     <p>
+      GIS, Remote Sensing, Drones
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    2. Spatial Statistics &amp; GIS
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       🌍 LAW
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      "Everything is related to everything else, but near things are more related than distant things." — Waldo Tobler (1970)
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   Spatial statistics integrates mathematical and statistical principles with GIS spatial data, addressing the key issue that nearby geographic features are often related — a property known as spatial dependence.
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       GIS Component
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Function
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Spatial Statistics Role
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Data Collection
+     </p>
+    </td>
+    <td>
+     <p>
+      Gathering from sensors, GPS, surveys
+     </p>
+    </td>
+    <td>
+     <p>
+      Ensures spatial representativeness
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Data Management
+     </p>
+    </td>
+    <td>
+     <p>
+      Storing and organizing spatial data
+     </p>
+    </td>
+    <td>
+     <p>
+      Maintains spatial relationships
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Data Analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Processing spatial patterns
+     </p>
+    </td>
+    <td>
+     <p>
+      Applies statistical methods
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Visualization
+     </p>
+    </td>
+    <td>
+     <p>
+      Creating maps and charts
+     </p>
+    </td>
+    <td>
+     <p>
+      Presents results spatially
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Decision Support
+     </p>
+    </td>
+    <td>
+     <p>
+      Informing policy and management
+     </p>
+    </td>
+    <td>
+     <p>
+      Evidence-based spatial insights
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    3. Spatial Autocorrelation
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial autocorrelation measures the degree to which nearby locations share similar or dissimilar values. It tests whether observed spatial patterns are clustered, dispersed, or random — and whether they are statistically significant.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Why It Matters:
+   </strong>
+  </p>
+  <p>
+   Most classical statistical methods assume independence between observations — an assumption routinely violated in geographic data. Ignoring spatial autocorrelation leads to biased estimates, incorrect standard errors, and misleading conclusions.
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Phenomenon
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Spatial Pattern
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Autocorrelation Type
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Malaria outbreak in villages
+     </p>
+    </td>
+    <td>
+     <p>
+      Nearby villages show elevated cases
+     </p>
+    </td>
+    <td>
+     <p>
+      Positive
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Soil fertility distribution
+     </p>
+    </td>
+    <td>
+     <p>
+      Similar fertility in adjacent fields
+     </p>
+    </td>
+    <td>
+     <p>
+      Positive
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NDVI / Vegetation health
+     </p>
+    </td>
+    <td>
+     <p>
+      Healthy patches cluster together
+     </p>
+    </td>
+    <td>
+     <p>
+      Positive
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Urban heat islands
+     </p>
+    </td>
+    <td>
+     <p>
+      Temperature clusters in urban cores
+     </p>
+    </td>
+    <td>
+     <p>
+      Positive
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Checkerboard land use
+     </p>
+    </td>
+    <td>
+     <p>
+      Alternating industrial/residential
+     </p>
+    </td>
+    <td>
+     <p>
+      Negative
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Retail store locations
+     </p>
+    </td>
+    <td>
+     <p>
+      Competitors deliberately spaced apart
+     </p>
+    </td>
+    <td>
+     <p>
+      Negative
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Raindrops on a flat surface
+     </p>
+    </td>
+    <td>
+     <p>
+      No systematic relationship
+     </p>
+    </td>
+    <td>
+     <p>
+      Random (CSR)
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    4. Types of Spatial Autocorrelation
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ✅  POSITIVE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       ❓  RANDOM (CSR)
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       ↔  NEGATIVE
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Similar values cluster together. High near high, low near low.
+     </p>
+    </td>
+    <td>
+     <p>
+      No systematic spatial relationship. Each location is independent of its neighbours.
+     </p>
+    </td>
+    <td>
+     <p>
+      Dissimilar values neighbour each other. High values surrounded by low values.
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <em>
+       Most common in nature and geographic data.
+      </em>
+     </p>
+    </td>
+    <td>
+     <p>
+      <em>
+       Null hypothesis tested by most spatial statistics.
+      </em>
+     </p>
+    </td>
+    <td>
+     <p>
+      <em>
+       Rare; occurs in competitive systems.
+      </em>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Example: Disease outbreak clusters, crop yield belts
+     </p>
+    </td>
+    <td>
+     <p>
+      Example: Raindrops on a flat surface
+     </p>
+    </td>
+    <td>
+     <p>
+      Example: Retail stores avoiding each other
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Type
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Visual Pattern
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Example
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Positive
+     </p>
+    </td>
+    <td>
+     <p>
+      Nearby areas have similar values — high near high, low near low
+     </p>
+    </td>
+    <td>
+     <p>
+      Clustered / Grouped
+     </p>
+    </td>
+    <td>
+     <p>
+      Agricultural areas with similar crop yield
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Negative
+     </p>
+    </td>
+    <td>
+     <p>
+      Nearby areas have dissimilar values — high near low
+     </p>
+    </td>
+    <td>
+     <p>
+      Checkerboard / Alternating
+     </p>
+    </td>
+    <td>
+     <p>
+      Competing retail or industrial vs residential
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      None (Random)
+     </p>
+    </td>
+    <td>
+     <p>
+      Values randomly distributed, no spatial dependence
+     </p>
+    </td>
+    <td>
+     <p>
+      Scattered / No pattern
+     </p>
+    </td>
+    <td>
+     <p>
+      Complete Spatial Randomness (CSR)
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    5. Moran's I — Global Spatial Autocorrelation
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I is the most widely used GLOBAL measure of spatial autocorrelation. It produces a single statistic summarising the overall spatial pattern across the entire study area. Range: approximately −1 (perfect dispersion) to +1 (perfect clustering).
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td colspan="2">
+     <p>
+      <strong>
+       FORMULA
+      </strong>
+      |  I = (N / S₀) × [ΣΣ wᵢⱼ(xᵢ − x̄)(xⱼ − x̄)] / [Σ(xᵢ − x̄)²]
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Variable
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        N
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Number of spatial observations
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        S₀
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Sum of all spatial weights (normalization factor)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        wᵢⱼ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial weight between locations i and j
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        xᵢ, xⱼ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Attribute values at locations i and j
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        x̄
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Mean value of the attribute
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        I
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I statistic (output)
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Interpretation Scale
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Value Range
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Interpretation
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Pattern Type
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      I &gt; 0  (e.g. +0.36)
+     </p>
+    </td>
+    <td>
+     <p>
+      Positive spatial autocorrelation — similar values cluster together. Closer to +1 = stronger clustering.
+     </p>
+    </td>
+    <td>
+     <p>
+      CLUSTERED
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      I ≈ 0
+     </p>
+    </td>
+    <td>
+     <p>
+      No spatial pattern — values are randomly distributed across the study area.
+     </p>
+    </td>
+    <td>
+     <p>
+      RANDOM
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      I &lt; 0  (e.g. −0.45)
+     </p>
+    </td>
+    <td>
+     <p>
+      Negative spatial autocorrelation — dissimilar values are neighbours. Closer to −1 = stronger dispersion.
+     </p>
+    </td>
+    <td>
+     <p>
+      DISPERSED
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ✅ EXAMPLE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Pollution levels across neighbouring industrial zones yield Moran's I = +0.36. This confirms high-pollution areas tend to cluster near other high-pollution zones — warranting targeted remediation.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Soil nutrient mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Identifying clusters of high/low soil fertility across agricultural land
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NDVI clustering analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Detecting vegetation health patterns from satellite imagery
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Crop disease hotspot detection
+     </p>
+    </td>
+    <td>
+     <p>
+      Finding clusters of disease outbreak in farmland
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Rainfall pattern analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Understanding precipitation spatial distribution
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Urban heat islands
+     </p>
+    </td>
+    <td>
+     <p>
+      Confirming spatial clustering of high-temperature zones
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    6. Geary's C — Difference-Based Measure
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Geary's C is a global measure of spatial autocorrelation based on SQUARED DIFFERENCES between neighbouring values — making it more sensitive to local variation and small-scale patterns than Moran's I. Range: 0 to approximately 2.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td colspan="2">
+     <p>
+      <strong>
+       FORMULA
+      </strong>
+      |  C = [(N − 1) / 2S₀] × [ΣΣ wᵢⱼ(xᵢ − xⱼ)²] / [Σ(xᵢ − x̄)²]
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Variable
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        N
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Number of spatial observations
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        S₀
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Sum of all spatial weights
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        wᵢⱼ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial weight between locations i and j
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        xᵢ − xⱼ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Squared difference between neighbouring values (key distinction from Moran's I)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        x̄
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Mean value of the attribute
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        C
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Geary's C statistic (output)
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Interpretation Scale
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Value Range
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Interpretation
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Pattern Type
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      C &lt; 1  (e.g. 0.67)
+     </p>
+    </td>
+    <td>
+     <p>
+      Positive spatial autocorrelation — neighbouring values are similar. Smaller = stronger clustering.
+     </p>
+    </td>
+    <td>
+     <p>
+      CLUSTERED
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      C = 1
+     </p>
+    </td>
+    <td>
+     <p>
+      No spatial pattern — the distribution is completely random.
+     </p>
+    </td>
+    <td>
+     <p>
+      RANDOM
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      C &gt; 1  (e.g. 1.6)
+     </p>
+    </td>
+    <td>
+     <p>
+      Negative spatial autocorrelation — neighbouring values differ greatly.
+     </p>
+    </td>
+    <td>
+     <p>
+      DISPERSED
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ✅ EXAMPLE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Crop yield data across a farming region yields Geary's C = 0.67. Since C &lt; 1, this confirms positive spatial clustering — farms with similar yields are located near each other, likely due to shared soil and irrigation conditions.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Local variability analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Detecting micro-scale spatial differences in field data
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Precision agriculture
+     </p>
+    </td>
+    <td>
+     <p>
+      Identifying within-field soil and crop variability
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Soil property analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Mapping local soil heterogeneity at fine resolution
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Crop stress detection
+     </p>
+    </td>
+    <td>
+     <p>
+      Finding localised crop stress zones
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Ecological studies
+     </p>
+    </td>
+    <td>
+     <p>
+      Measuring species distribution differences at local scale
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    7. Moran's I vs. Geary's C — Side-by-Side Comparison
+   </strong>
+  </p>
+  <p>
+   Both are global measures of spatial autocorrelation but differ fundamentally in formulation and sensitivity. Use them together during exploratory analysis for a comprehensive view of spatial structure.
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Property
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Moran's I
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Geary's C
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Basis
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Covariance of neighbouring values
+     </p>
+    </td>
+    <td>
+     <p>
+      Squared differences of neighbouring values
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Scale
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Global — one statistic for entire area
+     </p>
+    </td>
+    <td>
+     <p>
+      Global but more sensitive to local variation
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Value Range
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Approximately −1 to +1
+     </p>
+    </td>
+    <td>
+     <p>
+      0 to approximately 2
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Clustering Indicator
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      I &gt; 0 (positive value)
+     </p>
+    </td>
+    <td>
+     <p>
+      C &lt; 1 (value below 1)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Random Indicator
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      I ≈ 0
+     </p>
+    </td>
+    <td>
+     <p>
+      C = 1
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Dispersion Indicator
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      I &lt; 0 (negative value)
+     </p>
+    </td>
+    <td>
+     <p>
+      C &gt; 1 (value above 1)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Primary Use
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Overall pattern summary; Moran scatter plot
+     </p>
+    </td>
+    <td>
+     <p>
+      Cross-check; local discontinuity detection
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Software Support
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      ArcGIS, GeoDa, R, QGIS
+     </p>
+    </td>
+    <td>
+     <p>
+      GeoDa, R (spdep package)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Common in
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      GIS and geography broadly
+     </p>
+    </td>
+    <td>
+     <p>
+      Ecological and agricultural studies
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    8. Getis-Ord Gi* — Hotspot Analysis
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Getis-Ord Gi* is a LOCAL spatial statistic that identifies statistically significant clusters of HIGH values (hotspots) and LOW values (coldspots). Unlike Moran's I, it pinpoints exactly WHERE clusters occur — making it invaluable for applied GIS.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    How It Works:
+   </strong>
+  </p>
+  <p>
+   For each feature in the dataset, Gi* evaluates the feature and its neighbours. It produces a z-score and p-value for every location, measuring how the local sum deviates from the global mean.
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Gi* Z-Score
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Interpretation
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Classification
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Z ≥ +1.96
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Statistically significant cluster of HIGH values
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       🔴  HOTSPOT (95% confidence)
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Z ≥ +2.58
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Very strong cluster of HIGH values
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       🔴🔴  HOTSPOT (99% confidence)
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      −1.96 &lt; Z &lt; +1.96
+     </p>
+    </td>
+    <td>
+     <p>
+      No statistically significant spatial pattern
+     </p>
+    </td>
+    <td>
+     <p>
+      ⚪  NOT SIGNIFICANT
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Z ≤ −1.96
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Statistically significant cluster of LOW values
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       🔵  COLDSPOT (95% confidence)
+      </strong>
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    <br/>
+    Step-by-Step Workflow
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       1
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Input Spatial Data
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Attribute values at each location (e.g., crop yield, crime count, NDVI)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       2
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Define Spatial Neighbourhood
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Choose distance band or contiguity rule to define which features are 'neighbours'
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       3
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Calculate Gi* Z-Scores
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Standardised deviation of local sum from global mean, accounting for neighbours
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       4
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Calculate P-values
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Probability that the observed pattern arose by chance
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       5
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Classify Hotspots / Coldspots
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Map significant clusters at 90%, 95%, and 99% confidence levels
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Pest infestation mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Identifying fields with concentrated pest attacks for targeted treatment
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Crop disease monitoring
+     </p>
+    </td>
+    <td>
+     <p>
+      Detecting disease outbreak zones before they spread
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Drought severity mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Finding regions with consistently low rainfall or NDVI
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Urban heat island analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Mapping temperature hotspots in built-up environments
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Flood risk assessment
+     </p>
+    </td>
+    <td>
+     <p>
+      Identifying high-risk flood zones for infrastructure planning
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    9. Kernel Density Estimation (KDE)
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      KDE transforms discrete point data into a continuous smooth surface representing the density of events across the study area. Each point contributes to the surface via a kernel function, with influence decreasing with distance — producing a 'heat map' of point concentration.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td colspan="2">
+     <p>
+      <strong>
+       FORMULA
+      </strong>
+      |  f̂(x) = (1 / nh) × Σᵢ K((x − xᵢ) / h)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Variable
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        h
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Bandwidth (smoothing parameter) — controls the degree of smoothing
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        n
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Total number of points in the dataset
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        K
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Kernel function (typically Gaussian / normal distribution)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        x − xᵢ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Distance from evaluation point x to each data point xᵢ
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        f̂(x)
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Estimated density at location x
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ⚠️ BANDWIDTH
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Bandwidth selection is critical: • Too small → noisy, spiky surface — over-fits local variation • Too large → over-smooth surface — obscures local patterns • Optimal: Use Silverman's Rule of Thumb or cross-validation methods in ArcGIS / R
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Output Interpretation
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Density Area
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       🔴  High-density (HOT)
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Many events concentrated in this area
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      🟡  Medium-density
+     </p>
+    </td>
+    <td>
+     <p>
+      Moderate concentration of events
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      🔵  Low-density (COOL)
+     </p>
+    </td>
+    <td>
+     <p>
+      Few events — sparse distribution
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Crime analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Continuous density surface of incidents for patrol planning
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Disease mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Visualising outbreak spread and intensity zones
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Pollution monitoring
+     </p>
+    </td>
+    <td>
+     <p>
+      Mapping concentration gradients from point measurements
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Traffic safety
+     </p>
+    </td>
+    <td>
+     <p>
+      Locating accident-prone road segments as density peaks
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Ecological habitat
+     </p>
+    </td>
+    <td>
+     <p>
+      Mapping wildlife occurrence density from GPS data
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    10. Point Pattern Analysis — Core Concepts
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Point Pattern Analysis (PPA) studies the spatial arrangement of discrete point events — disease cases, crime locations, tree positions, well locations — to determine whether their distribution is Clustered, Random, or Regular.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <em>
+    Key Principle: PPA focuses on GEOMETRIC ARRANGEMENT rather than attribute values. Understanding the pattern reveals the underlying process that generated it.
+   </em>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       CLUSTERED
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       RANDOM (CSR)
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       REGULAR
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Points occur close together in groups — indicating attraction or a common underlying cause.
+     </p>
+    </td>
+    <td>
+     <p>
+      Points occur without any systematic order. Each location equally likely — the null hypothesis.
+     </p>
+    </td>
+    <td>
+     <p>
+      Points are evenly spaced — indicating repulsion, competition, or deliberate planning.
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <em>
+       Example: Disease cases from contaminated water source; crop pest outbreaks
+      </em>
+     </p>
+    </td>
+    <td>
+     <p>
+      <em>
+       Example: Raindrops on a flat surface; trees in undisturbed uniform forest
+      </em>
+     </p>
+    </td>
+    <td>
+     <p>
+      <em>
+       Example: Orchard tree rows; fire stations for equal city coverage
+      </em>
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       💡 NOTE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Point patterns are influenced by both FIRST-ORDER effects (variation in intensity across the study area — e.g., population density) and SECOND-ORDER effects (interactions between points — e.g., contagion). Distinguishing these is essential for correct interpretation.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Point Feature Type
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Example in GIS / Remote Sensing
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Tree locations
+     </p>
+    </td>
+    <td>
+     <p>
+      Forest stand mapping, plantation spacing planning
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Disease cases
+     </p>
+    </td>
+    <td>
+     <p>
+      Epidemiological mapping, outbreak tracking
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Crime incidents
+     </p>
+    </td>
+    <td>
+     <p>
+      Urban safety analysis, hotspot detection
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Borewell/well locations
+     </p>
+    </td>
+    <td>
+     <p>
+      Groundwater resource mapping and planning
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Pest attack points
+     </p>
+    </td>
+    <td>
+     <p>
+      Agricultural pest monitoring and intervention
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Weather stations
+     </p>
+    </td>
+    <td>
+     <p>
+      Climate data network design and interpolation
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    11. Nearest Neighbour Index (NNI)
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      The NNI compares the OBSERVED mean distance between each point and its nearest neighbour to the EXPECTED mean distance under Complete Spatial Randomness (CSR). The ratio reveals whether points are clustered, random, or regularly spaced.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td colspan="2">
+     <p>
+      <strong>
+       FORMULA
+      </strong>
+      |  NNI = d_obs / d_exp        where  d_exp = 1 / (2√λ)        and  λ = n / A
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Variable
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        d_obs
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Observed mean nearest-neighbour distance (calculated from your data)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        d_exp
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Expected mean distance under Complete Spatial Randomness
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        λ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Point density (number of points n divided by study area A)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        NNI
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Nearest Neighbour Index — the ratio of observed to expected distance
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Interpretation Scale  (Range: 0 → 2.15)
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Value Range
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Interpretation
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Pattern Type
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NNI = 0.0
+     </p>
+    </td>
+    <td>
+     <p>
+      Maximum clustering — all points at the same location
+     </p>
+    </td>
+    <td>
+     <p>
+      MAXIMUM CLUSTER
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NNI &lt; 1  (e.g. 0.56)
+     </p>
+    </td>
+    <td>
+     <p>
+      Observed distances &lt; expected. Points closer than random.
+     </p>
+    </td>
+    <td>
+     <p>
+      CLUSTERED
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NNI = 1
+     </p>
+    </td>
+    <td>
+     <p>
+      Observed distances match expected random distribution.
+     </p>
+    </td>
+    <td>
+     <p>
+      RANDOM (CSR)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NNI &gt; 1  (e.g. 1.75)
+     </p>
+    </td>
+    <td>
+     <p>
+      Observed distances &gt; expected. Points more evenly spaced.
+     </p>
+    </td>
+    <td>
+     <p>
+      REGULAR
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NNI = 2.15
+     </p>
+    </td>
+    <td>
+     <p>
+      Maximum regularity — perfect hexagonal lattice
+     </p>
+    </td>
+    <td>
+     <p>
+      MAXIMUM REGULAR
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📐 SIGNIFICANCE TEST
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Statistical significance is tested via a z-score: z = (NNI − 1) / SE. A z-score beyond ±1.96 (95% confidence) indicates the pattern is unlikely by chance. ArcGIS, QGIS, and R all compute this automatically.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ✅ WORKED EXAMPLE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Retail store study: observed mean nearest-neighbour distance = 0.312 km; expected under CSR = 0.559 km. NNI = 0.312 / 0.559 = 0.558. Well below 1 → stores are significantly clustered, likely near high-traffic corridors.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Limitations of NNI
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Limitation
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Explanation
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Single-scale only
+     </p>
+    </td>
+    <td>
+     <p>
+      Only considers the NEAREST neighbour — misses clustering at broader distances
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Edge effects
+     </p>
+    </td>
+    <td>
+     <p>
+      Irregular boundaries can bias results if edge corrections are not applied
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Homogeneity assumption
+     </p>
+    </td>
+    <td>
+     <p>
+      Assumes uniform study area; fails with population or density heterogeneity
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Tree plantation spacing
+     </p>
+    </td>
+    <td>
+     <p>
+      Optimal spacing analysis for forest plantations
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Disease outbreak
+     </p>
+    </td>
+    <td>
+     <p>
+      Identifying clustering patterns of infection cases
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Irrigation well distribution
+     </p>
+    </td>
+    <td>
+     <p>
+      Planning well placement for optimal spatial coverage
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Urban facility planning
+     </p>
+    </td>
+    <td>
+     <p>
+      Optimal placement of schools, hospitals, fire stations
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Pest attack clustering
+     </p>
+    </td>
+    <td>
+     <p>
+      Detecting concentrated pest incidents for intervention
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    12. Ripley's K Function — Multi-Scale Analysis
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Ripley's K is a MULTI-SCALE point pattern analysis tool that examines clustering, randomness, or dispersion across a RANGE of distances — not just at a single scale like NNI. It reveals how spatial structure changes with distance.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td colspan="2">
+     <p>
+      <strong>
+       FORMULA
+      </strong>
+      |  K(r) = (A / n²) × ΣᵢΣⱼ wᵢⱼ · I(dᵢⱼ ≤ r)        →  L(r) = √(K(r) / π) − r
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Variable
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        A
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Total area of the study region
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        n
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Total number of points
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        wᵢⱼ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Edge correction weight for pair i, j
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        I(dᵢⱼ ≤ r)
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Indicator: 1 if distance between i and j ≤ r, else 0
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        r
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Search distance (radius) — varied across a range
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        K(r)
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Ripley's K statistic at distance r
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        L(r)
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Besag's L transformation — linearises K(r) so L=0 means CSR
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Interpreting the L(r) Plot
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Value Range
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Interpretation
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Pattern Type
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      L(r) &gt; 0
+     </p>
+    </td>
+    <td>
+     <p>
+      Clustering at distance r — more points within r than expected under CSR
+     </p>
+    </td>
+    <td>
+     <p>
+      CLUSTERED at this scale
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      L(r) = 0
+     </p>
+    </td>
+    <td>
+     <p>
+      Random pattern at distance r — matches CSR expectation
+     </p>
+    </td>
+    <td>
+     <p>
+      RANDOM at this scale
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      L(r) &lt; 0
+     </p>
+    </td>
+    <td>
+     <p>
+      Dispersion at distance r — fewer points within r than expected
+     </p>
+    </td>
+    <td>
+     <p>
+      DISPERSED at this scale
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ✅ KEY EXAMPLE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Trees in a forest: clustered at small scales (seed dispersal → juveniles grow near parent) but regular at large scales (competition for light and water → self-thinning). NNI would give an ambiguous single value; Ripley's K reveals BOTH patterns.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       💡 CSR ENVELOPE
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Software generates a simulation envelope from multiple random patterns. If the observed K/L curve lies ABOVE the upper envelope → significant clustering. BELOW the lower envelope → significant dispersion. Between the envelopes → random pattern at that scale.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Ripley's K vs. NNI
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Property
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       NNI
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Ripley's K
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Scale
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Single scale (nearest neighbour only)
+     </p>
+    </td>
+    <td>
+     <p>
+      Multiple scales across a distance range
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Output
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      One ratio value
+     </p>
+    </td>
+    <td>
+     <p>
+      A curve of K or L values vs. distance
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Complexity
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Simple, fast to compute
+     </p>
+    </td>
+    <td>
+     <p>
+      More intensive; requires simulation envelope
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Best For
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Quick overall pattern assessment
+     </p>
+    </td>
+    <td>
+     <p>
+      Multi-scale processes; ecology, epidemiology
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Forest ecology
+     </p>
+    </td>
+    <td>
+     <p>
+      Tree distribution patterns at multiple spatial scales
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Disease spread analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Understanding spread distances and contagion patterns
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Agricultural field analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Crop distribution and within-field spacing patterns
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Wildlife habitat studies
+     </p>
+    </td>
+    <td>
+     <p>
+      Animal nest or den distribution and territory size
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Species clustering
+     </p>
+    </td>
+    <td>
+     <p>
+      Biodiversity assessments across habitat gradients
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    13. Spatial Interpolation
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 DEF
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial interpolation estimates values at UNKNOWN locations using known sample points. Underpinned by Tobler's Law — nearby points are more similar than distant ones — it converts point observations into continuous spatial surfaces.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Category
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Method
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Deterministic
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       IDW
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Weights decrease with distance from known points — simple and fast
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Deterministic
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Spline
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Smooth surface fitted through known points — good for gradual changes
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Geostatistical
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Kriging
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Optimal prediction using spatial autocorrelation; provides uncertainty estimates
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td colspan="2">
+     <p>
+      <strong>
+       FORMULA
+      </strong>
+      |  IDW:  Z(x₀) = Σ [Zᵢ / dᵢᵖ] / Σ [1 / dᵢᵖ]
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Variable
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Meaning
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        Z(x₀)
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Estimated value at unknown location x₀
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        Zᵢ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Known sample value at point i
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        dᵢ
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Distance from sample point i to the unknown location
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       <em>
+        p
+       </em>
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Power parameter (typically 2) — controls the rate of distance decay
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Method Comparison
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Method
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Advantages
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Disadvantages
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Best Used For
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       IDW
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Simple, fast, intuitive
+     </p>
+    </td>
+    <td>
+     <p>
+      No uncertainty; edge artifacts
+     </p>
+    </td>
+    <td>
+     <p>
+      Dense samples, quick estimates
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Spline
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Smooth, good for gradients
+     </p>
+    </td>
+    <td>
+     <p>
+      Overshoots with outliers
+     </p>
+    </td>
+    <td>
+     <p>
+      Elevation, temperature maps
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Kriging
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Optimal; uncertainty estimates
+     </p>
+    </td>
+    <td>
+     <p>
+      Complex; needs variogram
+     </p>
+    </td>
+    <td>
+     <p>
+      Precision agriculture, minerals
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ⭐ KRIGING
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Kriging is considered the gold standard because it INCORPORATES SPATIAL AUTOCORRELATION via a variogram model — directly linking it to Moran's I and Geary's C concepts. It also provides prediction uncertainty (standard error) at each interpolated point.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    14. GIS &amp; Remote Sensing Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 OVERVIEW
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial autocorrelation and point pattern analysis are applied across all major remote sensing platforms and GIS applications for environmental monitoring, resource management, and spatial decision-making.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application Area
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Spatial Method
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Remote Sensing Source
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      NDVI / Vegetation analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I, Getis-Ord Gi*
+     </p>
+    </td>
+    <td>
+     <p>
+      Landsat, Sentinel-2, MODIS
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Land Use / Land Cover change
+     </p>
+    </td>
+    <td>
+     <p>
+      Point pattern analysis, hotspot
+     </p>
+    </td>
+    <td>
+     <p>
+      Landsat time series
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Precision agriculture
+     </p>
+    </td>
+    <td>
+     <p>
+      Kriging, hotspot analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Drone imagery, Sentinel-2
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Forest monitoring
+     </p>
+    </td>
+    <td>
+     <p>
+      Ripley's K, NNI
+     </p>
+    </td>
+    <td>
+     <p>
+      Landsat, Sentinel-1 SAR
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Urban growth analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial autocorrelation
+     </p>
+    </td>
+    <td>
+     <p>
+      Landsat, nighttime lights
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Drought assessment
+     </p>
+    </td>
+    <td>
+     <p>
+      Getis-Ord Gi*, trend analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      MODIS, TRMM rainfall
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Flood risk mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Interpolation, hotspot analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      SAR (Sentinel-1), DEM
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Soil fertility analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Kriging, Moran's I
+     </p>
+    </td>
+    <td>
+     <p>
+      Hyperspectral, field samples
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Groundwater potential
+     </p>
+    </td>
+    <td>
+     <p>
+      Interpolation, point pattern
+     </p>
+    </td>
+    <td>
+     <p>
+      Gravity, SAR, well data
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Key Satellite Platforms
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Satellite / Sensor
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Resolution
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Revisit Time
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Primary Use
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Landsat 8/9
+     </p>
+    </td>
+    <td>
+     <p>
+      30 m multispectral
+     </p>
+    </td>
+    <td>
+     <p>
+      16 days
+     </p>
+    </td>
+    <td>
+     <p>
+      Land cover, vegetation, urban
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Sentinel-2
+     </p>
+    </td>
+    <td>
+     <p>
+      10 m multispectral
+     </p>
+    </td>
+    <td>
+     <p>
+      5 days
+     </p>
+    </td>
+    <td>
+     <p>
+      Agriculture, vegetation health
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Sentinel-1 (SAR)
+     </p>
+    </td>
+    <td>
+     <p>
+      10–40 m
+     </p>
+    </td>
+    <td>
+     <p>
+      6 days
+     </p>
+    </td>
+    <td>
+     <p>
+      All-weather monitoring, soil moisture, floods
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      MODIS
+     </p>
+    </td>
+    <td>
+     <p>
+      250 m–1 km
+     </p>
+    </td>
+    <td>
+     <p>
+      Daily
+     </p>
+    </td>
+    <td>
+     <p>
+      Global NDVI, temperature, fire
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Drone / UAV
+     </p>
+    </td>
+    <td>
+     <p>
+      cm-scale
+     </p>
+    </td>
+    <td>
+     <p>
+      On-demand
+     </p>
+    </td>
+    <td>
+     <p>
+      Precision agriculture, detailed field mapping
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    15. Agriculture &amp; Precision Farming Applications
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       📌 OVERVIEW
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Modern agriculture relies on geospatial statistics for precision farming, resource optimisation, and sustainable management — connecting all the spatial methods covered in this guide to real-world agricultural outcomes.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Application
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Spatial Method
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Benefit
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Precision Agriculture
+     </p>
+    </td>
+    <td>
+     <p>
+      Kriging, spatial autocorrelation
+     </p>
+    </td>
+    <td>
+     <p>
+      Identify soil nutrient variability; apply fertilisers selectively
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Crop Health Monitoring
+     </p>
+    </td>
+    <td>
+     <p>
+      NDVI analysis, Getis-Ord Gi*
+     </p>
+    </td>
+    <td>
+     <p>
+      Detect unhealthy crop regions and stress zones from satellite
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Pest &amp; Disease Mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Point pattern analysis, NNI
+     </p>
+    </td>
+    <td>
+     <p>
+      Identify outbreak zones for targeted intervention
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Irrigation Planning
+     </p>
+    </td>
+    <td>
+     <p>
+      Spatial interpolation (IDW, Kriging)
+     </p>
+    </td>
+    <td>
+     <p>
+      Estimate groundwater and soil moisture distribution
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Yield Variability Mapping
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I, Geary's C
+     </p>
+    </td>
+    <td>
+     <p>
+      Map yield clustering to guide management zone delineation
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Climate Change Analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Trend analysis, autocorrelation
+     </p>
+    </td>
+    <td>
+     <p>
+      Analyse drought trends and crop vulnerability across seasons
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    Emerging Technologies
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Technology
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Description
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Application in Agriculture
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      AI &amp; Machine Learning
+     </p>
+    </td>
+    <td>
+     <p>
+      Automated pattern recognition and prediction
+     </p>
+    </td>
+    <td>
+     <p>
+      Crop yield prediction, automated zone delineation
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Google Earth Engine
+     </p>
+    </td>
+    <td>
+     <p>
+      Cloud-based planetary-scale analysis
+     </p>
+    </td>
+    <td>
+     <p>
+      Large-scale NDVI, time series monitoring
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Drone-based Monitoring
+     </p>
+    </td>
+    <td>
+     <p>
+      High-resolution aerial imagery
+     </p>
+    </td>
+    <td>
+     <p>
+      Real-time crop health, variable-rate application
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      IoT Sensor Networks
+     </p>
+    </td>
+    <td>
+     <p>
+      Ground-based real-time data collection
+     </p>
+    </td>
+    <td>
+     <p>
+      Soil moisture, microclimate monitoring at field scale
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Cloud GIS Platforms
+     </p>
+    </td>
+    <td>
+     <p>
+      Scalable geospatial computing
+     </p>
+    </td>
+    <td>
+     <p>
+      Agricultural decision support, collaborative mapping
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    16. Advantages &amp; Limitations
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ✅  Advantages
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       ⚠️  Limitations
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Detects hidden spatial patterns not visible in raw data
+     </p>
+    </td>
+    <td>
+     <p>
+      Results depend heavily on data quality and completeness
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Provides evidence-based insights for planning and policy
+     </p>
+    </td>
+    <td>
+     <p>
+      Sensitive to scale and spatial weights matrix choice
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Tracks changes in ecosystems, climate, and land use
+     </p>
+    </td>
+    <td>
+     <p>
+      Computationally intensive for large datasets
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Enables targeted precision agriculture interventions
+     </p>
+    </td>
+    <td>
+     <p>
+      Different methods can yield different results on same data
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Identifies critical hotspots requiring immediate action
+     </p>
+    </td>
+    <td>
+     <p>
+      Requires solid statistical understanding to interpret correctly
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Supports forecasting and scenario modelling
+     </p>
+    </td>
+    <td>
+     <p>
+      Edge effects can bias NNI, Ripley's K, and KDE results
+     </p>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       ⚠️ CAUTION
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      Always consider data quality, appropriate scale, and methodological assumptions. A significant Moran's I or Gi* result is meaningless if the underlying data has systematic collection errors or the spatial weights are misspecified.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    17. Conclusion
+   </strong>
+  </p>
+  <table>
+   <tr>
+    <td>
+     <p>
+      <strong>
+       Key Takeaway
+      </strong>
+     </p>
+    </td>
+    <td>
+     <p>
+      <strong>
+       Core Message
+      </strong>
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Spatial autocorrelation is fundamental
+     </p>
+    </td>
+    <td>
+     <p>
+      Nearby features are related — classical statistics that ignores this will produce misleading results
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Multiple complementary methods
+     </p>
+    </td>
+    <td>
+     <p>
+      Moran's I, Geary's C, Gi*, KDE, NNI, Ripley's K each address a different aspect of spatial structure
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Global → Local progression
+     </p>
+    </td>
+    <td>
+     <p>
+      Start with global tests (Moran's I) then drill to local patterns (Gi*, KDE)
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Scale matters
+     </p>
+    </td>
+    <td>
+     <p>
+      Use NNI for single-scale, Ripley's K for multi-scale point pattern understanding
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Interpolation extends knowledge
+     </p>
+    </td>
+    <td>
+     <p>
+      Kriging and IDW convert sparse point samples into continuous spatial surfaces
+     </p>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <p>
+      Modern technology amplifies power
+     </p>
+    </td>
+    <td>
+     <p>
+      AI, Cloud GIS, Google Earth Engine, and satellite data multiply analytical reach and scale
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p>
+   <strong>
+    18. References
+   </strong>
+  </p>
+  <p>
+   1.  Lecture Notes: RGIS 802 — Spatial Statistics &amp; Interpolation
+  </p>
+  <p>
+   2.  Lecture Notes: Applications of GIS — Spatial Autocorrelation and Hotspot Analysis
+  </p>
+  <p>
+   3.  ArcGIS Pro Documentation — Esri Inc. (https://pro.arcgis.com)
+  </p>
+  <p>
+   4.  QGIS Documentation — QGIS.org (https://qgis.org/en/docs/)
+  </p>
+  <p>
+   5.  Google Earth Engine Documentation — Google LLC (https://developers.google.com/earth-engine)
+  </p>
+  <p>
+   6.  Tobler, W. (1970). A Computer Movie Simulating Urban Growth in the Detroit Region. Economic Geography, 46(Supplement), 234–240.
+  </p>
+  <p>
+   7.  Burrough, P.A. &amp; McDonnell, R.A. Principles of Geographical Information Systems. Oxford University Press.
+  </p>
+  <p>
+   8.  Getis, A. &amp; Ord, J.K. (1992). The Analysis of Spatial Association by Use of Distance Statistics. Geographical Analysis, 24(3), 189–206.
+  </p>
+  <p>
+   9.  Ripley, B.D. (1977). Modelling Spatial Patterns. Journal of the Royal Statistical Society, Series B, 39(2), 172–212.
+  </p>
+  <p>
+   10. Moran, P.A.P. (1950). Notes on Continuous Stochastic Phenomena. Biometrika, 37(1/2), 17–23.
+  </p>
+  <p>
+   11. Geary, R.C. (1954). The Contiguity Ratio and Statistical Mapping. The Incorporated Statistician, 5(3), 115–145.
+  </p>
+  <p>
+   <img src="assets/image_2.png"/>
+  </p>
+  <p>
+   <img src="assets/image_3.png"/>
+  </p>
+ </body>
+</html>

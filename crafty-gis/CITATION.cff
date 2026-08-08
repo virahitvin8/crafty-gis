@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use CRAFTY GIS in your research, please cite it as below."
+title: "CRAFTY GIS: Conversational Remote Analysis & Field Technology for Geographic Information Systems"
+authors:
+  - family-names: "Kumar"
+    given-names: "Akshit"
+    orcid: ""
+    email: "akshitvinay4636@gmail.com"
+version: 1.0.0
+date-released: 2026-05-30
+doi: ""
+repository-code: "https://github.com/virahitvin8/crafty-gis"
+license: "GPL-3.0"
+keywords:
+  - "GIS"
+  - "remote sensing"
+  - "geospatial analysis"
+  - "artificial intelligence"
+  - "satellite imagery"
+  - "open source"
+  - "agriculture"
+abstract: "CRAFTY GIS is an open-source, AI-powered geospatial intelligence platform that makes satellite data analysis accessible to everyone. It combines a conversational AI investigation system with automated workflow orchestration, multi-tool GIS processing (GDAL, GeoPandas, Rasterio, QGIS, SAGA, GRASS), and comprehensive data source integration (Sentinel, Landsat, MODIS, SRTM, OSM, CHIRPS, ERA5) to deliver professional-grade geospatial analysis outputs including maps, reports, and raw data files."

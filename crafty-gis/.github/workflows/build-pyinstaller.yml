@@ -1,0 +1,82 @@
+name: Build PyInstaller Desktop App (Windows)
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to tag (optional)"
+        required: false
+
+jobs:
+  # =========================================================================
+  # BUILD PYINSTALLER DESKTOP APP (Windows)
+  # =========================================================================
+  pyinstaller:
+    name: PyInstaller (Windows)
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${env:GITHUB_REF#refs/tags/v}" >> $env:GITHUB_OUTPUT
+
+      # Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: crafty-gis-server/requirements.txt
+
+      # Install system dependencies for geospatial libs
+      - name: Install GDAL (Windows)
+        run: |
+          pip install gdal==3.9.3
+        continue-on-error: true
+
+      # Install Python dependencies
+      - name: Install Python Dependencies
+        working-directory: crafty-gis-server
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      # Setup Node.js for frontend build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Install and build the frontend (Vite React frontend for desktop)
+      - name: Install Frontend Dependencies
+        working-directory: crafty-gis/frontend
+        run: npm install
+
+      - name: Build Frontend
+        working-directory: crafty-gis/frontend
+        run: npm run build
+
+      # Generate icons
+      - name: Generate App Icons
+        run: python scripts/generate-icons.py
+        continue-on-error: true
+
+      # Build with PyInstaller
+      - name: Build with PyInstaller
+        run: python scripts/build-desktop-pyinstaller.py
+
+      # Upload artifact
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: crafty-gis-pyinstaller-${{ steps.version.outputs.VERSION }}
+          path: dist/CRAFTY-GIS/
+          if-no-files-found: warn

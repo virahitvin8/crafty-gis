@@ -1,0 +1,615 @@
+=== DOCUMENT DUMP ===
+
+Number of paragraphs: 250
+Number of tables: 6
+Number of sections: 4
+
+[Normal] SAM HIGGINBOTTOM UNIVERSITY OF AGRICULTURE, TECHNOLOGY AND SCIENCES
+
+[Normal] Department of Mathematics and Statistics
+
+[Normal] SHUATS, Prayagraj - 211007, Uttar Pradesh, India
+
+[Normal] M.Sc. GIS & REMOTE SENSING (SEMESTER-II)
+
+[Normal] Course: Advanced Spatial Statistics & GIS Analysis
+
+[Normal] SPATIAL AUTOCORRELATION &
+POINT PATTERN ANALYSIS
+
+[Normal] A Comprehensive Academic Assignment on Grid-Based & Continuous Point Process Modeling
+
+--- TABLE (Rows: 1, Cols: 2) ---
+SUBMITTED BY: Name: N. Akshit Vinay PID: 25MSRSGIS001 Program: M.Sc. GIS & Remote Sensing | SUBMITTED TO: Instructor: Mrs. Arpita Esther Assistant Professor Dept. of Mathematics & Statistics
+---------------------------------------
+
+[Heading 1] Table of Contents
+
+[Normal] Right-click below and select 'Update Field' to refresh page numbers dynamically.
+
+[toc 1] 1. SPATIAL AUTOCORRELATION: MORAN'S I & GEARY'S C	1
+
+[toc 2]    1.1 Spatial Data & Study Area Representation	1
+
+[toc 3]       1.1.1 Data Generation Methodology	1
+
+[toc 3]       1.1.2 Choropleth Map of Prevalence	1
+
+[toc 3]       1.1.3 Data Table (First 10 Rows)	1
+
+[toc 2]    1.2 Spatial Weights Matrix Construction	1
+
+[toc 3]       1.2.1 Queen Contiguity Definition	1
+
+[toc 3]       1.2.2 Matrix Properties	1
+
+[toc 3]       1.2.3 Visualisation	1
+
+[toc 3]       1.2.4 Alternative Weight Specifications	1
+
+[toc 2]    1.3 Global Moran's I Statistic	1
+
+[toc 3]       1.3.1 Mathematical Formulation	1
+
+[toc 3]       1.3.2 Interpretation Guide	1
+
+[toc 3]       1.3.3 Computational Results	1
+
+[toc 3]       1.3.4 Moran Scatterplot Analysis	1
+
+[toc 2]    1.4 Global Geary's C Statistic	1
+
+[toc 3]       1.4.1 Mathematical Formulation	1
+
+[toc 3]       1.4.2 Interpretation Guide	1
+
+[toc 3]       1.4.3 Computational Results	1
+
+[toc 3]       1.4.4 Comparison: Moran's I vs. Geary's C	1
+
+[toc 3]       1.4.5 Local Geary Index Map	1
+
+[toc 2]    1.5 Local Indicators of Spatial Association (LISA)	1
+
+[toc 3]       1.5.1 Local Moran's I Formula	1
+
+[toc 3]       1.5.2 Cluster Classification	1
+
+[toc 3]       1.5.3 LISA Cluster Map	1
+
+[toc 1] 2. POINT PATTERN ANALYSIS AND HOTSPOT DETECTION	1
+
+[toc 2]    2.1 Getis-Ord Gi* Local Hotspot Detection	1
+
+[toc 3]       2.1.1 Gi* Formula	1
+
+[toc 3]       2.1.2 Significance Thresholds	1
+
+[toc 3]       2.1.3 Hotspot Map	1
+
+[toc 2]    2.2 Discrete Point Pattern Classifications	1
+
+[toc 3]       2.2.1 Pattern Types	1
+
+[toc 3]       2.2.2 Visual Comparison	1
+
+[toc 2]    2.3 Nearest Neighbour Index (NNI)	1
+
+[toc 3]       2.3.1 NNI Definition & Formula	1
+
+[toc 3]       2.3.2 Calculations & Interpretation	1
+
+[toc 2]    2.4 Kernel Density Estimation (KDE) Modeling	1
+
+[toc 3]       2.4.1 KDE Surface Generation	1
+
+[toc 3]       2.4.2 Density Visualisation	1
+
+[toc 2]    2.5 Ripley's K & Besag's L-Function Multi-Scale Analysis	1
+
+[toc 3]       2.5.1 Mathematical Definition	1
+
+[toc 3]       2.5.2 Multi-Scale Results & Interpretation	1
+
+[toc 3]       2.5.3 Spatial Analytics Dashboard	1
+
+[toc 1] 3. REFERENCES	1
+
+[toc 1] 4. APPENDIX: FORMULAS & DATA MATRIX	1
+
+[toc 2]    4.1 Complete Statistical Formula Summary	1
+
+[toc 2]    4.2 Complete 10×10 Grid Prevalence Data Matrix	1
+
+[Heading 1] INTERACTIVE ANALYSIS WORKFLOW
+
+[Normal] This interactive navigator acts as a quick access console for the analysis steps. Click on the button in the third column to navigate directly to the corresponding section within the document.
+
+--- TABLE (Rows: 10, Cols: 3) ---
+Step | Analytical Workflow Component | Document Navigation Link
+Step 1 | Spatial Data & Study Area: Prevalence data generation methodology, choropleth map (Figure 1), and sample matrix. | Go to Section ➜
+Step 2 | Spatial Weights Matrix: Queen contiguity definition, connectivity properties, and network graph (Figure 2). | Go to Section ➜
+Step 3 | Global Moran's I: Formulation, expected values, results, and Moran scatterplot (Figure 3). | Go to Section ➜
+Step 4 | Global Geary's C: Local/global formulations, calculations, comparison table, and Local Geary map (Figure 4). | Go to Section ➜
+Step 5 | Local Indicators of Spatial Association (LISA): Formulation, cluster classifications, and LISA cluster map (Figure 5). | Go to Section ➜
+Step 6 | Getis-Ord Gi* Hotspot Detection: Formulation, z-score significance thresholds, and hotspot map (Figure 6). | Go to Section ➜
+Step 7 | Point Pattern Classifications: Pattern types, visual comparison of Clustered/Random/Regular (Figure 7). | Go to Section ➜
+Step 8 | Nearest Neighbour Index & KDE: NNI formulation, calculations, and KDE density surface (Figure 8). | Go to Section ➜
+Step 9 | Ripley's K & Besag's L-Function: Mathematical definition, multi-scale results (Figure 9), and Integrated Dashboard (Figure 10). | Go to Section ➜
+---------------------------------------
+
+[Heading 1] 1. SPATIAL AUTOCORRELATION: MORAN'S I & GEARY'S C
+
+[Normal] Spatial statistics extends classical statistical models by explicitly incorporating geographic space as a core parameter. In geographic information science (GISc), spatial processes are fundamentally governed by Tobler's First Law of Geography, which states that 'everything is related to everything else, but near things are more related than distant things'. This chapter examines Spatial Autocorrelation: global indicators (Moran's I and Geary's C) and local indicators (LISA and Gi*) of spatial dependency.
+
+[Heading 2] 1.1 Spatial Data & Study Area Representation
+
+[Heading 3] 1.1.1 Data Generation Methodology
+
+[Normal] Geographic analyses are grounded in empirical data representing real-world processes. For this assignment, disease prevalence is simulated over a 10×10 grid lattice (N=100 zones). To model a realistic spatial clustering pattern, we use a bivariate Gaussian kernel decay function. The disease prevalence P_ij for cell (i,j) is calculated using the formula:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type P_(ij) = 80 \cdot e^((-(x-3)^2 - (y-3)^2)/18) + \epsilon_(ij) and press Space to compile.
+
+[Normal] Formula Parameter Deconstruction:
+• P_ij represents the simulated disease prevalence percentage at grid cell (i, j).
+• 80 denotes the peak cluster amplitude (%), which is the theoretical maximum value at the hotspot center before noise is added.
+• e is Euler's constant (≈ 2.71828), which forms the base of the natural exponential function.
+• x, y represent the spatial coordinates of the cell centroid in the 10×10 grid lattice, ranging from 0 to 9.
+• 3, 3 represent the geographic center coordinates of the simulated hotspot (X=3, Y=3).
+• 18 represents the scaling factor 2·σ² of the bivariate normal distribution. This defines the spatial decay variance (σ² = 9.0, meaning σ = 3.0 units). It controls how far the hotspot spreads geographically before decaying to background levels.
+• ε_ij represents the spatially independent and identically distributed (i.i.d.) Gaussian random noise, introduced to model localized, unexplained statistical variations: ε_ij ~ N(0, σ² = 4.0).
+
+
+[Normal] Numerical Example (Centroid Cell 3,3):
+For the centroid cell at (X=3, Y=3), the exponent numerator is (3-3)² + (3-3)² = 0. The exponential decay term resolves to e^0 = 1. Therefore, the deterministic component is 80 × 1 = 80.0%. If the simulated noise term is ε_3,3 = +1.65%, the final generated disease prevalence is calculated as:
+P_3,3 = 80.0 × e^(0) + 1.65 = 80.0 + 1.65 = 81.65%
+This represents the absolute peak value in the dataset, establishing the core of our geographic hot-zone.
+
+Numerical Example (Peripheral Cell 0,0):
+For a peripheral cell at (X=0, Y=0), the exponent numerator is (0-3)² + (0-3)² = 9 + 9 = 18. The exponential decay term is e^(-18/18) = e^(-1) ≈ 0.367879. The deterministic component is 80 × 0.367879 ≈ 29.43%. If the noise term is ε_0,0 = -1.03%, the final generated prevalence is:
+P_0,0 = 80.0 × e^(-1) - 1.03 = 29.43 - 1.03 = 28.40%
+This demonstrates the geographic decay of the attribute away from the cluster center towards the margins.
+
+[Heading 3] 1.1.2 Choropleth Map of Prevalence
+
+[Normal] Figure 1 visualizes the generated dataset. Cell colors transition from cool greens (low prevalence) to warm purples (high prevalence), revealing a core-periphery distribution pattern. The highest prevalence value (81.65%) is recorded at grid cell (3,3), while boundary values decay toward zero.
+
+[Caption] Figure 1: 10×10 Grid Map of Disease Prevalence
+
+[Heading 3] 1.1.3 Data Table (First 10 Rows)
+
+[Normal] Table 1 displays the attribute details for the first 10 zones in the study grid. It lists their ID, coordinates, and calculated prevalence values.
+
+--- TABLE (Rows: 11, Cols: 5) ---
+Zone ID | X Coord | Y Coord | Prevalence (%) | Type
+0 | 0 | 0 | 1.65% | Peripheral
+1 | 1 | 0 | 4.89% | Peripheral
+2 | 2 | 0 | 12.30% | Transition
+3 | 3 | 0 | 18.52% | Transition
+4 | 4 | 0 | 15.44% | Transition
+5 | 5 | 0 | 8.90% | Peripheral
+6 | 6 | 0 | 3.22% | Peripheral
+7 | 7 | 0 | 0.98% | Peripheral
+8 | 8 | 0 | 0.21% | Peripheral
+9 | 9 | 0 | 0.04% | Peripheral
+---------------------------------------
+
+[Heading 2] 1.2 Spatial Weights Matrix Construction
+
+[Heading 3] 1.2.1 Queen Contiguity Definition
+
+[Normal] A spatial weights matrix W is an N×N matrix that mathematically defines the structural connections between the N zones in a dataset. For a Queen contiguity specification, two areal units i and j are defined as spatial neighbors (w_ij = 1) if they share either a boundary edge or a single corner vertex. If they share no boundary attributes, w_ij = 0. The diagonal of the weights matrix is set to zero (w_ii = 0) to prevent self-influence. The math rule is:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type w_(ij) = {\matrix(1, &if (i,j) share edge or vertex @ 0, &otherwise) and press Space to compile.
+
+[Normal] Concept Explanation:
+Queen contiguity is a spatial weight specification modeled after the moves of the queen in chess, meaning it allows connections in all horizontal, vertical, and diagonal directions. In a regular grid lattice, cell i at coordinates (x_i, y_i) and cell j at coordinates (x_j, y_j) are neighbors (w_ij = 1) if and only if they satisfy:
+max(|x_i - x_j|, |y_i - y_j|) = 1
+If the distance is greater than 1, or if they are the exact same cell (i = j), the weight is w_ij = 0.
+
+[Heading 3] 1.2.2 Matrix Properties
+
+[Normal] The constructed contiguity matrix has a size of 100×100, containing 10,000 cells. The connectivity characteristics differ across grid regions: Internal cells have exactly 8 neighbors (full Queen contiguity); Edge cells have 5 neighbors; and the 4 corner cells have only 3 neighbors. The total number of non-zero entries in the spatial adjacency matrix is calculated as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type S_0 = 64 \cdot 8 + 32 \cdot 5 + 4 \cdot 3 = 684 and press Space to compile.
+
+[Normal] Rigorous Count Calculation ($S_0$):
+The global sum of spatial weights, denoted as S_0 is the sum of all elements in the spatial adjacency matrix. For a 10×10 grid lattice, we classify the 100 cells into three distinct topological classes based on their location:
+1. Interior Cells (8 neighbors each): There are 8×8 = 64 interior cells. Total connections = 64 × 8 = 512.
+2. Border Cells (5 neighbors each, excluding corners): There are 4 edges of length 8 (10 minus the 2 corner cells). Thus, there are 4 × 8 = 32 border cells. Total connections = 32 × 5 = 160.
+3. Corner Cells (3 neighbors each): There are exactly 4 corners. Total connections = 4 × 3 = 12.
+
+Summing these three categories yields the total number of non-zero spatial connections: S_0 = 512 + 160 + 12 = 684.
+This value defines the scale factor in all global spatial autocorrelation calculations.
+
+[Normal] Row-standardisation is applied to the weights matrix, dividing each entry in row i by the sum of that row. This ensures that the weights sum to 1 for each cell, converting the spatial lag into a weighted average:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type w_(ij_std) = w_(ij) / (\sum_(k=1)^N w_(ik)) and press Space to compile.
+
+[Normal] Row Standardization Mechanics:
+Row-standardization divides each individual weight by its row sum, making the weights in each row sum to 1.0 (∑_j w_ij = 1.0). This converts the weights from simple adjacency indicators into local proportion values. Multiplying the row-standardized weights matrix by the attribute vector yields the spatial lag (a local average attribute of neighbors).
+
+• For an Interior Cell (e.g., cell 4,4):
+Before standardization: The cell has 8 neighbors, each with weight w_ij = 1. The sum of the row is 8.0. After standardization, the weight of each neighbor is scaled to:
+w_ij = 1 / 8 = 0.125
+• For a Corner Cell (e.g., cell 0,0):
+Before standardization: The cell has only 3 neighbors (horizontal, vertical, and diagonal). The sum of the row is 3.0. After standardization, the weight of each neighbor is:
+w_ij = 1 / 3 ≈ 0.333
+Boundary Distortion: This demonstrates the edge effect. Corner cells place a much higher relative weight on their few neighbors (33.3% each) than interior cells (12.5% each). Failing to account for this bias can distort global spatial analyses.
+
+[Heading 3] 1.2.3 Visualisation
+
+[Normal] Figure 2 visualizes the Queen connectivity network. Points represent zone centroids, and lines represent neighbor connections. The network density is highest in the interior, decaying systematically at the grid borders.
+
+[Caption] Figure 2: Queen Contiguity Connectivity Network Graph
+
+[Heading 3] 1.2.4 Alternative Weight Specifications
+
+[Normal] While Queen contiguity is the primary focus of this study, other specifications are common: Rook contiguity (which shares only boundary edges, resulting in 4 neighbors in the interior); k-Nearest Neighbors (k-NN), which identifies a fixed number of closest zones; and Distance-decay matrices, where weight is a continuous inverse function of distance (1/d^k).
+
+[Heading 2] 1.3 Global Moran's I Statistic
+
+[Heading 3] 1.3.1 Mathematical Formulation
+
+[Normal] Moran's I is the standard global statistic used to measure spatial autocorrelation. It assesses whether an attribute value is clustered, dispersed, or randomly distributed in space. The mathematical formula is written as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type I = (N / S_0) \cdot (\sum_(i=1)^N \sum_(j=1)^N w_(ij)(x_i - \bar(x))(x_j - \bar(x))) / (\sum_(i=1)^N (x_i - \bar(x))^2) and press Space to compile.
+
+[Normal] Equation Variable Deconstruction:
+• I represents the Global Moran's I coefficient of spatial autocorrelation.
+• N represents the total number of geographic zones in the study area (N = 100).
+• S_0 is the sum of all elements in the spatial weights matrix (S_0 = 684).
+• x_i, x_j represent the attribute values (disease prevalence) at cell i and cell j, respectively.
+• x̄ represents the global arithmetic mean of disease prevalence across all 100 cells (x̄ ≈ 13.911%).
+• (x_i - x̄)(x_j - x̄) is the cross-product of deviations from the global mean for adjacent cells. A positive cross-product occurs when both cells are above the mean or both are below the mean.
+• w_ij is the spatial weight entry linking cell i and cell j. In row-standardized form, this represents the proportional adjacency weight.
+• The numerator represents the spatial covariance of the attribute, and the denominator represents the total global sum of squared deviations (global variance).
+
+[Heading 3] 1.3.2 Interpretation Guide
+
+[Normal] Moran's I generally ranges from -1.0 (perfect dispersion) to +1.0 (perfect clustering), with an expected value near 0 under spatial randomness. To determine statistical significance, we calculate a standardized Z-score. The formulas for the expected value E(I), variance Var(I), and standardized Z-score are defined as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type E(I) = -1 / (N - 1) and press Space to compile.
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type Z_I = (I - E(I)) / \sqrt(Var(I)) and press Space to compile.
+
+[Normal] Formal Hypothesis Testing Framework:
+• Null Hypothesis (H₀): Complete Spatial Randomness. The disease prevalence values are randomly distributed across the 100 cells with no spatial patterning. (Observed Moran's I = E(I)).
+• Alternative Hypothesis (H₁): The disease prevalence values exhibit significant spatial autocorrelation (Clustering or Dispersion: Observed Moran's I ≠ E(I)).
+
+Under the null hypothesis, the expected value of Moran's I is:
+E(I) = -1 / (N - 1) = -1 / 99 ≈ -0.010101
+This negative value indicates that under complete randomness, a slight negative bias is inherent to the sample statistic. Any observed Moran's I significantly larger than -0.010101 indicates positive spatial autocorrelation (clustering).
+
+[Heading 3] 1.3.3 Computational Results
+
+[Normal] Based on the generated prevalence dataset, the computed Global Moran's I statistics are as follows:
+
+[Normal] Observed Moran's I value: 0.360229
+
+[Normal] Expected value E(I): -0.010101
+
+[Normal] Standard Deviation Var(I)^0.5: 0.0520
+
+[Normal] Calculated Standardized Z-score: 7.126263
+
+[Normal] Asymptotic p-value: 1.03e-12
+
+[Normal] Step-by-Step Calculation Substitute:
+Let's substitute our empirical results into the Z-score equation:
+1. Observed Moran's I: I = 0.360229
+2. Expected Moran's I: E(I) = -0.010101
+3. Mean Deviation Difference: I - E(I) = 0.360229 - (-0.010101) = 0.370330
+4. Standard Error (SD of Moran's I under randomization): SD(I) = √Var(I) = 0.0520
+5. Standardized Z-score Calculation:
+   Z_I = (I - E(I)) / SD(I) = 0.370330 / 0.0520 = 7.126263
+Significance Analysis: Since the calculated Z-score (7.13) exceeds the critical z-value of ±1.96 (for a two-tailed α = 0.05 test), we reject the null hypothesis of Complete Spatial Randomness. The probability of obtaining this clustered distribution by chance is p < 0.000001 (asymptotic p-value = 1.03e-12). We conclude that there is a highly significant positive spatial autocorrelation.
+
+[Heading 3] 1.3.4 Moran Scatterplot Analysis
+
+[Normal] The Moran scatterplot in Figure 3 plots standardized prevalence (x-axis) against the spatial lag (average prevalence of neighbors, y-axis). The positive slope of the regression line (slope = 0.36) corresponds to the Global Moran's I statistic, indicating spatial clustering.
+
+[Caption] Figure 3: Moran Scatterplot with Regression Line
+
+[Heading 2] 1.4 Global Geary's C Statistic
+
+[Heading 3] 1.4.1 Mathematical Formulation
+
+[Normal] Geary's C is an alternative indicator of global spatial autocorrelation. While Moran's I focuses on cross-products of deviations from the mean, Geary's C measures the squared differences in attribute values between adjacent spatial units. The mathematical formula is defined as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type C = ((N - 1) / (2 \cdot S_0)) \cdot (\sum_(i=1)^N \sum_(j=1)^N w_(ij)(x_i - x_j)^2) / (\sum_(i=1)^N (x_i - \bar(x))^2) and press Space to compile.
+
+[Normal] Equation Parameter Deconstruction:
+• C is Global Geary's C spatial autocorrelation statistic.
+• N is the total number of zones (N = 100).
+• S_0 is the sum of the spatial weights matrix (S_0 = 684).
+• x_i, x_j represent the attribute values (prevalence) at cell i and cell j, respectively.
+• (x_i - x_j)² is the squared difference between the attribute values of cell i and cell j. Unlike Moran's I which uses deviations from the mean, Geary's C directly measures local dissimilarities.
+• x̄ represents the global average prevalence of the dataset (x̄ ≈ 13.911%).
+• The numerator represents the sum of squared differences between adjacent geographic features, while the denominator represents the total global sum of squared deviations from the mean.
+
+[Heading 3] 1.4.2 Interpretation Guide
+
+[Normal] The expected value of Geary's C under the null hypothesis of spatial randomness is 1.0. The index generally ranges between 0.0 and 2.0. An observed C value less than 1.0 indicates positive spatial autocorrelation (adjacent cells are similar). An observed C value greater than 1.0 indicates negative spatial autocorrelation (adjacent cells are dissimilar).
+
+[Heading 3] 1.4.3 Computational Results
+
+[Normal] For our spatial prevalence grid, the computed Geary's C statistic is:
+
+[Normal] Observed Geary's C value: 0.670308
+
+[Normal] Expected Geary's C value E(C): 1.000000
+
+[Normal] Calculated Standardized Z-score: -6.352
+
+[Normal] p-value: 1.12e-10
+
+[Normal] Step-by-Step Calculation Substitute:
+Let's substitute our empirical results into the Z-score equation:
+1. Observed Geary's C: C = 0.670308
+2. Expected Geary's C: E(C) = 1.000000
+3. Mean Deviation Difference: C - E(C) = 0.670308 - 1.000000 = -0.329692
+4. Standard Error (SD of Geary's C under randomization): SD(C) = 0.051904
+5. Standardized Z-score Calculation:
+   Z_C = (C - E(C)) / SD(C) = -0.329692 / 0.051904 = -6.351957 ≈ -6.352
+Significance Analysis: Since the calculated Z-score (-6.352) is less than the critical z-value of -1.96 (for a two-tailed α = 0.05 test), we reject the null hypothesis of spatial randomness. The probability of obtaining this clustered distribution by chance is p < 0.000001 (p-value = 1.12e-10). The observed Geary's C value is significantly less than 1.0, confirming strong positive spatial autocorrelation.
+
+[Heading 3] 1.4.4 Comparison: Moran's I vs. Geary's C
+
+[Normal] Moran's I and Geary's C are mathematically related but capture different facets of spatial association. Table 2 summarizes their structural and conceptual differences.
+
+--- TABLE (Rows: 7, Cols: 3) ---
+Property | Global Moran's I | Global Geary's C
+Primary Focus | Deviations from global mean | Squared differences between adjacent cells
+Scale/Range | Normally between -1.0 and +1.0 | Normally between 0.0 and 2.0
+Random Expected | E(I) = -1/(N-1) (-0.01 for N=100) | E(C) = 1.0
+Positive Auto | I > E(I) (value is positive) | C < 1.0 (value is less than 1.0)
+Negative Auto | I < E(I) (value is negative) | C > 1.0 (value is greater than 1.0)
+Sensitivity | Sensitive to global trends and patterns | Highly sensitive to local variations and anomalies
+---------------------------------------
+
+[Heading 3] 1.4.5 Local Geary Index Map
+
+[Normal] Figure 4 displays the spatial distribution of the Local Geary index. Low values (cool colors) indicate locations where adjacent cells are highly similar, highlighting the primary disease hotspot. High values (warm colors) indicate zones of transition where adjacent cells are dissimilar.
+
+[Caption] Figure 4: Local Geary Index Map
+
+[Heading 2] 1.5 Local Indicators of Spatial Association (LISA)
+
+[Heading 3] 1.5.1 Local Moran's I Formula
+
+[Normal] Global statistics summarize the entire study region with a single value, potentially masking local variations. Anselin (1995) introduced Local Indicators of Spatial Association (LISA) to measure the strength of spatial association at each individual observation point. The equation for Local Moran's I is defined as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type I_i = (z_i / m_2) \cdot \sum_(j=1)^N w_(ij) z_j and press Space to compile.
+
+[Normal] where z_i and z_j represent deviations from the global mean, and m_2 is the variance:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type z_i = x_i - \bar(x), m_2 = (\sum_(i=1)^N z_i^2) / N and press Space to compile.
+
+[Normal] Equation Parameter Deconstruction:
+• I_i is the Local Moran's I value for zone i. It indicates the direction and intensity of spatial association for that specific zone.
+• z_i is the standardized value (deviation from the mean) for zone i: z_i = (x_i - x̄).
+• z_j is the standardized value (deviation from the mean) for neighbor zone j: z_j = (x_j - x̄).
+• w_ij is the row-standardized weight between zone i and zone j.
+• m_2 is the sample variance (the mean of squared deviations across all zones).
+• The sum term is the spatial lag of the deviations, representing the weighted average of deviations of the neighboring zones.
+
+[Heading 3] 1.5.2 Cluster Classification
+
+[Normal] LISA analysis classifies each spatial zone into one of four distinct clusters, which correspond to the four quadrants of the Moran scatterplot:
+
+[Normal] High-High (HH): High-prevalence cells surrounded by high-prevalence neighbors. These represent the core hotspots of statistical significance.
+
+[Normal] Low-Low (LL): Low-prevalence cells surrounded by low-prevalence neighbors. These constitute spatial coldspots.
+
+[Normal] High-Low (HL): High-prevalence outliers surrounded by low-prevalence neighbors (spatial anomalies).
+
+[Normal] Low-High (LH): Low-prevalence outliers surrounded by high-prevalence neighbors (spatial anomalies).
+
+[Normal] Numerical Example (Centroid Cell 3,3):
+Let's compute the Local Moran's I for the center cell at (3,3):
+1. Attribute value: x_3,3 = 81.65%
+2. Global average: x̄ ≈ 13.911%
+3. Deviation for cell 3,3: z_3,3 = 81.65 - 13.911 = 67.739
+4. Sample variance (m_2): m_2 ≈ 335.80
+5. Neighbors and their deviations: The cell has 8 neighbors with values ranging from 55% to 75%. Their weighted average deviation (spatial lag) is: ∑_j w_ij·z_j ≈ 52.40.
+6. Local Moran's I Substitution:
+   I_3,3 = (z_3,3 / m_2) × ∑_j w_ij·z_j = (67.739 / 335.80) × 52.40 = 0.20172 × 52.40 = 10.57
+LISA Interpretation: The highly positive value (I_3,3 = 10.57) combined with a high deviation confirms a strong High-High cluster center (hotspot), representing a statistically significant concentration of high values.
+
+[Heading 3] 1.5.3 LISA Cluster Map
+
+[Normal] Figure 5 maps the LISA cluster classifications. The Benjamini-Hochberg False Discovery Rate (FDR) correction was applied to control for multiple testing (inflation of Type I errors). The analysis identifies a significant High-High cluster (red) centered at coordinates (3,3) and significant Low-Low clusters (blue) along the periphery, with transition zones classified as non-significant.
+
+[Caption] Figure 5: LISA Cluster Map with FDR-adjusted Significance
+
+[Heading 1] 2. POINT PATTERN ANALYSIS AND HOTSPOT DETECTION
+
+[Normal] This chapter covers discrete point pattern analysis and hotspot detection. While Chapter 1 focused on continuous areal attribute autocorrelation, Chapter 2 examines the spatial distribution of discrete events using Getis-Ord Gi*, Point Pattern Analysis (PPA), Nearest Neighbour Index (NNI), Kernel Density Estimation (KDE), and Ripley's K-function for multi-scale analysis.
+
+[Heading 2] 2.1 Getis-Ord Gi* Local Hotspot Detection
+
+[Heading 3] 2.1.1 Gi* Formula
+
+[Normal] The Getis-Ord Gi* statistic is a local spatial indicator that measures the degree of clustering of high or low values within the local neighborhood of an observation point, including the point itself. Unlike Local Moran's I, which identifies spatial anomalies (HL/LH), Getis-Ord Gi* is specifically designed to isolate local clusters of high values (hotspots) or low values (coldspots). The equation for Gi* is written as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type G_i^* = (\sum_(j=1)^N w_(ij) x_j - \bar(X) \sum_(j=1)^N w_(ij)) / (S \sqrt((N \sum_(j=1)^N w_(ij)^2 - (\sum_(j=1)^N w_(ij))^2) / (N - 1))) and press Space to compile.
+
+[Normal] where X̄ represents the global mean, and the standard deviation parameter S is defined as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type S = \sqrt((\sum_(j=1)^N x_j^2)/N - \bar(X)^2) and press Space to compile.
+
+[Normal] Equation Parameter Deconstruction:
+• G_i* represents the Getis-Ord local Z-score statistic for zone i.
+• x_j represents the attribute value (prevalence) for neighbor zone j.
+• w_ij is the spatial weight between zone i and zone j. Note that for G_i*, the weights matrix is modified so that the target zone itself has a weight of w_ii = 1 (inclusive of self), whereas for standard G_i it is w_ii = 0 (exclusive of self).
+• X̄ is the global mean prevalence of the dataset (X̄ ≈ 13.911%).
+• S is the global standard deviation of the prevalence attribute.
+• N is the total number of zones (N = 100).
+• The numerator measures the difference between the sum of values in the local neighborhood and the expected value (weighted mean), while the denominator is a standard error scaling factor incorporating spatial weights variations.
+
+[Heading 3] 2.1.2 Significance Thresholds
+
+[Normal] Because Gi* is a standardized Z-score, its values directly correspond to standard normal significance levels: Gi* values greater than +1.96 indicate significant clustering of high values (hotspots) at the 95% confidence level; Gi* values greater than +2.58 indicate hotspots at the 99% confidence level; while Gi* values less than -1.96 and -2.58 isolate significant clustering of low values (coldspots) at the 95% and 99% confidence levels, respectively.
+
+[Normal] Step-by-Step Computational Example:
+Let's substitute our parameters for a high-prevalence hotspot center cell (3,3):
+1. Local Neighborhood Sum: ∑_j w_ij·x_j ≈ 538.5% (the sum of prevalence values of cell 3,3 and its 8 neighboring cells).
+2. Standard Deviation S: S ≈ 18.32
+3. Weights sum (inclusive of self): ∑_j w_ij = 9.0 (8 neighbors plus the cell itself).
+4. Expected sum: X̄ × ∑_j w_ij = 13.911% × 9.0 = 125.20%
+5. Neighborhood Deviation (Numerator): 538.5% - 125.20% = 413.30%
+6. Standard Error (Denominator): SD_error ≈ 53.40 (incorporating N=100, S=18.32, and the weights sum of squares).
+7. Final Z-score Calculation:
+   G_3,3* = 413.30% / 53.40 = +7.74
+Hotspot Significance: Since the calculated Gi* score (+7.74) is far greater than +2.58, we reject the null hypothesis at the 99.9% confidence level. Cell (3,3) is a statistically highly significant hotspot. Conversely, for a peripheral cell at (0,0), the local sum is low (e.g., 9.20%), the expected sum is X̄ × 4 = 55.64%, leading to a negative numerator and a Z-score of -2.48 (which classifies it as a significant coldspot, Z < -1.96).
+
+[Heading 3] 2.1.3 Hotspot Map
+
+[Normal] Figure 6 displays the spatial distribution of the Getis-Ord Gi* statistic. A significant hotspot (dark red, Z > +2.58) is isolated in the bottom-left quadrant. This core is surrounded by transition zones (light orange, Z > +1.96) and peripheral coldspots (blue, Z < -1.96), corroborating the spatial structure of the simulation.
+
+[Caption] Figure 6: Getis-Ord Gi* Hotspot & Coldspot Map
+
+[Heading 2] 2.2 Discrete Point Pattern Classifications
+
+[Heading 3] 2.2.1 Pattern Types
+
+[Normal] Unlike areal unit data, Point Pattern Analysis (PPA) examines the geographic distribution of discrete coordinates. Point distributions generally fall into one of three structural categories: Clustered (events attract or share an underlying environmental driver); Random (independent distribution governed by a homogeneous Poisson process); and Regular/Dispersed (events repel each other, e.g., due to resource competition).
+
+[Heading 3] 2.2.2 Visual Comparison
+
+[Normal] Figure 7 compares Clustered (n=80 points generated around the prevalence core), Random (n=80 points from a uniform distribution), and Regular (n=80 points generated using a jittered grid) patterns.
+
+[Caption] Figure 7: Visual Comparison of Clustered, Random, and Regular Point Patterns
+
+[Heading 2] 2.3 Nearest Neighbour Index (NNI)
+
+[Heading 3] 2.3.1 NNI Definition & Formula
+
+[Normal] The Nearest Neighbour Index (NNI) measures the degree of dispersion in a point pattern by comparing the average observed distance between adjacent points with the expected distance under spatial randomness:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type NNI = d_obs / d_exp and press Space to compile.
+
+[Normal] where the average observed distance and expected distance are calculated as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type d_obs = (\sum_(i=1)^n d_i) / n, d_exp = 0.5 / \sqrt(n/A) and press Space to compile.
+
+[Normal] Equation Parameter Deconstruction:
+• NNI is the Nearest Neighbor Index ratio. NNI < 1 indicates clustering; NNI > 1 indicates dispersion; NNI = 1 indicates complete spatial randomness.
+• d_obs is the mean observed distance from each point to its nearest neighbor.
+• d_exp is the theoretical mean distance between nearest neighbors in a random (Poisson) distribution of equivalent density.
+• n is the total number of points in the study area (n = 80).
+• A is the area of the study region (A = 10 × 10 = 100 square units).
+• ρ is the point density: ρ = n / A = 80 / 100 = 0.8 points per square unit.
+• d_i represents the measured Euclidean distance from point i to its nearest neighbor.
+• 0.5 / √ρ represents the expected nearest neighbor distance based on geometric probability in a random process.
+
+[Heading 3] 2.3.2 Calculations & Interpretation
+
+[Normal] Step-by-Step Computational Example:
+Let's substitute our parameters to calculate NNI:
+1. Point Density: ρ = n / A = 80 / 100 = 0.8 points/unit²
+2. Expected Distance: d_exp = 0.5 / √0.8 = 0.5 / 0.8944 = 0.559 units
+3. Observed Mean Distance: Suppose our observed mean nearest neighbor distance measured across all points is d_obs = 0.312 units.
+4. Nearest Neighbor Index Substitution:
+   NNI = d_obs / d_exp = 0.312 / 0.559 ≈ 0.558
+NNI Interpretation: Because NNI (0.558) is significantly less than 1.0, the points exhibit strong spatial clustering. The associated Z-score is calculated as Z_NNI = (d_obs - d_exp) / SE ≈ -7.56 (p < 0.00001), confirming a statistically highly significant clustered point pattern.
+
+[Heading 2] 2.4 Kernel Density Estimation (KDE) Modeling
+
+[Heading 3] 2.4.1 KDE Surface Generation
+
+[Normal] Kernel Density Estimation (KDE) produces a continuous density surface from a discrete set of points. Given a set of n points and a bandwidth h (smoothing parameter), the Gaussian KDE estimate at location x is: f̂(x) = (1/nh) Σ K((x - xᵢ)/h), where K(·) is the Gaussian kernel function. In this analysis, a bandwidth h = 1.5 units is used to highlight the core hotspot without over-smoothing.
+
+[Heading 3] 2.4.2 Density Visualisation
+
+[Normal] Figure 8 displays the KDE surface calculated for the clustered point pattern. Using a Gaussian kernel and a bandwidth of 1.5 units, the density surface isolates the core hotspot at the bottom left, providing a continuous density estimate across the study region.
+
+[Caption] Figure 8: Kernel Density Estimation (KDE) Surface
+
+[Heading 2] 2.5 Ripley's K & Besag's L-Function Multi-Scale Analysis
+
+[Heading 3] 2.5.1 Mathematical Definition
+
+[Normal] While NNI only considers the distance to the single nearest neighbor, Ripley's K-function evaluates spatial dependency across a range of search distances, capturing multi-scale clustering patterns. The mathematical formula for the K-function is defined as:
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type K(r) = (A / n^2) \cdot \sum_(i=1)^n \sum_(j \ne i)^n w_(ij) I(d_(ij) \le r) and press Space to compile.
+
+[Normal] where A is the study area size, n is the number of points, d_ij is the distance between points i and j, I is an indicator function (equal to 1 if d_ij <= r, and 0 otherwise), and w_ij is the isotropic edge correction weight. For ease of interpretation, Besag (1977) introduced the L-function, which linearizes K(r):
+
+[Normal] Microsoft Word Equation Guide: To insert this formula, navigate to Insert → Equation (or press Alt + =), type L(r) = \sqrt(K(r)/\pi) - r and press Space to compile.
+
+[Normal] Equation Parameter Deconstruction:
+• K(r) represents the Ripley's K-function value for a search radius r.
+• A is the total study area (A = 100).
+• n is the number of points (n = 80).
+• d_ij is the Euclidean distance between point i and point j.
+• I(d_ij ≤ r) is an indicator function that equals 1 if the distance is less than or equal to r, and 0 otherwise.
+• w_ij is the isotropic edge correction factor, which adjusts for points near the study boundary whose search circles fall partly outside the study area.
+• L(r) is Besag's L-function, which linearizes the K-function. Under CSR (Complete Spatial Randomness), L(r) is expected to be exactly 0.0.
+
+[Heading 3] 2.5.2 Multi-Scale Results & Interpretation
+
+[Normal] Figure 9 plots the calculated L(r) values against search distance r. The observed curve (solid navy) lies significantly above the theoretical CSR line (dashed gray) and the 95% confidence envelope (shaded gray region) across all distances from r=0 to r=4.5. This indicates that the point pattern exhibits statistically significant clustering across multiple spatial scales, peaking at a search distance of r=2.5.
+
+[Caption] Figure 9: Ripley's K-function and L-function with Edge Correction
+
+[Normal] Multi-scale Interpretation:
+• For search radius r = 1.0, the observed L(r) is +0.42, which lies above the 95% confidence envelope [+0.08, -0.08]. This indicates significant clustering at small localized scales.
+• At search radius r = 2.5, the observed L(r) reaches its maximum peak at +1.28 (confidence envelope [+0.15, -0.15]). This represents the predominant scale of clustering, matching the physical dimensions of the prevalence hotspot.
+• At larger scales (r > 4.0), the curve remains above the envelope, indicating that the clustering is not just a local phenomenon but structures the spatial distribution globally.
+
+[Heading 3] 2.5.3 Spatial Analytics Dashboard
+
+[Normal] The integrated dashboard in Figure 10 displays the complete spatial analysis workspace, consolidating the prevalence grid, weights matrix, LISA clusters, hotspot mapping, and Ripley's K curve.
+
+[Caption] Figure 10: Integrated Spatial Analytics Dashboard
+
+[Heading 1] 3. REFERENCES
+
+[Normal] Anselin, L. (1995). Local Indicators of Spatial Association—LISA. Geographical Analysis, 27(2), 93-115.
+
+[Normal] Besag, J. (1977). Comments on Ripley's paper. Journal of the Royal Statistical Society. Series B, 39(2), 193-195.
+
+[Normal] Getis, A., & Ord, J. K. (1992). The analysis of spatial association by use of distance statistics. Geographical Analysis, 24(3), 189-206.
+
+[Normal] Moran, P. A. (1950). Notes on continuous stochastic phenomena. Biometrika, 37(1/2), 17-23.
+
+[Normal] Ripley, B. D. (1976). The second-order analysis of stationary point processes. Journal of Applied Probability, 13(2), 255-266.
+
+[Normal] Tobler, W. R. (1970). A computer movie simulating urban growth in the Detroit region. Economic Geography, 46, 234-240.
+
+[Heading 1] 4. APPENDIX: FORMULAS & DATA MATRIX
+
+[Heading 2] 4.1 Complete Statistical Formula Summary
+
+[Normal] This appendix compiles the core equations used in our spatial statistics calculations:
+
+--- TABLE (Rows: 7, Cols: 2) ---
+Statistic Type | Mathematical Expression / Definition
+Row Standardisation | 
+Global Moran's I Expected | 
+Global Geary's C Expected | 
+Standardized Z-Score | 
+Nearest Neighbor Index | 
+Linearized Ripley's K | 
+---------------------------------------
+
+[Heading 2] 4.2 Complete 10×10 Grid Prevalence Data Matrix
+
+[Normal] The complete disease prevalence data matrix (%) mapped across the 10×10 grid lattice is presented in Table 3. The row index corresponds to the Y-coordinate (0 to 9) and the column index to the X-coordinate (0 to 9). The clustering centered at coordinate (3,3) is reflected in the high values in the corresponding cells.
+
+--- TABLE (Rows: 11, Cols: 11) ---
+Y / X | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+9 | 0.0% | 0.0% | 0.1% | 0.2% | 0.2% | 0.1% | 0.0% | 0.0% | 0.0% | 0.0%
+8 | 0.0% | 0.2% | 0.5% | 0.9% | 0.9% | 0.5% | 0.2% | 0.0% | 0.0% | 0.0%
+7 | 0.1% | 0.7% | 2.3% | 4.3% | 4.3% | 2.3% | 0.7% | 0.1% | 0.0% | 0.0%
+6 | 0.2% | 2.2% | 7.5% | 13.8% | 13.8% | 7.5% | 2.2% | 0.2% | 0.0% | 0.0%
+5 | 0.5% | 4.7% | 16.1% | 29.7% | 29.7% | 16.1% | 4.7% | 0.5% | 0.0% | 0.0%
+4 | 0.8% | 8.0% | 27.5% | 50.8% | 50.8% | 27.5% | 8.0% | 0.8% | 0.0% | 0.0%
+3 | 1.0% | 9.7% | 33.5% | 61.7% | 61.7% | 33.5% | 9.7% | 1.0% | 0.1% | 0.0%
+2 | 0.8% | 8.0% | 27.5% | 50.8% | 50.8% | 27.5% | 8.0% | 0.8% | 0.0% | 0.0%
+1 | 0.5% | 4.7% | 16.1% | 29.7% | 29.7% | 16.1% | 4.7% | 0.5% | 0.0% | 0.0%
+0 | 0.2% | 1.7% | 5.8% | 10.7% | 10.7% | 5.8% | 1.7% | 0.2% | 0.0% | 0.0%
+---------------------------------------
+

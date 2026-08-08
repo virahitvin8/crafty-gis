@@ -1,0 +1,8 @@
+Global Moran's I: 0.360229
+Global Moran's Expected I: -0.010101
+Global Moran's Z-score: 7.126263
+Global Moran's p-value: 1.031397e-12
+Global Geary's C: 0.670308
+Global Geary's Expected C: 1.000000
+FDR Rejected Hypotheses (LISA significance): 3
+Clustered point count: 80

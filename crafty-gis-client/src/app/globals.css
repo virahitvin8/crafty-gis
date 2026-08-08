@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/* =============================================================
+   CRAFTY GIS — Global Design System
+   Dark professional dashboard with Earth-tone accents
+   Mobile-first, Android PWA compatible
+   ============================================================= */
+
+@theme {
+  /* ── Brand Colors ─────────────────────────────────────────── */
+  --color-crafty-50:  #f0f7ff;
+  --color-crafty-100: #e0effe;
+  --color-crafty-200: #b9dffd;
+  --color-crafty-300: #7cc6fb;
+  --color-crafty-400: #36a9f5;
+  --color-crafty-500: #0c8ee7;
+  --color-crafty-600: #0070c4;
+  --color-crafty-700: #01599f;
+  --color-crafty-800: #064c83;
+  --color-crafty-900: #0b406d;
+  --color-crafty-950: #07284a;
+
+  /* ── Earth / Nature Accent ────────────────────────────────── */
+  --color-earth-50:  #f6f6ef;
+  --color-earth-100: #eaead9;
+  --color-earth-200: #d5d5b2;
+  --color-earth-300: #baba83;
+  --color-earth-400: #a09f5d;
+  --color-earth-500: #888745;
+  --color-earth-600: #6d6b36;
+  --color-earth-700: #56532d;
+  --color-earth-800: #484529;
+  --color-earth-900: #3e3b25;
+
+  /* ── Status Colors ────────────────────────────────────────── */
+  --color-success:   #22c55e;
+  --color-warning:   #f59e0b;
+  --color-error:     #ef4444;
+  --color-info:      #3b82f6;
+
+  /* ── Typography ───────────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Animations ───────────────────────────────────────────── */
+  --animate-slide-up:       slide-up 0.3s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-fade-in:        fade-in 0.25s ease-out;
+  --animate-pulse-glow:     pulse-glow 2s infinite;
+  --animate-float:          float 3s ease-in-out infinite;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(12, 142, 231, 0.3); }
+  50%       { box-shadow: 0 0 22px rgba(12, 142, 231, 0.7); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30%            { opacity: 1;   transform: scale(1); }
+}
+
+/* ── Base Styles ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #09090b;
+  color: #e4e4e7;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Custom Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* ── Smooth Transitions ─────────────────────────────────────── */
+button, a, input, textarea {
+  transition: all 150ms ease-out;
+}
+
+/* ── Glass Effect ───────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── Typing Indicator ───────────────────────────────────────── */
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0c8ee7;
+  animation: typing 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── MapLibre Overrides ─────────────────────────────────────── */
+.maplibregl-map { width: 100%; height: 100%; border-radius: 8px; }
+.maplibregl-ctrl-top-right { top: 8px; right: 8px; }
+.maplibregl-ctrl-group { background: rgba(24,24,27,0.9) !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+
+/* ── Status Badge ───────────────────────────────────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.status-badge.running { background: rgba(12,142,231,0.15); color: #36a9f5; border: 1px solid rgba(12,142,231,0.3); }
+.status-badge.done    { background: rgba(34,197,94,0.15);  color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.status-badge.failed  { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.status-badge.pending { background: rgba(113,113,122,0.15); color: #a1a1aa; border: 1px solid rgba(113,113,122,0.3); }
+
+/* ── Mobile PWA Safe Area ───────────────────────────────────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* ── Prose (Message Rendering) ──────────────────────────────── */
+.prose-crafty strong { color: #e4e4e7; font-weight: 600; }
+.prose-crafty code { 
+  font-family: var(--font-mono); 
+  background: rgba(255,255,255,0.07);
+  padding: 1px 5px; 
+  border-radius: 4px; 
+  font-size: 12px;
+}
+.prose-crafty a { color: #36a9f5; text-decoration: underline; }

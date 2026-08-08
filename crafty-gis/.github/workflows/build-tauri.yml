@@ -1,0 +1,112 @@
+name: Build Tauri Desktop App
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to tag (optional)"
+        required: false
+
+jobs:
+  # =========================================================================
+  # BUILD TAURI DESKTOP APP (Windows, macOS, Linux)
+  # =========================================================================
+  tauri:
+    name: Tauri (${{ matrix.os }})
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            target: x86_64-unknown-linux-gnu
+            artifact_name: CRAFTY-GIS_*.AppImage
+          - os: windows-latest
+            platform: windows
+            target: x86_64-pc-windows-msvc
+            artifact_name: CRAFTY-GIS_*.msi
+          - os: macos-latest
+            platform: macos
+            target: aarch64-apple-darwin
+            artifact_name: CRAFTY-GIS_*.dmg
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      # Setup Rust
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.target }}
+
+      # Setup Node.js for frontend build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: crafty-gis-client/package-lock.json
+
+      # Install frontend dependencies
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: crafty-gis-client
+
+      # Build the Next.js frontend
+      - name: Build Frontend
+        run: npm run build
+        working-directory: crafty-gis-client
+
+      # Install Linux system dependencies
+      - name: Install Linux Dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      # Install macOS dependencies (already present)
+      - name: Install macOS Dependencies
+        if: matrix.platform == 'macos'
+        run: |
+          brew install librsvg
+
+      # Install Tauri CLI
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2"
+
+      # Generate icons
+      - name: Generate App Icons
+        run: python scripts/generate-icons.py
+        continue-on-error: true
+
+      # Build Tauri app
+      - name: Build Tauri App
+        run: cargo tauri build --bundles ${{ matrix.platform == 'windows' && 'msi' || matrix.platform == 'macos' && 'dmg' || 'appimage' }}
+        working-directory: crafty-gis
+
+      # Upload artifacts
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: crafty-gis-${{ matrix.platform }}-${{ steps.version.outputs.VERSION }}
+          path: |
+            crafty-gis/src-tauri/target/release/bundle/${{ matrix.platform == 'windows' && 'msi' || matrix.platform == 'macos' && 'dmg' || 'appimage' }}/${{ matrix.artifact_name }}
+          if-no-files-found: warn

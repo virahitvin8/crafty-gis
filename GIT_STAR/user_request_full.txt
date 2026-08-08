@@ -1,0 +1,112 @@
+<USER_REQUEST>
+Your comprehensive **Spatial Autocorrelation & Point Pattern Analysis Assignment** is complete and ready for download. Here's everything that was built:
+
+---
+
+## 📄 Main Document
+
+**[Spatial_Autocorrelation_Assignment.docx](sandbox:///mnt/agents/output/Spatial_Autocorrelation_Assignment.docx)** *(2.3 MB)*
+
+This is a fully interactive Word document with:
+- **Clickable Table of Contents** — jump to any of 12 sections instantly
+- **Interactive Flowchart** — 8 colour-coded navigation buttons with hyperlinks to sections
+- **Professional styling** with navy/blue/green/purple colour theming throughout
+- **12 embedded visualisations** with figure captions
+- **Complete statistical computations** from first principles (no black-box software)
+
+---
+
+## 📊 12 Custom Visualisations Generated
+
+| # | Figure | Description |
+|---|--------|-------------|
+| 1 | Mind Map | Spatial Statistics conceptual framework |
+| 2 | Flowchart | 12-step interactive analysis workflow |
+| 3 | Grid Map | 10×10 disease prevalence choropleth |
+| 4 | Moran Scatterplot | Quadrant-classified with regression line |
+| 5 | LISA Cluster Map | HH/LL/HL/LH classification |
+| 6 | Geary's C Map | Local dissimilarity index surface |
+| 7 | Hotspot Map | Getis-Ord Gi* Z-score classification |
+| 8 | Point Patterns | CSR vs Clustered vs Regular comparison |
+| 9 | Ripley's K | L-function with 95% simulation envelope |
+| 10 | KDE Surface | Kernel density with cluster centres |
+| 11 | Spatial Weights | Network graph + matrix heatmap |
+| 12 | Summary Dashboard | All statistics in one infographic |
+
+---
+
+## 🔬 Real Statistical Results Computed
+
+| Statistic | Value | Significance |
+|-----------|-------|-------------|
+| **Moran's I** | 0.3594 | Z = 7.09, ***p < 0.001*** |
+| **Geary's C** | 0.6709 | Z = -5.59, ***p < 0.001*** |
+| **LISA Hot Spots** | 24 cells (24%) | High-High clusters |
+| **LISA Cold Spots** | 19 cells (19%) | Low-Low clusters |
+| **NNI (Clustered)** | R = 0.617 | Significant clustering |
+| **Ripley's K** | L(d) > 0 | Confirmed at a
+<truncated 45215 bytes>
+z)
+    
+    return I_local
+
+# ============================================================================
+# PART 4: GEARY'S C CALCULATION
+# ============================================================================
+
+def gearys_c(values, W):
+    """Calculate Geary's C statistic"""
+    n = len(values)
+    S0 = W.sum()
+    
+    numerator = 0.5 * np.sum(W * np.subtract.outer(values, values)**2)
+    denominator = S0 * np.sum((values - values.mean())**2) / (n - 1)
+    
+    C = numerator / denominator
+    return C
+
+def gearys_c_significance(values, W, permutations=999):
+    """Calculate Geary's C with permutation test"""
+    C_observed = gearys_c(values, W)
+    C_permuted = []
+    
+    for _ in range(permutations):
+        np.random.shuffle(values)
+        C_permuted.append(gearys_c(values, W))
+    
+    C_permuted = np.array(C_permuted)
+    p_value = (np.sum(C_permuted <= C_observed) + 1) / (permutations + 1)
+    z_score = (C_observed - C_permuted.mean()) / C_permuted.std()
+    
+    return {
+        'C': C_observed,
+        'p_value': p_value,
+        'z_score': z_score,
+        'expected': C_permuted.mean(),
+        'std': C_permuted.std()
+    }
+
+# ============================================================================
+# PART 5: GETIS-ORD GI* HOTSPOT ANALYSIS
+# ============================================================================
+
+def getis_ord_gi_star(values, W):
+    """Calculate Getis-Ord Gi* statistic for hotspot detection"""
+    n = len(values)
+    gi_star = np.zeros(n)
+    
+    x_bar = values.mean()
+    s = values.std()
+    S = np.sqrt((values**2).mean() - x_bar**2)
+    
+    for i in range(n):
+        numerator = np.sum(W[i] * values) - x_bar * np.sum(W[i])
+        denominator = s * np.sqrt((n * np.sum(W[i]**2) - np.sum(W[i])**2) / (n - 1))
+        gi_star[i] = numerator / denominator if denominator != 0 else 0
+    
+    return gi_star
+
+# =====
+<truncated 68573 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.

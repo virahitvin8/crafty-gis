@@ -1,0 +1,14 @@
+.git
+output/
+__pycache__/
+*.pyc
+env/
+venv/
+.venv/
+.gemini/
+.agent/
+graphify-out/
+bin/
+obj/
+extracted_figs/
+assignment_images/

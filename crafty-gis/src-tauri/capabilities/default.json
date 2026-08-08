@@ -1,0 +1,9 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for CRAFTY GIS",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "opener:default"
+  ]
+}

@@ -1,0 +1,68 @@
+name: Feature Request
+description: Suggest an idea or enhancement for CRAFTY GIS
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! We appreciate your input in making CRAFTY GIS better.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is.
+      placeholder: "I'm always frustrated when I can't..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the Solution
+      description: A clear and concise description of what you want to happen.
+      placeholder: "I would like the system to automatically..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: "I tried using X instead, but it doesn't work because..."
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      options:
+        - New Analysis Type
+        - New Data Source
+        - AI/ML Enhancement
+        - UI/UX Improvement
+        - Performance Optimization
+        - Integration (QGIS, SAGA, etc.)
+        - Documentation
+        - Deployment/Infrastructure
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Low (Nice to have)
+        - Medium (Important)
+        - High (Critical for my workflow)
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context, mockups, or screenshots about the feature request here.
