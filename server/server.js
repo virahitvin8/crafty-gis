@@ -402,8 +402,8 @@ app.post('/api/gee/time-series', async (req, res) => {
 // ─── Sentinel Hub Token Proxy ───
 app.post('/api/sentinel/token', async (req, res) => {
   try {
-    const clientId = process.env.SENTINEL_HUB_CLIENT_ID || '0cf48b39-ea09-4cfa-9845-4fb6ccfcd688';
-    const clientSecret = process.env.SENTINEL_HUB_CLIENT_SECRET || 'BZDMaPTfW6GRX7j564qogGQQy4YEXkYR';
+    const clientId = process.env.SENTINEL_HUB_CLIENT_ID || '29fb6ce6-bbb5-4088-b647-0eed6488c253';
+    const clientSecret = process.env.SENTINEL_HUB_CLIENT_SECRET || '0QRRQfKPsKx8rsGbjFAtZeLjILvBKUu7';
     
     if (!clientId || !clientSecret) {
       return res.status(400).json({ error: 'Sentinel Hub credentials missing on server' });
