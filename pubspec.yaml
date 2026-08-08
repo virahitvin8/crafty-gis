@@ -1,0 +1,46 @@
+name: landgps
+description: "LandGPS - measure land boundaries by walking, then analyze crop health with Google Earth Engine."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Map rendering (OpenStreetMap tiles) - Handy GPS style mapping
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+  # GPS location tracking
+  geolocator: ^13.0.2
+
+  # Local storage for saved plots
+  shared_preferences: ^2.3.3
+
+  # Backend API calls (Google Earth Engine proxy)
+  http: ^1.2.2
+
+  # Formatting (area units, dates)
+  intl: ^0.20.0
+
+  # KML import/export (existing land boundaries from Google Earth etc.)
+  xml: ^6.5.0
+  path: ^1.9.0
+  file_picker: ^8.1.2
+  archive: ^3.6.1
+  share_plus: ^10.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Georgia", "Playfair Display", serif;
+  --font-sans: "Helvetica Neue", "Arial", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer utilities {
+  .glass-panel {
+    background: #ffffff;
+    border: 1px solid rgba(26, 26, 26, 0.08);
+    box-shadow: 0 4px 24px rgba(26, 26, 26, 0.02);
+  }
+  
+  .glass-panel:hover {
+    border-color: rgba(26, 26, 26, 0.16);
+  }
+
+  .ndvi-gradient {
+    background: linear-gradient(to right, #d9534f, #f0ad4e, #ffd275, #5cb85c);
+  }
+
+  .spectral-gradient {
+    background: linear-gradient(90deg, #d9534f 0%, #f0ad4e 30%, #ffd275 60%, #5cb85c 100%);
+  }
+}
+
+/* Custom Scrollbar for Editorial theme */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f5f0;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 26, 0.15);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 26, 26, 0.3);
+}
+

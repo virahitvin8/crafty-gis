@@ -1,0 +1,28 @@
+# Render Blueprint — FarmHealth backend
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy via: Render Dashboard → New → Blueprint → connect this repo
+# Set the three secret env vars below in the Render dashboard
+# (mark them as "Secret" so they are not stored in the yaml).
+
+services:
+  - type: web
+    name: farmhealth-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && cd server && npm install
+    startCommand: node server/server.js
+    healthCheckPath: /api/gee/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # ── Set these in Render Dashboard → Environment (mark as Secret) ──
+      - key: SENTINEL_HUB_CLIENT_ID
+        sync: false
+      - key: SENTINEL_HUB_CLIENT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

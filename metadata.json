@@ -1,0 +1,6 @@
+{
+  "name": "FarmHealth Precision",
+  "description": "Satellite-based crop health monitoring with real-time NDVI, EVI, NDMI, live weather, soil properties, and AI-powered agronomic advice.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

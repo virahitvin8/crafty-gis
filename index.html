@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmHealth — Precision Satellite Crop Monitor</title>
+<meta name="description" content="Professional satellite-based crop health monitoring with REAL Sentinel Hub API data, live weather, terrain, soil analysis, and AI-powered advice. For farmers, students, and researchers.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1a12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FarmHealth">
+
+<!-- External Libraries -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+
+<!-- Application Styles -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SIDEBAR
+     ═══════════════════════════════════════════════════════ -->
+<div id="sidebar">
+
+  <!-- HEADER -->
+  <div class="sidebar-header">
+    <div class="logo">
+      <span class="logo-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+      </span>
+      <h1>FarmHealth</h1>
+    </div>
+    <div class="tagline">Precision Satellite Intelligence • Sentinel-2 L2A • Live Weather • Soil Analytics • AI Advisory</div>
+    
+    <!-- User Info & Sign Out Bar (hidden by default, shown on login) -->
+    <div id="userInfoBar" class="user-info-bar" style="display:none">
+      <div id="userInfo" class="user-info"></div>
+      <button class="signout-btn" onclick="FH.signOut()" title="Sign out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+  <!-- USER PROFILE BAR (populated by Firebase auth state) -->
+  <div class="user-bar" id="userBar" style="display:none;">
+    <div id="userAvatarWrap"></div>
+    <div class="user-details">
+      <span class="user-name" id="userDisplayName">—</span>
+      <span class="user-email" id="userDisplayEmail">—</span>
+    </div>
+    <span class="user-role-badge" id="userRoleBadge">user</span>
+    <button class="logout-btn" onclick="FH.signOut()" title="Sign Out">Sign Out</button>
+  </div>
+
+  <!-- MODE SWITCHER -->
+  <div class="mode-bar" id="modeBar" style="display:none">
+    <button class="mode-btn active" data-mode="farmer" onclick="FH.setMode('farmer')">Farmer</button>
+    <button class="mode-btn" data-mode="student" onclick="FH.setMode('student')">Student</button>
+    <button class="mode-btn" data-mode="researcher" onclick="FH.setMode('researcher')">Researcher</button>
+  </div>
+
+  <!-- ─── FIELD SELECTION ─── -->
+  <div class="card">
+    <h3>Select Your Field</h3>
+    <div class="tabs" id="fieldTabs">
+      <div class="tab active" data-tab="coords">Coordinates</div>
+      <div class="tab" data-tab="click">Click Map</div>
+      <div class="tab" data-tab="kml">KML/GeoJSON</div>
+      <div class="tab" data-tab="walk">Walk</div>
+    </div>
+    <div class="tab-panel active" id="panel-coords">
+      <label>Latitude</label>
+      <input type="number" id="latInput" step="any" placeholder="e.g. 25.4358 (Prayagraj)">
+      <label>Longitude</label>
+      <input type="number" id="lngInput" step="any" placeholder="e.g. 81.8463">
+      <label>Field size (hectares)</label>
+      <input type="number" id="haInput" value="5" min="0.5" max="500" step="0.5">
+      <button class="btn-primary" onclick="FH.setFieldFromCoords()">Set Field Here</button>
+      <div class="hint">Enter GPS coordinates from your phone. Supports decimal degrees (25.4358) or DMS (25°26'8.9"N).</div>
+    </div>
+    <div class="tab-panel" id="panel-click">
+      <button class="btn-secondary" id="drawBtn" onclick="FH.toggleDraw()">Start Marking Corners</button>
+      <button class="btn-primary" onclick="FH.finishDraw()">Finish Boundary</button>
+      <button class="btn-danger" onclick="FH.clearDraw()">Clear Points</button>
+      <div class="coord-list" id="coordList"></div>
+      <div class="hint">Click each corner of your field on the map (min 3 points), then press "Finish Boundary".</div>
+    </div>
+    <div class="tab-panel" id="panel-kml">
+      <div class="dropzone" id="dropzone">
+        Click or drop <b>.kml</b> / <b>.geojson</b> file here<br>
+        <small>(from Google Earth, QGIS, survey apps)</small>
+      </div>
+      <input type="file" id="fileInput" accept=".kml,.xml,.geojson,.json" style="display:none">
+      <div class="hint">Reads the first polygon boundary from KML or GeoJSON files.</div>
+    </div>
+    <div class="tab-panel" id="panel-walk">
+      <button class="btn-secondary" id="gpsStartBtn" onclick="FH.startGpsWalk()">Start GPS Tracking</button>
+      <button class="btn-accent" id="gpsPinBtn" onclick="FH.dropGpsPin()" style="display:none;margin-top:6px;font-size:1.1rem;padding:12px;">Drop Corner Pin Here</button>
+      <button class="btn-primary" id="gpsFinishBtn" onclick="FH.finishGpsWalk()" style="display:none;margin-top:6px;">Finish Boundary</button>
+      <div class="hint" id="gpsHint">Walk to the first corner of your field and press Start. Ensure location services are enabled.</div>
+    </div>
+  </div>
+
+  <!-- ─── LAND INFO (CADASTRAL) ─── -->
+  <div class="card" id="landRecordCard" style="display:none">
+    <h3>Land Info</h3>
+    <div style="font-size:0.85rem; color:var(--green-light); margin-bottom:8px;">
+      Location: <span id="lrLocation">Fetching...</span><br>
+      Area: <span id="lrArea">Calculating...</span> ha
+    </div>
+    
+    <label>Survey Number</label>
+    <input type="text" id="lrSurveyInput" placeholder="e.g. 124" style="margin-bottom:6px">
+    
+    <label>Bona / Khata Number</label>
+    <input type="text" id="lrBonaInput" placeholder="e.g. 345/12" style="margin-bottom:6px">
+    
+    <label>Owner Name</label>
+    <input type="text" id="lrOwnerInput" placeholder="e.g. Ram Singh" style="margin-bottom:6px">
+    
+    <button class="btn-secondary btn-sm" onclick="FH.saveLandInfo()" style="width:100%">Save this farm</button>
+    
+    <div class="hint" style="margin-top:8px">Details are saved to your phone. Next visit, it remembers everything automatically!</div>
+  </div>
+
+  <!-- ─── SATELLITE ANALYSIS ─── -->
+  <div class="card">
+    <h3>Satellite Analysis</h3>
+    <button class="btn-primary" id="analyzeBtn" onclick="FH.runFullAnalysis()">
+      Run Full Analysis
+    </button>
+    <div class="hint">Fetches real Sentinel-2 telemetry, live weather, terrain & soil data automatically for your field.</div>
+    <!-- Compatibility fields for background logic -->
+    <select id="cropSelect" style="display:none"><option value="generic" selected>Generic</option></select>
+    <select id="stageSelect" style="display:none"><option value="mid" selected>Mid</option></select>
+    <input type="date" id="sowingDate" style="display:none">
+  </div>
+
+  <!-- ─── SATELLITE SCENES ─── -->
+  <div class="card" id="scenesCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      Satellite Scenes <span class="badge badge-live">LIVE</span>
+    </h3>
+    <div class="card-body" id="scenesBody">
+      <div id="scenesList" class="scroll-section"></div>
+      <div class="hint" id="scenesHint">Scenes from Earth Search STAC API (Sentinel-2 L2A)</div>
+    </div>
+  </div>
+
+  <!-- ─── UNIFIED LAYER SELECTOR ─── -->
+  <div class="card" id="layerSelectorCard" style="display:none">
+    <h3>Map Layer</h3>
+    <select id="layerSelect" onchange="FH.switchLayer(this.value)" style="margin-bottom:6px">
+      <optgroup label="Vegetation Health">
+        <option value="ndvi" selected>NDVI (General Greenness)</option>
+        <option value="evi">EVI (Dense Canopy)</option>
+        <option value="gndvi">GNDVI (Nitrogen)</option>
+        <option value="ndre">NDRE (Red Edge)</option>
+      </optgroup>
+      <optgroup label="Moisture & Water Stress">
+        <option value="ndmi">NDMI (Leaf Water)</option>
+        <option value="ndwi">NDWI (Open Water)</option>
+        <option value="sar">SMMI (Soil Moisture via SAR Radar)</option>
+      </optgroup>
+      <optgroup label="Advanced Analytics">
+        <option value="pest">Pest/Disease Anomaly</option>
+        <option value="tvdi">TVDI (Thermal Water Stress)</option>
+      </optgroup>
+    </select>
+    <div class="hint" id="layerInfo">NDVI measures vegetation greenness using Red and NIR bands.</div>
+  </div>
+
+  <!-- ─── HEALTH REPORT ─── -->
+  <div class="card" id="resultsCard" style="display:none">
+    <h3>Field Health Report</h3>
+    <div class="stat-grid" id="statGrid">
+      <div class="stat"><div class="val" id="statNdvi">–</div><div class="lbl">Avg NDVI</div></div>
+      <div class="stat"><div class="val" id="statScore">–</div><div class="lbl">Health Score</div></div>
+      <div class="stat"><div class="val" id="statArea">–</div><div class="lbl">Area (ha)</div></div>
+      <div class="stat"><div class="val" id="statProblem">–</div><div class="lbl">Problem Area</div></div>
+    </div>
+    
+    <div style="margin-top:12px; background:rgba(46, 204, 113, 0.1); border-left:3px solid var(--green); padding:8px;">
+      <div style="font-weight:600;font-size:0.9rem;margin-bottom:2px">Expected Yield</div>
+      <div id="statYield" style="font-size:1.1rem;font-weight:700;color:var(--text)">Calculating...</div>
+    </div>
+
+    <div style="margin-top:10px" id="bars"></div>
+    <div id="adviceBox"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn-secondary btn-sm" onclick="FH.copyReport()">Copy</button>
+      <button class="btn-secondary btn-sm" onclick="FH.exportCSV()">CSV (TS)</button>
+      <button class="btn-secondary btn-sm" onclick="FH.exportGeoJSON()">GeoJSON</button>
+      <button class="btn-secondary btn-sm" onclick="FH.showFullReport()">Full Report</button>
+    </div>
+  </div>
+
+  <!-- ─── WEATHER ─── -->
+  <div class="card" id="weatherCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      Live Weather <span class="badge badge-live">LIVE</span>
+    </h3>
+    <div class="card-body" id="weatherBody"></div>
+  </div>
+
+  <!-- ─── TERRAIN ─── -->
+  <div class="card" id="terrainCard" style="display:none" data-require="student researcher">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      Terrain Analysis <span class="badge badge-live">LIVE</span>
+    </h3>
+    <div class="card-body" id="terrainBody"></div>
+  </div>
+
+  <!-- ─── SOIL ─── -->
+  <div class="card" id="soilCard" style="display:none" data-require="student researcher">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      Soil Properties <span class="badge badge-live">LIVE</span>
+    </h3>
+    <div class="card-body" id="soilBody"></div>
+  </div>
+
+  <!-- ─── NDVI CHART ─── -->
+  <div class="card" id="chartCard" style="display:none">
+    <h3>Health Distribution</h3>
+    <div class="chart-wrap"><canvas id="healthChart"></canvas></div>
+  </div>
+
+  <!-- ─── TIME SERIES ─── -->
+  <div class="card" id="tsCard" style="display:none" data-require="researcher">
+    <h3>NDVI Time Series <span class="badge badge-live">LIVE API</span></h3>
+    <div class="chart-wrap" style="height:180px"><canvas id="tsChart"></canvas></div>
+    <button class="btn-secondary btn-sm" onclick="FH.showChangeDetection()" style="margin-top:6px">Change Detection</button>
+  </div>
+
+  <!-- ─── PROFESSIONAL DATA DASHBOARD ─── -->
+  <div class="card" id="dashCard" style="display:none">
+    <h3>Data Dashboard <span class="badge badge-live">PRO</span></h3>
+    <div id="dataDashboard"></div>
+  </div>
+
+  <!-- ─── SAVED FIELDS ─── -->
+  <div class="card">
+    <h3>Saved Fields</h3>
+    <div id="savedFieldsList">
+      <div class="advice info" style="font-size:0.75rem">No saved fields yet. Run analysis, then click save on map.</div>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="btn-secondary btn-sm" onclick="FH.saveCurrentField()" style="flex:1">Save Current</button>
+      <button class="btn-secondary btn-sm" onclick="FH.renderSavedFields()" style="flex:1">Refresh</button>
+    </div>
+    <div class="hint">Saved fields are stored in your browser and sync across devices.</div>
+  </div>
+
+  <!-- ─── AI ADVICE ─── -->
+  <div class="card" id="aiCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      AI Insights <span class="badge badge-new">AI</span>
+    </h3>
+    <div class="card-body" id="aiBody">
+      <div id="aiContent" style="font-size:0.78rem;line-height:1.6;color:var(--text)"></div>
+      <button class="btn-accent btn-sm" onclick="FH.getAIAdvice()" id="aiBtn" style="margin-top:8px">Get AI Analysis</button>
+      <div class="hint">Requires Gemini API key in Settings. Uses your field data for personalized advice.</div>
+    </div>
+  </div>
+
+  <!-- ─── ALERTS DASHBOARD ─── -->
+  <div class="card" id="alertsCard" style="display:none">
+    <h3>Field Alerts <span class="badge" id="alertsCount"></span></h3>
+    <div id="alertsBody"></div>
+  </div>
+
+  <!-- ─── YIELD PROJECTION ─── -->
+  <div class="card" id="yieldCard" style="display:none">
+    <h3>Yield Projection</h3>
+    <div class="stat-grid cols3">
+      <div class="stat"><div class="val" id="yieldValue" style="font-size:1rem">--</div><div class="lbl">Per Hectare</div></div>
+      <div class="stat"><div class="val" id="yieldTotal" style="font-size:1rem">--</div><div class="lbl">Total Field</div></div>
+      <div class="stat"><div class="val" id="yieldRating" style="font-size:0.9rem">--</div><div class="lbl">Rating</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <span class="badge" id="yieldConfidence" style="display:inline-block;width:auto">Confidence: --</span>
+      <span style="font-size:0.75rem;color:var(--text-dim)" id="yieldValueEstimate"></span>
+    </div>
+  </div>
+
+  <!-- ─── PEST RISK ─── -->
+  <div class="card" id="pestCard" style="display:none">
+    <h3>Pest & Disease Risk</h3>
+    <div class="stat-grid">
+      <div class="stat"><div class="val" id="pestOverallValue" style="font-size:1.1rem">--</div><div class="lbl">Risk Score</div></div>
+      <div class="stat"><div class="val" id="pestOverallLevel" style="font-size:1rem">--</div><div class="lbl">Risk Level</div></div>
+    </div>
+    <div id="pestBody"></div>
+    <div class="hint">Based on current temperature & humidity conditions favorable to common pests</div>
+  </div>
+
+  <!-- ─── STUDENT: LEARNING ─── -->
+  <div class="card" data-require="student" style="display:none">
+    <h3>Learning Module</h3>
+    <button class="btn-secondary" onclick="FH.openLearning()">Open Lessons (8 Topics)</button>
+    <button class="btn-accent" onclick="FH.openQuiz()" style="margin-top:4px">Take Quiz (10 Questions)</button>
+  </div>
+
+  <!-- ─── SETTINGS ─── -->
+  <div class="card">
+    <h3 class="card-collapse collapsed" onclick="FH.toggleCard(this)">Settings</h3>
+    <div class="card-body hidden">
+      <div id="adminSettings" style="display:none;">
+        <div class="setting-item">
+          <div class="setting-label">Gemini API Key</div>
+          <div class="setting-desc">For AI-powered field advice. Get a key from Google AI Studio.</div>
+          <input type="password" id="geminiKey" placeholder="AIza..." onchange="FH.saveSettings()">
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Sentinel Hub Credentials</div>
+          <div class="setting-desc">Currently hardcoded as requested. You can override below.</div>
+          <input type="text" id="shClientId" placeholder="Client ID" onchange="FH.saveSettings()" style="margin-bottom:4px">
+          <input type="password" id="shClientSecret" placeholder="Client Secret" onchange="FH.saveSettings()">
+        </div>
+      </div>
+      <div class="setting-item" style="display:none">
+        <div class="setting-label">Cloud Cover Threshold</div>
+        <input type="number" id="cloudThresh" value="30" min="0" max="100" step="5" onchange="FH.saveSettings()">
+      </div>
+      <div class="setting-item" style="display:none">
+        <div class="setting-label">Search Months</div>
+        <input type="number" id="searchMonths" value="3" min="1" max="24" step="1" onchange="FH.saveSettings()">
+      </div>
+      <div class="setting-item" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:12px; margin-top:12px;">
+        <div class="setting-label">Automated Alerts (SMS/WhatsApp)</div>
+        <div class="setting-desc">Get notified if NDVI drops suddenly or pests are detected.</div>
+        <input type="tel" id="alertPhone" placeholder="+1 (555) 000-0000" onchange="FH.saveSettings()" style="margin-bottom:6px">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="alertEnabled" onchange="FH.saveSettings()">
+          <label for="alertEnabled" style="margin:0; font-size:0.85rem">Enable Automated Alerts</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LEGEND ─── -->
+  <div class="card">
+    <h3 class="card-collapse collapsed" onclick="FH.toggleCard(this)">Colour Guide</h3>
+    <div class="card-body hidden">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--soil)"></div><div><b>Bare soil / Water</b><small>No crop cover — check germination</small></div></div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--poor)"></div><div><b>Poor / Stressed</b><small>Urgent — pest, disease or water stress</small></div></div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--below)"></div><div><b>Below average</b><small>Needs nutrients or irrigation</small></div></div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--moderate)"></div><div><b>Moderate</b><small>Growing okay — keep monitoring</small></div></div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--healthy)"></div><div><b>Healthy</b><small>Good growth — maintain care</small></div></div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--vhealthy)"></div><div><b>Very healthy</b><small>Excellent vigour</small></div></div>
+    </div>
+    <div id="moistureLegend" style="display:none">
+      <!-- Injected dynamically by updateLegend() -->
+    </div>
+    <div id="ndviLegend">
+      <!-- Default NDVI legend is the one above -->
+    </div>
+  </div>
+
+</div><!-- /sidebar -->
+
+<!-- ═══════════════════════════════════════════════════════
+     MAP AREA
+     ═══════════════════════════════════════════════════════ -->
+<div id="mapArea">
+  <div id="map"></div>
+  <div id="modeBanner">CLICK MAP TO MARK FIELD CORNERS</div>
+  <div class="map-controls">
+    <button class="map-ctrl-btn" onclick="FH.startGpsWalk()" style="background:var(--green); color:#fff; border-color:var(--green); font-weight:bold;">GPS Walk</button>
+    <button class="map-ctrl-btn" onclick="FH.toggleLayer()">Labels</button>
+    <button class="map-ctrl-btn" onclick="FH.cycleBasemap()">Basemap</button>
+  </div>
+  <!-- ─── PROFESSIONAL TOOLS BAR ─── -->
+  <div class="prof-tools">
+    <button class="prof-tool-btn" onclick="FH.toggleFullscreen()" title="Fullscreen mode">Full</button>
+    <button class="prof-tool-btn" onclick="FH.enableCompare()" title="Split-view compare">Compare</button>
+    <button class="prof-tool-btn" onclick="FH.toggleTimeAnimation()" title="Timelapse animation">Animate</button>
+  </div>
+  <!-- ─── COMPARE BAR ─── -->
+  <div class="compare-bar" id="compareBar">
+    <span style="color:var(--text-dim);font-size:0.68rem">Split-view</span>
+    <span id="compareLabel" style="font-size:0.72rem;font-weight:600">NDVI: Current</span>
+    <button class="compare-btn" onclick="FH.switchLayer('ndmi')">NDMI</button>
+    <button class="compare-btn" onclick="FH.disableCompare()">Exit</button>
+  </div>
+  <!-- ─── ANIMATION CONTROLS ─── -->
+  <div class="anim-controls" id="animControls">
+    <button class="anim-btn" onclick="FH.toggleTimeAnimation()" id="animPlayBtn" title="Play/Pause">Play</button>
+    <span class="anim-label">Scene:</span>
+    <span class="anim-date" id="animDate">--</span>
+    <span class="anim-label" id="animProgress">0/0</span>
+  </div>
+  <!-- ─── FLOATING LEGEND ─── -->
+  <div class="map-legend" id="mapLegend" style="display:none; bottom: 30px;">
+    <div style="font-size:0.85rem;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:4px; display:flex; justify-content:space-between">
+      <span><span id="legendDate">--</span></span>
+      <span id="legendSource" style="font-size:0.75rem;font-weight:600">...</span>
+    </div>
+    <div style="font-size:0.7rem;margin-bottom:6px; display:flex; justify-content:space-between">
+      <span><span id="legendSat">Sentinel-2 L2A</span></span>
+    </div>
+    <div id="legendColorBar" style="display:flex; height:12px; width:100%; border-radius:4px; overflow:hidden; margin-bottom:4px;">
+      <!-- Dynamic colors injected here -->
+    </div>
+    <div id="legendLabels" style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-dim);">
+      <span>Low</span><span>High</span>
+    </div>
+  </div>
+
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <div id="loadingText">Analyzing field…</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ═══ GUIDED ONBOARDING OVERLAY ═══ -->
+<div class="onboarding-overlay" id="onboardingOverlay"></div>
+
+<!-- Guided Tour Button (floating) -->
+<button class="metro-tour-btn" onclick="FH.startOnboarding()" title="Take the guided tour">Tour</button>
+
+<!-- ═══ MODALS ═══ -->
+<div class="modal-overlay" id="loginModal" style="display:none; z-index:9999; background:rgba(0,0,0,0.85)">
+  <div class="modal" style="max-width:350px; text-align:center; padding: 20px;">
+    <h2>Secure Login</h2>
+    <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:15px">FarmHealth Platform Access</p>
+    <input type="text" id="loginUser" placeholder="Username or Email" style="width:100%; margin-bottom:10px; text-align:center">
+    <input type="password" id="loginPass" placeholder="Password" style="width:100%; margin-bottom:15px; text-align:center">
+    <button class="btn-primary" onclick="FH.handleLogin()" style="width:100%">Login</button>
+    <div id="loginError" style="color:var(--poor); font-size:0.8rem; margin-top:10px; display:none">Invalid credentials</div>
+    
+    <div style="margin: 15px 0; display:flex; align-items:center; justify-content:center; gap:10px;">
+      <div style="flex:1; height:1px; background:var(--border-light)"></div>
+      <span style="font-size:0.75rem; color:var(--text-faint)">OR</span>
+      <div style="flex:1; height:1px; background:var(--border-light)"></div>
+    </div>
+    
+    <button class="google-login-btn" onclick="FH.handleGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#fff; color:#1f1f1f; border:1px solid #dadce0; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer;">
+      <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:4px;"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.69-1.55 2.69-3.84 2.69-6.57z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.7H.95v2.3C2.43 15.89 5.5 18 9 18z" fill="#34A853"/><path d="M3.95 10.75c-.18-.54-.28-1.12-.28-1.75s.1-1.21.28-1.75V4.95H.95A8.99 8.99 0 000 9c0 1.54.39 3.03 1.07 4.35l2.88-2.6z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3C13.46.86 11.42 0 9 0 5.5 0 2.43 2.11.95 5.09l2.9 2.24c.72-2.19 2.7-3.75 5.15-3.75z" fill="#EA4335"/></svg>
+      Sign in with Google
+    </button>
+
+    <div style="font-size:0.75rem; color:var(--text-dim); margin-top:20px">
+      Sign in with Google for full access.
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="googleModal" style="display:none; z-index:10000; background:rgba(0,0,0,0.85)">
+  <div class="modal" style="max-width:360px; text-align:center; padding: 24px; background: #fff; color: #3c4043; border-radius: 8px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" style="margin-bottom:12px;"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 1.56-1.56 2.95-3.24 3.75v3.08h5.27c3.08-2.85 4.88-7.06 4.88-11.9 0-.62-.06-1.21-.15-1.82z" fill="#4285F4"/><path d="M12.18 21.43c2.75 0 5.06-.92 6.75-2.5l-5.27-3.08c-.76.51-1.78.83-3.18.83-3.07 0-5.66-2.11-6.59-4.94H1.3v3.19c1.9 3.79 5.8 6.5 10.88 6.5z" fill="#34A853"/><path d="M5.59 11.74c-.13-.42-.2-.86-.2-1.3s.07-.88.2-1.3V5.95H1.3A11.89 11.89 0 000 10.44c0 1.63.33 3.19.92 4.6l4.67-3.3z" fill="#FBBC05"/><path d="M12.18 2.87c1.78 0 3.2.62 4.3 1.64l3.24-3.24C17.72.63 15.22 0 12.18 0 7.1 0 3.2 2.71 1.3 6.5l4.67 3.3c.93-2.83 3.52-4.93 6.59-4.93z" fill="#EA4335"/></svg>
+    <h3 style="margin: 0 0 8px; font-size:1.2rem; color:#202124; font-family: 'Google Sans',Roboto,Arial,sans-serif;">Choose an account</h3>
+    <p style="font-size:0.85rem; color:#5f6368; margin-bottom:20px; font-family: Roboto,Arial,sans-serif;">to continue to <span style="color:#1e7d32; font-weight:600;">FarmHealth</span></p>
+    
+    <div id="googleAccountsList" style="display:flex; flex-direction:column; gap:4px; margin-bottom:24px; text-align:left;">
+      <!-- Accounts will be injected dynamically -->
+    </div>
+    
+    <button class="btn-secondary" onclick="FH.closeModal('googleModal')" style="width:100%; border: 1px solid #dadce0; background: #fff; color: #3c4043;">Cancel</button>
+  </div>
+</div>
+<div class="modal-overlay" id="learningModal">
+  <div class="modal" style="max-width:750px">
+    <div class="modal-header">
+      <h2>Remote Sensing Learning Module</h2>
+      <button class="modal-close" onclick="FH.closeModal('learningModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="lesson-nav" id="lessonNav"></div>
+      <div class="lesson-content" id="lessonContent"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn-secondary" onclick="FH.prevLesson()">← Previous</button>
+        <button class="btn-primary" onclick="FH.nextLesson()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="quizModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Knowledge Quiz</h2>
+      <button class="modal-close" onclick="FH.closeModal('quizModal')">✕</button>
+    </div>
+    <div class="modal-body" id="quizBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal" style="max-width:800px">
+    <div class="modal-header">
+      <h2>Full Field Report</h2>
+      <button class="modal-close" onclick="FH.closeModal('reportModal')">✕</button>
+    </div>
+    <div class="modal-body" id="reportBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="changeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Change Detection</h2>
+      <button class="modal-close" onclick="FH.closeModal('changeModal')">✕</button>
+    </div>
+    <div class="modal-body" id="changeBody">
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px">Compare NDVI between two dates to detect crop health changes.</p>
+      <label>Date 1</label>
+      <select id="cdDate1"></select>
+      <label>Date 2</label>
+      <select id="cdDate2"></select>
+      <button class="btn-primary" onclick="FH.runChangeDetection()">Compare</button>
+      <div id="cdResults" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     APPLICATION JAVASCRIPT — Modular Architecture
+     Load order matters:
+       1. config     — constants, credentials
+       2. utils      — shared helpers
+       3. api        — external API calls
+       4. map        — Leaflet map operations
+       5. ui         — rendering functions
+       6. analysis   — analysis pipeline
+       7. app        — orchestrator (exposes FH)
+     ═══════════════════════════════════════════════════════ -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/map.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/app.js"></script>
+<script>
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
