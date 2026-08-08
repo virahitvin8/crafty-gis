@@ -56,6 +56,8 @@ loadEnvFile();
 
 // Log critical environment variables (without exposing secrets)
 console.log('[Server] Environment check:');
+console.log('  GEE_SERVICE_ACCOUNT:', process.env.GEE_SERVICE_ACCOUNT ? 'SET (' + process.env.GEE_SERVICE_ACCOUNT + ')' : 'NOT SET');
+console.log('  GEE_PRIVATE_KEY:', process.env.GEE_PRIVATE_KEY ? 'SET (Length: ' + process.env.GEE_PRIVATE_KEY.length + ')' : 'NOT SET');
 console.log('  SENTINEL_HUB_CLIENT_ID:', process.env.SENTINEL_HUB_CLIENT_ID ? 'SET (' + process.env.SENTINEL_HUB_CLIENT_ID.substring(0, 8) + '...)' : 'NOT SET');
 console.log('  GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET (' + process.env.GEMINI_API_KEY.substring(0, 8) + '...)' : 'NOT SET');
 
@@ -64,12 +66,10 @@ console.log('  GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET (' + process.
 // fail on cloud platforms. We catch the error so the server still runs.
 let geeAvailable = false;
 let ee = null;
-let geeInit = null;
 
 try {
   const gee = require('@google/earthengine');
   ee = gee.ee;
-  geeInit = gee.initialize;
   geeAvailable = true;
   console.log('[GEE] Earth Engine module loaded successfully');
 } catch (e) {
@@ -79,8 +79,6 @@ try {
 
 // ─── Configuration ───
 const PORT = process.env.PORT || 3001;
-const GCLOUD_CREDENTIALS_PATH = process.env.GOOGLE_APPLICATION_CREDENTIALS ||
-  path.join(process.env.HOME || '/root', '.config', 'gcloud', 'application_default_credentials.json');
 
 const app = express();
 app.use(cors());
@@ -103,27 +101,58 @@ async function initGEE() {
 
   geeInitializing = true;
   try {
-    console.log(`[GEE] Initializing with credentials from: ${GCLOUD_CREDENTIALS_PATH}`);
-    
+    const serviceAccount = process.env.GEE_SERVICE_ACCOUNT;
+    let privateKey = process.env.GEE_PRIVATE_KEY;
+
+    if (!serviceAccount || !privateKey) {
+      console.warn('[GEE] Missing GEE_SERVICE_ACCOUNT or GEE_PRIVATE_KEY environment variables');
+      geeInitializing = false;
+      return false;
+    }
+
+    // Replace escaped newlines if passed as a single line string
+    privateKey = privateKey.replace(/\\n/g, '\n');
+
+    console.log(`[GEE] Authenticating via Service Account: ${serviceAccount}`);
+
     const initPromise = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('GEE initialization timed out after 15s'));
       }, 15000);
-      
-      geeInit(null, null, () => {
-        clearTimeout(timeout);
-        console.log('[GEE] Initialized successfully!');
-        geeInitialized = true;
-        geeInitializing = false;
-        resolve();
-      }, (error) => {
-        clearTimeout(timeout);
-        console.error('[GEE] Initialization failed:', error);
-        geeInitializing = false;
-        reject(error);
-      });
+
+      ee.data.authenticateViaPrivateKey(
+        {
+          client_email: serviceAccount,
+          private_key: privateKey,
+        },
+        () => {
+          ee.initialize(
+            null,
+            null,
+            () => {
+              clearTimeout(timeout);
+              console.log('[GEE] Initialized successfully!');
+              geeInitialized = true;
+              geeInitializing = false;
+              resolve();
+            },
+            (error) => {
+              clearTimeout(timeout);
+              console.error('[GEE] Initialization failed:', error);
+              geeInitializing = false;
+              reject(error);
+            }
+          );
+        },
+        (error) => {
+          clearTimeout(timeout);
+          console.error('[GEE] Service account authentication failed:', error);
+          geeInitializing = false;
+          reject(error);
+        }
+      );
     });
-    
+
     await initPromise;
     return true;
   } catch (e) {
@@ -133,6 +162,27 @@ async function initGEE() {
     return false;
   }
 }
+
+// Automatically trigger GEE initialization on startup
+if (geeAvailable) {
+  initGEE().catch(err => console.error('[GEE] Auto-init background error:', err.message));
+}
+
+// ─── Root Status Route ───
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'FarmHealth API Backend is running',
+    geeStatus: geeInitialized ? 'connected' : 'disconnected',
+    endpoints: {
+      health: '/api/gee/health',
+      ndvi: '/api/gee/ndvi',
+      sar: '/api/gee/sar',
+      timeSeries: '/api/gee/time-series',
+      geminiAnalysis: '/api/gemini-analysis'
+    }
+  });
+});
 
 // ─── Health Check ───
 app.get('/api/gee/health', (req, res) => {
@@ -167,7 +217,7 @@ app.post('/api/gee/ndvi', async (req, res) => {
   }
   try {
     const { coordinates, dateStr, cropPeak, indexType } = req.body;
-    
+
     if (!coordinates || !coordinates.length) {
       return res.status(400).json({ error: 'No coordinates provided' });
     }
@@ -190,7 +240,7 @@ app.post('/api/gee/ndvi', async (req, res) => {
       .sort('CLOUDY_PIXEL_PERCENTAGE');
 
     const image = collection.first();
-    
+
     if (!image) {
       return res.status(404).json({ error: 'No images found for this date/location' });
     }
@@ -286,7 +336,7 @@ app.post('/api/gee/sar', async (req, res) => {
   }
   try {
     const { coordinates, dateStr } = req.body;
-    
+
     if (!coordinates || !coordinates.length) {
       return res.status(400).json({ error: 'No coordinates provided' });
     }
@@ -311,7 +361,7 @@ app.post('/api/gee/sar', async (req, res) => {
       .sort('system:time_start', false);
 
     const image = collection.first();
-    
+
     if (!image) {
       return res.status(404).json({ error: 'No SAR images found for this date/location' });
     }
@@ -430,26 +480,26 @@ app.post('/api/sentinel/token', async (req, res) => {
   try {
     const clientId = process.env.SENTINEL_HUB_CLIENT_ID;
     const clientSecret = process.env.SENTINEL_HUB_CLIENT_SECRET;
-    
+
     if (!clientId || !clientSecret) {
       return res.status(400).json({ error: 'Sentinel Hub credentials missing on server' });
     }
-    
+
     const body = 'grant_type=client_credentials&client_id=' +
       encodeURIComponent(clientId) +
       '&client_secret=' + encodeURIComponent(clientSecret);
-      
+
     const authRes = await fetch('https://services.sentinel-hub.com/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: body
     });
-    
+
     if (!authRes.ok) {
       const errText = await authRes.text();
       throw new Error(`Sentinel Hub auth returned status ${authRes.status}: ${errText}`);
     }
-    
+
     const data = await authRes.json();
     res.json(data);
   } catch (error) {
@@ -464,7 +514,7 @@ function getFallbackAdvice(crop, ndvi, ph, nitrogen, stage) {
   const isCritical = ndvi < 0.3;
 
   let advice = `### fallback_advisory\n`;
-  
+
   advice += `### 🌿 Vegetation Health Evaluation\n`;
   if (isHealthy) {
     advice += `The field exhibits an outstanding average value of **${ndvi}**, signifying dense activity and a robust vegetative canopy. Growth is currently matching or exceeding target yield curves for this stage (**${stage}**).\n\n`;
@@ -517,7 +567,7 @@ function getFallbackAdvice(crop, ndvi, ph, nitrogen, stage) {
 app.post('/api/gemini-analysis', async (req, res) => {
   const { fieldName, crop, ndvi, soilPh, soilNitrogen, soilOrganicCarbon, growthStage, weather } = req.body;
   const key = process.env.GEMINI_API_KEY;
-  
+
   if (!key || key === 'your_gemini_api_key_here') {
     console.log("[Server] No Gemini API key found, returning expert fallback advice.");
     console.log("[Server] GEMINI_API_KEY env value:", key ? 'SET (length: ' + key.length + ')' : 'NOT SET');
@@ -556,11 +606,11 @@ app.post('/api/gemini-analysis', async (req, res) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
-    
+
     if (!response.ok) {
       throw new Error(`Gemini API returned ${response.status}`);
     }
-    
+
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No analysis could be generated.';
     res.json({
@@ -582,10 +632,10 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`  ─────────────────────────────`);
   console.log(`  🌐  http://0.0.0.0:${PORT}`);
   console.log(`  🔌  Endpoints:`);
-  console.log(`       GET  /api/gee/health     — Connection status`);
-  console.log(`       POST /api/gee/init       — Initialize GEE`);
-  console.log(`       POST /api/gee/ndvi       — Compute NDVI`);
-  console.log(`       POST /api/gee/time-series — Time series`);
+  console.log(`        GET  /api/gee/health     — Connection status`);
+  console.log(`        POST /api/gee/init       — Initialize GEE`);
+  console.log(`        POST /api/gee/ndvi       — Compute NDVI`);
+  console.log(`        POST /api/gee/time-series — Time series`);
   console.log(`  📡  GEE module: ${geeAvailable ? 'LOADED' : 'NOT AVAILABLE (optional)'}`);
   console.log(`  📋  Serving frontend from: ${path.join(__dirname, '..')}\n`);
 });
