@@ -3,7 +3,7 @@
 # The backend (Node.js GEE proxy + Sentinel Hub auth) runs separately on Render
 
 [build]
-  command = "bash build-web.sh"
+  command = "bash build.sh"
   publish = "www"
 
 [dev]
