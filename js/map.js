@@ -15,6 +15,70 @@ const FH_MAP = (function() {
     _state = state;
   }
 
+  // ═══════════ USER GPS LOCATION MARKER ═══════════
+  // Places a pulsing blue "You are here" dot + accuracy circle at the user's
+  // current location whenever GPS is available, and keeps it live via watchPosition.
+  let _userMarker = null;
+  let _userAccuracyCircle = null;
+  let _userWatchId = null;
+
+  function placeUserMarker(lat, lng, accuracy) {
+    if (!_state.map) return;
+    // Remove previous marker + accuracy circle
+    if (_userMarker) _state.map.removeLayer(_userMarker);
+    if (_userAccuracyCircle) _state.map.removeLayer(_userAccuracyCircle);
+
+    if (accuracy) {
+      _userAccuracyCircle = L.circle([lat, lng], {
+        radius: accuracy || 50,
+        color: '#2e86de', weight: 1, opacity: 0.4,
+        fillColor: '#2e86de', fillOpacity: 0.08
+      }).addTo(_state.map);
+    }
+
+    const icon = L.divIcon({
+      className: 'user-loc-marker',
+      html: '<div class="user-loc-pulse"></div><div class="user-loc-dot"></div>',
+      iconSize: [22, 22],
+      iconAnchor: [11, 11]
+    });
+    _userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
+      .bindTooltip('📍 You are here', { permanent: false, direction: 'top' })
+      .addTo(_state.map);
+  }
+
+  // Requests the user's current GPS position and drops the blue "You are here"
+  // marker on the map. Optional: recenters the map to the user location.
+  function locateUser(centerMap) {
+    if (!('geolocation' in navigator)) {
+      toast('GPS not supported on this device', 'err');
+      return;
+    }
+    toast('📍 Locating you…');
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        placeUserMarker(latitude, longitude, accuracy);
+        if (centerMap) _state.map.setView([latitude, longitude], 17);
+        toast(`📍 You are here (accuracy ±${Math.round(accuracy || 0)}m)`);
+        // Keep the marker live as the user moves
+        if (_userWatchId === null) {
+          _userWatchId = navigator.geolocation.watchPosition(
+            (p2) => placeUserMarker(p2.coords.latitude, p2.coords.longitude, p2.coords.accuracy),
+            () => {},
+            { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 }
+          );
+        }
+      },
+      (err) => {
+        console.warn('GPS Error:', err);
+        toast('GPS Error: ' + err.message, 'err');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+    );
+  }
+
   // ═══════════ MAP SETUP ═══════════
   function initMap() {
     _state.map = L.map('map', { zoomControl: true, attributionControl: true }).setView([22.5, 78.9], 5);
@@ -152,6 +216,7 @@ const FH_MAP = (function() {
     _gpsWatchId = navigator.geolocation.watchPosition(
       (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
+        placeUserMarker(latitude, longitude, accuracy);
         _state.map.setView([latitude, longitude], 19);
         toast(`Location updated (Accuracy: ${Math.round(accuracy)}m)`);
       },
@@ -167,7 +232,9 @@ const FH_MAP = (function() {
     if (!('geolocation' in navigator)) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const p = L.latLng(pos.coords.latitude, pos.coords.longitude);
+        const { latitude, longitude, accuracy } = pos.coords;
+        placeUserMarker(latitude, longitude, accuracy);
+        const p = L.latLng(latitude, longitude);
         _state.drawPts.push(p);
         L.circleMarker(p, {
           radius: 8, color: '#e74c3c', fillColor: '#c0392b', fillOpacity: 1, weight: 2
@@ -305,6 +372,59 @@ const FH_MAP = (function() {
         }).bindTooltip(`Moisture: ${(cellMoisture * 100).toFixed(0)}%`).addTo(_moistureGrid);
       }
     }
+  }
+
+
+  // ═══════ SHOW MY CURRENT LOCATION ═══════
+  function showMyLocation() {
+    if (!('geolocation' in navigator)) {
+      return toast('GPS not supported on this device', 'err');
+    }
+
+    toast('📍 Getting your location...');
+    
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        const userLatLng = L.latLng(latitude, longitude);
+        
+        // Remove existing user marker if present
+        if (_state.userLocationMarker) {
+          _state.map.removeLayer(_state.userLocationMarker);
+        }
+        
+        // Add user location marker with custom icon
+        const userIcon = L.divIcon({
+          className: 'user-location-marker',
+          html: `<div style="background-color: #3498db; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"></div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+        
+        _state.userLocationMarker = L.marker(userLatLng, { icon: userIcon })
+          .addTo(_state.map)
+          .bindPopup(`<b>📍 You are here</b><br>Accuracy: ±${Math.round(accuracy)}m`)
+          .openPopup();
+        
+        // Center map on user location
+        _state.map.setView([latitude, longitude], 17);
+        
+        toast(`✅ Location found (Accuracy: ±${Math.round(accuracy)}m)`);
+      },
+      (err) => {
+        console.warn('Geolocation error:', err);
+        let errorMsg = 'Could not get location';
+        if (err.code === 1) errorMsg = 'Location permission denied. Please enable GPS.';
+        else if (err.code === 2) errorMsg = 'Location unavailable. Please try again.';
+        else if (err.code === 3) errorMsg = 'Location request timed out. Please try again.';
+        toast('❌ ' + errorMsg, 'err');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   }
 
   function hideResults() {
@@ -661,10 +781,14 @@ const FH_MAP = (function() {
       $('panel-' + t.dataset.tab).classList.add('active');
       if (t.dataset.tab !== 'click' && _state.drawMode) toggleDraw();
     }));
-  }    return {
+  }
+
+  return {
     setStateRef,
     findSavedField,
     initMap,
+    locateUser,
+    placeUserMarker,
     toggleLayer,
     cycleBasemap,
     setFieldFromCoords,

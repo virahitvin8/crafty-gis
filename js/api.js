@@ -18,22 +18,83 @@ const FH_API = (function() {
     _state = state;
   }
 
+  function getApiUrl(path) {
+    if (typeof window !== 'undefined' && window.location &&
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      if (window.location.port !== '3001') {
+        return 'http://localhost:3001' + path;
+      }
+    }
+    return path;
+  }
+
   // ═══════════ SENTINEL HUB AUTH ═══════════
+  // Tries, in order:
+  //   1. Same-origin backend proxy  (/api/sentinel/token — Node server or Vercel fn)
+  //   2. Remote backend proxy        (static hosts like Netlify/GitHub Pages)
+  //   3. Direct OAuth in-browser     (last resort so REAL data still works when
+  //                                   the app is opened statically, e.g. file://)
   async function getSHToken() {
     const now = Date.now();
     if (_state.shToken && _state.shTokenExpiry > now + 60000) return _state.shToken;
 
-    // Call our backend proxy to fetch the Sentinel Hub token securely and avoid browser CORS errors
-    const res = await fetch('/api/sentinel/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const attempts = [
+      { url: getApiUrl('/api/sentinel/token'), name: 'backend proxy' },
+      { url: API.SH_TOKEN_PROXY_FALLBACK, name: 'remote backend proxy' }
+    ];
 
-    if (!res.ok) throw new Error('Sentinel Hub auth via proxy failed.');
-    const data = await res.json();
-    _state.shToken = data.access_token;
-    _state.shTokenExpiry = now + (data.expires_in * 1000);
-    return _state.shToken;
+    let lastErr = null;
+    for (const a of attempts) {
+      try {
+        // Abort remote fallback after 6s so a dead proxy doesn't hang the analysis
+        const ctrl = a.url.startsWith('http') ? AbortSignal.timeout(6000) : undefined;
+        const res = await fetch(a.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: ctrl
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data && data.access_token) {
+          _state.shToken = data.access_token;
+          _state.shTokenExpiry = now + ((data.expires_in || 3600) * 1000);
+          return _state.shToken;
+        }
+        throw new Error('no access_token in response');
+      } catch (e) {
+        lastErr = e;
+        console.warn('[SH] Token via ' + a.name + ' failed:', e.message);
+      }
+    }
+
+    // Last resort: direct OAuth from the browser using config/settings credentials
+    const cid = ($('shClientId')?.value || _state.settings.shClientId || SH_CLIENT_ID || '').trim();
+    const csec = ($('shClientSecret')?.value || _state.settings.shClientSecret || SH_CLIENT_SECRET || '').trim();
+    if (cid && csec) {
+      try {
+        const body = 'grant_type=client_credentials&client_id=' + encodeURIComponent(cid) +
+                     '&client_secret=' + encodeURIComponent(csec);
+        const res = await fetch(API.SH_AUTH, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.access_token) {
+            _state.shToken = data.access_token;
+            _state.shTokenExpiry = now + ((data.expires_in || 3600) * 1000);
+            console.log('[SH] Direct OAuth token obtained');
+            return _state.shToken;
+          }
+        }
+        lastErr = new Error('Sentinel Hub OAuth returned ' + res.status);
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+
+    throw new Error('Sentinel Hub auth unavailable (' + (lastErr ? lastErr.message : 'no credentials') + ').');
   }
 
   function getSHGeoJSON() {
@@ -79,11 +140,18 @@ const FH_API = (function() {
         return _state.scenes;
       }
     } catch (e) {
-      console.warn('STAC API failed, using simulated scenes:', e);
+      console.error('STAC API failed:', e);
+      toast('❌ Satellite scene search failed: ' + (e.message || 'Connection error').substring(0, 80), 'err');
     }
 
-    // Fallback: generate simulated scenes spanning the last N months
-    toast('📡 Using simulated satellite scenes (real API unavailable)', 'info');
+    // Fallback: generate date candidates spanning the last N months.
+    // NOTE: these are only POSSIBLE acquisition dates for the date picker —
+    // the actual NDVI values are fetched separately from Sentinel Hub, which
+    // searches the archive for the nearest cloud-free image automatically.
+    if (_state.scenes && _state.scenes.length === 0) {
+      console.warn('[STAC] Scene list unavailable — using rolling date candidates. NDVI comes from Sentinel Hub on analysis.');
+      toast('📅 Scene list unavailable — using recent dates', 'info');
+    }
     const simulated = [];
     const totalDays = months * 30;
     const step = Math.max(7, Math.floor(totalDays / 10));
@@ -361,6 +429,19 @@ const FH_API = (function() {
     return result || { cc: [0, 0, 0, 0, 0, 0], cnt: 1 };
   }
 
+  // ─── LIVE/DEMO status banner ───
+  function setDataStatus(live, msg) {
+    _state.simulatedData = !live;
+    const bar = $('dataStatusBar');
+    if (!bar) return;
+    bar.style.display = 'flex';
+    bar.className = 'data-status-bar ' + (live ? 'live' : 'demo');
+    $('dataStatusIcon').textContent = live ? '🛰️' : '🔄';
+    $('dataStatusText').textContent = msg || (live ? 'LIVE satellite data' : 'Demo / simulated data');
+    const src = $('legendSource');
+    if (src) src.textContent = live ? 'LIVE DATA' : 'DEMO DATA';
+  }
+
   // ═══════════ SENTINEL HUB PROCESS API ═══════════
   async function renderGrid(indexType, dateStr, cropPeak, preferMean) {
     // Fallback: if Sentinel Hub calls fail, use simulated data
@@ -447,18 +528,27 @@ const FH_API = (function() {
           // Draw a semi-transparent health grid on top of the image overlay
           // This gives the user clear colored blocks they can read at a glance
           drawHealthGridForRealData(gridMean, cropPeak);
+          setDataStatus(true, 'LIVE — real satellite imagery (' + (FH_CONFIG.INDEX_INFO[indexType]?.name || indexType).toUpperCase() + ' · ' + dateStr + ')');
           
           resolve({ cc, cnt: Math.max(1, cnt) });
         };
         img.src = imageUrl;
       });
     } catch (e) {
-      console.warn('Sentinel Hub Process API failed, using simulated data:', e);
-      // Only show toast once on first simulated render
+      console.error('Sentinel Hub Process API failed:', e);
+      // Show clear error message with details
+      const errorMsg = e.message || 'Unknown error';
+      toast('❌ Satellite data unavailable: ' + errorMsg.substring(0, 100), 'err');
+      setDataStatus(false, 'DEMO — real satellite data unavailable: ' + errorMsg.substring(0, 80));
+      
+      // Only show simulated data toast once
       if (!_state.simulatedData) {
         _state.simulatedData = true;
-        toast('🔄 Using simulated satellite data (real API unavailable)', 'info');
+        setTimeout(() => {
+          toast('⚠️ Showing simulated data for demonstration. Check browser console for the exact API error.', 'info');
+        }, 2000);
       }
+      
       // Use the passed preferred mean, or read from existing analysis, or generate a reasonable value
       const fallbackMean = preferMean || _state.analysisData?.meanNdvi || (0.55 + Math.random() * 0.25);
       return generateSimulatedGrid(fallbackMean, cropPeak);
@@ -791,7 +881,7 @@ const FH_API = (function() {
         text = data.candidates[0].content.parts[0].text;
       } else {
         // Safe backend call to avoid exposing key & bypass CORS
-        const res = await fetch('/api/gemini-analysis', {
+        const res = await fetch(getApiUrl('/api/gemini-analysis'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -958,6 +1048,7 @@ const FH_API = (function() {
     drawHealthGrid,
     valueToClassColor,
     fetchGEEStatistics,
-    fetchGEETimeSeries
+    fetchGEETimeSeries,
+    setDataStatus
   };
 })();

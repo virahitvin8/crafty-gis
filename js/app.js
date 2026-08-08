@@ -34,6 +34,13 @@ const FH = (function() {
     FH_UI.loadSettings();
     FH_UI.checkLoginState();
 
+    // Auto-place the blue "You are here" marker when GPS is available
+    setTimeout(() => {
+      try {
+        FH_MAP.locateUser(false);
+      } catch (e) { console.warn('[FH] Auto-locate skipped:', e.message); }
+    }, 1200);
+
     // Modal close on overlay click
     document.querySelectorAll('.modal-overlay').forEach(m => {
       m.addEventListener('click', e => {
@@ -75,6 +82,8 @@ const FH = (function() {
     startGpsWalk: FH_MAP.startGpsWalk,
     dropGpsPin: FH_MAP.dropGpsPin,
     finishGpsWalk: FH_MAP.finishGpsWalk,
+    locateUser: FH_MAP.locateUser,
+    showMyLocation: FH_MAP.locateUser,
 
     // Analysis
     runFullAnalysis: FH_ANALYSIS.runFullAnalysis,

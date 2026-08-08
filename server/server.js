@@ -15,23 +15,49 @@ const path = require('path');
 const fs = require('fs');
 
 // Load environment variables from .env manually to avoid extra dependencies
-try {
-  const envPath = path.join(__dirname, '..', '.env');
-  if (fs.existsSync(envPath)) {
-    const envFile = fs.readFileSync(envPath, 'utf8');
-    envFile.split('\n').forEach(line => {
-      const parts = line.split('=');
-      if (parts.length > 1 && !line.trim().startsWith('#')) {
-        const key = parts[0].trim();
-        const val = parts.slice(1).join('=').trim().replace(/(^['"]|['"]$)/g, '');
-        process.env[key] = val;
+// Check multiple possible locations for .env file
+function loadEnvFile() {
+  const possiblePaths = [
+    path.join(__dirname, '..', '.env'),           // root/.env (when server is in server/)
+    path.join(__dirname, '..', '..', '.env'),     // root/.env
+    path.join(process.cwd(), '.env'),             // current working directory
+    '.env'                                        // relative path
+  ];
+
+  for (const envPath of possiblePaths) {
+    try {
+      if (fs.existsSync(envPath)) {
+        const envFile = fs.readFileSync(envPath, 'utf8');
+        let loadedCount = 0;
+        envFile.split('\n').forEach(line => {
+          const parts = line.split('=');
+          if (parts.length > 1 && !line.trim().startsWith('#')) {
+            const key = parts[0].trim();
+            const val = parts.slice(1).join('=').trim().replace(/(^['"]|['"]$)/g, '');
+            if (key && val && !process.env[key]) {
+              process.env[key] = val;
+              loadedCount++;
+            }
+          }
+        });
+        console.log(`[Server] Loaded .env from: ${envPath} (${loadedCount} variables)`);
+        return true;
       }
-    });
-    console.log('[Server] Loaded .env configuration manually');
+    } catch (e) {
+      console.warn(`[Server] Error reading .env from ${envPath}:`, e.message);
+    }
   }
-} catch (e) {
-  console.warn('[Server] Error reading .env file:', e.message);
+
+  console.warn('[Server] No .env file found in any location');
+  return false;
 }
+
+loadEnvFile();
+
+// Log critical environment variables (without exposing secrets)
+console.log('[Server] Environment check:');
+console.log('  SENTINEL_HUB_CLIENT_ID:', process.env.SENTINEL_HUB_CLIENT_ID ? 'SET (' + process.env.SENTINEL_HUB_CLIENT_ID.substring(0, 8) + '...)' : 'NOT SET');
+console.log('  GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET (' + process.env.GEMINI_API_KEY.substring(0, 8) + '...)' : 'NOT SET');
 
 // ─── Google Earth Engine (optional) ───
 // The @google/earthengine package has native dependencies that may
@@ -494,6 +520,7 @@ app.post('/api/gemini-analysis', async (req, res) => {
   
   if (!key || key === 'your_gemini_api_key_here') {
     console.log("[Server] No Gemini API key found, returning expert fallback advice.");
+    console.log("[Server] GEMINI_API_KEY env value:", key ? 'SET (length: ' + key.length + ')' : 'NOT SET');
     return res.json({
       advice: getFallbackAdvice(crop || 'Wheat', ndvi || 0.74, soilPh || 6.8, soilNitrogen || 142, growthStage || 'mid'),
       isFallback: true

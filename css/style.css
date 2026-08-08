@@ -2594,3 +2594,98 @@ button {
     align-items: flex-start;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   GPS USER LOCATION MARKER + LIVE/DEMO DATA STATUS BAR
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Pulsing blue "You are here" dot ── */
+.user-loc-marker {
+  position: relative;
+}
+
+.user-loc-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(46, 134, 222, 0.35);
+  border: 2px solid rgba(46, 134, 222, 0.6);
+  animation: user-loc-pulse 1.8s ease-out infinite;
+}
+
+@keyframes user-loc-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+}
+
+.user-loc-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #2e86de;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px rgba(46, 134, 222, 0.8);
+}
+
+/* ── LIVE / DEMO data status banner (top of map) ── */
+.data-status-bar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: var(--shadow);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  max-width: calc(100% - 120px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.data-status-bar.live {
+  background: rgba(18, 46, 28, 0.9);
+  border: 1px solid rgba(46, 204, 113, 0.5);
+  color: var(--green-light);
+}
+
+.data-status-bar.demo {
+  background: rgba(58, 40, 12, 0.92);
+  border: 1px solid rgba(243, 156, 18, 0.55);
+  color: #f5c87d;
+}
+
+.data-status-bar #dataStatusIcon {
+  font-size: 0.9rem;
+}
+
+/* Mobile: keep banner readable */
+@media (max-width: 800px) {
+  .data-status-bar {
+    max-width: calc(100% - 40px);
+    font-size: 0.64rem;
+    padding: 6px 12px;
+  }
+}

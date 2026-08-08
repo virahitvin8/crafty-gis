@@ -111,6 +111,7 @@
       <div class="hint">Reads the first polygon boundary from KML or GeoJSON files.</div>
     </div>
     <div class="tab-panel" id="panel-walk">
+      <button class="btn-primary" onclick="FH.showMyLocation()" style="margin-bottom:8px;">📍 Show My Location</button>
       <button class="btn-secondary" id="gpsStartBtn" onclick="FH.startGpsWalk()">Start GPS Tracking</button>
       <button class="btn-accent" id="gpsPinBtn" onclick="FH.dropGpsPin()" style="display:none;margin-top:6px;font-size:1.1rem;padding:12px;">Drop Corner Pin Here</button>
       <button class="btn-primary" id="gpsFinishBtn" onclick="FH.finishGpsWalk()" style="display:none;margin-top:6px;">Finish Boundary</button>
@@ -330,7 +331,7 @@
         </div>
         <div class="setting-item">
           <div class="setting-label">Sentinel Hub Credentials</div>
-          <div class="setting-desc">Currently hardcoded as requested. You can override below.</div>
+          <div class="setting-desc">Used for direct browser auth if the backend proxy is unreachable (e.g. opening the app statically). Override the defaults below if needed.</div>
           <input type="text" id="shClientId" placeholder="Client ID" onchange="FH.saveSettings()" style="margin-bottom:4px">
           <input type="password" id="shClientSecret" placeholder="Client Secret" onchange="FH.saveSettings()">
         </div>
@@ -383,9 +384,15 @@
   <div id="map"></div>
   <div id="modeBanner">CLICK MAP TO MARK FIELD CORNERS</div>
   <div class="map-controls">
+    <button class="map-ctrl-btn" onclick="FH.locateUser(true)" style="background:#2e86de; color:#fff; border-color:#2e86de; font-weight:bold;">📍 Me</button>
     <button class="map-ctrl-btn" onclick="FH.startGpsWalk()" style="background:var(--green); color:#fff; border-color:var(--green); font-weight:bold;">GPS Walk</button>
     <button class="map-ctrl-btn" onclick="FH.toggleLayer()">Labels</button>
     <button class="map-ctrl-btn" onclick="FH.cycleBasemap()">Basemap</button>
+  </div>
+  <!-- ─── LIVE / DEMO DATA STATUS BANNER ─── -->
+  <div class="data-status-bar" id="dataStatusBar" style="display:none">
+    <span id="dataStatusIcon">🛰️</span>
+    <span id="dataStatusText">LIVE satellite data</span>
   </div>
   <!-- ─── PROFESSIONAL TOOLS BAR ─── -->
   <div class="prof-tools">

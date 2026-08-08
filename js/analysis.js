@@ -480,8 +480,11 @@ const FH_ANALYSIS = (function() {
       }
 
       $('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      const sourceLabel = _state.simulatedData ? 'Simulated (API unavailable)' :
-        (usedDataSource === 'google-earth-engine' ? 'Google Earth Engine' : 'Sentinel Hub');
+      const sourceLabel = _state.simulatedData ? 'DEMO / simulated (real API unavailable)' :
+        (usedDataSource === 'google-earth-engine' ? 'Google Earth Engine' : 'Sentinel Hub — REAL data');
+      if (FH_API.setDataStatus) {
+        FH_API.setDataStatus(!_state.simulatedData, sourceLabel);
+      }
       toast(`Analysis complete! Data: ${sourceLabel}`);
 
     } catch (e) {
