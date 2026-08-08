@@ -81,11 +81,12 @@ const FH_CONFIG = (function() {
     SH_PROCESS: 'https://services.sentinel-hub.com/api/v1/process',
     // Remote backend proxy used when the app is served from a static host
     // (no same-origin /api/sentinel/token). Kept in sync with netlify/render configs.
-    SH_TOKEN_PROXY_FALLBACK: 'https://farmhealth-backend.onrender.com/api/sentinel/token',
+    // NOTE: this must match your LIVE Render service URL (farmhealth1-backend).
+    SH_TOKEN_PROXY_FALLBACK: 'https://farmhealth1-backend.onrender.com/api/sentinel/token',
     GEE_PROXY: (typeof window !== 'undefined' && window.location && 
                  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
       ? (window.location.port === '3001' ? '/api/gee' : 'http://localhost:3001/api/gee')
-      : 'https://farmhealth-backend.onrender.com/api/gee'
+      : 'https://farmhealth1-backend.onrender.com/api/gee'
   };
 
   // ─── Guided Onboarding Steps ───
