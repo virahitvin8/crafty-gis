@@ -1,0 +1,61 @@
+version: '3.8'
+
+# ═══════════════════════════════════════════════════════════
+# FarmHealth — Docker Compose Configuration
+# For local development and testing
+# ═══════════════════════════════════════════════════════════
+
+services:
+  # ─── Frontend + Backend (Combined) ───
+  farmhealth:
+    build: .
+    ports:
+      - "3001:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      # Uncomment and fill in for Google Earth Engine:
+      # - GOOGLE_CLOUD_PROJECT=your-project-id
+      # - GOOGLE_APPLICATION_CREDENTIALS=/credentials/service-account.json
+      # Uncomment and fill in for Sentinel Hub:
+      # - SENTINEL_HUB_CLIENT_ID=your-client-id
+      # - SENTINEL_HUB_CLIENT_SECRET=your-client-secret
+      # Uncomment for Gemini AI:
+      # - GEMINI_API_KEY=your-api-key
+    volumes:
+      # Mount Google Cloud credentials (if using GEE)
+      # - ./credentials:/credentials:ro
+      # Mount .env file
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/api/gee/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # ─── Python Backend (Alternative) ───
+  farmhealth-python:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEMO_MODE=1
+      # Uncomment for real GEE:
+      # - GOOGLE_CLOUD_PROJECT=your-project-id
+      # - GOOGLE_APPLICATION_CREDENTIALS=/credentials/service-account.json
+    volumes:
+      # - ./credentials:/credentials:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+# ─── Volumes ───
+volumes:
+  farmhealth-data:

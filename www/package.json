@@ -1,0 +1,35 @@
+{
+  "name": "farmhealth-web",
+  "version": "2.0.0",
+  "description": "🛰️ FarmHealth — Satellite Crop Monitor. Real-time crop health monitoring using Sentinel-2, Sentinel-1 SAR, Landsat-8, with AI-powered agronomist advice.",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "build": "bash build.sh",
+    "deploy:netlify": "netlify deploy --prod",
+    "deploy:render": "echo 'Push to GitHub to trigger Render deploy'"
+  },
+  "keywords": [
+    "agriculture",
+    "satellite",
+    "crop-monitoring",
+    "ndvi",
+    "sentinel-hub",
+    "google-earth-engine",
+    "precision-agriculture",
+    "farm-health",
+    "gis"
+  ],
+  "author": "FarmHealth Team",
+  "license": "MIT",
+  "dependencies": {
+    "@google/earthengine": "^1.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

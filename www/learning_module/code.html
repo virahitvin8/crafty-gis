@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FarmHealth | Student Learning Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(15, 26, 18, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .spectral-gradient {
+            background: linear-gradient(90deg, #ff0000 0%, #ff7f00 20%, #ffff00 40%, #00ff00 60%, #0000ff 80%, #4b0082 100%);
+        }
+        .active-tab-indicator {
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #4ae183;
+            border-radius: 0 4px 4px 0;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "text-muted": "#94a3b8",
+                        "inverse-primary": "#556157",
+                        "stress-high": "#e67e22",
+                        "tertiary": "#eec209",
+                        "surface-container": "#19211f",
+                        "soil-clay": "#a0522d",
+                        "on-tertiary-container": "#4e3d00",
+                        "border-glass": "rgba(255, 255, 255, 0.1)",
+                        "surface-tint": "#bdcabd",
+                        "on-surface": "#dce4e0",
+                        "surface-container-low": "#151d1b",
+                        "surface-container-high": "#232c29",
+                        "background": "#0d1513",
+                        "on-secondary-fixed-variant": "#005228",
+                        "health-optimal": "#27ae60",
+                        "on-primary": "#28332a",
+                        "surface-container-lowest": "#08100e",
+                        "on-primary-container": "#778479",
+                        "on-tertiary-fixed": "#231b00",
+                        "primary-fixed": "#d9e6d9",
+                        "surface-bright": "#333b38",
+                        "tertiary-fixed": "#ffe084",
+                        "secondary": "#4ae183",
+                        "on-secondary-container": "#00431f",
+                        "surface": "#0d1513",
+                        "primary-container": "#0f1a12",
+                        "tertiary-container": "#cea700",
+                        "on-secondary-fixed": "#00210c",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#2a3230",
+                        "on-secondary": "#003919",
+                        "secondary-fixed-dim": "#4ae183",
+                        "surface-variant": "#2e3634",
+                        "primary": "#bdcabd",
+                        "on-primary-fixed": "#131e16",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#2e3634",
+                        "surface-dim": "#0d1513",
+                        "tertiary-fixed-dim": "#eec209",
+                        "stress-critical": "#e74c3c",
+                        "on-primary-fixed-variant": "#3e4a40",
+                        "on-surface-variant": "#c4c8c1",
+                        "on-background": "#dce4e0",
+                        "secondary-container": "#06bb63",
+                        "primary-fixed-dim": "#bdcabd",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#6bfe9c",
+                        "on-error": "#690005",
+                        "on-tertiary": "#3c2f00",
+                        "outline": "#8e928c",
+                        "outline-variant": "#434843",
+                        "inverse-surface": "#dce4e0",
+                        "text-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "card-padding": "20px",
+                        "grid-margin": "24px",
+                        "stack-lg": "32px",
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-caps": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["13px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-lg overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-grid-margin h-16 bg-background/80 backdrop-blur-xl border-b border-border-glass">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-secondary tracking-tight font-bold">FarmHealth</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps uppercase" href="#">Academy</a>
+<a class="text-secondary font-bold font-label-caps uppercase" href="#">Learning</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps uppercase" href="#">Certifications</a>
+</nav>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="p-2 hover:bg-surface-bright rounded-full transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-full border border-border-glass">
+<span class="material-symbols-outlined text-secondary text-[18px]">school</span>
+<span class="font-label-caps">Level 4</span>
+</div>
+<button class="p-1 border-2 border-secondary rounded-full">
+<div class="w-8 h-8 rounded-full bg-cover" data-alt="A professional studio portrait of a young agricultural scientist wearing a clean white lab coat, smiling confidently against a minimalist dark green background. The lighting is crisp and cinematic, emphasizing a modern professional aesthetic. The high-tech agricultural theme is represented by subtle bokeh light patterns resembling data nodes in the background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAP0A4OB0jMui_IAFpq5-sK4rdPuxK2IuZO1uPlQQdql0wUkvcqLAS2TPgINwcOmUnsN42XpvlsNJPzHFtxOLHbClXpmUDlf9MyU-95lmoGY15vg85UmBZJ0hDD-w4EtHVXIMKxTzM82ndX6Z5cz7RpA1zdHvMaooe83-PhGZBSSsCiLQjw7elBpm3kjXN0wR2Q_nPPNd12XKow5980N0QfiHWnQOxqkfY_5Ud796UtFaJEJEy6o2wAwM7v6bBPcpnSFdRgCWbWDO-I')"></div>
+</button>
+</div>
+</header>
+<!-- Side Navigation -->
+<aside class="h-screen w-80 fixed left-0 top-0 pt-16 bg-surface-container-low border-r border-border-glass flex flex-col">
+<div class="px-6 py-8">
+<h3 class="font-label-caps text-secondary mb-4 opacity-70">CURRICULUM</h3>
+<div class="space-y-1">
+<!-- Topic 1 -->
+<div class="relative group cursor-pointer p-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold flex items-center gap-3">
+<div class="active-tab-indicator"></div>
+<span class="material-symbols-outlined">satellite_alt</span>
+<span class="font-body-lg">Remote Sensing Basics</span>
+</div>
+<!-- Topic 2 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-body-lg">Understanding NDVI</span>
+</div>
+<!-- Topic 3 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-lg">Spectral Signatures</span>
+</div>
+<!-- Topic 4 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3 opacity-60">
+<span class="material-symbols-outlined">grass</span>
+<span class="font-body-lg">Chlorophyll Absorption</span>
+</div>
+<!-- Topic 5 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3 opacity-60">
+<span class="material-symbols-outlined">cloud</span>
+<span class="font-body-lg">Atmospheric Correction</span>
+</div>
+<!-- Topic 6 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3 opacity-40">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-lg">Temporal Monitoring</span>
+</div>
+<!-- Topic 7 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3 opacity-40">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+<span class="font-body-lg">Precision Ag Tech</span>
+</div>
+<!-- Topic 8 -->
+<div class="group cursor-pointer p-3 rounded-lg text-on-surface-variant hover:bg-surface-bright transition-all flex items-center gap-3 opacity-40">
+<span class="material-symbols-outlined">verified</span>
+<span class="font-body-lg">Final Certification</span>
+</div>
+</div>
+</div>
+<div class="mt-auto p-6 border-t border-border-glass bg-surface-container-lowest">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-on-surface-variant">COURSE PROGRESS</span>
+<span class="font-label-caps text-secondary">24%</span>
+</div>
+<div class="w-full bg-surface-bright h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 24%"></div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-80 pt-16 h-screen overflow-y-auto no-scrollbar">
+<div class="max-w-5xl mx-auto px-10 py-12">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-text-muted font-label-caps mb-4">
+<span>MODULE 01</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-secondary">REMOTE SENSING BASICS</span>
+</div>
+<!-- Lesson Header -->
+<div class="mb-10">
+<h1 class="font-headline-lg text-white mb-4">The Spectral Fingerprint of Crops</h1>
+<p class="text-on-surface-variant max-w-3xl font-body-lg leading-relaxed">
+                    Satellites don't just "see" colors like we do. They measure specific bands of light reflected from the earth's surface. To detect plant health, we primarily look at the relationship between <span class="text-stress-high font-bold">Red Light</span> and <span class="text-secondary font-bold">Near-Infrared (NIR)</span>.
+                </p>
+</div>
+<!-- Interactive Diagram Section (Bento Style) -->
+<div class="grid grid-cols-12 gap-gutter mb-stack-lg">
+<!-- Spectral Graph Card -->
+<div class="col-span-8 glass-panel p-card-padding rounded-xl relative overflow-hidden group">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-md text-white mb-1">Reflectance Curve</h3>
+<p class="font-label-caps text-on-surface-variant">VEGETATION SIGNATURE (400nm - 1000nm)</p>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-surface-bright text-on-surface rounded text-[10px] font-label-caps border border-border-glass">SENTINEL-2 DATA</span>
+</div>
+</div>
+<div class="h-64 w-full relative">
+<!-- Abstract Spectral Graph -->
+<div class="absolute inset-0 flex items-end justify-between px-2 pb-6 border-b border-l border-border-glass">
+<!-- Curve Line -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 400 200">
+<path class="drop-shadow-[0_0_8px_rgba(74,225,131,0.5)]" d="M0,180 Q50,180 100,170 T200,160 T250,40 T300,30 T400,20" fill="none" stroke="#4ae183" stroke-width="3"></path>
+<circle cx="100" cy="170" fill="#e74c3c" r="4"></circle> <!-- Red Band Point -->
+<circle cx="300" cy="30" fill="#4ae183" r="4"></circle> <!-- NIR Band Point -->
+</svg>
+<!-- X Axis Labels -->
+<div class="absolute -bottom-6 w-full flex justify-between text-[10px] font-label-caps text-text-muted">
+<span>BLUE</span>
+<span>GREEN</span>
+<span class="text-stress-critical font-bold">RED</span>
+<span class="text-secondary font-bold">NIR</span>
+<span>SWIR</span>
+</div>
+</div>
+<!-- Spectral Spectrum Gradient at the bottom -->
+<div class="absolute -bottom-2 left-0 w-full h-1 spectral-gradient opacity-30"></div>
+</div>
+<!-- Highlight Labels -->
+<div class="mt-8 grid grid-cols-2 gap-4">
+<div class="p-3 bg-surface-container-high rounded-lg border-l-4 border-stress-critical">
+<div class="font-label-caps text-stress-critical mb-1">RED ABSORPTION</div>
+<p class="text-body-sm text-on-surface-variant">Healthy chlorophyll absorbs red light for photosynthesis.</p>
+</div>
+<div class="p-3 bg-surface-container-high rounded-lg border-l-4 border-secondary">
+<div class="font-label-caps text-secondary mb-1">NIR REFLECTION</div>
+<p class="text-body-sm text-on-surface-variant">The cellular structure of leaves scatters and reflects NIR light.</p>
+</div>
+</div>
+</div>
+<!-- Microscope/Detail Card -->
+<div class="col-span-4 glass-panel p-card-padding rounded-xl flex flex-col justify-between">
+<div>
+<div class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mb-4">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<h3 class="font-headline-md text-white mb-2">Cellular View</h3>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                            Inside the leaf, the spongy mesophyll layer is responsible for reflecting up to 50% of incoming NIR light.
+                        </p>
+</div>
+<div class="mt-6 rounded-lg overflow-hidden border border-border-glass h-40">
+<img class="w-full h-full object-cover" data-alt="A highly detailed scientific illustration of a plant leaf cross-section showing cellular structures like the mesophyll and chloroplasts. The style is clean and technical, using an emerald and deep forest green color palette with glowing highlights to represent light rays interacting with the cells. The lighting is sharp and clinical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQqTCRwSwRsIBpwiWSw9shlk5KvLX7DUfO69n7rGNygUsXe4eff_V1BL1yqz91LacEx2mURL6ZnZsJp9dOntFW6bUXQkLFPyLAAHoibo7s8yaEx3oHUI6INHZexU4Zle9sQeKDcNW4LKHsIybxuJO7t_mTaz0oGPkYthXUtw2cOiSRswQ2tP3zNOTAclxbxCjClbc93ewPDI18hexD07Fk2W5ig8vSRxiB4XSokmu2e7tbCnQsB1wTltBuyq2ktZOlW4UXknwz5AK9"/>
+</div>
+</div>
+<!-- Equation Card -->
+<div class="col-span-12 glass-panel p-6 rounded-xl border border-secondary/20 bg-gradient-to-r from-surface-container-low to-primary-container">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<div class="flex-1">
+<h4 class="font-label-caps text-secondary mb-2">THE GOLD STANDARD</h4>
+<h2 class="font-headline-md text-white">Normalized Difference Vegetation Index (NDVI)</h2>
+</div>
+<div class="bg-background/50 px-8 py-6 rounded-xl border border-border-glass">
+<div class="font-headline-lg font-serif text-secondary tracking-widest flex items-center gap-4">
+<span>NDVI =</span>
+<div class="flex flex-col items-center">
+<span class="border-b border-on-surface pb-1 text-2xl px-4">NIR - RED</span>
+<span class="pt-1 text-2xl px-4">NIR + RED</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quiz Section (Bottom Sticky-style) -->
+<section class="mt-12 mb-32">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary">quiz</span>
+<h3 class="font-headline-md text-white">Knowledge Check</h3>
+</div>
+<div class="glass-panel p-8 rounded-2xl border-2 border-border-glass relative">
+<div class="absolute -top-3 right-8 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-[10px]">REQUIRED</div>
+<p class="font-headline-md text-on-surface mb-8">If a field shows <span class="text-secondary font-bold">low Red absorption</span> and <span class="text-stress-high font-bold">low NIR reflection</span>, what is the most likely state of the crop?</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<button class="flex items-center gap-4 p-4 rounded-xl border border-border-glass bg-surface-container-high hover:border-secondary hover:bg-secondary/5 transition-all group text-left">
+<div class="w-8 h-8 rounded-full border border-border-glass flex items-center justify-center group-hover:border-secondary text-on-surface-variant group-hover:text-secondary font-label-caps">A</div>
+<span class="text-on-surface-variant group-hover:text-on-surface">Optimal health with high chlorophyll content</span>
+</button>
+<button class="flex items-center gap-4 p-4 rounded-xl border border-secondary bg-secondary/10 text-left">
+<div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-bold font-label-caps shadow-[0_0_15px_rgba(74,225,131,0.4)]">B</div>
+<span class="text-on-surface font-bold">Significant stress or harvesting has occurred</span>
+</button>
+<button class="flex items-center gap-4 p-4 rounded-xl border border-border-glass bg-surface-container-high hover:border-secondary hover:bg-secondary/5 transition-all group text-left">
+<div class="w-8 h-8 rounded-full border border-border-glass flex items-center justify-center group-hover:border-secondary text-on-surface-variant group-hover:text-secondary font-label-caps">C</div>
+<span class="text-on-surface-variant group-hover:text-on-surface">Recent fertilization and irrigation event</span>
+</button>
+<button class="flex items-center gap-4 p-4 rounded-xl border border-border-glass bg-surface-container-high hover:border-secondary hover:bg-secondary/5 transition-all group text-left">
+<div class="w-8 h-8 rounded-full border border-border-glass flex items-center justify-center group-hover:border-secondary text-on-surface-variant group-hover:text-secondary font-label-caps">D</div>
+<span class="text-on-surface-variant group-hover:text-on-surface">Transition from vegetative to reproductive stage</span>
+</button>
+</div>
+<div class="mt-10 flex justify-between items-center border-t border-border-glass pt-6">
+<span class="text-text-muted font-body-sm italic">Multiple choice: Select the best possible answer.</span>
+<button class="bg-secondary text-on-secondary-container px-8 py-3 rounded-lg font-bold hover:scale-105 transition-transform active:scale-95">Submit Answer</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Floating Progress Action -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="flex items-center gap-3 bg-secondary text-on-secondary px-6 py-4 rounded-full shadow-2xl hover:brightness-110 active:scale-95 transition-all">
+<span class="font-bold">Next Lesson: NDVI Calculation</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Atmospheric Effect (Background WebGL placeholder simulation) -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-20">
+
+</div>
+<script>
+        // Micro-interaction: Sidebar active state logic
+        const navItems = document.querySelectorAll('aside .group');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(i => {
+                    i.classList.remove('bg-secondary-container', 'text-on-secondary-container', 'font-bold');
+                    i.classList.add('text-on-surface-variant');
+                    const indicator = i.querySelector('.active-tab-indicator');
+                    if (indicator) indicator.remove();
+                });
+                
+                item.classList.add('bg-secondary-container', 'text-on-secondary-container', 'font-bold');
+                item.classList.remove('text-on-surface-variant');
+                
+                const indicator = document.createElement('div');
+                indicator.className = 'active-tab-indicator';
+                item.prepend(indicator);
+            });
+        });
+
+        // Simple button hover sound or feedback logic could be added here
+    </script>
+</body></html>
