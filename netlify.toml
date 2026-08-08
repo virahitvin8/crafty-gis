@@ -1,6 +1,7 @@
 # ─── Netlify Configuration – FarmHealth Satellite Crop Monitor ───
 
 [build]
+  command = "bash build.sh"
   publish = "www"
 
 [dev]
