@@ -97,6 +97,7 @@ const FH = (function() {
     openModal: FH_UI.openModal,
     closeModal: FH_UI.closeModal,
     saveLandInfo: FH_UI.saveLandInfo,
+    openLandPortal: FH_UI.openLandPortal,
     updateLegend: FH_UI.updateLegend,
     renderMoistureGrid: FH_MAP.renderMoistureGrid,
 

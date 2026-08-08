@@ -777,71 +777,118 @@ const FH_UI = (function() {
     toast('Settings saved');
   }
 
-  // ─── Deterministic Land Info Generator ───
-  function generateDeterministicLandInfo(lat, lng) {
-    const latInt = Math.abs(Math.round(lat * 10000));
-    const lngInt = Math.abs(Math.round(lng * 10000));
-    
-    // Deterministic Survey Number
-    const surveyNum = `${(latInt % 400) + 1}/${(lngInt % 15) + 1}`;
-    
-    // Deterministic Bona / Patta / Khata Number
-    const bonaNum = `${(lngInt % 800) + 100}/${(latInt % 900) + 100}`;
-    
-    // Deterministic Owner Name
-    const owners = [
-      'Ram Singh', 'Rajesh Kumar', 'Suresh Patel', 'Vijay Sharma', 'Amit Verma',
-      'Sunita Devi', 'Ramesh Yadav', 'Harpreet Singh', 'Baldev Chaudhary', 'Karan Johar',
-      'Gurpreet Singh', 'Anil Mehta', 'Sanjay Patil', 'Devi Lal', 'Santosh Devi',
-      'Radha Raman', 'Mahendra Prasad', 'Shiv Charan', 'Jagdish Chandra', 'Rupesh Gowda'
-    ];
-    const ownerName = owners[(latInt + lngInt) % owners.length];
-    
-    return {
-      survey: surveyNum,
-      bona: bonaNum,
-      owner: ownerName
-    };
-  }
+  // ═══════════ LAND INFO (CADASTRAL) — REAL RECORDS ═══════════
+  // Honest implementation: NO survey/khata/owner data is ever invented.
+  // - Location + Area are real (reverse geocoded + computed from the polygon).
+  // - Owner details are ONLY what the user enters and saves, after verifying
+  //   them on the official state land portal (see openLandPortal()).
+  // - The previous "deterministic generator" that fabricated survey numbers,
+  //   khata numbers and owner names from coordinates has been REMOVED.
 
-  // ═══════════ LAND INFO (CADASTRAL) ═══════════
-  function saveLandInfo() {
-    if (!_state.fieldCenter) return toast('Select a field first', 'err');
-    const survey = $('lrSurveyInput').value.trim();
-    const owner = $('lrOwnerInput').value.trim();
-    const bona = $('lrBonaInput')?.value.trim() || '';
-    if (!survey && !owner && !bona) return toast('Enter at least one detail', 'err');
-    
+  function landStorageKey() {
+    if (!_state.fieldCenter) return null;
     const lat = _state.fieldCenter[0].toFixed(4);
     const lng = _state.fieldCenter[1].toFixed(4);
-    const key = `fh_land_${lat}_${lng}`;
-    
-    localStorage.setItem(key, JSON.stringify({ survey, owner, bona }));
-    toast('Farm details saved to device!');
+    return `fh_land_${lat}_${lng}`;
   }
 
+  function saveLandInfo() {
+    if (!_state.fieldCenter) return toast('Select a field first', 'err');
+    const data = {
+      survey:  $('lrSurveyInput').value.trim(),
+      khata:   $('lrKhataInput')?.value.trim() || '',
+      owner:   $('lrOwnerInput').value.trim(),
+      state:   $('lrStateInput')?.value.trim() || '',
+      district: $('lrDistrictInput')?.value.trim() || '',
+      tehsil:  $('lrTehsilInput')?.value.trim() || '',
+      village: $('lrVillageInput')?.value.trim() || '',
+      savedAt: new Date().toISOString()
+    };
+    if (!data.survey && !data.owner && !data.khata && !data.village) {
+      return toast('Enter at least one detail', 'err');
+    }
+    const key = landStorageKey();
+    if (!key) return;
+    localStorage.setItem(key, JSON.stringify(data));
+    updateLandStatus();
+    toast('✅ Land details saved to this device');
+  }
+
+  // Load saved details for a location. Inputs start EMPTY — never invented.
   function loadLandInfo(lat, lng) {
+    ['lrSurveyInput', 'lrKhataInput', 'lrOwnerInput', 'lrStateInput', 'lrDistrictInput', 'lrTehsilInput', 'lrVillageInput'].forEach(id => {
+      const el = $(id);
+      if (el) el.value = '';
+    });
+
     const key = `fh_land_${lat.toFixed(4)}_${lng.toFixed(4)}`;
     const saved = localStorage.getItem(key);
-    
-    // Generate automatic defaults based on selected location coordinates
-    const generated = generateDeterministicLandInfo(lat, lng);
-    let survey = generated.survey;
-    let bona = generated.bona;
-    let owner = generated.owner;
-    
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        if (data.survey) survey = data.survey;
-        if (data.bona) bona = data.bona;
-        if (data.owner) owner = data.owner;
+        if (data.survey) $('lrSurveyInput').value = data.survey;
+        if (data.khata && $('lrKhataInput')) $('lrKhataInput').value = data.khata;
+        if (data.owner) $('lrOwnerInput').value = data.owner;
+        if (data.state && $('lrStateInput')) $('lrStateInput').value = data.state;
+        if (data.district && $('lrDistrictInput')) $('lrDistrictInput').value = data.district;
+        if (data.tehsil && $('lrTehsilInput')) $('lrTehsilInput').value = data.tehsil;
+        if (data.village && $('lrVillageInput')) $('lrVillageInput').value = data.village;
       } catch (e) { /* ignore */ }
     }
-    
-    $('lrSurveyInput').value = survey;
-    $('lrOwnerInput').value = owner;
-    if ($('lrBonaInput')) $('lrBonaInput').value = bona;
+    updateLandStatus();
+  }
+
+  // Auto-fill state/district/tehsil/village from the structured reverse geocode.
+  // Only fills EMPTY fields so saved user-entered values are never overwritten.
+  function applyPlaceToLandInfo(place) {
+    if (!place) return;
+    const fill = (id, val) => {
+      if (!val) return;
+      const el = $(id);
+      if (el && !el.value.trim()) el.value = val;
+    };
+    fill('lrStateInput', place.state);
+    fill('lrDistrictInput', place.district);
+    fill('lrTehsilInput', place.tehsil);
+    fill('lrVillageInput', place.village);
+    const portalHint = $('landPortalHint');
+    if (portalHint) {
+      const portal = FH_CONFIG.findLandPortal(place.state);
+      portalHint.textContent = portal
+        ? `✓ ${portal.state} recognised — ${portal.note}`
+        : 'Select your state to find the official land records portal.';
+    }
+  }
+
+  // Opens the official land records portal for the entered/selected state
+  function openLandPortal() {
+    const state = $('lrStateInput')?.value.trim() || '';
+    const portal = FH_CONFIG.findLandPortal(state);
+    if (!portal) {
+      const q = encodeURIComponent((state ? state + ' ' : '') + 'land records portal official');
+      window.open('https://www.google.com/search?q=' + q, '_blank');
+      return toast('State not mapped — searching the web instead', 'info');
+    }
+    toast('Opening official ' + portal.state + ' portal (' + portal.note + ')…', 'info');
+    window.open(portal.url, '_blank');
+  }
+
+  // Update the verification status line on the Land Info card
+  function updateLandStatus() {
+    const badge = $('landStatusBadge');
+    if (!badge) return;
+    const key = landStorageKey();
+    let saved = null;
+    if (key) {
+      try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { /* ignore */ }
+    }
+    if (saved && (saved.survey || saved.khata || saved.owner)) {
+      badge.className = 'badge badge-live';
+      badge.textContent = '✓ Saved — verify on the official portal';
+    } else {
+      badge.className = 'badge badge-warn';
+      badge.textContent = '— Manual entry — verify on the official portal';
+    }
   }
 
   // ═══════════ YIELD PROJECTION RENDER ═══════════
@@ -1443,6 +1490,9 @@ const FH_UI = (function() {
     saveSettings,
     saveLandInfo,
     loadLandInfo,
+    applyPlaceToLandInfo,
+    openLandPortal,
+    updateLandStatus,
     updateLegend,
     renderYieldProjection,
     renderPestRiskCards,

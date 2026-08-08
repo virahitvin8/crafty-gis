@@ -1010,24 +1010,40 @@ const FH_API = (function() {
   }
 
   // ═══════════ REVERSE GEOCODING (OpenStreetMap Nominatim) ═══════════
+  // Returns a display string like "Village, District, State".
   async function reverseGeocode(lat, lng) {
+    const place = await reverseGeocodeFull(lat, lng);
+    if (!place) return 'Location Unavailable';
+    const parts = [];
+    if (place.village || place.town || place.city) parts.push(place.village || place.town || place.city);
+    if (place.district) parts.push(place.district);
+    if (place.state) parts.push(place.state);
+    return parts.join(', ') || place.full || 'Unknown Location';
+  }
+
+  // Structured reverse geocoding — returns { village, tehsil, district,
+  // state, country, full }. Used to auto-fill the Land Info card.
+  async function reverseGeocodeFull(lat, lng) {
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14`;
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=14&addressdetails=1`;
       const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
       if (!res.ok) throw new Error('Geocoding failed');
       const data = await res.json();
       if (data && data.address) {
         const a = data.address;
-        const parts = [];
-        if (a.village || a.suburb || a.town || a.city) parts.push(a.village || a.suburb || a.town || a.city);
-        if (a.county || a.state_district) parts.push(a.county || a.state_district);
-        if (a.state) parts.push(a.state);
-        return parts.join(', ');
+        return {
+          village: a.village || a.suburb || a.town || a.city_district || '',
+          tehsil: a.county || a.municipality || a.taluk || a.district || '',
+          district: a.state_district || a.county || a.district || '',
+          state: a.state || '',
+          country: a.country || '',
+          full: data.display_name || ''
+        };
       }
-      return 'Unknown Location';
+      return null;
     } catch (e) {
       console.error('Geocoding error:', e);
-      return 'Location Unavailable';
+      return null;
     }
   }
 
@@ -1045,6 +1061,7 @@ const FH_API = (function() {
     getAIAdvice,
     fetchCombinedStress,
     reverseGeocode,
+    reverseGeocodeFull,
     drawHealthGrid,
     valueToClassColor,
     fetchGEEStatistics,

@@ -301,9 +301,21 @@ const FH_MAP = (function() {
       FH_UI.loadLandInfo(_state.fieldCenter[0], _state.fieldCenter[1]);
     }
     
-    FH_API.reverseGeocode(_state.fieldCenter[0], _state.fieldCenter[1])
-      .then(res => {
-        $('lrLocation').textContent = res;
+    // Real location details (village/district/state) via a single reverse geocode
+    FH_API.reverseGeocodeFull(_state.fieldCenter[0], _state.fieldCenter[1])
+      .then(place => {
+        if (!place) {
+          $('lrLocation').textContent = 'Location Unavailable';
+          return;
+        }
+        const parts = [];
+        if (place.village) parts.push(place.village);
+        if (place.district) parts.push(place.district);
+        if (place.state) parts.push(place.state);
+        $('lrLocation').textContent = parts.join(', ') || place.full || 'Unknown Location';
+        if (window.FH_UI && FH_UI.applyPlaceToLandInfo) {
+          FH_UI.applyPlaceToLandInfo(place);
+        }
       })
       .catch(() => {
         $('lrLocation').textContent = 'Location Unavailable';

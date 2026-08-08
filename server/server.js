@@ -69,7 +69,7 @@ let ee = null;
 
 try {
   const gee = require('@google/earthengine');
-  ee = gee.ee;
+  ee = gee;
   geeAvailable = true;
   console.log('[GEE] Earth Engine module loaded successfully');
 } catch (e) {

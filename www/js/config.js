@@ -69,6 +69,60 @@ const FH_CONFIG = (function() {
     { min:  0.8, max: 1.0,  col: '#1a5276', label: 'Saturated' }
   ];
 
+  // ─── Official Land Records Portals (All India) ───
+  // Deep-links to each state's official land record / khatauni portal.
+  // Owner details on these portals require OTP verification from the
+  // registered mobile — that is a government security requirement.
+  const LAND_PORTALS = [
+    { state: 'Uttar Pradesh',            url: 'https://upbhulekh.gov.in',                       note: 'UP Bhulekh — khatauni/khasra, OTP required' },
+    { state: 'Madhya Pradesh',           url: 'https://mpbhulekh.gov.in',                       note: 'MP Bhulekh' },
+    { state: 'Maharashtra',              url: 'https://bhulekh.mahabhumi.gov.in',               note: 'Mahabhumi — 7/12 extracts' },
+    { state: 'Karnataka',                url: 'https://landrecords.karnataka.gov.in',           note: 'Bhoomi — RTC records' },
+    { state: 'Telangana',                url: 'https://dharani.telangana.gov.in',               note: 'Dharani — land records' },
+    { state: 'Andhra Pradesh',           url: 'https://meebhoomi.ap.gov.in',                    note: 'Mee Bhoomi' },
+    { state: 'Tamil Nadu',               url: 'https://eservices.tn.gov.in',                    note: 'Patta Chitta / FMB' },
+    { state: 'Kerala',                   url: 'https://revenuedepartment.kerala.gov.in',        note: 'Revenue Dept — land records' },
+    { state: 'West Bengal',              url: 'https://banglarbhumi.gov.in',                    note: 'Banglar Bhumi' },
+    { state: 'Bihar',                    url: 'https://lrc.bihar.gov.in',                       note: 'Bihar Bhulekh' },
+    { state: 'Odisha',                   url: 'https://bhulekh.odisha.gov.in',                  note: 'Odisha Bhulekh' },
+    { state: 'Rajasthan',                url: 'https://apnakhata.rajasthan.gov.in',             note: 'Apna Khata' },
+    { state: 'Gujarat',                  url: 'https://anyror.gujarat.gov.in',                  note: 'AnyROR — land records' },
+    { state: 'Haryana',                  url: 'https://jamabandi.nic.in',                       note: 'Jamabandi (Haryana)' },
+    { state: 'Punjab',                   url: 'https://jamabandi.punjab.gov.in',                note: 'Punjab Jamabandi' },
+    { state: 'Himachal Pradesh',         url: 'https://himrevenue.gov.in',                      note: 'Him Bhoomi' },
+    { state: 'Uttarakhand',              url: 'https://bhulekh.uk.gov.in',                      note: 'UK Bhulekh' },
+    { state: 'Jharkhand',                url: 'https://jharbhoomi.jharkhand.gov.in',            note: 'Jhar Bhoomi' },
+    { state: 'Chhattisgarh',             url: 'https://cglandrecords.cg.gov.in',                note: 'CG Land Records' },
+    { state: 'Assam',                    url: 'https://revenue.assam.gov.in',                   note: 'Assam Revenue Dept' },
+    { state: 'Goa',                      url: 'https://egov.goa.nic.in',                        note: 'Goa Land Records' },
+    { state: 'Jammu and Kashmir',        url: 'https://landrecords.jk.gov.in',                  note: 'JK Land Records' },
+    { state: 'Ladakh',                   url: 'https://landrecords.ladakh.gov.in',              note: 'Ladakh Land Records' },
+    { state: 'Delhi',                    url: 'https://dilrms.delhi.gov.in',                    note: 'DLRMS — Delhi land records' },
+    { state: 'Puducherry',               url: 'https://revenue.py.gov.in',                      note: 'Puducherry Revenue' },
+    { state: 'Sikkim',                   url: 'https://sikkimrevenue.gov.in',                   note: 'Sikkim Revenue' },
+    { state: 'Manipur',                  url: 'https://manipur.gov.in',                         note: 'Manipur Revenue Dept' },
+    { state: 'Meghalaya',                url: 'https://megrevenuenic.in',                       note: 'Meghalaya Revenue' },
+    { state: 'Mizoram',                  url: 'https://revenue.mizoram.gov.in',                 note: 'Mizoram Revenue' },
+    { state: 'Nagaland',                 url: 'https://nagaland.gov.in',                        note: 'Nagaland Revenue' },
+    { state: 'Tripura',                  url: 'https://triphoodr.tripura.gov.in',               note: 'Tripura Revenue' },
+    { state: 'Arunachal Pradesh',        url: 'https://arunachalpradesh.gov.in',                note: 'Arunachal Revenue' },
+    { state: 'Andaman and Nicobar',      url: 'https://db.and.nic.in',                          note: 'Andaman Records' },
+    { state: 'Chandigarh',               url: 'https://chandigarh.gov.in',                      note: 'Chandigarh' },
+    { state: 'Dadra and Nagar Haveli',   url: 'https://dnh.gov.in',                             note: 'DNH' },
+    { state: 'Lakshadweep',              url: 'https://lakshadweep.gov.in',                     note: 'Lakshadweep' }
+  ];
+
+  // Find the official portal for a state name (fuzzy match, case-insensitive)
+  function findLandPortal(stateName) {
+    if (!stateName) return null;
+    const s = stateName.trim().toLowerCase();
+    let best = LAND_PORTALS.find(p => p.state.toLowerCase() === s);
+    if (best) return best;
+    // fuzzy: state names sometimes include suffixes like 'India'
+    best = LAND_PORTALS.find(p => s.includes(p.state.toLowerCase()) || p.state.toLowerCase().includes(s));
+    return best || null;
+  }
+
   // ─── API Endpoints ───
   const API = {
     STAC_URL: 'https://earth-search.aws.element84.com/v1',
@@ -290,6 +344,8 @@ const FH_CONFIG = (function() {
     INDEX_INFO,
     MOISTURE_COLORS,
     API,
+    LAND_PORTALS,
+    findLandPortal,
     ONBOARDING_STEPS,
     WEATHER_CODES,
     STRESS_INDEX_INFO,
