@@ -1076,6 +1076,253 @@ const FH_UI = (function() {
     if (_state.scenes.length > 0) selectScene(0);
   }
 
+  // ═══════════ FARM DASHBOARD (Cropin-style overview) ═══════════
+  // Helper: derive a field health status label from NDVI
+  function fieldStatusOf(ndvi, peak) {
+    if (ndvi == null || isNaN(ndvi)) return 'NODATA';
+    const p = peak || 0.80;
+    const ratio = ndvi / p;
+    if (ratio >= 0.72) return 'OPTIMAL';
+    if (ratio >= 0.45) return 'STRESSED';
+    return 'CRITICAL';
+  }
+
+  // Helper: derive a 0-100 health score from NDVI
+  function healthScoreOf(ndvi, peak) {
+    if (ndvi == null || isNaN(ndvi)) return null;
+    return Math.round(Math.min(100, (ndvi / (peak || 0.80)) * 115));
+  }
+
+  // View switching: 'dashboard' | 'map'
+  function showView(view) {
+    const dash = $('dashboardView');
+    const side = $('sidebar');
+    const mapArea = $('mapArea');
+    const switcherBtns = document.querySelectorAll('.view-btn');
+
+    if (view === 'dashboard') {
+      dash.style.display = 'block';
+      side.style.display = 'none';
+      mapArea.style.display = 'none';
+      switcherBtns.forEach(b => b.classList.toggle('active', b.dataset.view === 'dashboard'));
+      renderDashboard();
+      toast('📊 Farm Dashboard');
+    } else {
+      dash.style.display = 'none';
+      side.style.display = '';
+      mapArea.style.display = '';
+      switcherBtns.forEach(b => b.classList.toggle('active', b.dataset.view === 'map'));
+      // Refresh map size after layout shift
+      setTimeout(() => {
+        if (_state.map) _state.map.invalidateSize();
+      }, 120);
+    }
+  }
+
+  // ─── RENDER THE FULL DASHBOARD ───
+  function renderDashboard() {
+    const saved = FH_MAP.loadSavedFields();
+    const grid = $('dashGrid');
+    if (!grid) return;
+
+    const query = ($('dashSearch')?.value || '').toLowerCase().trim();
+    const filter = $('dashFilter')?.value || 'all';
+
+    const cards = saved
+      .map(f => {
+        const status = fieldStatusOf(f.ndvi, f.cropPeak);
+        const score = healthScoreOf(f.ndvi, f.cropPeak);
+        const area = FH_UTILS.areaHa(f.coords || []);
+        return { f, status, score, area };
+      })
+      .filter(({ f, status }) => {
+        if (filter !== 'all' && status !== filter) return false;
+        if (query && !(f.name || '').toLowerCase().includes(query) &&
+            !(f.cropName || f.crop || '').toLowerCase().includes(query)) return false;
+        return true;
+      })
+      .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+    renderDashboardSummary(saved);
+    renderDashboardAlerts(saved);
+
+    if (!saved.length) {
+      grid.innerHTML = `
+        <div class="dash-empty">
+          <div class="dash-empty-icon">🌾</div>
+          <h3>No fields monitored yet</h3>
+          <p>Select your first field on the map, run a full satellite analysis, and save it — your farm dashboard will come alive with live health scores from Sentinel-2.</p>
+          <button class="btn-primary" onclick="FH.showView('map')">＋ Start Your First Analysis</button>
+        </div>`;
+      return;
+    }
+
+    if (!cards.length) {
+      grid.innerHTML = `<div class="dash-empty"><div class="dash-empty-icon">🔍</div><h3>No fields match your filter</h3><p>Try a different search or clear the status filter.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = cards.map(({ f, status, score, area }) => {
+      const ndviPct = f.ndvi != null ? Math.max(2, Math.min(98, (f.ndvi / 1.0) * 100)) : 2;
+      const cropName = f.cropName || (f.crop ? (FH_CONFIG.CROPS[f.crop]?.name || f.crop) : 'Crop');
+      const cropIcon = f.crop ? (FH_CONFIG.CROPS[f.crop]?.icon || '🌿') : '🌿';
+      const dateTxt = f.date ? new Date(f.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '—';
+      const srcBadge = f.demo
+        ? '<span class="field-card-src">DEMO</span>'
+        : (f.ndvi != null ? '<span class="field-card-src">🛰️ LIVE</span>' : '<span class="field-card-src">UNANALYZED</span>');
+      const safeId = String(f.id).replace(/'/g, '&#39;');
+      const safeName = String(f.name || 'Field').replace(/'/g, '&#39;');
+
+      return `
+        <div class="field-card" onclick="FH.openFieldFromDashboard('${safeId}')" title="Open ${safeName} on map">
+          <div class="field-card-banner">
+            <span class="field-card-status ${status}">${status}</span>
+            ${srcBadge}
+          </div>
+          <div class="field-card-body">
+            <div class="field-card-name">📍 ${safeName}</div>
+            <div class="field-card-meta">
+              <span>📐 ${area.toFixed(1)} ha</span>
+              <span>${cropIcon} ${cropName}</span>
+              <span>📅 ${dateTxt}</span>
+            </div>
+            <div class="ndvi-bar-wrap">
+              <div class="ndvi-bar"><div class="ndvi-bar-fill" style="left:${ndviPct}%"></div></div>
+              <div class="ndvi-bar-labels"><span>0.0</span><span>NDVI ${f.ndvi != null ? f.ndvi.toFixed(2) : '--'}</span><span>1.0</span></div>
+            </div>
+            <div class="field-card-footer">
+              <span class="field-card-score ${score != null && score < 50 ? 'bad' : score != null && score < 70 ? 'warn' : ''}">
+                ${score != null ? 'Health ' + score + '%' : 'Run analysis to score'}
+              </span>
+              <div class="field-card-actions">
+                <button class="btn-secondary btn-sm" onclick="event.stopPropagation(); FH.loadFieldFromSavedById('${safeId}')">Analyze</button>
+                <button class="btn-secondary btn-sm" onclick="event.stopPropagation(); FH.exportFieldGeoJSON('${safeId}')">GeoJSON</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ─── SUMMARY STATS ───
+  function renderDashboardSummary(saved) {
+    const fields = saved.filter(f => f.ndvi != null);
+    let totalArea = 0;
+    let scoreSum = 0;
+    let alertCount = 0;
+
+    saved.forEach(f => {
+      const a = FH_UTILS.areaHa(f.coords || []);
+      totalArea += a;
+      const status = fieldStatusOf(f.ndvi, f.cropPeak);
+      if (status === 'CRITICAL' || status === 'STRESSED') alertCount++;
+      if (f.ndvi != null) {
+        scoreSum += healthScoreOf(f.ndvi, f.cropPeak);
+      }
+    });
+
+    const avg = fields.length ? Math.round(scoreSum / fields.length) : null;
+
+    const areaEl = $('dashTotalArea');
+    if (areaEl) {
+      areaEl.textContent = totalArea >= 100 ? Math.round(totalArea) + ' ha' : totalArea.toFixed(1) + ' ha';
+    }
+    const healthEl = $('dashAvgHealth');
+    if (healthEl) {
+      healthEl.textContent = avg != null ? avg + '%' : '--';
+      healthEl.className = 'dash-stat-value' + (avg != null && avg < 50 ? ' bad' : avg != null && avg < 70 ? ' warn' : '');
+    }
+    const countEl = $('dashFieldCount');
+    if (countEl) countEl.textContent = saved.length;
+    const alertEl = $('dashAlertCount');
+    if (alertEl) {
+      alertEl.textContent = alertCount;
+      alertEl.className = 'dash-stat-value' + (alertCount > 0 ? ' warn' : '');
+    }
+  }
+
+  // ─── ALERTS LISTING ───
+  function renderDashboardAlerts(saved) {
+    const section = $('dashAlertsSection');
+    const box = $('dashAlerts');
+    if (!section || !box) return;
+
+    const alerts = saved
+      .map(f => {
+        const status = fieldStatusOf(f.ndvi, f.cropPeak);
+        if (status === 'OPTIMAL' || status === 'NODATA') return null;
+        return { f, status };
+      })
+      .filter(Boolean)
+      .sort((a, b) => (a.status === 'CRITICAL' ? 0 : 1) - (b.status === 'CRITICAL' ? 0 : 1));
+
+    if (!alerts.length) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    box.innerHTML = alerts.map(({ f, status }) => {
+      const safeId = String(f.id).replace(/'/g, '&#39;');
+      const isCrit = status === 'CRITICAL';
+      const msg = isCrit
+        ? `NDVI ${f.ndvi != null ? f.ndvi.toFixed(2) : '--'} is critically low — immediate irrigation, nutrient or scouting intervention recommended.`
+        : `NDVI ${f.ndvi != null ? f.ndvi.toFixed(2) : '--'} is below optimum — spot-check stressed zones and consider irrigation or fertilizer.`;
+      return `
+        <div class="dash-alert-item ${isCrit ? 'critical' : ''}" onclick="FH.openFieldFromDashboard('${safeId}')">
+          <span class="dash-alert-icon">${isCrit ? '🚨' : '⚠️'}</span>
+          <div class="dash-alert-body">
+            <div class="dash-alert-title">${isCrit ? 'Critical stress' : 'Stress detected'} — ${String(f.name || 'Field').replace(/'/g, '&#39;')}</div>
+            <div class="dash-alert-msg">${msg}</div>
+          </div>
+          <span class="dash-alert-field">${status}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // ─── OPEN A FIELD FROM DASHBOARD ───
+  function openFieldFromDashboard(id) {
+    const field = FH_MAP.findSavedField(id);
+    if (!field) return toast('⚠️ Field not found', 'err');
+    showView('map');
+    setTimeout(() => {
+      FH_MAP.loadFieldFromSaved(field);
+      toast('📌 Loaded: ' + (field.name || 'Field'));
+    }, 150);
+  }
+
+  // ─── DELETE A FIELD FROM DASHBOARD ───
+  function deleteFieldFromDashboard(id) {
+    if (!confirm('Delete this field from your dashboard?')) return;
+    FH_MAP.deleteSavedField(id);
+    renderDashboard();
+  }
+
+  // ─── EXPORT A SAVED FIELD AS GEOJSON ───
+  function exportFieldGeoJSON(id) {
+    const field = FH_MAP.findSavedField(id);
+    if (!field || !field.coords || !field.coords.length) return toast('⚠️ No boundary for this field', 'err');
+    const coords = field.coords.map(ll => [ll[1], ll[0]]);
+    coords.push(coords[0]);
+    const gj = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates: [coords] },
+        properties: {
+          name: field.name || 'Field',
+          area_ha: FH_UTILS.areaHa(field.coords).toFixed(2),
+          ndvi: field.ndvi,
+          health_score: healthScoreOf(field.ndvi, field.cropPeak),
+          crop: field.crop || '',
+          last_analyzed: field.date || null
+        }
+      }]
+    }, null, 2);
+    FH_UTILS.downloadBlob(gj, (field.name || 'field').replace(/\s+/g, '_').toLowerCase() + '.geojson', 'application/json');
+    toast('GeoJSON exported');
+  }
+
   return {
     setStateRef,
     checkLoginState,
@@ -1119,6 +1366,14 @@ const FH_UI = (function() {
     skipOnboarding,
     finishOnboarding,
     renderSavedFields,
-    renderDataDashboard
+    renderDataDashboard,
+    // Farm Dashboard
+    showView,
+    renderDashboard,
+    openFieldFromDashboard,
+    deleteFieldFromDashboard,
+    exportFieldGeoJSON,
+    fieldStatusOf,
+    healthScoreOf
   };
 })();

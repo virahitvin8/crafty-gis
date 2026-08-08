@@ -269,6 +269,8 @@ The frontend works standalone because Sentinel Hub API calls go directly from th
 ```bash
 # Linux/Mac
 ./build.sh
+# or web-only:
+bash build-web.sh
 
 # Windows PowerShell
 .\build-web.ps1
@@ -276,13 +278,52 @@ The frontend works standalone because Sentinel Hub API calls go directly from th
 
 Files are output to the `www/` directory.
 
-#### Deploy to Netlify
+#### Deploy to Netlify (recommended — config included)
 ```bash
-# Using Netlify CLI
+# Push this repo to GitHub, then:
+# 1. app.netlify.com → Add new site → Import from Git
+# 2. Netlify auto-detects netlify.toml (builds www/, proxies /api/* to Render)
+# 3. Or CLI:
 netlify deploy --prod --dir www
 
 # Or drag-and-drop the www/ folder onto https://app.netlify.com/drop
 ```
+
+The included `netlify.toml` handles the build command, SPA redirects, API proxying to the Render backend, and security headers automatically.
+
+#### Deploy to Vercel (fully serverless — no separate backend needed)
+
+FarmHealth ships with **Vercel serverless functions** so the whole app runs on
+Vercel alone — no Render server required for satellite auth or AI advice.
+
+```bash
+# Push to GitHub, then:
+# 1. vercel.com → New Project → Import this repo
+# 2. Framework preset: Other (static files)
+# 3. Add env vars (optional): GEMINI_API_KEY, SENTINEL_HUB_CLIENT_ID, SENTINEL_HUB_CLIENT_SECRET
+
+# Or CLI:
+vercel --prod
+```
+
+The included `vercel.json` + `api/` folder wire up:
+- `api/sentinel-token.js` → Sentinel Hub OAuth proxy (real satellite auth)
+- `api/gemini-analysis.js` → Gemini AI advice with expert offline fallback
+- SPA rewrites + security headers
+
+#### Deploy to Google Cloud (App Engine / Cloud Run — 24×7 managed)
+
+```bash
+# App Engine Flexible (uses the Dockerfile):
+gcloud app deploy app.yaml
+
+# Cloud Run via Cloud Build:
+gcloud builds submit --config cloudbuild.yaml .
+```
+
+Both run the Node server + frontend 24×7 with health checks and auto-restart.
+
+#### Deploy to GitHub Pages
 
 #### Deploy to Vercel
 ```bash

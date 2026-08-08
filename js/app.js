@@ -139,8 +139,17 @@ const FH = (function() {
     toggleTimeAnimation: FH_MAP.toggleTimeAnimation,
     saveCurrentField: FH_MAP.saveCurrentField,
     loadFieldFromSaved: FH_MAP.loadFieldFromSaved,
+    loadFieldFromSavedById: FH_MAP.loadFieldFromSavedById,
+    findSavedField: FH_MAP.findSavedField,
     deleteSavedField: FH_MAP.deleteSavedField,
     renderSavedFields: FH_UI.renderSavedFields,
-    renderDataDashboard: FH_UI.renderDataDashboard
+    renderDataDashboard: FH_UI.renderDataDashboard,
+
+    // Farm Dashboard
+    showView: FH_UI.showView,
+    renderDashboard: FH_UI.renderDashboard,
+    openFieldFromDashboard: FH_UI.openFieldFromDashboard,
+    deleteFieldFromDashboard: FH_UI.deleteFieldFromDashboard,
+    exportFieldGeoJSON: FH_UI.exportFieldGeoJSON
   };
 })();

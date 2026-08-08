@@ -1,28 +1,25 @@
 # ─── Netlify Configuration – FarmHealth Satellite Crop Monitor ───
-# Deploy the static frontend to Netlify
-# The backend runs separately on Render or Google Cloud Run
+# Deploy the static frontend (Vanilla JS + Leaflet) to Netlify
+# The backend (Node.js GEE proxy + Sentinel Hub auth) runs separately on Render
 
 [build]
-  # Publish the built web assets
+  command = "bash build-web.sh"
   publish = "www"
-  # No build command needed - we pre-build with build.sh
 
 [dev]
   framework = "#static"
 
 # SPA redirects: serve index.html for all routes (so the app handles routing)
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = true
-
-# Proxy API calls to backend (update with your actual backend URL)
-[[redirects]]
   from = "/api/*"
   to = "https://farmhealth-backend.onrender.com/api/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 # Headers for security and PWA support
 [[headers]]
@@ -32,7 +29,6 @@
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(self)"
-    Cache-Control = "public, max-age=3600"
 
 [[headers]]
   for = "/sw.js"
@@ -43,8 +39,3 @@
   for = "/manifest.json"
   [headers.values]
     Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"

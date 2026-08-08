@@ -1,0 +1,46 @@
+# ═══════════════════════════════════════════════════════════
+#  FarmHealth — Google Cloud Build pipeline
+#  Builds the Docker image and pushes it to Artifact Registry,
+#  ready for Cloud Run / App Engine Flexible deployment.
+#
+#  Usage:
+#    gcloud builds submit --config cloudbuild.yaml .
+#  ═══════════════════════════════════════════════════════════
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:latest'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'farmhealth'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--min-instances=0'
+      - '--max-instances=2'
+      - '--timeout=300'
+      - '--set-env-vars=NODE_ENV=production'
+
+substitutions:
+  _REGION: us-central1
+  _REPO: farmhealth
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'

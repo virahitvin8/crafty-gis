@@ -505,17 +505,73 @@ const FH_MAP = (function() {
   }
 
   // ═══════════ SAVED FIELDS ═══════════
+  // Find a saved field by id (string or number)
+  function findSavedField(id) {
+    const saved = _state.savedFields.length ? _state.savedFields : loadSavedFields();
+    return saved.find(f => String(f.id) === String(id)) || null;
+  }
+
+  // Load a saved field by id, then show it on the map
+  function loadFieldFromSavedById(id) {
+    const field = findSavedField(id);
+    if (!field) return toast('⚠️ Invalid saved field', 'err');
+    if (FH_UI && FH_UI.showView) FH_UI.showView('map');
+    setTimeout(() => loadFieldFromSaved(field), 150);
+  }
+
+  // Update an existing saved field whose coords match the current field with
+  // fresh analysis data — keeps the dashboard live after re-analysis.
+  function updateSavedFieldHealth() {
+    if (!_state.fieldLL || !_state.fieldLL.length || !_state.analysisData) return;
+    const saved = _state.savedFields.length ? _state.savedFields : loadSavedFields();
+    if (!saved.length) return;
+
+    const curCenter = _state.fieldCenter
+      ? _state.fieldCenter.map(v => v.toFixed(5)).join(',')
+      : FH_UTILS.polyCenter(_state.fieldLL).map(v => v.toFixed(5)).join(',');
+
+    let changed = false;
+    saved.forEach(f => {
+      if (!f.center) return;
+      const fCenter = f.center.map(v => v.toFixed(5)).join(',');
+      if (fCenter !== curCenter) return;
+      const cropDef = FH_CONFIG.CROPS[f.crop || 'generic'] || FH_CONFIG.CROPS.generic;
+      const ad = _state.analysisData;
+      f.ndvi = ad.meanNdvi;
+      f.date = new Date().toISOString();
+      f.cropPeak = cropDef.peak;
+      f.healthScore = FH_UI && FH_UI.healthScoreOf ? FH_UI.healthScoreOf(ad.meanNdvi, cropDef.peak) : null;
+      f.status = FH_UI && FH_UI.fieldStatusOf ? FH_UI.fieldStatusOf(ad.meanNdvi, cropDef.peak) : null;
+      f.dataSource = ad.dataSource || null;
+      changed = true;
+    });
+
+    if (changed) {
+      _state.savedFields = saved;
+      localStorage.setItem('fh_saved_fields', JSON.stringify(saved));
+    }
+  }
+
   function saveCurrentField(name) {
     if (!_state.fieldLL.length) return toast('No field selected to save', 'err');
+    const cropType = $('cropSelect')?.value || 'generic';
+    const cropDef = FH_CONFIG.CROPS[cropType] || FH_CONFIG.CROPS.generic;
+    const ad = _state.analysisData;
     const field = {
       id: Date.now().toString(36),
       name: name || `Field ${_state.savedFields.length + 1}`,
       coords: _state.fieldLL,
       center: _state.fieldCenter,
-      crop: $('cropSelect')?.value || 'generic',
+      crop: cropType,
+      cropName: cropDef.name,
+      cropPeak: cropDef.peak,
       stage: $('stageSelect')?.value || 'mid',
       date: new Date().toISOString(),
-      ndvi: _state.analysisData?.meanNdvi || null
+      ndvi: ad?.meanNdvi ?? null,
+      healthScore: FH_UI && FH_UI.healthScoreOf ? FH_UI.healthScoreOf(ad?.meanNdvi, cropDef.peak) : null,
+      status: FH_UI && FH_UI.fieldStatusOf ? FH_UI.fieldStatusOf(ad?.meanNdvi, cropDef.peak) : null,
+      dataSource: ad?.dataSource || null,
+      demo: false
     };
 
     // Save to localStorage (always — fast, immediate)
@@ -605,10 +661,9 @@ const FH_MAP = (function() {
       $('panel-' + t.dataset.tab).classList.add('active');
       if (t.dataset.tab !== 'click' && _state.drawMode) toggleDraw();
     }));
-  }
-
-  return {
+  }    return {
     setStateRef,
+    findSavedField,
     initMap,
     toggleLayer,
     cycleBasemap,
@@ -634,6 +689,8 @@ const FH_MAP = (function() {
     saveCurrentField,
     loadSavedFields,
     loadFieldFromSaved,
+    loadFieldFromSavedById,
+    updateSavedFieldHealth,
     deleteSavedField,
     mergeFromFirestore
   };

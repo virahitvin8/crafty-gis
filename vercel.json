@@ -1,0 +1,49 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/sentinel/token",
+      "destination": "/api/sentinel-token"
+    },
+    {
+      "source": "/api/gemini-analysis",
+      "destination": "/api/gemini-analysis"
+    },
+    // The catch-all excludes /api/* deliberately: in production the frontend
+    // calls GEE through the Render backend URL, so unhandled /api paths
+    // should 404 (not silently serve the SPA) rather than mask a proxy outage.
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "functions": {
+    "api/sentinel-token.js": { "maxDuration": 10 },
+    "api/gemini-analysis.js": { "maxDuration": 30 }
+  }
+}

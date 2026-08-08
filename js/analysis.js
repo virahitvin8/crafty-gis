@@ -472,6 +472,17 @@ const FH_ANALYSIS = (function() {
 
       $('aiCard').style.display = '';
       hideLoading();
+
+      // Keep the farm dashboard live with the freshest telemetry
+      try {
+        FH_MAP.updateSavedFieldHealth();
+        if (FH_UI && FH_UI.renderDashboard && $('dashboardView') && $('dashboardView').style.display !== 'none') {
+          FH_UI.renderDashboard();
+        }
+      } catch (e) {
+        console.warn('Dashboard refresh skipped:', e);
+      }
+
       $('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       const sourceLabel = _state.simulatedData ? 'Simulated (API unavailable)' :
         (usedDataSource === 'google-earth-engine' ? 'Google Earth Engine' : 'Sentinel Hub');

@@ -41,6 +41,12 @@
       <h1>FarmHealth</h1>
     </div>
     <div class="tagline">Precision Satellite Intelligence • Sentinel-2 L2A • Live Weather • Soil Analytics • AI Advisory</div>
+
+    <!-- VIEW SWITCHER: Dashboard / Map -->
+    <div class="view-switcher">
+      <button class="view-btn" data-view="dashboard" onclick="FH.showView('dashboard')">📊 Dashboard</button>
+      <button class="view-btn active" data-view="map" onclick="FH.showView('map')">🗺️ Map &amp; Analysis</button>
+    </div>
     
     <!-- User Info & Sign Out Bar (hidden by default, shown on login) -->
     <div id="userInfoBar" class="user-info-bar" style="display:none">
@@ -422,6 +428,82 @@
     <div class="spinner"></div>
     <div id="loadingText">Analyzing field…</div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     FARM DASHBOARD VIEW (Cropin-style field overview)
+     ═══════════════════════════════════════════════════════ -->
+<div id="dashboardView" style="display:none">
+  <header class="dash-header">
+    <div class="dash-header-left">
+      <div class="dash-title-row">
+        <span class="dash-logo">🛰️</span>
+        <h1>Farm Dashboard</h1>
+        <span class="badge badge-live">Sentinel-2 LIVE</span>
+      </div>
+      <p class="dash-subtitle">Every field you own, monitored from space — health, stress and alerts at a glance.</p>
+    </div>
+    <div class="dash-header-actions">
+      <button class="btn-secondary btn-sm" onclick="FH.showView('map')">🗺️ Open Map</button>
+      <button class="btn-primary btn-sm" onclick="FH.showView('map')">＋ New Analysis</button>
+    </div>
+  </header>
+
+  <!-- ─── SUMMARY STAT CARDS ─── -->
+  <section class="dash-summary">
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon">📐</div>
+      <div class="dash-stat-body">
+        <div class="dash-stat-value" id="dashTotalArea">-- ha</div>
+        <div class="dash-stat-label">Total Area</div>
+      </div>
+    </div>
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon">🌿</div>
+      <div class="dash-stat-body">
+        <div class="dash-stat-value" id="dashAvgHealth">--%</div>
+        <div class="dash-stat-label">Avg Health Score</div>
+      </div>
+    </div>
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon">🧭</div>
+      <div class="dash-stat-body">
+        <div class="dash-stat-value" id="dashFieldCount">0</div>
+        <div class="dash-stat-label">Fields Monitored</div>
+      </div>
+    </div>
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon">🚨</div>
+      <div class="dash-stat-body">
+        <div class="dash-stat-value" id="dashAlertCount">0</div>
+        <div class="dash-stat-label">Active Alerts</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEARCH & FILTER TOOLBAR ─── -->
+  <div class="dash-toolbar">
+    <div class="dash-search">
+      <span class="dash-search-icon">🔍</span>
+      <input type="text" id="dashSearch" placeholder="Search fields…" oninput="FH.renderDashboard()">
+    </div>
+    <select id="dashFilter" onchange="FH.renderDashboard()">
+      <option value="all">All Fields</option>
+      <option value="OPTIMAL">✅ Optimal</option>
+      <option value="STRESSED">⚠️ Stressed</option>
+      <option value="CRITICAL">🚨 Critical</option>
+    </select>
+    <button class="btn-secondary btn-sm" onclick="FH.renderDashboard()" title="Refresh">↻ Refresh</button>
+  </div>
+
+  <!-- ─── FIELD CARDS BENTO GRID ─── -->
+  <div class="dash-grid" id="dashGrid"></div>
+
+  <!-- ─── ALERTS SECTION ─── -->
+  <div class="dash-alerts-section" id="dashAlertsSection" style="display:none">
+    <h3 class="dash-alerts-title">⚠️ Field Alerts</h3>
+    <div id="dashAlerts"></div>
   </div>
 </div>
 
