@@ -34,9 +34,6 @@
       "source": "/api/gemini-analysis",
       "destination": "/api/gemini-analysis"
     },
-    // The catch-all excludes /api/* deliberately: in production the frontend
-    // calls GEE through the Render backend URL, so unhandled /api paths
-    // should 404 (not silently serve the SPA) rather than mask a proxy outage.
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"

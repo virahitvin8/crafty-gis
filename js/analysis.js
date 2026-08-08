@@ -474,13 +474,9 @@ const FH_ANALYSIS = (function() {
       hideLoading();
 
       // Keep the farm dashboard live with the freshest telemetry
-      try {
-        FH_MAP.updateSavedFieldHealth();
-        if (FH_UI && FH_UI.renderDashboard && $('dashboardView') && $('dashboardView').style.display !== 'none') {
-          FH_UI.renderDashboard();
-        }
-      } catch (e) {
-        console.warn('Dashboard refresh skipped:', e);
+      FH_MAP.updateSavedFieldHealth();
+      if (FH_UI && FH_UI.renderDashboard && $('dashboardView') && $('dashboardView').style.display !== 'none') {
+        FH_UI.renderDashboard();
       }
 
       $('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });

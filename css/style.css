@@ -2579,10 +2579,13 @@ button {
 
 /* ── RESPONSIVE DASHBOARD ── */
 @media (max-width: 800px) {
+  body.fh-dash-active {
+    overflow-y: auto;
+  }
   #dashboardView {
     padding: 16px 14px 90px;
-    height: auto;
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
   }
   .dash-grid {
     grid-template-columns: 1fr;

@@ -311,6 +311,14 @@ The included `vercel.json` + `api/` folder wire up:
 - `api/gemini-analysis.js` → Gemini AI advice with expert offline fallback
 - SPA rewrites + security headers
 
+> Note: the catch-all rewrite excludes `/api/*` deliberately — in production the
+> frontend calls Google Earth Engine through the Render backend URL, so unhandled
+> API paths 404 instead of silently serving the SPA.
+
+> **Long-term Google Cloud note:** App Engine Flexible is being sunset by Google
+> Cloud. For a forward-looking 24×7 Google deployment, prefer **Cloud Run** via
+> `cloudbuild.yaml` — `app.yaml` is still provided for teams already on GAE Flex.
+
 #### Deploy to Google Cloud (App Engine / Cloud Run — 24×7 managed)
 
 ```bash

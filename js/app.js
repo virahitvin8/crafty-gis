@@ -148,6 +148,7 @@ const FH = (function() {
     // Farm Dashboard
     showView: FH_UI.showView,
     renderDashboard: FH_UI.renderDashboard,
+    loadDemoFields: FH_UI.loadDemoFields,
     openFieldFromDashboard: FH_UI.openFieldFromDashboard,
     deleteFieldFromDashboard: FH_UI.deleteFieldFromDashboard,
     exportFieldGeoJSON: FH_UI.exportFieldGeoJSON

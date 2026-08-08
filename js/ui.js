@@ -1099,12 +1099,14 @@ const FH_UI = (function() {
     const side = $('sidebar');
     const mapArea = $('mapArea');
     const switcherBtns = document.querySelectorAll('.view-btn');
+    const bodyEl = document.body;
 
     if (view === 'dashboard') {
       dash.style.display = 'block';
       side.style.display = 'none';
       mapArea.style.display = 'none';
       switcherBtns.forEach(b => b.classList.toggle('active', b.dataset.view === 'dashboard'));
+      if (bodyEl) bodyEl.classList.add('fh-dash-active');
       renderDashboard();
       toast('📊 Farm Dashboard');
     } else {
@@ -1112,11 +1114,93 @@ const FH_UI = (function() {
       side.style.display = '';
       mapArea.style.display = '';
       switcherBtns.forEach(b => b.classList.toggle('active', b.dataset.view === 'map'));
+      if (bodyEl) bodyEl.classList.remove('fh-dash-active');
       // Refresh map size after layout shift
       setTimeout(() => {
         if (_state.map) _state.map.invalidateSize();
       }, 120);
     }
+  }
+
+  // ─── SEED DEMO FIELDS (so the dashboard shows a realistic Cropin-style view) ───
+  // Realistic sample fields with plausible satellite telemetry, clearly marked DEMO.
+  function loadDemoFields() {
+    const existing = FH_MAP.loadSavedFields();
+    if (existing.some(f => f.demo)) return toast('Demo farm already loaded', 'info');
+
+    const baseDate = Date.now();
+    const demos = [
+      {
+        id: 'demo-' + Date.now().toString(36) + '-1',
+        name: 'North Sector B-12',
+        coords: [[40.018, -88.247], [40.018, -88.239], [40.012, -88.239], [40.012, -88.247]],
+        center: [40.015, -88.243],
+        crop: 'wheat',
+        cropName: 'Wheat',
+        cropPeak: 0.80,
+        stage: 'mid',
+        date: new Date(baseDate - 86400000 * 2).toISOString(),
+        ndvi: 0.82,
+        healthScore: 94,
+        status: 'OPTIMAL',
+        dataSource: 'sentinel-hub',
+        demo: true
+      },
+      {
+        id: 'demo-' + Date.now().toString(36) + '-2',
+        name: 'West Pivot 04',
+        coords: [[40.034, -88.275], [40.034, -88.267], [40.028, -88.267], [40.028, -88.275]],
+        center: [40.031, -88.271],
+        crop: 'maize',
+        cropName: 'Maize',
+        cropPeak: 0.85,
+        stage: 'mid',
+        date: new Date(baseDate - 86400000 * 5).toISOString(),
+        ndvi: 0.45,
+        healthScore: 61,
+        status: 'STRESSED',
+        dataSource: 'sentinel-hub',
+        demo: true
+      },
+      {
+        id: 'demo-' + Date.now().toString(36) + '-3',
+        name: 'Hillside Vineyard',
+        coords: [[40.005, -88.215], [40.005, -88.207], [39.999, -88.207], [39.999, -88.215]],
+        center: [40.002, -88.211],
+        crop: 'soybean',
+        cropName: 'Soybean',
+        cropPeak: 0.82,
+        stage: 'mid',
+        date: new Date(baseDate - 86400000 * 9).toISOString(),
+        ndvi: 0.78,
+        healthScore: 89,
+        status: 'OPTIMAL',
+        dataSource: 'sentinel-hub',
+        demo: true
+      },
+      {
+        id: 'demo-' + Date.now().toString(36) + '-4',
+        name: 'East Paddy 09',
+        coords: [[40.051, -88.229], [40.051, -88.221], [40.045, -88.221], [40.045, -88.229]],
+        center: [40.048, -88.225],
+        crop: 'rice',
+        cropName: 'Rice',
+        cropPeak: 0.78,
+        stage: 'mid',
+        date: new Date(baseDate - 86400000 * 14).toISOString(),
+        ndvi: 0.12,
+        healthScore: 18,
+        status: 'CRITICAL',
+        dataSource: 'sentinel-hub',
+        demo: true
+      }
+    ];
+
+    const merged = demos.concat(existing);
+    _state.savedFields = merged;
+    localStorage.setItem('fh_saved_fields', JSON.stringify(merged));
+    renderDashboard();
+    toast('🌾 Demo farm loaded — explore the dashboard!');
   }
 
   // ─── RENDER THE FULL DASHBOARD ───
@@ -1151,8 +1235,11 @@ const FH_UI = (function() {
         <div class="dash-empty">
           <div class="dash-empty-icon">🌾</div>
           <h3>No fields monitored yet</h3>
-          <p>Select your first field on the map, run a full satellite analysis, and save it — your farm dashboard will come alive with live health scores from Sentinel-2.</p>
-          <button class="btn-primary" onclick="FH.showView('map')">＋ Start Your First Analysis</button>
+          <p>Select your first field on the map, run a full satellite analysis, and save it — your farm dashboard will come alive with live health scores from Sentinel-2. Or preview the dashboard with a sample farm.</p>
+          <div class="row" style="max-width:420px;margin:0 auto">
+            <button class="btn-primary" onclick="FH.showView('map')">＋ Start Your First Analysis</button>
+            <button class="btn-secondary" onclick="FH.loadDemoFields()">🌾 Load Demo Farm</button>
+          </div>
         </div>`;
       return;
     }
@@ -1370,6 +1457,7 @@ const FH_UI = (function() {
     // Farm Dashboard
     showView,
     renderDashboard,
+    loadDemoFields,
     openFieldFromDashboard,
     deleteFieldFromDashboard,
     exportFieldGeoJSON,
