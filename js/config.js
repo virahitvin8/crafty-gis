@@ -7,12 +7,10 @@ const FH_CONFIG = (function() {
 
   // ─── Sentinel Hub Credentials ───
   // Primary path: the backend proxy at /api/sentinel/token handles OAuth2
-  // server-side (secure). These values are used ONLY as a last-resort
-  // browser fallback so the app still fetches REAL satellite data when it is
-  // opened statically (no backend) — e.g. opening index.html directly.
-  // ⚠️ For production, override these via the backend env vars instead.
-  const SH_CLIENT_ID = '29fb6ce6-bbb5-4088-b647-0eed6488c253';
-  const SH_CLIENT_SECRET = '0QRRQfKPsKx8rsGbjFAtZeLjILvBKUu7';
+  // server-side (secure). Credentials live ONLY in backend env vars.
+  // The browser never sees them — it calls the backend token proxy instead.
+  const SH_CLIENT_ID = '';
+  const SH_CLIENT_SECRET = '';
 
   // ─── Gemini AI API Key ───
   // ⚠️ Set your own key in Settings > Gemini API Key for AI features
