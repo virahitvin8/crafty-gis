@@ -969,6 +969,41 @@ button {
   border-left: 3px solid var(--cyan);
 }
 
+/* ── LESSON COLOUR SCALE (matches the live analysis palette) ── */
+.lesson-scale {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.lesson-scale-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.lesson-scale-item:hover {
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+}
+
+.lesson-scale-item .lesson-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
 /* ── QUIZ ── */
 
 .quiz-q {
@@ -1728,6 +1763,56 @@ button {
   background: var(--green);
   color: #06210f;
   border-color: var(--green);
+}
+
+/* ── SPLIT-VIEW DRAG DIVIDER ── */
+.compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background: linear-gradient(180deg, rgba(46, 204, 113, 0.9), rgba(126, 231, 135, 0.9), rgba(46, 204, 113, 0.9));
+  box-shadow: 0 0 14px rgba(46, 204, 113, 0.65);
+  z-index: 1100;
+  cursor: col-resize;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  transition: box-shadow 0.2s;
+}
+
+.compare-divider:hover {
+  box-shadow: 0 0 22px rgba(46, 204, 113, 0.9);
+}
+
+.compare-divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -18px;
+  right: -18px;
+  cursor: col-resize;
+}
+
+.compare-handle {
+  width: 34px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--green);
+  color: var(--green-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: 2px;
 }
 
 /* ── TIME ANIMATION CONTROLS ── */

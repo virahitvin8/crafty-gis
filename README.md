@@ -11,11 +11,11 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://javascript.com)
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com)
-[![Sentinel Hub](https://img.shields.io/badge/Sentinel_Hub-004488?style=for-the-badge&logo=esa&logoColor=white)](https://sentinel-hub.com)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
-[![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)](https://cloud.google.com)
-[![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
-[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://capacitorjs.com)
+[![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.ai)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+
+**🆓 100% Open-Source Stack • Runs 24×7 Free • Zero API Costs**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
@@ -27,6 +27,7 @@
 
 - [✨ Features](#-features)
 - [🛰️ How It Works](#️-how-it-works)
+- [🆓 100% Open-Source Stack](#-100-open-source-stack-primary--legacy-fallbacks)
 - [🚀 Quick Start](#-quick-start)
 - [🔧 Deployment Guide](#-deployment-guide)
   - [Option 1: Local Development Server](#option-1-local-development-server)
@@ -34,8 +35,10 @@
   - [Option 3: Google Cloud Run (Recommended)](#option-3-google-cloud-run-recommended)
   - [Option 4: Static Hosting (Netlify / Vercel / GitHub Pages)](#option-4-static-hosting-netlify--vercel--github-pages)
   - [Option 5: Android App (Capacitor)](#option-5-android-app-capacitor)
+  - [🔥 NEW: Coolify / Dokploy (24×7 self-hosted)](COOLIFY_DEPLOY.md)
 - [🔐 Authentication & API Keys](#-authentication--api-keys)
 - [📡 Satellite Data Sources](#-satellite-data-sources)
+- [🏞️ Land Records (Survey/Khata number)](#️-land-records-survey--khata-number)
 - [🗺️ Map Layers & Indices](#️-map-layers--indices)
 - [📁 Project Structure](#-project-structure)
 - [🔧 Troubleshooting](#-troubleshooting)
@@ -53,7 +56,8 @@
 | 🐛 | **Pest Risk Detection** | Anomaly detection from Red-Edge/NIR spectral drops | Evalscript |
 | 🌡️ | **Thermal Stress (TVDI)** | Land Surface Temperature via Landsat-8 | Landsat L1C |
 | 💧 | **SAR Soil Moisture** | Soil moisture via Sentinel-1 radar (works through clouds!) | Sentinel-1 GRD |
-| 🤖 | **AI Agronomist** | Gemini-powered personalized field advice | Google Gemini API |
+| 🤖 | **AI Agronomist** | DeepSeek LLM-powered personalized field advice | Ollama (self-hosted, free) |
+| 📷 | **Crop Photo Diagnosis** | LLaVA vision AI detects diseases/pests from photos | Ollama + LLaVA (self-hosted) |
 | 🌤️ | **Live Weather** | 7-day forecast, soil temp/moisture, evapotranspiration | Open-Meteo |
 | ⛰️ | **Terrain Analysis** | Elevation, slope, drainage class | Open-Meteo + SRTM |
 | 🌱 | **Soil Properties** | pH, organic carbon, texture, nitrogen | SoilGrids |
@@ -61,6 +65,8 @@
 | 🚇 | **Guided Onboarding** | 8-step metro tour walks new users through first analysis | Interactive UI |
 | 📚 | **Education Module** | 8 remote sensing lessons + 10-question knowledge quiz | Built-in |
 | 📱 | **PWA + Android** | Installs as native app, works offline | Capacitor + Service Worker |
+| 🔒 | **Self-Hosted Auth** | Optional authentik SSO (replaces Firebase) | authentik (open-source) |
+| 📡 | **STAC/Open Data Cube** | Alternative to Sentinel Hub (free satellite data) | Copernicus + Planetary Computer |
 
 ---
 
@@ -119,6 +125,39 @@ Log in as **Admin**, open **Settings**, and add:
 - **Gemini API Key** — for AI advice ([get free key](https://aistudio.google.com/app/apikey))
 - **Sentinel Hub credentials** — override defaults if needed
 - **Alert phone number** — for SMS/WhatsApp notifications
+
+---
+
+## 🆓 100% Open-Source Stack (Primary) + Legacy Fallbacks
+
+FarmHealth runs on a **primary → fallback** architecture: the free open-source services are used first, and the legacy cloud services only kick in if a new service is unreachable. **Nothing is broken — everything is additive.**
+
+| Feature | 🆓 New (PRIMARY) | Legacy (FALLBACK) |
+|---|---|---|
+| **Satellite data** | Open Data Cube + STAC API, Google Earth Engine | Sentinel Hub |
+| **AI agronomy advice** | Ollama + DeepSeek-R1 (self-hosted) | Gemini API |
+| **Crop photo diagnosis** | LLaVA vision model (self-hosted) | — (new feature) |
+| **Authentication** | authentik / Authelia (self-hosted SSO) | Firebase Auth |
+| **Hosting** | Coolify / Dokploy (24×7, $5-10/mo) | Render |
+| **Monitoring** | Uptime Kuma (self-hosted) | — |
+| **Offline backup** | `getFallbackAdvice()` — always available | — |
+
+### Quick start (self-hosted stack)
+
+```bash
+# Option A — all services via Docker Compose (recommended)
+docker compose -f docker-compose.coolify.yml up -d
+
+# Option B — one-liner install of Ollama for AI advice only
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull deepseek-r1:7b
+ollama pull llava-phi3      # for photo diagnosis
+
+# Then just run the app as usual:
+node server/server.js
+```
+
+> 📘 Full docs: [`COOLIFY_DEPLOY.md`](COOLIFY_DEPLOY.md) · [`DEPLOYMENT.md`](DEPLOYMENT.md) · [`SELFHOST_MIGRATION.md`](SELFHOST_MIGRATION.md)
 
 ---
 
@@ -406,7 +445,14 @@ The `capacitor.config.json` is already configured:
 
 ## 🔐 Authentication & API Keys
 
-### Built-in Roles
+### Sign-in methods (new → fallback)
+| Priority | Method | Type | When used |
+|---|---|---|---|
+| **1 (NEW)** | **authentik** | Self-hosted OIDC SSO | If configured (`localStorage` `fh_authentik_issuer`) |
+| **2** | **Google Sign-In** | Firebase Auth | Default — works out of the box |
+| **3** | **Built-in roles** | Local demo | Always available |
+
+### Built-in Roles (demo / offline)
 | Role | Username | Password | Settings Access |
 |------|----------|----------|-----------------|
 | **Admin** | `admin` | `admin` | Can view & edit API keys |
@@ -416,14 +462,20 @@ The `capacitor.config.json` is already configured:
 
 | Key | Source | Purpose | Required? |
 |-----|--------|---------|-----------|
-| **Gemini API Key** | [Google AI Studio](https://aistudio.google.com/app/apikey) | AI-powered field advice | ❌ (optional) |
-| **Sentinel Hub Client ID** | [Sentinel Hub Dashboard](https://www.sentinel-hub.com/) | Satellite data fetch | ✅ (default provided) |
-| **Sentinel Hub Client Secret** | [Sentinel Hub Dashboard](https://www.sentinel-hub.com/) | Satellite data auth | ✅ (default provided) |
+| **Ollama URL/Model** | Self-hosted | AI advice + photo diagnosis (PRIMARY) | ❌ (auto-fallback) |
+| **Gemini API Key** | [Google AI Studio](https://aistudio.google.com/app/apikey) | AI fallback if Ollama offline | ❌ (optional) |
+| **GEE Service Account** | GCloud IAM | Free satellite indices (PRIMARY) | ❌ (uses Sentinel Hub) |
+| **Sentinel Hub Client ID/Secret** | [Sentinel Hub Dashboard](https://www.sentinel-hub.com/) | Satellite data fetch (fallback) | ✅ (default provided) |
 
 ### Environment Variables (Server)
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | Server port | `3001` |
+| `OLLAMA_BASE_URL` | Self-hosted LLM address | `http://localhost:11434` |
+| `OLLAMA_MODEL` | Text model | `deepseek-r1:7b` |
+| `OLLAMA_VISION_MODEL` | Vision model (photo diagnosis) | `llava-phi3` |
+| `GEE_SERVICE_ACCOUNT` | GEE service account email | `(empty)` |
+| `GEE_PRIVATE_KEY` | GEE private key | `(empty)` |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Path to GCloud service account JSON | `~/.config/gcloud/application_default_credentials.json` |
 | `NODE_ENV` | Environment mode | `development` |
 
@@ -441,6 +493,33 @@ The `capacitor.config.json` is already configured:
 | **Open-Meteo** | Weather data | Meteorological | 1km | Hourly |
 | **SoilGrids** | Soil properties | Soil maps | 250m | Static |
 | **Nominatim** | Reverse geocoding | Address lookup | — | — |
+
+**STAC scene discovery** now queries two free, open catalogs in order: **AWS Element84 Earth Search** → **Microsoft Planetary Computer** (Sentinel-2 L2A). If both fail, it falls back to rolling date candidates (NDVI still comes from Sentinel Hub/GEE). No API key required.
+
+---
+
+## 🏞️ Land Records (Survey / Khata number)
+
+After you draw/select a field boundary, the **Land Info** card:
+
+1. **Auto-detects** State, District, Tehsil, Village and PIN code (via Nominatim reverse geocoding)
+2. **Deep-links to the correct official state portal** — all **36 Indian states/UTs are mapped** (UP Bhulekh, MP Bhulekh, MahaBhumi, Dharani, Mee Bhoomi, BanglarBhumi, Jamabandi, …)
+3. Guides you through the official **khatauni/jamabandi** lookup flow (District → Tehsil → Village → Khata/Khasra)
+
+> ⚠️ **Honest note:** Owner names are legally protected — official portals require **OTP from the registered mobile** before showing them. FarmHealth **never invents** survey/khata/owner records. You enter what you verified, it saves locally, and it auto-fills for that field next time.
+
+Supported portals (subset):
+
+| State | Portal | Record type |
+|---|---|---|
+| Uttar Pradesh | `upbhulekh.gov.in` | Khatauni / Khasra |
+| Madhya Pradesh | `mpbhulekh.gov.in` | Khasra |
+| Maharashtra | `bhulekh.mahabhumi.gov.in` | 7/12 extract |
+| Karnataka | `landrecords.karnataka.gov.in` | Bhoomi RTC |
+| Telangana | `dharani.telangana.gov.in` | Dharani |
+| Andhra Pradesh | `meebhoomi.ap.gov.in` | Mee Bhoomi |
+| Tamil Nadu | `eservices.tn.gov.in` | Patta / Chitta |
+| …all others… | *auto-detected from location* | — |
 
 ---
 

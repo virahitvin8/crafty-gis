@@ -1,0 +1,107 @@
+# ═══════════════════════════════════════════════════════════
+# FarmHealth — Production stack for Coolify / Dokploy
+#
+#   In Coolify / Dokploy: New Resource → Docker Compose → paste
+#   the contents of this file (or point it at this repo).
+#
+#   Services:
+#     8080 → FarmHealth app + backend (public)
+#     11434 → Ollama (internal only — LAN 127.0.0.1)
+#     3002 → Uptime Kuma (optional — reverse-proxy for auth)
+#
+#   All external APIs are FALLBACKS — the app runs fully on these
+#   services even with zero internet. Sentinel Hub / Gemini are
+#   only consulted when the free local path (GEE / Ollama) fails.
+# ═══════════════════════════════════════════════════════════
+
+services:
+  # ─── FarmHealth app + backend (public entrypoint on 8080) ───
+  farmhealth:
+    image: ghcr.io/virahitvin8/crafty-gis:latest  # or build from this repo
+    # To build from this repo instead of a registry image, use:
+    # build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      # ── Open-source PRIMARYs ──
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-deepseek-r1:7b}
+      - OLLAMA_VISION_MODEL=${OLLAMA_VISION_MODEL:-llava-phi3}
+      # ── Google Earth Engine (PRIMARY satellite source, free) ──
+      - GEE_SERVICE_ACCOUNT=${GEE_SERVICE_ACCOUNT:-}
+      - GEE_PRIVATE_KEY=${GEE_PRIVATE_KEY:-}
+      # ── Legacy FALLBACKS (kept for backwards compatibility) ──
+      - SENTINEL_HUB_CLIENT_ID=${SENTINEL_HUB_CLIENT_ID:-}
+      - SENTINEL_HUB_CLIENT_SECRET=${SENTINEL_HUB_CLIENT_SECRET:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    volumes:
+      - ./.env:/app/.env:ro
+    depends_on:
+      ollama:
+        condition: service_healthy
+      postgis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/api/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ─── Ollama — self-hosted LLM + Vision (PRIMARY AI) ───
+  ollama:
+    image: ollama/ollama:latest
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_KEEP_ALIVE=10m
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${OLLAMA_MODEL:-deepseek-r1:7b} || true && ollama pull ${OLLAMA_VISION_MODEL:-llava-phi3} || true && wait"]
+
+  # ─── PostgreSQL + PostGIS — saved farms, land records, STAC/ODC index ───
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-farmhealth}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-farmhealth}
+      - POSTGRES_DB=${POSTGRES_DB:-farmhealth}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-farmhealth} -d ${POSTGRES_DB:-farmhealth}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ─── Uptime Kuma — health monitoring + alerts (optional but recommended) ───
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    ports:
+      - "3002:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  ollama_models:
+  postgis_data:
+  uptime_kuma_data:

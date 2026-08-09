@@ -51,6 +51,10 @@ const FH_ANALYSIS = (function() {
   async function switchLayer(layer) {
     _state.currentIndex = layer;
     if ($('layerSelect')) $('layerSelect').value = layer;
+    // Keep the split-view bar label in sync while comparing
+    if (_state.compareMode && FH_MAP && FH_MAP.updateCompareLabel) {
+      FH_MAP.updateCompareLabel();
+    }
     const { INDEX_INFO } = FH_CONFIG;
     // Handle 'sar' alias — INDEX_INFO uses 'smmi' key
     const infoKey = layer === 'sar' ? 'smmi' : layer;
@@ -352,6 +356,9 @@ const FH_ANALYSIS = (function() {
   async function runFullAnalysis() {
     if (!_state.fieldPoly) return toast('First select your field!', 'err');
     $('analyzeBtn').disabled = true;
+
+    // A fresh analysis should always retry the live satellite API
+    if (FH_API.resetSHUnavailable) FH_API.resetSHUnavailable();
 
     try {
       showLoading('Searching satellite scenes…', 10);

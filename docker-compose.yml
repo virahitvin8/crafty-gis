@@ -1,8 +1,11 @@
-version: '3.8'
-
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — Docker Compose Configuration
-# For local development and testing
+# FarmHealth — Docker Compose (self-hosted AI included)
+#
+#   App:    http://localhost:3001
+#   Ollama: port 11434 (internal network only — do NOT expose publicly)
+#
+#   For the full always-on-laptop stack (with PostGIS + Uptime Kuma)
+#   use: docker compose -f docker-compose.selfhost.yml up -d
 # ═══════════════════════════════════════════════════════════
 
 services:
@@ -14,26 +17,68 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=production
+      # Self-hosted AI (Ollama) — PRIMARY, zero cost
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-deepseek-r1:7b}
+      - OLLAMA_VISION_MODEL=${OLLAMA_VISION_MODEL:-llava-phi3}
+      # Optional cloud fallbacks (kept working — the AI chain is
+      # Ollama → Gemini → built-in expert, so these just add headroom):
+      # - GEMINI_API_KEY=your-api-key
       # Uncomment and fill in for Google Earth Engine:
       # - GOOGLE_CLOUD_PROJECT=your-project-id
       # - GOOGLE_APPLICATION_CREDENTIALS=/credentials/service-account.json
       # Uncomment and fill in for Sentinel Hub:
       # - SENTINEL_HUB_CLIENT_ID=your-client-id
       # - SENTINEL_HUB_CLIENT_SECRET=your-client-secret
-      # Uncomment for Gemini AI:
-      # - GEMINI_API_KEY=your-api-key
     volumes:
       # Mount Google Cloud credentials (if using GEE)
       # - ./credentials:/credentials:ro
       # Mount .env file
       - ./.env:/app/.env:ro
+    depends_on:
+      ollama:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/api/gee/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/api/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
       interval: 30s
-      timeout: 3s
+      timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
+
+  # ─── Ollama (Self-hosted LLM + Vision AI) ───
+  # deepseek-r1:7b = DeepSeek-R1-Distill-Qwen-7B (text advice, ~4.7GB)
+  # llava-phi3    = LLaVA vision (crop photos, ~2.9GB, CPU-friendly)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      # 8GB laptop: one inference at a time, unload models when idle
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_KEEP_ALIVE=10m
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    # Auto-pull the text model on first boot so the app finds it ready.
+    # Pull the vision model once manually: ollama pull llava-phi3
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${OLLAMA_MODEL:-deepseek-r1:7b} || true && wait"]
+    # GPU support (optional — uncomment only if you have an NVIDIA GPU):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
 
   # ─── Python Backend (Alternative) ───
   farmhealth-python:
@@ -47,7 +92,7 @@ services:
       # Uncomment for real GEE:
       # - GOOGLE_CLOUD_PROJECT=your-project-id
       # - GOOGLE_APPLICATION_CREDENTIALS=/credentials/service-account.json
-    volumes:
+      # Mount Google Cloud credentials (if using GEE):
       # - ./credentials:/credentials:ro
     restart: unless-stopped
     healthcheck:
@@ -58,4 +103,5 @@ services:
 
 # ─── Volumes ───
 volumes:
+  ollama-data:      # Persists downloaded models across restarts
   farmhealth-data:

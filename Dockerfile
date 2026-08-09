@@ -38,13 +38,13 @@ COPY --from=builder /app/server/ ./server/
 # Create directory for GCloud credentials (mount at runtime)
 RUN mkdir -p /root/.config/gcloud
 
-# Expose the port Cloud Run expects
+# Expose the port
 ENV PORT=8080
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 8080) + '/api/gee/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
+# Health check (checks backend health endpoint)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 8080) + '/api/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
 
 # Start the server
 CMD ["node", "server/server.js"]

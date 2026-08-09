@@ -316,11 +316,14 @@ const FH_CONFIG = (function() {
       settings: {},
       shToken: null,
       shTokenExpiry: 0,
+      shUnavailableAt: null,      // timestamp of last Sentinel Hub failure (cached demo mode)
+      shFallbackWarned: false,    // only warn about DEMO fallback once per session
       // Professional features
       fullscreen: false,
       compareMode: false,
       compareLayer: null,
       compareDate: null,
+      compareLayers: null,        // layer group for the split-view right pane
       compareSlider: null,
       compareOverlay: null,
       timeAnimating: false,

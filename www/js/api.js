@@ -38,6 +38,13 @@ const FH_API = (function() {
     const now = Date.now();
     if (_state.shToken && _state.shTokenExpiry > now + 60000) return _state.shToken;
 
+    // If Sentinel Hub failed very recently, don't hammer the network again —
+    // fall back to DEMO data instantly so layer switching / Compare stay snappy.
+    // A fresh "Run Full Analysis" resets this so live data can be retried.
+    if (_state.shUnavailableAt && (now - _state.shUnavailableAt) < 3 * 60 * 1000) {
+      throw new Error('Sentinel Hub auth unavailable (recent failure cached)');
+    }
+
     const attempts = [
       { url: getApiUrl('/api/sentinel/token'), name: 'backend proxy' },
       { url: API.SH_TOKEN_PROXY_FALLBACK, name: 'remote backend proxy' }
@@ -46,8 +53,11 @@ const FH_API = (function() {
     let lastErr = null;
     for (const a of attempts) {
       try {
-        // Abort remote fallback after 6s so a dead proxy doesn't hang the analysis
-        const ctrl = a.url.startsWith('http') ? AbortSignal.timeout(6000) : undefined;
+        // Allow up to 20s per attempt (Render free-tier cold starts can take
+        // ~15-30s; the old 6s abort killed valid requests). Applying a timeout
+        // to the same-origin path too so a cold/hanging backend proxy on
+        // Netlify can't stall the first render before we fall back.
+        const ctrl = AbortSignal.timeout(20000);
         const res = await fetch(a.url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -94,7 +104,14 @@ const FH_API = (function() {
       }
     }
 
+    // Remember the outage so subsequent calls fail fast (no repeated 20s waits)
+    _state.shUnavailableAt = Date.now();
     throw new Error('Sentinel Hub auth unavailable (' + (lastErr ? lastErr.message : 'no credentials') + ').');
+  }
+
+  // Allow a fresh full analysis to retry the live API after an outage
+  function resetSHUnavailable() {
+    _state.shUnavailableAt = null;
   }
 
   function getSHGeoJSON() {
@@ -104,10 +121,12 @@ const FH_API = (function() {
   }
 
   // ═══════════ STAC SCENE DISCOVERY ═══════════
+  // Tries in order: Element84 (AWS Earth Search) → Microsoft Planetary Computer
+  // Both are free, open STAC catalogs of Sentinel-2. If both fail, falls back
+  // to rolling date candidates (NDVI still comes from Sentinel Hub / GEE).
   async function fetchScenes() {
     if (!_state.fieldLL.length) return [];
     const bb = polyBBox(_state.fieldLL);
-    // Automate search parameters to retrieve the latest satellite release image
     const months = 6;
     const cloudMax = 30;
     const now = new Date();
@@ -123,25 +142,35 @@ const FH_API = (function() {
       limit: 20
     };
 
-    try {
-      const data = await fetchJSON(API.STAC_URL + '/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
+    // Two FREE STAC endpoints (primary + secondary)
+    const stacEndpoints = [
+      { url: API.STAC_URL + '/search', label: 'AWS Element84 STAC' },
+      { url: 'https://planetarycomputer.microsoft.com/api/stac/v1/search', label: 'Microsoft Planetary Computer' }
+    ];
 
-      if (data && data.features) {
-        _state.scenes = data.features.map(f => ({
-          id: f.id,
-          date: f.properties.datetime?.split('T')[0] || 'Unknown',
-          cloud: Math.round(f.properties['eo:cloud_cover'] || 0),
-          thumbnail: f.assets?.thumbnail?.href || null
-        }));
-        return _state.scenes;
+    for (const ep of stacEndpoints) {
+      try {
+        // Element84 expects POST /search; Planetary Computer supports POST too.
+        const data = await fetchJSON(ep.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (data && data.features && data.features.length) {
+          _state.scenes = data.features.map(f => ({
+            id: f.id,
+            date: f.properties.datetime?.split('T')[0] || 'Unknown',
+            cloud: Math.round(f.properties['eo:cloud_cover'] || 0),
+            thumbnail: f.assets?.thumbnail?.href || null
+          }));
+          console.log('[STAC] Scenes from', ep.label + ':', _state.scenes.length);
+          return _state.scenes;
+        }
+        console.warn('[STAC] No scenes from', ep.label, '— trying next source');
+      } catch (e) {
+        console.error('STAC API failed (' + ep.label + '):', e.message);
       }
-    } catch (e) {
-      console.error('STAC API failed:', e);
-      toast('❌ Satellite scene search failed: ' + (e.message || 'Connection error').substring(0, 80), 'err');
     }
 
     // Fallback: generate date candidates spanning the last N months.
@@ -265,9 +294,16 @@ const FH_API = (function() {
   }
 
   // ═══════════ DRAW VISUAL HEALTH GRID ON MAP ═══════════
-  // Creates colored rectangle cells inside the field boundary
-  function drawHealthGrid(gridData, cropPeak) {
-    if (!_state.ndviLayer || !_state.fieldLL || !_state.fieldLL.length) return;
+  // Creates colored rectangle cells inside the field boundary.
+  // paneName: 'comparePane' renders into the split-view right pane.
+  // indexType: the index these grid values represent (so the compare pane
+  //            colours with its own scale, not the left layer's scale).
+  function drawHealthGrid(gridData, cropPeak, paneName, indexType) {
+    if (!_state.fieldLL || !_state.fieldLL.length) return;
+    // Drop compare-pane draws when compare was exited mid-render
+    if (paneName && !_state.compareMode) return;
+    const target = paneName ? (_state.compareLayers || _state.ndviLayer) : _state.ndviLayer;
+    if (!target) return;
     // Don't clear if Sentinel Hub image overlay is already there — add grid on top
     
     const bb = polyBBox(_state.fieldLL);
@@ -282,7 +318,7 @@ const FH_API = (function() {
     let cc = [0, 0, 0, 0, 0, 0];
     let cnt = 0;
     
-    const indexType = _state.currentIndex || 'ndvi';
+    const idx = indexType || _state.currentIndex || 'ndvi';
     
     for (let r = 0; r < GRID; r++) {
       for (let c = 0; c < GRID; c++) {
@@ -294,7 +330,7 @@ const FH_API = (function() {
         
         // Get value for this cell from gridData
         const val = gridData[r * GRID + c] || 0;
-        const health = valueToClassColor(val, indexType, peak);
+        const health = valueToClassColor(val, idx, peak);
         cc[health.cls]++;
         cnt++;
         
@@ -304,9 +340,9 @@ const FH_API = (function() {
           [bb.south + (r + 1) * latStep, bb.west + (c + 1) * lngStep]
         ];
         
-        const indexLabel = indexType.toUpperCase();
+        const indexLabel = idx.toUpperCase();
         let pctScore;
-        if (['tvdi', 'csi'].includes(indexType)) {
+        if (['tvdi', 'csi'].includes(idx)) {
           pctScore = ((1 - val) * 100).toFixed(0) + '%';
         } else {
           pctScore = ((val / peak) * 100).toFixed(0) + '%';
@@ -317,11 +353,12 @@ const FH_API = (function() {
           weight: 0.5,
           opacity: 0.6,
           fillColor: health.color,
-          fillOpacity: 0.55
+          fillOpacity: 0.55,
+          pane: paneName || 'overlayPane'
         }).bindTooltip(
           `<b>${health.label}</b><br>${indexLabel}: ${val.toFixed(3)}<br>Score: ${pctScore}`,
           { sticky: true, className: 'ndvi-tooltip' }
-        ).addTo(_state.ndviLayer);
+        ).addTo(target);
       }
     }
     
@@ -331,7 +368,7 @@ const FH_API = (function() {
   // ═══════════ DRAW HEALTH GRID FOR REAL DATA ═══════════
   // When the real Sentinel Hub API succeeds, also render a visible grid
   // overlay on the map so problem areas are clearly identifiable.
-  function drawHealthGridForRealData(meanNdvi, cropPeak) {
+  function drawHealthGridForRealData(meanNdvi, cropPeak, paneName, indexType) {
     if (!_state.fieldLL || !_state.fieldLL.length) return;
     const peak = cropPeak || 0.80;
     const mean = meanNdvi || 0.60;
@@ -359,18 +396,23 @@ const FH_API = (function() {
       }
     }
     
-    drawHealthGrid(gridData, peak);
+    drawHealthGrid(gridData, peak, paneName, indexType);
   }
 
   // ═══════════ GENERATE SIMULATED GRID DATA + VISUAL OVERLAY ═══════════
   // Creates a realistic NDVI spatial distribution with gradients and stress zones
-  function generateSimulatedGrid(meanNdvi, cropPeak) {
+  function generateSimulatedGrid(meanNdvi, cropPeak, paneName, indexType) {
     const peak = cropPeak || 0.80;
     const mean = meanNdvi || 0.60;
     const GRID = 12;
+    const simType = (indexType || _state.currentIndex || 'ndvi').toLowerCase();
     
-    // Clear existing overlay
-    if (_state.ndviLayer) _state.ndviLayer.clearLayers();
+    // Clear existing overlay (main map or compare pane, depending on target)
+    if (paneName) {
+      if (_state.compareLayers) _state.compareLayers.clearLayers();
+    } else if (_state.ndviLayer) {
+      _state.ndviLayer.clearLayers();
+    }
     
     // Generate spatially coherent NDVI grid with gradient + hotspots
     const gridData = [];
@@ -412,7 +454,7 @@ const FH_API = (function() {
         }
         
         let val;
-        if (['tvdi', 'csi'].includes((_state.currentIndex || 'ndvi').toLowerCase())) {
+        if (['tvdi', 'csi'].includes(simType)) {
           // TVDI stress hotspots represent drier/hotter zones (increase value)
           val = Math.max(0.02, Math.min(0.98, mean + gradientEffect + noise + hotspotDrop));
         } else {
@@ -424,7 +466,7 @@ const FH_API = (function() {
     }
     
     // Draw visual grid on the map
-    const result = drawHealthGrid(gridData, peak);
+    const result = drawHealthGrid(gridData, peak, paneName, indexType);
     
     return result || { cc: [0, 0, 0, 0, 0, 0], cnt: 1 };
   }
@@ -443,11 +485,22 @@ const FH_API = (function() {
   }
 
   // ═══════════ SENTINEL HUB PROCESS API ═══════════
-  async function renderGrid(indexType, dateStr, cropPeak, preferMean) {
+  // paneName — set to 'comparePane' to render into the split-view right pane.
+  // quiet — suppress error toasts/status banner (used by the compare pane so
+  //        Compare never spams "API is unavailable" errors).
+  // compareSeq — monotonically increasing per compare render; stale renders
+  //        (e.g. after Exit or a rapid layer switch) are dropped at commit.
+  let _compareSeq = 0;
+  async function renderGrid(indexType, dateStr, cropPeak, preferMean, paneName, quiet) {
+    const targetGroup = paneName ? (_state.compareLayers || _state.ndviLayer) : _state.ndviLayer;
+    const seq = paneName ? ++_compareSeq : 0;
+    const stale = () => paneName && seq !== _compareSeq;
+    const emptyStats = { cc: [0, 0, 0, 0, 0, 0], cnt: 1 };
     // Fallback: if Sentinel Hub calls fail, use simulated data
     try {
       const token = await getSHToken();
-      if (_state.ndviLayer) _state.ndviLayer.clearLayers();
+      if (stale()) return emptyStats;
+      if (targetGroup && targetGroup.clearLayers) targetGroup.clearLayers();
       
       // Mark as non-simulated — we're successfully connecting to real API
       _state.simulatedData = false;
@@ -494,12 +547,13 @@ const FH_API = (function() {
       const blob = await res.blob();
       const imageUrl = URL.createObjectURL(blob);
       const bounds = _state.fieldPoly.getBounds();
-      L.imageOverlay(imageUrl, bounds, { opacity: 0.7 }).addTo(_state.ndviLayer);
+      L.imageOverlay(imageUrl, bounds, { opacity: 0.7, pane: paneName || 'overlayPane' }).addTo(targetGroup);
 
       return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = 'Anonymous';
         img.onload = () => {
+          if (stale()) { resolve(emptyStats); return; }
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
@@ -527,8 +581,10 @@ const FH_API = (function() {
           const gridMean = preferMean || _state.analysisData?.meanNdvi || 0.6;
           // Draw a semi-transparent health grid on top of the image overlay
           // This gives the user clear colored blocks they can read at a glance
-          drawHealthGridForRealData(gridMean, cropPeak);
-          setDataStatus(true, 'LIVE — real satellite imagery (' + (FH_CONFIG.INDEX_INFO[indexType]?.name || indexType).toUpperCase() + ' · ' + dateStr + ')');
+          drawHealthGridForRealData(gridMean, cropPeak, paneName, indexType);
+          if (!paneName) {
+            setDataStatus(true, 'LIVE — real satellite imagery (' + (FH_CONFIG.INDEX_INFO[indexType]?.name || indexType).toUpperCase() + ' · ' + dateStr + ')');
+          }
           
           resolve({ cc, cnt: Math.max(1, cnt) });
         };
@@ -536,22 +592,28 @@ const FH_API = (function() {
       });
     } catch (e) {
       console.error('Sentinel Hub Process API failed:', e);
-      // Show clear error message with details
+      // Remember the outage so layer switches / Compare fall back instantly
+      _state.shUnavailableAt = Date.now();
       const errorMsg = e.message || 'Unknown error';
-      toast('❌ Satellite data unavailable: ' + errorMsg.substring(0, 100), 'err');
-      setDataStatus(false, 'DEMO — real satellite data unavailable: ' + errorMsg.substring(0, 80));
-      
-      // Only show simulated data toast once
-      if (!_state.simulatedData) {
-        _state.simulatedData = true;
-        setTimeout(() => {
-          toast('⚠️ Showing simulated data for demonstration. Check browser console for the exact API error.', 'info');
-        }, 2000);
+      if (!quiet) {
+        // One friendly notice per session instead of an error toast on every retry
+        if (!_state.shFallbackWarned) {
+          _state.shFallbackWarned = true;
+          toast('📡 Live satellite API unreachable — showing DEMO map data. Live data resumes automatically when the service responds.', 'info');
+        }
+        setDataStatus(false, 'DEMO — real satellite data unavailable: ' + errorMsg.substring(0, 80));
+        if (!_state.simulatedData) {
+          _state.simulatedData = true;
+          setTimeout(() => {
+            toast('⚠️ Showing simulated data for demonstration. Check browser console for the exact API error.', 'info');
+          }, 2000);
+        }
       }
       
+      if (stale()) return emptyStats;
       // Use the passed preferred mean, or read from existing analysis, or generate a reasonable value
       const fallbackMean = preferMean || _state.analysisData?.meanNdvi || (0.55 + Math.random() * 0.25);
-      return generateSimulatedGrid(fallbackMean, cropPeak);
+      return generateSimulatedGrid(fallbackMean, cropPeak, paneName, indexType);
     }
   }
 
@@ -869,7 +931,33 @@ const FH_API = (function() {
 
     try {
       let text = '';
-      if (key) {
+      let usedBackend = false;
+
+      // 1. Prefer the backend proxy. It now runs the self-hosted AI chain
+      //    server-side: Ollama (local LLM) → Gemini → built-in expert
+      //    fallback — so AI advice works even fully offline on the laptop.
+      try {
+        const res = await fetch(getApiUrl('/api/gemini-analysis'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Proxy API error: ' + res.status);
+        const data = await res.json();
+        text = data.advice;
+        // Show which AI source responded
+        if (data.source && window.FH_UI && FH_UI.showAISourceIndicator) {
+          FH_UI.showAISourceIndicator(data.source);
+        }
+        usedBackend = true;
+      } catch (e) {
+        console.warn('[AI] Backend proxy unavailable, trying direct Gemini:', e.message);
+        if (window.FH_UI && FH_UI.hideAISourceIndicator) FH_UI.hideAISourceIndicator();
+      }
+
+      // 2. Direct browser Gemini — only when NO backend is reachable AND a
+      //    key is configured (pure static hosting like file:// or GitHub Pages).
+      if (!usedBackend && key) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${key}`;
         const res = await fetch(url, {
           method: 'POST',
@@ -879,18 +967,17 @@ const FH_API = (function() {
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
         text = data.candidates[0].content.parts[0].text;
-      } else {
-        // Safe backend call to avoid exposing key & bypass CORS
-        const res = await fetch(getApiUrl('/api/gemini-analysis'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('Proxy API error');
-        const data = await res.json();
-        text = data.advice;
+        if (window.FH_UI && FH_UI.showAISourceIndicator) FH_UI.showAISourceIndicator('gemini');
       }
-      
+
+      // 3. Built-in expert system fallback
+      if (!text) {
+        text = getFallbackAdvice(payload);
+        if (window.FH_UI && FH_UI.showAISourceIndicator) FH_UI.showAISourceIndicator('expert');
+      }
+
+      if (!text) throw new Error('No advice returned');
+
       $('aiContent').innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
       $('aiCard').style.display = '';
       toast('🤖 AI analysis ready!');
@@ -900,6 +987,131 @@ const FH_API = (function() {
 
     $('aiBtn').disabled = false;
     $('aiBtn').textContent = '✨ Get AI Analysis';
+  }
+
+  // ═══════════ VISION ANALYSIS — Crop Photo Disease Detection ═══════════
+  // Uses LLaVA vision model via backend Ollama to analyze crop photos
+  async function analyzeCropPhoto(inputElement) {
+    const file = inputElement.files?.[0];
+    if (!file) return;
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast('⚠️ Image too large. Please select an image under 10MB.', 'err');
+      return;
+    }
+
+    const resultDiv = $('visionResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="padding:12px;background:var(--bg);border-radius:6px;text-align:center">📸 Analyzing photo... <br><small>This may take 30-60 seconds on CPU</small></div>';
+
+    // Convert image to base64
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Image = e.target.result;
+
+      try {
+        const payload = {
+          imageBase64: base64Image,
+          fieldName: _state.savedFields?.find(f => JSON.stringify(f.coords) === JSON.stringify(_state.fieldLL))?.name || 'My Farm',
+          crop: _state.analysisData?.crop?.name || 'Unknown',
+          ndvi: _state.analysisData?.meanNdvi || 'N/A',
+          weather: _state.weatherData?.forecast?.current ? {
+            temp: _state.weatherData.forecast.current.temperature_2m,
+            condition: _state.weatherData.forecast.current.weather_code
+          } : null
+        };
+
+        const res = await fetch(getApiUrl('/api/vision-analysis'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Vision API error: ' + res.status);
+        const data = await res.json();
+
+        if (data.success && data.analysis) {
+          const a = data.analysis;
+          // Canonical schema (disease/parameters) with legacy fallbacks for
+          // responses from older prompts (disease_detected/color_anomalies).
+          const disease = a.disease || a.disease_detected || 'none';
+          const params = a.parameters || {};
+          const ndvi = params.ndvi !== undefined ? params.ndvi : a.estimated_ndvi_visual;
+          const colorAnomaly = params.color_anomaly || a.color_anomalies;
+          const texture = params.texture || a.texture_issues;
+          const rec = Array.isArray(a.recommendation) ? a.recommendation
+            : typeof a.recommendation === 'string'
+              ? a.recommendation.split('\n').map(s => s.trim()).filter(Boolean)
+              : (a.recommendations || []);
+
+          const isDiseased = !!disease && ['none', 'no disease', 'healthy'].indexOf(disease.toLowerCase()) === -1;
+          const statusColor = isDiseased ? '#e74c3c' : '#7ac943';
+          const statusLabel = isDiseased ? 'DISEASED' : (a.health_status || 'HEALTHY').toUpperCase();
+
+          let html = '<div style="padding:12px;background:var(--bg);border-radius:6px;border-left:3px solid var(--accent)">';
+          html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">`;
+          html += `<span style="background:${statusColor};color:white;padding:4px 10px;border-radius:12px;font-size:0.75rem;font-weight:600">${statusLabel}</span>`;
+          if (isDiseased) html += `<span style="font-size:0.75rem;color:var(--text)">🦠 ${disease}</span>`;
+          html += `</div>`;
+
+          // Confidence, severity, affected area
+          if (a.confidence !== undefined) {
+            const confidencePct = Math.round(Number(a.confidence) * 100);
+            html += `<div style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:6px">`;
+            html += `Confidence: ${confidencePct}% | Severity: ${(a.severity || 'unknown').toUpperCase()}`;
+            if (a.affected_area) html += ` | Affected: ${a.affected_area}`;
+            html += `</div>`;
+          }
+
+          // Detailed analysis
+          if (a.detailed_analysis) {
+            html += `<div style="font-size:0.75rem;line-height:1.5;margin:8px 0">${a.detailed_analysis}</div>`;
+          }
+
+          // Visible symptoms (legacy field)
+          if (Array.isArray(a.visible_symptoms) && a.visible_symptoms.length) {
+            html += `<div style="font-size:0.7rem;margin-top:8px"><b>Visible Symptoms:</b><br>`;
+            html += a.visible_symptoms.map(s => `• ${s}`).join('<br>');
+            html += `</div>`;
+          }
+
+          // Recommendation (string or array)
+          if (rec.length) {
+            html += `<div style="font-size:0.7rem;margin-top:8px;padding:8px;background:var(--card);border-radius:4px">`;
+            html += `<b>📋 Recommendation:</b><br>` + rec.map(r => `• ${String(r).trim()}`).join('<br>');
+            html += `</div>`;
+          }
+
+          // Parameters: ndvi / color anomaly / texture
+          if (ndvi !== undefined || colorAnomaly || texture) {
+            html += `<div style="font-size:0.65rem;margin-top:8px;padding:6px;background:rgba(0,0,0,0.2);border-radius:4px;color:var(--text-secondary)">`;
+            html += `<b>Parameters:</b> `;
+            if (ndvi !== undefined) html += `NDVI: ${Number(ndvi).toFixed(2)} | `;
+            if (colorAnomaly) html += `Color: ${colorAnomaly} | `;
+            if (texture) html += `Texture: ${texture}`;
+            html += `</div>`;
+          }
+
+          html += `</div>`;
+          resultDiv.innerHTML = html;
+          toast('✅ Vision analysis complete!');
+        } else {
+          resultDiv.innerHTML = '<div style="padding:12px;background:var(--bg);border-radius:6px">⚠️ Analysis unavailable. Ensure Ollama with LLaVA is running.</div>';
+        }
+      } catch (error) {
+        console.error('[Vision] Frontend error:', error);
+        resultDiv.innerHTML = '<div style="padding:12px;background:var(--bg);border-radius:6px">⚠️ Analysis failed. Check backend logs.</div>';
+        toast('⚠️ Vision analysis failed', 'err');
+      }
+    };
+
+    reader.onerror = () => {
+      resultDiv.style.display = 'none';
+      toast('⚠️ Failed to read image', 'err');
+    };
+
+    reader.readAsDataURL(file);
   }
 
   // ═══════════ COMBINED STRESS INDEX (CSI / TVDI-like) ═══════════
@@ -1035,6 +1247,8 @@ const FH_API = (function() {
           village: a.village || a.suburb || a.town || a.city_district || '',
           tehsil: a.county || a.municipality || a.taluk || a.district || '',
           district: a.state_district || a.county || a.district || '',
+          subdistrict: a.subdistrict || a.municipality || a.taluk || a.county || '',
+          pincode: a.postcode || a['ISO3166-2-lvl4'] || '',
           state: a.state || '',
           country: a.country || '',
           full: data.display_name || ''
@@ -1047,6 +1261,143 @@ const FH_API = (function() {
     }
   }
 
+  // ═══════════ PINCODE LOOKUP (India Post, free) ═══════════
+  // Real pincode from the Indian Postal Department API using the village /
+  // place name. Falls back gracefully — returns null on any failure so the
+  // UI can keep the reverse-geocoded postcode instead.
+  // IMPORTANT: the API returns ALL post offices that fuzzy-match the query,
+  // sometimes from OTHER districts (e.g. "Kandhai" matched "Kandhaipur" in
+  // Barabanki). We therefore require a NAME match and, when known, a
+  // district/state match so we never show a pincode for the wrong locality.
+  async function lookupPincode(placeName, district, state) {
+    const candidates = [];
+    if (placeName) candidates.push(placeName.trim());
+    if (district && district !== placeName) candidates.push(district.trim());
+    if (state && state !== placeName) candidates.push(state.trim());
+    if (!candidates.length) return null;
+
+    const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const districtNorm = norm(district);
+    const stateNorm = norm(state);
+
+    for (const q of candidates.slice(0, 3)) {
+      try {
+        const url = 'https://api.postalpincode.in/postoffice/' + encodeURIComponent(q);
+        const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (!Array.isArray(data) || data[0]?.Status !== 'Success') continue;
+        const posts = data[0].PostOffice || [];
+
+        // 1. Strongest: EXACT name match for the queried place (e.g. "Kandhai"
+        //    only matches a post office actually named Kandhai).
+        const qNorm = norm(q);
+        const byExactName = posts.filter(p => qNorm && norm(p.Name) === qNorm);
+        // 2. Prefix name match ("Kandhai" ~ "Kandhai Kalan") — only trusted
+        //    when the region ALSO matches, so a suburb in another district
+        //    ("Kandhaipur", Barabanki) can never pass.
+        const hasRegion = !!(districtNorm || stateNorm);
+        const regionOk = (p) =>
+          (!districtNorm || norm(p.District) === districtNorm || norm(p.District).includes(districtNorm)) &&
+          (!stateNorm || norm(p.State) === stateNorm || norm(p.State).includes(stateNorm));
+        const byPrefix = posts.filter(p => qNorm && (norm(p.Name).startsWith(qNorm) || qNorm.startsWith(norm(p.Name))) && regionOk(p));
+        // 3. Region-only match (district name query, etc.)
+        const byRegion = hasRegion ? posts.filter(regionOk) : [];
+
+        // Only accept a confident match — never a fuzzy result from ANOTHER
+        // district. If nothing matches confidently, try the next candidate
+        // (district / state) instead of guessing.
+        const pool = byExactName.length ? byExactName : (byPrefix.length ? byPrefix : byRegion);
+        if (pool && pool.length) {
+          const po = pool[0];
+          return po?.Pincode || null;
+        }
+      } catch (e) {
+        console.warn('[Pincode] lookup failed for', q, ':', e.message);
+      }
+    }
+    return null;
+  }
+
+  function getFallbackAdvice(payload) {
+    const ndvi = payload.ndvi || 0;
+    const ph = payload.soilPh || 6.5;
+    const temp = payload.weather?.temp || 25;
+    let health = 'moderate';
+    if (ndvi > 0.7) health = 'excellent';
+    else if (ndvi > 0.5) health = 'good';
+    else if (ndvi > 0.3) health = 'moderate';
+    else health = 'poor';
+    const recs = [];
+    if (health === 'excellent') {
+      recs.push('Crop health is excellent. Maintain current irrigation schedule.');
+      recs.push('Monitor for pest outbreaks.');
+    } else if (health === 'good') {
+      recs.push('Crop is looking good. Consider nitrogen top-dressing if in vegetative stage.');
+      recs.push('Watch for moisture stress during hot afternoons.');
+    } else if (health === 'moderate') {
+      recs.push('NDVI suggests moderate vigor. Check for nutrient deficiencies, especially nitrogen.');
+      recs.push('Ensure irrigation is adequate.');
+    } else {
+      recs.push('NDVI is low. Inspect field for disease, pest damage, or waterlogging.');
+      recs.push('Consider soil testing and foliar nutrition spray.');
+    }
+    if (ph < 6.0) recs.push('Soil is acidic — apply lime as per recommendations.');
+    else if (ph > 7.5) recs.push('Soil is alkaline — use acid-forming fertilizers or gypsum.');
+    if (temp > 35) recs.push('High temperature alert — provide light irrigation during evening.');
+    else if (temp < 10) recs.push('Low temperature — protect seedlings with mulching.');
+    const advice = recs.map((r, i) => (i + 1) + '. ' + r).join('\n');
+    return '### FarmHealth Expert Advice\n\n**Crop Status: ' + health.toUpperCase() + '** (NDVI: ' + ndvi.toFixed(3) + ')\n\n' + advice + '\n\n> This advice is generated by FarmHealth built-in expert system. Connect Ollama or Gemini for more detailed AI analysis.';
+  }
+
+  async function fetchInfrastructure(lat, lng, radius) {
+    const R = radius || 2000;
+    // 1. Same-origin backend proxy (Node server / Render)
+    try {
+      const res = await fetch(getApiUrl('/api/infrastructure'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lng, radius: R })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.elements) return data;
+      }
+      throw new Error('Proxy returned ' + res.status);
+    } catch (e) {
+      console.warn('[Infrastructure] Proxy failed, using direct OSM Overpass:', e.message);
+    }
+    // 2. Direct Overpass fallback (static hosts like Netlify / file://)
+    try {
+      const query = `
+        [out:json][timeout:25];
+        (
+          node["man_made"="pipeline"]["substance"="water"](around:${R},${lat},${lng});
+          way["man_made"="pipeline"]["substance"="water"](around:${R},${lat},${lng});
+          node["power"="pole"](around:${R},${lat},${lng});
+          node["power"="tower"](around:${R},${lat},${lng});
+          way["power"="line"](around:${R},${lat},${lng});
+          node["water"="well"](around:${R},${lat},${lng});
+          node["water"="pump"](around:${R},${lat},${lng});
+          way["waterway"="canal"](around:${R},${lat},${lng});
+          node["emergency"="fire_hydrant"](around:${R},${lat},${lng});
+        );
+        out center body;
+      `;
+      const res = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(query)
+      });
+      if (!res.ok) throw new Error('Overpass HTTP ' + res.status);
+      const data = await res.json();
+      return { success: true, count: data.elements?.length || 0, source: 'openstreetmap', elements: data.elements || [] };
+    } catch (e) {
+      console.warn('[Infrastructure] Direct Overpass also failed:', e.message);
+      return null;
+    }
+  }
+
   // ═══════════ EXPORTS ═══════════
   return {
     setStateRef,
@@ -1055,17 +1406,22 @@ const FH_API = (function() {
     fetchStatistics,
     renderGrid,
     generateSimulatedGrid,
+    resetSHUnavailable,
     fetchWeather,
     fetchTerrain,
     fetchSoil,
     getAIAdvice,
+    analyzeCropPhoto,
     fetchCombinedStress,
     reverseGeocode,
     reverseGeocodeFull,
+    lookupPincode,
     drawHealthGrid,
     valueToClassColor,
     fetchGEEStatistics,
     fetchGEETimeSeries,
-    setDataStatus
+    setDataStatus,
+    getFallbackAdvice,
+    fetchInfrastructure
   };
 })();

@@ -123,11 +123,35 @@
   <div class="card" id="landRecordCard" style="display:none">
     <h3>Land Info <span class="badge badge-warn" id="landStatusBadge">— Manual entry</span></h3>
     <div style="font-size:0.85rem; color:var(--green-light); margin-bottom:8px;">
-      Location: <span id="lrLocation">Fetching...</span><br>
-      Area: <span id="lrArea">Calculating...</span> ha
+      📍 Location: <span id="lrLocation">Fetching...</span><br>
+      📐 Area: <span id="lrArea">Calculating...</span> ha
+    </div>
+
+    <!-- AUTO-SCAN RESULTS — populated when a field is selected (pincode + OSM infra + matched records) -->
+    <div id="locationScan" style="display:none; margin-bottom:10px;"></div>
+
+    <!-- STEP-BY-STEP GUIDE — mirrors the official khatauni workflow (like the UP Bhulekh flow) -->
+    <div style="background:rgba(46,204,113,0.07); border:1px solid rgba(46,204,113,0.28); border-radius:8px; padding:10px; margin-bottom:10px;">
+      <div style="font-weight:700;font-size:0.78rem;color:var(--green-light);margin-bottom:6px">📋 How to get Survey / Khata / Owner details</div>
+      <ol style="margin:0;padding-left:18px;font-size:0.72rem;line-height:1.75;color:var(--text)">
+        <li>Open the official portal for <b><span id="lrGuideState">your state</span></b> — button below.</li>
+        <li>Select <b>District → Tehsil → Village</b> on the portal.</li>
+        <li>Open the <b>Khatauni</b> (record of rights / jamabandi).</li>
+        <li>Find your <b>Khata number</b> and the <b>Khasra / Survey number</b> for this plot.</li>
+        <li>Copy the <b>Owner name</b> from the khatauni entry.</li>
+        <li>Enter them below and press <b>Save</b> — they auto-fill for this location next time.</li>
+      </ol>
+      <div style="font-size:0.68rem;color:var(--text-faint);margin-top:6px;border-top:1px dashed rgba(255,255,255,0.15);padding-top:6px">
+        हिंदी: आधिकारिक पोर्टल खोलें → ज़िला → तहसील → गाँव चुनें → खतौनी खोलें → खाता नंबर व खसरा नंबर देखें → यहाँ भरकर सेव करें।
+        <br>🔒 Government portals require OTP from the registered mobile to show owner names — FarmHealth never invents records.
+      </div>
     </div>
     
-    <div style="font-size:0.72rem; color:var(--text-faint); margin-bottom:6px;">Location & area are real (GPS + geometry). Survey/Khata/Owner are filled by you after verifying on the official state portal.</div>
+    <button class="btn-accent btn-sm" onclick="FH.openLandPortal()" id="lrPortalBtn" style="width:100%; margin-bottom:6px; font-weight:600;">
+      🔗 Open official state portal
+    </button>
+    
+    <div class="hint" id="landPortalHint" style="margin:0 0 8px;">State is auto-detected from the location — the guide above matches that portal.</div>
     
     <label>State</label>
     <input type="text" id="lrStateInput" placeholder="e.g. Uttar Pradesh" style="margin-bottom:6px">
@@ -141,6 +165,9 @@
     <label>Village / Mohalla</label>
     <input type="text" id="lrVillageInput" placeholder="e.g. Kandhai" style="margin-bottom:6px">
     
+    <label>Pin Code</label>
+    <input type="text" id="lrPincodeInput" placeholder="Auto-filled from location" style="margin-bottom:6px">
+    
     <label>Survey Number (Khasra)</label>
     <input type="text" id="lrSurveyInput" placeholder="e.g. 124" style="margin-bottom:6px">
     
@@ -150,15 +177,90 @@
     <label>Owner Name (from khatauni)</label>
     <input type="text" id="lrOwnerInput" placeholder="e.g. Ram Singh" style="margin-bottom:6px">
     
-    <div class="hint" id="landPortalHint" style="margin-top:4px; margin-bottom:8px;">Select your state to find the official land records portal.</div>
-    
-    <button class="btn-accent btn-sm" onclick="FH.openLandPortal()" style="width:100%; margin-bottom:6px;">
-      🔗 Verify on official state portal
-    </button>
-    
     <button class="btn-secondary btn-sm" onclick="FH.saveLandInfo()" style="width:100%">💾 Save this farm's details</button>
     
-    <div class="hint" style="margin-top:8px">Details are saved to this device and auto-fill on your next visit. Owner names require OTP on the official portal — this app never invents records.</div>
+    <div class="hint" style="margin-top:8px">Details are saved to this device and auto-fill on your next visit. This app never invents records — everything here is verified by you on the official portal.</div>
+
+    <!-- IMPORT MY OWN RECORDS (CSV) — matches a clicked field to your data -->
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-size:0.75rem;font-weight:600;margin-bottom:6px;color:var(--text)">
+        📁 My Land Records (auto-match)
+      </div>
+      <div class="hint" style="font-size:0.65rem;margin-bottom:6px">
+        Upload your own records CSV — clicking a field then shows the matching row automatically. Columns: <code style="color:var(--green-light)">lat, lng, survey, khata, owner, motor, pipeline, electricity, village, district, state, pincode</code>
+      </div>
+      <input type="file" id="landRecordsCsvInput" accept=".csv" style="font-size:0.7rem;margin-bottom:6px"
+             onchange="FH.importLandRecordsCSV(this)">
+      <div id="csvImportStatus" style="font-size:0.68rem;color:var(--text-dim);display:none"></div>
+    </div>
+  </div>
+
+  <!-- ─── INFRASTRUCTURE (Motor / Pipeline / Electricity) ─── -->
+  <div class="card" id="infraCard" style="display:none">
+    <h3>⚡ Infrastructure <span class="badge badge-warn" id="infraStatusBadge">— Not entered</span></h3>
+    <div style="font-size:0.8rem;color:var(--text-faint);margin-bottom:10px;">
+      Enter your field's utility connections. All data stays on your device only.
+    </div>
+
+    <label>Motor / Pump Connection Number</label>
+    <input type="text" id="infraMotorInput" placeholder="e.g. MTR-2024-0451" style="margin-bottom:6px">
+
+    <label>Pipeline / Tubewell Number</label>
+    <input type="text" id="infraPipelineInput" placeholder="e.g. TWL-03 / PIPE-12" style="margin-bottom:6px">
+
+    <label>Electricity Connection Number</label>
+    <input type="text" id="infraElectricityInput" placeholder="e.g. EB-789456123" style="margin-bottom:6px">
+
+    <label>Primary Water Source</label>
+    <select id="infraWaterSource" style="margin-bottom:6px">
+      <option value="none">— Select —</option>
+      <option value="tube_well">Tube Well / Borewell</option>
+      <option value="canal">Canal</option>
+      <option value="river">River / Stream</option>
+      <option value="pond">Pond / Tank</option>
+      <option value="rainwater">Rainwater Harvesting</option>
+      <option value="municipal">Municipal Supply</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label>Irrigation Type</label>
+    <select id="infraIrrigationType" style="margin-bottom:6px">
+      <option value="none">— Select —</option>
+      <option value="drip">Drip Irrigation</option>
+      <option value="sprinkler">Sprinkler</option>
+      <option value="flood">Flood / Furrow</option>
+      <option value="rainfed">Rainfed</option>
+      <option value="mixed">Mixed</option>
+    </select>
+
+    <label>Notes</label>
+    <textarea id="infraNotesInput" rows="2" placeholder="e.g. Motor on phase-3, pipeline leaks in summer…" style="margin-bottom:8px;resize:vertical;"></textarea>
+
+    <button class="btn-secondary btn-sm" onclick="FH.saveInfrastructure()" style="width:100%;margin-bottom:6px;">💾 Save Infrastructure</button>
+    <button class="btn-primary btn-sm" onclick="FH.loadOSMInfrastructure()" style="width:100%;margin-bottom:4px;">🗺️ Show Nearby Infrastructure (OSM)</button>
+    <button class="btn-secondary btn-sm" onclick="FH.clearOSMInfrastructure()" style="width:100%;">✕ Clear Map Overlay</button>
+
+    <div class="hint" style="margin-top:6px">
+      🔵 Blue = water pipelines &nbsp; ⚡ Orange = power lines/poles &nbsp; 💧 Green = canals/wells<br>
+      Public data from <a href="https://openstreetmap.org" target="_blank" style="color:var(--green-light)">OpenStreetMap</a> — no government scraping.
+    </div>
+  </div>
+
+  <!-- ─── FIELD JOURNAL (Offline-First) ─── -->
+  <div class="card" id="journalCard" style="display:none">
+    <h3>📔 Field Journal <span class="badge badge-new">Offline-first</span></h3>
+    <div style="font-size:0.8rem;color:var(--text-faint);margin-bottom:8px;">
+      Log daily observations, inputs, pest sightings, harvest notes — saved locally.
+    </div>
+
+    <textarea id="journalTextarea" rows="3" placeholder="e.g. Applied urea 50kg/acre. Noticed aphids on lower leaves. Weather: sunny, 32°C." style="margin-bottom:6px;resize:vertical;"></textarea>
+
+    <div style="display:flex;gap:6px;margin-bottom:8px;">
+      <button class="btn-primary btn-sm" onclick="FH.saveJournalEntry()" style="flex:1">💾 Save Entry</button>
+      <button class="btn-secondary btn-sm" onclick="FH.exportJournal()" style="flex:1">📥 Export CSV</button>
+    </div>
+
+    <div id="journalEntriesList" style="max-height:220px;overflow-y:auto;"></div>
   </div>
 
   <!-- ─── SATELLITE ANALYSIS ─── -->
@@ -292,12 +394,30 @@
   <!-- ─── AI ADVICE ─── -->
   <div class="card" id="aiCard" style="display:none">
     <h3 class="card-collapse" onclick="FH.toggleCard(this)">
-      AI Insights <span class="badge badge-new">AI</span>
+      AI Insights <span class="badge badge-new">AI</span> <span id="aiSourceIndicator" style="display:none;margin-left:6px;"></span>
     </h3>
     <div class="card-body" id="aiBody">
       <div id="aiContent" style="font-size:0.78rem;line-height:1.6;color:var(--text)"></div>
-      <button class="btn-accent btn-sm" onclick="FH.getAIAdvice()" id="aiBtn" style="margin-top:8px">Get AI Analysis</button>
-      <div class="hint">Requires Gemini API key in Settings. Uses your field data for personalized advice.</div>
+      
+      <!-- Text-based AI Advice -->
+      <button class="btn-accent btn-sm" onclick="FH.getAIAdvice()" id="aiBtn" style="margin-top:8px">
+        🤖 Get AI Analysis
+      </button>
+      <div class="hint">Uses Ollama (self-hosted) → Gemini → expert fallback. No API key required for Ollama.</div>
+      
+      <!-- Photo-based Disease Detection -->
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:0.75rem;font-weight:600;margin-bottom:6px;color:var(--text)">
+          📷 Crop Photo Diagnosis (LLaVA Vision AI)
+        </div>
+        <input type="file" id="visionImageInput" accept="image/*" capture="environment" 
+               style="font-size:0.7rem;margin-bottom:6px" 
+               onchange="FH.analyzeCropPhoto(this)">
+        <div class="hint" style="font-size:0.65rem">
+          Upload a photo of your crop/field to detect diseases, pests, and stress. Requires Ollama with LLaVA model.
+        </div>
+        <div id="visionResult" style="margin-top:8px;display:none"></div>
+      </div>
     </div>
   </div>
 
@@ -423,9 +543,14 @@
   <!-- ─── COMPARE BAR ─── -->
   <div class="compare-bar" id="compareBar">
     <span style="color:var(--text-dim);font-size:0.68rem">Split-view</span>
-    <span id="compareLabel" style="font-size:0.72rem;font-weight:600">NDVI: Current</span>
-    <button class="compare-btn" onclick="FH.switchLayer('ndmi')">NDMI</button>
+    <span id="compareLabel" style="font-size:0.72rem;font-weight:600">NDVI | NDMI</span>
+    <button class="compare-btn" onclick="FH.compareLayer('ndmi')">Right: NDMI</button>
+    <button class="compare-btn" onclick="FH.compareLayer('ndvi')">Right: NDVI</button>
     <button class="compare-btn" onclick="FH.disableCompare()">Exit</button>
+  </div>
+  <!-- ─── SPLIT-VIEW DRAG DIVIDER ─── -->
+  <div class="compare-divider" id="compareDivider" style="display:none">
+    <div class="compare-handle">⋮</div>
   </div>
   <!-- ─── ANIMATION CONTROLS ─── -->
   <div class="anim-controls" id="animControls">
@@ -558,13 +683,20 @@
       <div style="flex:1; height:1px; background:var(--border-light)"></div>
     </div>
     
+    <!-- PRIMARY: Authentik SSO (self-hosted, recommended) -->
+    <button id="authentikLoginBtn" onclick="FH.loginWithAuthentik()" style="width:100%; display:none; align-items:center; justify-content:center; gap:8px; background:#0066cc; color:#fff; border:none; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; font-size:0.9rem;">
+      🔐 Sign in with Authentik (SSO)
+    </button>
+    
+    <!-- SECONDARY: Google Sign-In (legacy fallback) -->
     <button class="google-login-btn" onclick="FH.handleGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#fff; color:#1f1f1f; border:1px solid #dadce0; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer;">
       <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:4px;"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.69-1.55 2.69-3.84 2.69-6.57z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.7H.95v2.3C2.43 15.89 5.5 18 9 18z" fill="#34A853"/><path d="M3.95 10.75c-.18-.54-.28-1.12-.28-1.75s.1-1.21.28-1.75V4.95H.95A8.99 8.99 0 000 9c0 1.54.39 3.03 1.07 4.35l2.88-2.6z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3C13.46.86 11.42 0 9 0 5.5 0 2.43 2.11.95 5.09l2.9 2.24c.72-2.19 2.7-3.75 5.15-3.75z" fill="#EA4335"/></svg>
       Sign in with Google
     </button>
 
     <div style="font-size:0.75rem; color:var(--text-dim); margin-top:20px">
-      Sign in with Google for full access.
+      <span id="authPrimaryLabel" style="display:none">🔐 Authentik SSO (self-hosted, primary)</span>
+      <span id="authSecondaryLabel">Sign in with Google (legacy)</span>
     </div>
   </div>
 </div>
@@ -655,6 +787,7 @@
 <script src="js/ui.js"></script>
 <script src="js/analysis.js"></script>
 <script src="js/firebase.js"></script>
+<script src="js/authentik.js"></script>
 <script src="js/app.js"></script>
 <script>
 // Register service worker for PWA offline support

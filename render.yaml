@@ -26,3 +26,14 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      # ── Google Earth Engine service account (paste the SINGLE-LINE key from
+      #    your local .env — it has \n escapes already baked in) ──
+      - key: GEE_SERVICE_ACCOUNT
+        sync: false
+      - key: GEE_PRIVATE_KEY
+        sync: false
+      # ── Optional: self-hosted Ollama (leave unset unless running) ──
+      - key: OLLAMA_BASE_URL
+        sync: false
+      - key: OLLAMA_MODEL
+        sync: false

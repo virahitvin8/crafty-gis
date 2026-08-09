@@ -18,14 +18,42 @@ const FH = (function() {
 
   // ═══════════ INITIALIZATION ═══════════
   function init() {
-    // Initialize Firebase (Google Sign-In + Firestore database)
+    // PRIMARY: Initialize authentik (self-hosted OIDC)
+    // Falls back to Firebase if authentik not configured
     try {
-      if (typeof FH_FIREBASE !== 'undefined' && FH_FIREBASE.init) {
+      if (typeof FH_AUTH !== 'undefined' && FH_AUTH.isConfigured && FH_AUTH.isConfigured()) {
+        // Handle OAuth2 callback if present
+        if (window.location.search.includes('code=')) {
+          FH_AUTH.handleCallback().then(user => {
+            if (user) {
+              console.log('[FH] Authentik login successful:', user.email);
+              FH_UI.updateLoginUI(user);
+            }
+          });
+        } else {
+          console.log('[FH] Authentik configured (primary auth)');
+        }
+        
+        // Show authentik button in login modal
+        const authBtn = document.getElementById('authentikLoginBtn');
+        const primaryLabel = document.getElementById('authPrimaryLabel');
+        const secondaryLabel = document.getElementById('authSecondaryLabel');
+        
+        if (authBtn) {
+          authBtn.style.display = 'flex';
+          authBtn.style.alignItems = 'center';
+          authBtn.style.justifyContent = 'center';
+        }
+        if (primaryLabel) primaryLabel.style.display = 'inline';
+        if (secondaryLabel) secondaryLabel.textContent = 'Google Sign-In (secondary)';
+        
+      } else if (typeof FH_FIREBASE !== 'undefined' && FH_FIREBASE.init) {
+        // SECONDARY: Initialize Firebase (legacy fallback)
         FH_FIREBASE.init();
-        console.log('[FH] Firebase initialized');
+        console.log('[FH] Firebase initialized (secondary auth)');
       }
     } catch (e) {
-      console.warn('[FH] Firebase init skipped:', e.message);
+      console.warn('[FH] Auth init skipped:', e.message);
     }
 
     FH_MAP.initMap();
@@ -69,6 +97,12 @@ const FH = (function() {
   // ═══════════ PUBLIC API ═══════════
   // All functions exposed for HTML onclick handlers and external access
   return {
+    // Auth (PRIMARY: authentik, SECONDARY: Firebase/Google)
+    loginWithAuthentik: function() {
+      if (typeof FH_AUTH !== 'undefined' && FH_AUTH.login) {
+        FH_AUTH.login();
+      }
+    },
     handleLogin: FH_UI.handleLogin,
     handleGoogleLogin: FH_UI.handleGoogleLogin,
     selectGoogleAccount: FH_UI.selectGoogleAccount,
@@ -89,6 +123,7 @@ const FH = (function() {
     runFullAnalysis: FH_ANALYSIS.runFullAnalysis,
     switchLayer: FH_ANALYSIS.switchLayer,
     getAIAdvice: FH_API.getAIAdvice,
+    analyzeCropPhoto: FH_API.analyzeCropPhoto,
 
     // UI
     setMode: FH_UI.setMode,
@@ -97,9 +132,24 @@ const FH = (function() {
     openModal: FH_UI.openModal,
     closeModal: FH_UI.closeModal,
     saveLandInfo: FH_UI.saveLandInfo,
+    loadLandInfo: FH_UI.loadLandInfo,
     openLandPortal: FH_UI.openLandPortal,
+    autoScanLocation: FH_UI.autoScanLocation,
+    importLandRecordsCSV: FH_UI.importLandRecordsCSV,
     updateLegend: FH_UI.updateLegend,
     renderMoistureGrid: FH_MAP.renderMoistureGrid,
+    // Infrastructure & Journal
+    saveInfrastructure: FH_UI.saveInfrastructure,
+    loadInfrastructure: FH_UI.loadInfrastructure,
+    loadOSMInfrastructure: FH_UI.loadOSMInfrastructure,
+    clearOSMInfrastructure: FH_UI.clearOSMInfrastructure,
+    saveJournalEntry: FH_UI.saveJournalEntry,
+    loadJournalEntries: FH_UI.loadJournalEntries,
+    renderJournalEntries: FH_UI.renderJournalEntries,
+    deleteJournalEntry: FH_UI.deleteJournalEntry,
+    exportJournal: FH_UI.exportJournal,
+    showAISourceIndicator: FH_UI.showAISourceIndicator,
+    hideAISourceIndicator: FH_UI.hideAISourceIndicator,
 
     // Alerts, Yield, Pest
     renderAlerts: FH_UI.renderAlerts,
@@ -143,6 +193,7 @@ const FH = (function() {
     // Professional Features
     toggleFullscreen: FH_MAP.toggleFullscreen,
     enableCompare: FH_MAP.enableCompare,
+    compareLayer: FH_MAP.compareLayer,
     disableCompare: FH_MAP.disableCompare,
     startTimeAnimation: FH_MAP.startTimeAnimation,
     stopTimeAnimation: FH_MAP.stopTimeAnimation,

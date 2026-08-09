@@ -60,6 +60,8 @@ console.log('  GEE_SERVICE_ACCOUNT:', process.env.GEE_SERVICE_ACCOUNT ? 'SET (' 
 console.log('  GEE_PRIVATE_KEY:', process.env.GEE_PRIVATE_KEY ? 'SET (Length: ' + process.env.GEE_PRIVATE_KEY.length + ')' : 'NOT SET');
 console.log('  SENTINEL_HUB_CLIENT_ID:', process.env.SENTINEL_HUB_CLIENT_ID ? 'SET (' + process.env.SENTINEL_HUB_CLIENT_ID.substring(0, 8) + '...)' : 'NOT SET');
 console.log('  GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET (' + process.env.GEMINI_API_KEY.substring(0, 8) + '...)' : 'NOT SET');
+console.log('  OLLAMA_BASE_URL:', process.env.OLLAMA_BASE_URL || 'http://localhost:11434 (default)');
+console.log('  OLLAMA_MODEL:', process.env.OLLAMA_MODEL || 'deepseek-r1:7b (default)');
 
 // ─── Google Earth Engine (optional) ───
 // The @google/earthengine package has native dependencies that may
@@ -82,7 +84,7 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '20mb' })); // 20mb so crop photos (base64) fit in /api/vision-analysis
 
 // ─── Serve Static Frontend ───
 app.use(express.static(path.join(__dirname, '..')));
@@ -176,10 +178,13 @@ app.get('/', (req, res) => {
     geeStatus: geeInitialized ? 'connected' : 'disconnected',
     endpoints: {
       health: '/api/gee/health',
+      generalHealth: '/api/health',
       ndvi: '/api/gee/ndvi',
       sar: '/api/gee/sar',
       timeSeries: '/api/gee/time-series',
-      geminiAnalysis: '/api/gemini-analysis'
+      geminiAnalysis: '/api/gemini-analysis',
+      visionAnalysis: '/api/vision-analysis',
+      aiHealth: '/api/ai/health'
     }
   });
 });
@@ -191,6 +196,75 @@ app.get('/api/gee/health', (req, res) => {
   }
   const status = geeInitialized ? 'connected' : (geeInitializing ? 'initializing' : 'disconnected');
   res.json({ status, initialized: geeInitialized });
+});
+
+// ─── General Health Check (used by Docker healthchecks + Uptime Kuma) ───
+app.get('/api/health', async (req, res) => {
+  const ollama = await ollamaPing();
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    gee: geeInitialized ? 'connected' : 'disconnected',
+    ollama: ollama.connected ? 'connected' : 'unavailable',
+    ai: {
+      model: OLLAMA_MODEL,
+      visionModel: OLLAMA_VISION_MODEL,
+      gemini: process.env.GEMINI_API_KEY ? 'configured' : 'not-configured'
+    }
+  });
+});
+
+// ─── Infrastructure Proxy (OSM Overpass API) ───
+// Proxies Overpass queries to avoid CORS issues and add caching.
+// All data comes from OpenStreetMap — no government scraping.
+app.post('/api/infrastructure', express.json(), async (req, res) => {
+  try {
+    const { lat, lng, radius = 2000 } = req.body;
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'lat and lng required' });
+    }
+
+    const query = `
+      [out:json][timeout:25];
+      (
+        node["man_made"="pipeline"]["substance"="water"](around:${radius},${lat},${lng});
+        way["man_made"="pipeline"]["substance"="water"](around:${radius},${lat},${lng});
+        node["power"="pole"](around:${radius},${lat},${lng});
+        node["power"="tower"](around:${radius},${lat},${lng});
+        way["power"="line"](around:${radius},${lat},${lng});
+        node["water"="well"](around:${radius},${lat},${lng});
+        node["water"="pump"](around:${radius},${lat},${lng});
+        way["waterway"="canal"](around:${radius},${lat},${lng});
+        node["emergency"="fire_hydrant"](around:${radius},${lat},${lng});
+      );
+      out body;
+    `;
+
+    const response = await fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        // Overpass rejects requests without a proper User-Agent (HTTP 406)
+        'User-Agent': 'FarmHealthApp/1.0 (precision-agriculture; contact: farmhealth@localhost)'
+      },
+      body: 'data=' + encodeURIComponent(query)
+    });
+
+    if (!response.ok) {
+      throw new Error('Overpass API returned ' + response.status);
+    }
+
+    const data = await response.json();
+    res.json({
+      success: true,
+      count: data.elements?.length || 0,
+      source: 'openstreetmap',
+      elements: data.elements || []
+    });
+  } catch (e) {
+    console.error('[Infrastructure] Proxy error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
 
 // ─── Initialize Endpoint ───
@@ -491,7 +565,7 @@ app.post('/api/sentinel/token', async (req, res) => {
 
     const authRes = await fetch('https://services.sentinel-hub.com/oauth/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'FarmHealth/1.0 (contact: akshitvinay4636@gmail.com)' },
       body: body
     });
 
@@ -563,21 +637,52 @@ function getFallbackAdvice(crop, ndvi, ph, nitrogen, stage) {
   return advice;
 }
 
-// ─── Gemini advisory analysis proxy ───
-app.post('/api/gemini-analysis', async (req, res) => {
-  const { fieldName, crop, ndvi, soilPh, soilNitrogen, soilOrganicCarbon, growthStage, weather } = req.body;
-  const key = process.env.GEMINI_API_KEY;
+// ═══════════ SELF-HOSTED LLM (OLLAMA) ═══════════
+// Primary AI backend for the self-hosted migration. Reads the Ollama
+// server directly over its HTTP API (no npm dependency needed).
+//   OLLAMA_BASE_URL  — default http://localhost:11434 (http://ollama:11434 in Docker)
+//   OLLAMA_MODEL     — default deepseek-r1:7b (DeepSeek-R1-Distill-Qwen-7B)
+const OLLAMA_BASE_URL = (process.env.OLLAMA_BASE_URL || 'http://localhost:11434').replace(/\/+$/, '');
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'deepseek-r1:7b';
+// CPU inference is slow: 7B Q4 ≈ 4-8 tok/s + cold-start model load (~30s).
+// 180s default covers a full report on first request; tune via env if needed.
+const OLLAMA_TIMEOUT_MS = parseInt(process.env.OLLAMA_TIMEOUT_MS || '180000', 10) || 180000;
 
-  if (!key || key === 'your_gemini_api_key_here') {
-    console.log("[Server] No Gemini API key found, returning expert fallback advice.");
-    console.log("[Server] GEMINI_API_KEY env value:", key ? 'SET (length: ' + key.length + ')' : 'NOT SET');
-    return res.json({
-      advice: getFallbackAdvice(crop || 'Wheat', ndvi || 0.74, soilPh || 6.8, soilNitrogen || 142, growthStage || 'mid'),
-      isFallback: true
+// Single non-streaming chat completion with an abort timeout (cold model
+// load + generation on a small CPU box can take a couple of minutes).
+async function ollamaChat(messages, timeoutMs = OLLAMA_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(OLLAMA_BASE_URL + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({ model: OLLAMA_MODEL, stream: false, messages })
     });
+    if (!res.ok) throw new Error('Ollama returned HTTP ' + res.status);
+    const data = await res.json();
+    return (data.message && data.message.content) || '';
+  } finally {
+    clearTimeout(timer);
   }
+}
 
-  const prompt = `
+// Lightweight connectivity + model list probe (used by /api/ai/health)
+async function ollamaPing() {
+  try {
+    const res = await fetch(OLLAMA_BASE_URL + '/api/tags', { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return { connected: false, error: 'HTTP ' + res.status };
+    const data = await res.json();
+    return { connected: true, models: (data.models || []).map(m => m.name) };
+  } catch (e) {
+    return { connected: false, error: e.message };
+  }
+}
+
+// ─── Build the agronomist prompt (shared by Ollama and Gemini) ───
+function buildAgronomistPrompt(fieldName, crop, ndvi, soilPh, soilNitrogen, soilOrganicCarbon, growthStage, weather) {
+  return `
     You are FarmHealth's Lead Agronomist AI, powered by satellite and soil telemetry.
     Analyze the following crop and field telemetry:
     
@@ -599,29 +704,224 @@ app.post('/api/gemini-analysis', async (req, res) => {
     
     Keep the tone professional, precise, scientific, and highly encouraging. Limit to around 300-400 words. Do not use generic introductions.
   `;
+}
 
+// ─── AI advisory proxy ───
+// Fallback chain (self-hosted migration):
+//   1. Ollama  (self-hosted LLM — PRIMARY, zero cost, private)
+//   2. Gemini  (cloud — only if OLLAMA is unreachable AND a key is set)
+//   3. getFallbackAdvice()  (built-in offline expert model — ALWAYS available)
+app.post('/api/gemini-analysis', async (req, res) => {
+  const { fieldName, crop, ndvi, soilPh, soilNitrogen, soilOrganicCarbon, growthStage, weather } = req.body;
+  const prompt = buildAgronomistPrompt(fieldName, crop, ndvi, soilPh, soilNitrogen, soilOrganicCarbon, growthStage, weather);
+  const fallbackNote = (msg) => `\n\n*(Note: Analysis fell back to the built-in expert model due to: ${msg})*`;
+
+  // ── 1. Ollama (self-hosted primary) ──
+  if (process.env.OLLAMA_DISABLED !== 'true') {
+    try {
+      const advice = await ollamaChat([
+        { role: 'system', content: 'You are an expert precision-agriculture agronomist. Answer in clean Markdown, be concise and specific.' },
+        { role: 'user', content: prompt }
+      ]);
+      if (advice && advice.trim()) {
+        console.log('[Ollama] Advice generated with model:', OLLAMA_MODEL);
+        return res.json({ advice, isFallback: false, source: 'ollama', model: OLLAMA_MODEL });
+      }
+      console.warn('[Ollama] Empty response, falling through to next backend.');
+    } catch (e) {
+      console.warn('[Ollama] Unavailable, falling through to next backend:', e.message);
+    }
+  }
+
+  // ── 2. Gemini (optional cloud fallback) ──
+  const key = process.env.GEMINI_API_KEY;
+  if (key && key !== 'your_gemini_api_key_here') {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${key}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Gemini API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No analysis could be generated.';
+      return res.json({ advice: text, isFallback: false, source: 'gemini' });
+    } catch (error) {
+      console.error('Gemini API Proxy Error:', error);
+    }
+  }
+
+  // ── 3. Built-in expert fallback (always works, offline) ──
+  const ollamaTried = process.env.OLLAMA_DISABLED !== 'true';
+  const geminiTried = !!(key && key !== 'your_gemini_api_key_here');
+  const reasonParts = [];
+  reasonParts.push(ollamaTried ? 'Ollama unreachable' : 'Ollama disabled');
+  reasonParts.push(geminiTried ? 'Gemini errored' : 'no Gemini key configured');
+  const reason = reasonParts.join(', ');
+  console.log('[Server] Returning expert fallback advice (' + reason + ').');
+  res.json({
+    advice: getFallbackAdvice(crop || 'Wheat', ndvi || 0.74, soilPh || 6.8, soilNitrogen || 142, growthStage || 'mid') + fallbackNote(reason),
+    isFallback: true,
+    source: 'fallback'
+  });
+});
+
+// ─── AI health check (for Uptime Kuma / status pages) ───
+app.get('/api/ai/health', async (req, res) => {
+  const ollama = await ollamaPing();
+  res.json({
+    status: ollama.connected ? 'ok' : 'degraded',
+    ollama: ollama.connected ? 'connected' : 'unavailable',
+    model: OLLAMA_MODEL,
+    ollamaBaseUrl: OLLAMA_BASE_URL,
+    models: ollama.models || [],
+    error: ollama.error || null,
+    gemini: process.env.GEMINI_API_KEY ? 'configured' : 'not-configured',
+    fallback: 'getFallbackAdvice (built-in, always available)'
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// VISION ANALYSIS — Crop Photo Disease Detection (LLaVA)
+// Analyzes uploaded field/crop photos for diseases, pests, stress
+// ═══════════════════════════════════════════════════════════
+
+// 8GB CPU laptop: use llava-phi3 (~2.9GB). llava:13b needs ~10GB+ RAM and is
+// far too slow on CPU-only inference. moondream (~1.7GB) is the ultra-light alt.
+const OLLAMA_VISION_MODEL = process.env.OLLAMA_VISION_MODEL || 'llava-phi3';
+
+app.post('/api/vision-analysis', async (req, res) => {
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${key}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini API returned ${response.status}`);
+    const { imageBase64, prompt: customPrompt, fieldName, crop, ndvi, weather } = req.body;
+    
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'No image provided' });
     }
 
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No analysis could be generated.';
-    res.json({
-      advice: text || "No analysis could be generated.",
-      isFallback: false
-    });
+    // Default prompt for crop analysis
+    const defaultPrompt = `
+      You are an expert agricultural diagnostician. Analyze this crop/field image and provide:
+      
+      1. **Crop Health Assessment**: Describe the overall health visible in the image (color, density, vigor)
+      2. **Disease/Pest Detection**: Identify any visible symptoms of diseases, pests, or nutrient deficiencies (spots, discoloration, wilting, holes, etc.)
+      3. **Severity Rating**: Rate severity as mild/moderate/severe with estimated affected area percentage
+      4. **Specific Issues**: Name specific diseases if recognizable (rust, blight, mildew, aphids, etc.)
+      5. **Immediate Actions**: Provide 3-5 specific, actionable recommendations
+      6. **Parameters**: Estimate visible NDVI proxy, color anomalies, texture issues
+      
+      Field context: ${crop || 'Unknown crop'} in ${fieldName || 'field'} (NDVI: ${ndvi || 'N/A'}, Weather: ${weather?.temp || 'N/A'}°C, ${weather?.condition || 'N/A'})
+      
+      Respond in structured JSON format ONLY (no markdown, no extra text):
+      {
+        "disease": "rust or none",
+        "confidence": 0.87,
+        "severity": "mild|moderate|severe",
+        "affected_area": "upper leaves",
+        "recommendation": "Apply fungicide within 3 days",
+        "parameters": {
+          "ndvi": 0.62,
+          "color_anomaly": "yellow-brown spots",
+          "texture": "necrotic patches"
+        }
+      }
+      Rules:
+      - "disease": name the disease/pest if visible, otherwise "none"
+      - "confidence": 0.0 to 1.0 (how sure you are about the diagnosis)
+      - "recommendation": ONE concise, actionable string
+      - "parameters.ndvi": your visual estimate of crop greenness (0.0-1.0)
+    `;
+
+    const prompt = customPrompt || defaultPrompt;
+
+    // Try Ollama vision model (LLaVA)
+    try {
+      console.log('[Vision] Trying Ollama LLaVA...');
+      
+      // Prepare the image for Ollama (base64 without data URL prefix)
+      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+      
+      const visionResponse = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: OLLAMA_VISION_MODEL,
+          prompt: prompt,
+          images: [base64Data],
+          stream: false,
+          options: {
+            temperature: 0.3, // Lower temperature for more consistent JSON
+            top_p: 0.85,
+            num_ctx: 8192 // Larger context for detailed analysis
+          }
+        }),
+        signal: AbortSignal.timeout(180000) // 3-minute timeout for vision models
+      });
+
+      if (!visionResponse.ok) {
+        throw new Error(`Ollama vision API returned ${visionResponse.status}`);
+      }
+
+      const visionData = await visionResponse.json();
+      const analysisText = visionData.response || '';
+      
+      console.log('[Vision] LLaVA analysis completed');
+      
+      // Try to parse JSON from the response
+      let analysisJson;
+      try {
+        // Extract JSON from markdown code blocks if present
+        const jsonMatch = analysisText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
+                          analysisText.match(/(\{[\s\S]*\})/);
+        const jsonStr = jsonMatch ? jsonMatch[1] : analysisText;
+        analysisJson = JSON.parse(jsonStr);
+      } catch (parseError) {
+        // If JSON parsing fails, return structured text response
+        console.warn('[Vision] JSON parse failed, returning text response');
+        analysisJson = {
+          health_status: "analysis_available",
+          detailed_analysis: analysisText,
+          raw_response: true
+        };
+      }
+
+      return res.json({
+        success: true,
+        analysis: analysisJson,
+        model: OLLAMA_VISION_MODEL,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (ollamaError) {
+      console.warn('[Vision] Ollama vision failed:', ollamaError.message);
+      
+      // Fallback: Basic image analysis using metadata only
+      return res.json({
+        success: true,
+        analysis: {
+          health_status: "analysis_unavailable",
+          detailed_analysis: "Vision model (LLaVA) is not available. Please ensure Ollama is running with the vision model: `ollama pull " + OLLAMA_VISION_MODEL + "`",
+          error: ollamaError.message,
+          recommendations: [
+            "Install Ollama: https://ollama.ai",
+            `Pull vision model: ollama pull ${OLLAMA_VISION_MODEL}`,
+            "Ensure Ollama server is running: ollama serve"
+          ]
+        },
+        model: 'fallback',
+        timestamp: new Date().toISOString()
+      });
+    }
+
   } catch (error) {
-    console.error("Gemini API Proxy Error:", error);
-    res.json({
-      advice: getFallbackAdvice(crop || 'Wheat', ndvi || 0.74, soilPh || 6.8, soilNitrogen || 142, growthStage || 'mid') + `\n\n*(Note: Analysis fell back to local expert model due to API response: ${error?.message || "connection issues"})*`,
-      isFallback: true
+    console.error('[Vision] Analysis error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Vision analysis failed',
+      message: error.message
     });
   }
 });
@@ -632,10 +932,15 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`  ─────────────────────────────`);
   console.log(`  🌐  http://0.0.0.0:${PORT}`);
   console.log(`  🔌  Endpoints:`);
+  console.log(`        GET  /api/health         — General health (Docker/Uptime Kuma)`);
   console.log(`        GET  /api/gee/health     — Connection status`);
   console.log(`        POST /api/gee/init       — Initialize GEE`);
   console.log(`        POST /api/gee/ndvi       — Compute NDVI`);
   console.log(`        POST /api/gee/time-series — Time series`);
+  console.log(`        POST /api/gemini-analysis — AI advice (Ollama → Gemini → expert fallback)`);
+  console.log(`        POST /api/vision-analysis — Crop photo disease detection (LLaVA)`);
+  console.log(`        GET  /api/ai/health       — AI/Ollama status (Uptime Kuma probe)`);
   console.log(`  📡  GEE module: ${geeAvailable ? 'LOADED' : 'NOT AVAILABLE (optional)'}`);
+  console.log(`  🤖  LLM: ${process.env.OLLAMA_DISABLED === 'true' ? 'Ollama DISABLED' : 'Ollama @ ' + OLLAMA_BASE_URL + ' model=' + OLLAMA_MODEL}`);
   console.log(`  📋  Serving frontend from: ${path.join(__dirname, '..')}\n`);
 });

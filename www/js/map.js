@@ -81,22 +81,29 @@ const FH_MAP = (function() {
 
   // ═══════════ MAP SETUP ═══════════
   function initMap() {
-    _state.map = L.map('map', { zoomControl: true, attributionControl: true }).setView([22.5, 78.9], 5);
+    _state.map = L.map('map', { zoomControl: true, attributionControl: true, maxZoom: 19 }).setView([22.5, 78.9], 5);
 
+    // Basemaps: every layer uses providers with global coverage and NO
+    // "Map data not yet available" placeholder tiles (that message came from
+    // OpenTopoMap / tile.openstreetmap.org tiles that had not been rendered).
+    // maxNativeZoom is set so Leaflet scales tiles instead of requesting
+    // missing tiles when zooming in past a layer's native resolution.
     _state.basemaps = [
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19, attribution: 'Imagery © Esri'
+        maxZoom: 19, maxNativeZoom: 19, attribution: 'Imagery © Esri'
       }),
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, attribution: '© OpenStreetMap'
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20, maxNativeZoom: 20, subdomains: 'abcd', attribution: '© OpenStreetMap contributors © CARTO'
       }),
-      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17, attribution: '© OpenTopoMap'
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19, maxNativeZoom: 19, attribution: 'Tiles © Esri'
       })
     ];
     _state.satLayer = _state.basemaps[0].addTo(_state.map);
-    _state.lblLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, opacity: 0.25
+    // Labels overlay uses Esri reference tiles (designed to sit on top of the
+    // satellite basemap) instead of OSM tiles, which showed placeholder text.
+    _state.lblLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, maxNativeZoom: 19, opacity: 0.25
     }).addTo(_state.map);
 
     _state.ndviLayer = L.layerGroup().addTo(_state.map);
@@ -293,12 +300,20 @@ const FH_MAP = (function() {
     
     // Trigger Land Info logic
     $('landRecordCard').style.display = 'block';
+    $('infraCard').style.display = 'block';
+    $('journalCard').style.display = 'block';
     $('lrLocation').textContent = 'Fetching...';
     if ($('lrArea')) $('lrArea').textContent = FH_UTILS.areaHa(ll).toFixed(2);
     
     // Auto-load any previously saved data for these coordinates
     if (window.FH_UI && FH_UI.loadLandInfo) {
       FH_UI.loadLandInfo(_state.fieldCenter[0], _state.fieldCenter[1]);
+    }
+    if (window.FH_UI && FH_UI.loadInfrastructure) {
+      FH_UI.loadInfrastructure();
+    }
+    if (window.FH_UI && FH_UI.loadJournalEntries) {
+      FH_UI.loadJournalEntries();
     }
     
     // Real location details (village/district/state) via a single reverse geocode
@@ -311,10 +326,17 @@ const FH_MAP = (function() {
         const parts = [];
         if (place.village) parts.push(place.village);
         if (place.district) parts.push(place.district);
+        if (place.subdistrict) parts.push(place.subdistrict);
         if (place.state) parts.push(place.state);
+        if (place.pincode) parts.push('PIN ' + place.pincode);
         $('lrLocation').textContent = parts.join(', ') || place.full || 'Unknown Location';
         if (window.FH_UI && FH_UI.applyPlaceToLandInfo) {
           FH_UI.applyPlaceToLandInfo(place);
+        }
+        // Auto-scan: pincode + OSM infrastructure + imported records match,
+        // all shown in the Land Info card ("What's at this location").
+        if (window.FH_UI && FH_UI.autoScanLocation) {
+          FH_UI.autoScanLocation();
         }
       })
       .catch(() => {
@@ -440,7 +462,7 @@ const FH_MAP = (function() {
   }
 
   function hideResults() {
-    ['resultsCard', 'scenesCard', 'weatherCard', 'terrainCard', 'soilCard', 'chartCard', 'tsCard', 'aiCard', 'indexCard', 'landRecordCard']
+    ['resultsCard', 'scenesCard', 'weatherCard', 'terrainCard', 'soilCard', 'chartCard', 'tsCard', 'aiCard', 'indexCard', 'landRecordCard', 'infraCard', 'journalCard']
     .forEach(id => {
       const el = $(id);
       if (el) el.style.display = 'none';
@@ -528,8 +550,74 @@ const FH_MAP = (function() {
   }
 
   // ═══════════ SPLIT-VIEW COMPARISON ═══════════
+  // Renders the current layer on the LEFT half of the map and a second
+  // index (default NDMI) on the RIGHT half, separated by a draggable divider.
+  // The right pane is rendered via FH_API.renderGrid(..., 'comparePane', true)
+  // which gracefully falls back to DEMO data when the satellite API is
+  // unreachable — so Compare always produces a visible result.
   let _splitActive = false;
-  let _splitRightLayer = null;
+  let _splitDividerInited = false;
+
+  function indexName(idx) {
+    const key = idx === 'sar' ? 'smmi' : idx;
+    return FH_CONFIG.INDEX_INFO[key]?.name ||
+           FH_CONFIG.STRESS_INDEX_INFO[key]?.name ||
+           (idx || '').toUpperCase() || 'Layer';
+  }
+
+  function compareDateStr() {
+    return _state.selectedScene ? _state.selectedScene.date : new Date().toISOString().split('T')[0];
+  }
+
+  function updateCompareLabel() {
+    const el = document.getElementById('compareLabel');
+    if (el) el.textContent = indexName(_state.currentIndex) + '  |  ' + indexName(_state.compareLayer);
+  }
+
+  function setCompareSplit(pct) {
+    const map = _state.map;
+    const div = document.getElementById('compareDivider');
+    if (!map || !div) return;
+    div.style.left = pct + '%';
+    const overlay = map.getPane('overlayPane');
+    const pane = map.getPane('comparePane');
+    if (overlay) {
+      overlay.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+      overlay.style.webkitClipPath = `inset(0 ${100 - pct}% 0 0)`;
+    }
+    if (pane) {
+      pane.style.clipPath = `inset(0 0 0 ${pct}%)`;
+      pane.style.webkitClipPath = `inset(0 0 0 ${pct}%)`;
+    }
+  }
+
+  function initCompareDivider() {
+    if (_splitDividerInited) return;
+    _splitDividerInited = true;
+    const div = document.getElementById('compareDivider');
+    const mapArea = document.getElementById('mapArea');
+    if (!div || !mapArea) return;
+    div.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (div.setPointerCapture) div.setPointerCapture(e.pointerId);
+      const move = (ev) => {
+        const rect = mapArea.getBoundingClientRect();
+        const pct = Math.max(12, Math.min(88, ((ev.clientX - rect.left) / rect.width) * 100));
+        setCompareSplit(pct);
+      };
+      const up = () => {
+        div.removeEventListener('pointermove', move);
+        div.removeEventListener('pointerup', up);
+      };
+      div.addEventListener('pointermove', move);
+      div.addEventListener('pointerup', up);
+    });
+  }
+
+  function renderCompareLayer(idx, dateStr) {
+    return FH_API.renderGrid(idx || 'ndmi', dateStr, cropPeak(), null, 'comparePane', true)
+      .then(() => toast('Right pane: ' + indexName(idx || 'ndmi')));
+  }
 
   function enableCompare(layerType, dateStr) {
     if (!_state.fieldPoly) return toast('Select a field first', 'err');
@@ -537,15 +625,53 @@ const FH_MAP = (function() {
 
     _splitActive = true;
     _state.compareMode = true;
-    _state.compareLayer = layerType || _state.currentIndex;
-    _state.compareDate = dateStr || (_state.selectedScene ? _state.selectedScene.date : null);
+    _state.compareLayer = layerType || 'ndmi';
+    _state.compareDate = dateStr || compareDateStr();
 
-    // Show the compare bar overlay
+    // Dedicated Leaflet pane for the right-hand (compare) layer
+    const map = _state.map;
+    if (!map.getPane('comparePane')) map.createPane('comparePane');
+    const pane = map.getPane('comparePane');
+    pane.style.pointerEvents = 'none';
+    pane.style.zIndex = '450';
+    pane.style.clipPath = 'inset(0 0 0 50%)';
+    pane.style.webkitClipPath = 'inset(0 0 0 50%)';
+
+    // Fresh layer group for the compare layers
+    if (_state.compareLayers) map.removeLayer(_state.compareLayers);
+    _state.compareLayers = L.layerGroup().addTo(map);
+
+    initCompareDivider();
+    setCompareSplit(50);
+
+    // Show the compare bar overlay + divider
     const bar = document.getElementById('compareBar');
     if (bar) bar.classList.add('show');
+    const div = document.getElementById('compareDivider');
+    if (div) div.style.display = 'flex';
 
-    toast('Split-view enabled — swipe to compare');
-    FH_ANALYSIS.switchLayer(layerType || _state.currentIndex);
+    updateCompareLabel();
+    toast('Split-view: ' + indexName(_state.currentIndex) + ' (left) vs ' + indexName(_state.compareLayer) + ' (right) — drag the divider');
+
+    // Ensure the left side has content (e.g. before a full analysis) and
+    // render the compare layer into the right pane — never shows API errors.
+    const leftReady = _state.analysisData
+      ? Promise.resolve()
+      : FH_API.renderGrid(_state.currentIndex, _state.compareDate, cropPeak(), null, null, true);
+    leftReady.then(() => renderCompareLayer(_state.compareLayer, _state.compareDate));
+  }
+
+  function cropPeak() {
+    return (FH_CONFIG.CROPS[$('cropSelect')?.value] || FH_CONFIG.CROPS.generic).peak;
+  }
+
+  // Switch which index the RIGHT pane shows (while left keeps the current one)
+  function compareLayer(layerType) {
+    if (!_splitActive) return enableCompare(layerType);
+    _state.compareLayer = layerType || 'ndmi';
+    _state.compareDate = compareDateStr();
+    updateCompareLabel();
+    renderCompareLayer(_state.compareLayer, _state.compareDate);
   }
 
   function disableCompare() {
@@ -554,11 +680,29 @@ const FH_MAP = (function() {
     _state.compareMode = false;
     _state.compareLayer = null;
     _state.compareDate = null;
-    
-    // Hide the compare bar overlay
+
+    const map = _state.map;
+    const overlay = map.getPane('overlayPane');
+    if (overlay) {
+      overlay.style.clipPath = '';
+      overlay.style.webkitClipPath = '';
+    }
+    if (_state.compareLayers) {
+      map.removeLayer(_state.compareLayers);
+      _state.compareLayers = null;
+    }
+    const pane = map.getPane('comparePane');
+    if (pane) {
+      pane.style.clipPath = '';
+      pane.style.webkitClipPath = '';
+    }
+
+    // Hide the compare bar overlay + divider
     const bar = document.getElementById('compareBar');
     if (bar) bar.classList.remove('show');
-    
+    const div = document.getElementById('compareDivider');
+    if (div) div.style.display = 'none';
+
     toast('Split-view disabled');
   }
 
@@ -818,7 +962,9 @@ const FH_MAP = (function() {
     // Professional Features
     toggleFullscreen,
     enableCompare,
+    compareLayer,
     disableCompare,
+    updateCompareLabel,
     startTimeAnimation,
     stopTimeAnimation,
     toggleTimeAnimation,

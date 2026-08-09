@@ -145,6 +145,18 @@ const FH_UI = (function() {
     }
   }
 
+  // Update UI after authentik SSO login (called from app.js init)
+  function updateLoginUI(user) {
+    const role = 'user';
+    localStorage.setItem('fh_auth_role', role);
+    localStorage.setItem('fh_auth_email', user.email || user.preferred_username || '');
+    localStorage.setItem('fh_auth_name', user.name || user.given_name || user.email?.split('@')[0] || 'Farmer');
+    document.getElementById('loginModal')?.classList.remove('show');
+    document.getElementById('googleModal').style.display = 'none';
+    applyRoleUI(role);
+    toast('Welcome, ' + (user.name || user.email || '') + '!');
+  }
+
   // ═══════════ SATELLITE SCENES RENDER (Enhanced) ═══════════
   function renderScenes() {
     const el = $('scenesList');
@@ -495,15 +507,29 @@ const FH_UI = (function() {
   }
 
   // ═══════════ LEARNING MODULE (Lessons & Quiz) ═══════════
+  // Build the colour scale straight from FH_CONFIG.HEALTH_CLASSES so the
+  // lessons always show the EXACT same colours/classes as the live analysis
+  // (map grid, report bars, doughnut chart and sidebar legend).
+  function healthScaleHTML() {
+    return '<div class="lesson-scale">' +
+      HEALTH_CLASSES.map(c =>
+        `<div class="lesson-scale-item"><span class="lesson-swatch" style="background:${c.col}"></span><span>${c.name}</span></div>`
+      ).join('') +
+      '</div>';
+  }
+
+  // NDVI thresholds shown in the lesson match valueToClassColor() in api.js
+  // for a generic crop (peak NDVI 0.80): bare soil <0.15, then 40/55/72/88%
+  // of the crop peak for Poor / Below avg / Moderate / Healthy / Very healthy.
   const LESSONS = [
     { title: 'Remote Sensing Basics', content: '<h4>What is Remote Sensing?</h4><p>Remote sensing is the science of obtaining information about objects from a distance using satellites or aircraft. In agriculture, we use satellite imagery to monitor crop health without visiting every field.</p><h4>Sentinel-2 Mission</h4><p>Sentinel-2 is a European Space Agency mission with two satellites providing free, open-access imagery globally every 5 days at 10m resolution.</p>' },
-    { title: 'Understanding NDVI', content: '<h4>What is NDVI?</h4><p>The Normalized Difference Vegetation Index quantifies vegetation greenness by comparing near-infrared (NIR) and red light reflectance.</p><div class="formula">NDVI = (NIR − Red) / (NIR + Red)</div><h4>Value Ranges</h4><ul><li><b>-1 to 0:</b> Water, snow, bare soil</li><li><b>0.15 to 0.30:</b> Stressed vegetation</li><li><b>0.45 to 0.60:</b> Moderate vegetation</li><li><b>0.60 to 0.90:</b> Dense healthy vegetation</li></ul>' },
+    { title: 'Understanding NDVI', content: '<h4>What is NDVI?</h4><p>The Normalized Difference Vegetation Index quantifies vegetation greenness by comparing near-infrared (NIR) and red light reflectance.</p><div class="formula">NDVI = (NIR − Red) / (NIR + Red)</div><h4>The colour scale FarmHealth uses</h4><p>These are the <b>exact same colours</b> the app paints on the map, the report bars, the doughnut chart and the sidebar legend — so what you learn here is what you see in your field analysis:</p>' + healthScaleHTML() + '<h4>NDVI ranges (generic crop, peak 0.80)</h4><ul><li><b>Bare soil / water (brown):</b> NDVI &lt; 0.15 — no crop cover yet</li><li><b>Poor / stressed (red):</b> 0.15 – 0.32 — urgent check needed</li><li><b>Below average (orange):</b> 0.32 – 0.44 — needs nutrients or irrigation</li><li><b>Moderate (yellow):</b> 0.44 – 0.58 — growing, keep monitoring</li><li><b>Healthy (green):</b> 0.58 – 0.70 — good growth, maintain care</li><li><b>Very healthy (dark green):</b> 0.70+ — excellent vigour</li></ul><p>Thresholds scale with your crop\u0027s peak NDVI (wheat 0.80, rice 0.78, sugarcane 0.88), which is why the same map can look different across crops.</p>' },
     { title: 'Vegetation Indices', content: '<h4>Beyond NDVI</h4><p><b>EVI</b> — Better for dense canopies. Uses blue band for atmospheric correction.<br><b>SAVI</b> — Soil-adjusted. Best for sparse vegetation.<br><b>GNDVI</b> — Chlorophyll-sensitive. Great for nitrogen assessment.<br><b>NDMI</b> — Measures leaf water content. Critical for drought detection.<br><b>NDRE</b> — Uses red edge band. Best for mid-to-late season monitoring.</p>' },
     { title: 'Sentinel-2 Bands', content: '<h4>13 Spectral Bands</h4><p><b>B2 (Blue, 490nm):</b> Atmospheric correction<br><b>B3 (Green, 560nm):</b> Chlorophyll assessment<br><b>B4 (Red, 665nm):</b> Chlorophyll absorption — key for NDVI<br><b>B5-7 (Red Edge, 705-783nm):</b> Canopy structure, LAI<br><b>B8 (NIR, 842nm):</b> Biomass, vegetation vigour<br><b>B11-12 (SWIR):</b> Moisture content</p><p><b>Resolution:</b> 10m (B2-4, B8), 20m (red edge, SWIR), 60m (atmospheric)</p>' },
     { title: 'Terrain in Agriculture', content: '<h4>Why Terrain Matters</h4><ul><li><b>Slope <2°:</b> Flat — water stagnation risk</li><li><b>Slope 2-5°:</b> Ideal for most crops</li><li><b>Slope >5°:</b> Erosion risk — consider contour farming</li></ul><p>Terrain affects water distribution, sunlight exposure, and microclimates across your field.</p>' },
     { title: 'Soil Properties', content: '<h4>Key Soil Parameters</h4><p><b>pH:</b> Controls nutrient availability. Ideal: 6.0-7.5<br><b>Organic Carbon:</b> Soil health indicator. >1.5% is good<br><b>Texture:</b> Clay retains water, sand drains fast<br><b>CEC:</b> Soil\'s ability to hold nutrients</p><p>Low NDVI zones often correlate with soil problems — combining soil data with NDVI maps finds the ROOT CAUSE.</p>' },
     { title: 'Weather & Farming', content: '<h4>Key Parameters</h4><p><b>Temperature:</b> >40°C = heat stress, <5°C = frost risk<br><b>Precipitation:</b> Compare 30-day total with crop water need<br><b>Humidity:</b> >85% + warmth = fungal disease risk<br><b>ET₀:</b> Atmospheric water demand. If ET₀ > rainfall, irrigate.</p><p>Combine ET₀ with NDMI for precise irrigation scheduling.</p>' },
-    { title: 'Reading Reports', content: '<h4>Understanding Your Report</h4><p><b>Health Score (0-100%):</b> Average NDVI vs crop peak NDVI. Above 80% = excellent.<br><b>Problem Area:</b> Fraction in "Bare soil/Poor/Below avg". Even 10% matters.<br><b>Time Series:</b> Healthy crops show a bell curve — rising at vegetative, peaking at flowering, declining at maturity.</p>' }
+    { title: 'Reading Reports', content: '<h4>Understanding Your Report</h4><p><b>Health Score (0-100%):</b> Average NDVI vs crop peak NDVI. Above 80% = excellent.<br><b>Problem Area:</b> Fraction in "Bare soil / Poor / Below avg". Even 10% matters.<br><b>Time Series:</b> Healthy crops show a bell curve — rising at vegetative, peaking at flowering, declining at maturity.</p><h4>The colour scale in your report</h4><p>The report bars, the doughnut chart and the map legend all use these same six colours — a red/orange bar simply means that fraction of the field needs attention:</p>' + healthScaleHTML() + '<p><b>Tip:</b> Hover any coloured cell on the map to see its class, index value and score.</p>' }
   ];
 
   let currentLesson = 0;
@@ -777,13 +803,12 @@ const FH_UI = (function() {
     toast('Settings saved');
   }
 
-  // ═══════════ LAND INFO (CADASTRAL) — REAL RECORDS ═══════════
-  // Honest implementation: NO survey/khata/owner data is ever invented.
-  // - Location + Area are real (reverse geocoded + computed from the polygon).
-  // - Owner details are ONLY what the user enters and saves, after verifying
-  //   them on the official state land portal (see openLandPortal()).
-  // - The previous "deterministic generator" that fabricated survey numbers,
-  //   khata numbers and owner names from coordinates has been REMOVED.
+  // ═══════════ LAND INFO + INFRASTRUCTURE + FIELD JOURNAL ═══════════
+  // - Land info: survey, khata, owner, location (user-entered, locally saved)
+  // - Infrastructure: motor/pipeline/electricity (user-entered, locally saved)
+  // - Field journal: offline-first notes with timestamps
+  // - OSM Overpass: public infrastructure near the field (pipelines, power lines, water sources)
+  // NO government data is scraped or bypassed. Everything is user-entered or from public OSM.
 
   function landStorageKey() {
     if (!_state.fieldCenter) return null;
@@ -802,6 +827,7 @@ const FH_UI = (function() {
       district: $('lrDistrictInput')?.value.trim() || '',
       tehsil:  $('lrTehsilInput')?.value.trim() || '',
       village: $('lrVillageInput')?.value.trim() || '',
+      pincode: $('lrPincodeInput')?.value.trim() || '',
       savedAt: new Date().toISOString()
     };
     if (!data.survey && !data.owner && !data.khata && !data.village) {
@@ -814,9 +840,8 @@ const FH_UI = (function() {
     toast('✅ Land details saved to this device');
   }
 
-  // Load saved details for a location. Inputs start EMPTY — never invented.
   function loadLandInfo(lat, lng) {
-    ['lrSurveyInput', 'lrKhataInput', 'lrOwnerInput', 'lrStateInput', 'lrDistrictInput', 'lrTehsilInput', 'lrVillageInput'].forEach(id => {
+    ['lrSurveyInput', 'lrKhataInput', 'lrOwnerInput', 'lrStateInput', 'lrDistrictInput', 'lrTehsilInput', 'lrVillageInput', 'lrPincodeInput'].forEach(id => {
       const el = $(id);
       if (el) el.value = '';
     });
@@ -833,13 +858,12 @@ const FH_UI = (function() {
         if (data.district && $('lrDistrictInput')) $('lrDistrictInput').value = data.district;
         if (data.tehsil && $('lrTehsilInput')) $('lrTehsilInput').value = data.tehsil;
         if (data.village && $('lrVillageInput')) $('lrVillageInput').value = data.village;
+        if (data.pincode && $('lrPincodeInput')) $('lrPincodeInput').value = data.pincode;
       } catch (e) { /* ignore */ }
     }
     updateLandStatus();
   }
 
-  // Auto-fill state/district/tehsil/village from the structured reverse geocode.
-  // Only fills EMPTY fields so saved user-entered values are never overwritten.
   function applyPlaceToLandInfo(place) {
     if (!place) return;
     const fill = (id, val) => {
@@ -851,16 +875,25 @@ const FH_UI = (function() {
     fill('lrDistrictInput', place.district);
     fill('lrTehsilInput', place.tehsil);
     fill('lrVillageInput', place.village);
+    fill('lrPincodeInput', place.pincode);
+    const stateVal = $('lrStateInput')?.value.trim() || place.state || '';
+    const portal = FH_CONFIG.findLandPortal(stateVal);
     const portalHint = $('landPortalHint');
     if (portalHint) {
-      const portal = FH_CONFIG.findLandPortal(place.state);
       portalHint.textContent = portal
         ? `✓ ${portal.state} recognised — ${portal.note}`
         : 'Select your state to find the official land records portal.';
     }
+    const guideState = $('lrGuideState');
+    if (guideState) guideState.textContent = portal ? portal.state : (stateVal || 'your state');
+    const portalBtn = $('lrPortalBtn');
+    if (portalBtn) {
+      portalBtn.textContent = portal
+        ? `🔗 Open ${portal.state} portal`
+        : '🔗 Open official state portal';
+    }
   }
 
-  // Opens the official land records portal for the entered/selected state
   function openLandPortal() {
     const state = $('lrStateInput')?.value.trim() || '';
     const portal = FH_CONFIG.findLandPortal(state);
@@ -869,11 +902,10 @@ const FH_UI = (function() {
       window.open('https://www.google.com/search?q=' + q, '_blank');
       return toast('State not mapped — searching the web instead', 'info');
     }
-    toast('Opening official ' + portal.state + ' portal (' + portal.note + ')…', 'info');
+    toast('Opening official ' + portal.state + ' portal (' + portal.note + ')...', 'info');
     window.open(portal.url, '_blank');
   }
 
-  // Update the verification status line on the Land Info card
   function updateLandStatus() {
     const badge = $('landStatusBadge');
     if (!badge) return;
@@ -889,6 +921,493 @@ const FH_UI = (function() {
       badge.className = 'badge badge-warn';
       badge.textContent = '— Manual entry — verify on the official portal';
     }
+  }
+
+  // ═══════════ AUTO-SCAN: WHAT'S AT THIS LOCATION ═══════════
+  // Runs automatically whenever a field is selected. Combines REAL public
+  // data: pincode (India Post), nearby infrastructure (OpenStreetMap), and
+  // any of the user's own imported CSV records that match the location.
+  // Nothing here is scraped or invented — every source is public/legal.
+  let _scanSeq = 0;
+
+  function haversineM(aLat, aLng, bLat, bLng) {
+    const R = 6371000;
+    const dLat = (bLat - aLat) * Math.PI / 180;
+    const dLng = (bLng - aLng) * Math.PI / 180;
+    const s = Math.sin(dLat / 2) ** 2 +
+              Math.cos(aLat * Math.PI / 180) * Math.cos(bLat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(s));
+  }
+
+  // HTML-escape user/CSV-supplied values before injecting into innerHTML
+  // (prevents XSS via a malicious CSV cell or saved field value).
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // Renders the auto-scan results panel inside the Land Info card.
+  function renderLocationScan({ pincode, infra, csvRecord }) {
+    const box = $('locationScan');
+    if (!box) return;
+    const parts = [];
+
+    // Pincode row
+    if (pincode) {
+      parts.push(`<div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text)"><span>📮</span><span>PIN Code: <b style="color:var(--green-light)">${esc(pincode)}</b> <span style="color:var(--text-faint)">(India Post)</span></span></div>`);
+    }
+
+    // Imported CSV record match (own data — takes priority)
+    if (csvRecord) {
+      const r = csvRecord;
+      const recLines = [];
+      if (r.survey) recLines.push(`Survey: <b>${esc(r.survey)}</b>`);
+      if (r.khata) recLines.push(`Khata: <b>${esc(r.khata)}</b>`);
+      if (r.owner) recLines.push(`Owner: <b>${esc(r.owner)}</b>`);
+      if (r.motor) recLines.push(`Motor: <b>${esc(r.motor)}</b>`);
+      if (r.pipeline) recLines.push(`Pipeline: <b>${esc(r.pipeline)}</b>`);
+      if (r.electricity) recLines.push(`Electricity: <b>${esc(r.electricity)}</b>`);
+      parts.push(`
+        <div style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.4);border-radius:8px;padding:8px;font-size:0.72rem;margin-top:6px">
+          <div style="font-weight:700;color:var(--green-light);margin-bottom:4px">✅ My record found — ${csvRecord.dist ? Math.round(csvRecord.dist) + ' m from this field' : 'at this location'}</div>
+          ${recLines.join('<br>')}
+        </div>`);
+    } else if (csvImportCount() > 0) {
+      parts.push(`<div style="font-size:0.68rem;color:var(--text-faint);margin-top:6px">ℹ️ ${csvImportCount()} of your records imported — none within 500 m of this field.</div>`);
+    }
+
+    // OSM infrastructure summary (grouped, with distances)
+    if (infra && infra.total > 0) {
+      const items = infra.items; // [{ t, d }] — objects, not strings
+      const groups = [];
+      const addGroup = (label, icon, list) => {
+        const rows = list.slice(0, 4).map(i => i.d + ' m');
+        if (!rows.length) return;
+        groups.push(`<div style="margin-top:5px"><span style="font-size:0.68rem;color:var(--text-dim)">${icon} ${label}:</span> <span style="font-size:0.7rem;color:var(--text)">${rows.join(', ')}${list.length > 4 ? ' +' + (list.length - 4) : ''}</span></div>`);
+      };
+      addGroup('Power lines/poles', '⚡', items.filter(i => i.t === 'power'));
+      addGroup('Water pipelines', '🔵', items.filter(i => i.t === 'pipeline'));
+      addGroup('Wells / pumps', '💧', items.filter(i => i.t === 'water'));
+      addGroup('Canals', '🌊', items.filter(i => i.t === 'canal'));
+      parts.push(`
+        <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:8px;margin-top:6px">
+          <div style="font-weight:700;color:var(--text);font-size:0.72rem;margin-bottom:4px">🗺️ Nearby infrastructure (OpenStreetMap, 2 km)</div>
+          ${groups.join('')}
+          <div style="font-size:0.65rem;color:var(--text-faint);margin-top:4px">Free public map data — tap “🗺️ Show Nearby Infrastructure” to see it on the map.</div>
+        </div>`);
+    }
+
+    if (!parts.length) return;
+    box.innerHTML = parts.join('');
+    box.style.display = 'block';
+  }
+
+  function csvImportCount() {
+    try { return JSON.parse(localStorage.getItem('fh_land_records_csv') || '[]').length; } catch (e) { return 0; }
+  }
+
+  // Find the nearest imported record within 500 m of the field center.
+  function matchCSVRecord(lat, lng) {
+    let rows = [];
+    try { rows = JSON.parse(localStorage.getItem('fh_land_records_csv') || '[]'); } catch (e) { return null; }
+    if (!rows.length || !_state.fieldCenter) return null;
+    let best = null;
+    rows.forEach(r => {
+      if (r.lat === undefined || r.lng === undefined) return;
+      const d = haversineM(lat, lng, Number(r.lat), Number(r.lng));
+      if (d <= 500 && (!best || d < best.dist)) {
+        best = { ...r, dist: d };
+      }
+    });
+    return best;
+  }
+
+  // The full auto-scan: pincode + OSM infra + own-record match.
+  async function autoScanLocation() {
+    if (!_state.fieldCenter) return;
+    const seq = ++_scanSeq;
+    const [lat, lng] = _state.fieldCenter;
+    const box = $('locationScan');
+    if (box) {
+      box.style.display = 'block';
+      box.innerHTML = '<div style="font-size:0.7rem;color:var(--text-dim)">🔍 Scanning location…</div>';
+    }
+
+    // 1. Own CSV records (instant, local)
+    const csvRecord = matchCSVRecord(lat, lng);
+
+    // 2. Pincode from the village/place name (India Post API)
+    let pincode = null;
+    const village = $('lrVillageInput')?.value.trim() || '';
+    const district = $('lrDistrictInput')?.value.trim() || '';
+    const state = $('lrStateInput')?.value.trim() || '';
+    if (village || district) {
+      pincode = await FH_API.lookupPincode(village || district, district, state).catch(() => null);
+    }
+    if (seq !== _scanSeq) return; // stale — field changed mid-scan
+
+    // 3. OSM infrastructure (public data, 2 km — matches the overlay query)
+    let infra = null;
+    try {
+      const data = await FH_API.fetchInfrastructure(lat, lng, 2000);
+      if (data && data.success && data.elements) {
+        const items = data.elements
+          .map(el => {
+            const pt = el.type === 'node' ? { lat: el.lat, lon: el.lon }
+              : (el.center || (el.geometry && el.geometry[Math.floor(el.geometry.length / 2)]));
+            if (!pt || pt.lat === undefined) return null;
+            const tags = el.tags || {};
+            const t = tags.man_made || tags.power || tags.water || tags.waterway || 'other';
+            const typeKey = tags.man_made === 'pipeline' ? 'pipeline'
+              : (tags.power ? 'power'
+                : (tags.water ? 'water'
+                  : (tags.waterway === 'canal' ? 'canal' : 'other')));
+            return {
+              t: typeKey,
+              d: Math.round(haversineM(lat, lng, pt.lat, pt.lon))
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.d - b.d);
+        infra = {
+          total: items.length,
+          items: items  // keep { t, d } objects — renderLocationScan filters by .t
+        };
+      }
+    } catch (e) {
+      console.warn('[Scan] OSM infra failed:', e);
+    }
+    if (seq !== _scanSeq) return;
+
+    renderLocationScan({ pincode, infra, csvRecord });
+  }
+
+  // ═══════════ IMPORT MY OWN LAND RECORDS (CSV) ═══════════
+  // Columns: lat,lng,survey,khata,owner,motor,pipeline,electricity,village,district,state,pincode
+  // Rows are stored locally and auto-matched to a clicked field (within 500 m).
+  function importLandRecordsCSV(inputElement) {
+    const file = inputElement.files?.[0];
+    if (!file) return;
+    const status = $('csvImportStatus');
+    const show = (msg, ok) => {
+      if (!status) return;
+      status.style.display = 'block';
+      status.style.color = ok ? 'var(--green-light)' : 'var(--orange)';
+      status.textContent = msg;
+    };
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = String(reader.result || '');
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) return show('CSV needs a header row + at least 1 data row', false);
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const rows = lines.slice(1).map(line => {
+          const cells = line.split(',').map(c => c.trim());
+          const row = {};
+          headers.forEach((h, i) => { row[h] = cells[i] !== undefined ? cells[i] : ''; });
+          return row;
+        }).filter(r => r.lat && r.lng && !isNaN(Number(r.lat)) && !isNaN(Number(r.lng)));
+        if (!rows.length) return show('No valid rows (need numeric lat and lng columns)', false);
+        localStorage.setItem('fh_land_records_csv', JSON.stringify(rows));
+        show(`✅ ${rows.length} records imported — they will auto-match when you click a field nearby`, true);
+        // Re-scan the current field so the match appears immediately
+        autoScanLocation();
+      } catch (e) {
+        console.error('[CSV] Import failed:', e);
+        show('❌ Could not read CSV: ' + e.message, false);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function saveInfrastructure() {
+    if (!_state.fieldCenter) return toast('Select a field first', 'err');
+    const data = {
+      motorNo: $('infraMotorInput')?.value.trim() || '',
+      pipelineNo: $('infraPipelineInput')?.value.trim() || '',
+      electricityNo: $('infraElectricityInput')?.value.trim() || '',
+      waterSource: $('infraWaterSource')?.value || 'none',
+      irrigationType: $('infraIrrigationType')?.value || 'none',
+      notes: $('infraNotesInput')?.value.trim() || '',
+      savedAt: new Date().toISOString()
+    };
+    const key = infraStorageKey();
+    if (!key) return;
+    localStorage.setItem(key, JSON.stringify(data));
+    updateInfraStatus();
+    toast('✅ Infrastructure details saved');
+  }
+
+  function loadInfrastructure() {
+    if (!_state.fieldCenter) return;
+    const key = infraStorageKey();
+    if (!key) return;
+    const saved = localStorage.getItem(key);
+    if (!saved) {
+      ['infraMotorInput', 'infraPipelineInput', 'infraElectricityInput', 'infraWaterSource', 'infraIrrigationType', 'infraNotesInput'].forEach(id => {
+        const el = $(id);
+        if (el) el.value = el.tagName === 'SELECT' ? 'none' : '';
+      });
+      return;
+    }
+    try {
+      const data = JSON.parse(saved);
+      if ($('infraMotorInput')) $('infraMotorInput').value = data.motorNo || '';
+      if ($('infraPipelineInput')) $('infraPipelineInput').value = data.pipelineNo || '';
+      if ($('infraElectricityInput')) $('infraElectricityInput').value = data.electricityNo || '';
+      if ($('infraWaterSource')) $('infraWaterSource').value = data.waterSource || 'none';
+      if ($('infraIrrigationType')) $('infraIrrigationType').value = data.irrigationType || 'none';
+      if ($('infraNotesInput')) $('infraNotesInput').value = data.notes || '';
+    } catch (e) { /* ignore */ }
+    updateInfraStatus();
+  }
+
+  function updateInfraStatus() {
+    const badge = $('infraStatusBadge');
+    if (!badge) return;
+    const key = infraStorageKey();
+    let saved = null;
+    if (key) {
+      try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { /* ignore */ }
+    }
+    if (saved && (saved.motorNo || saved.pipelineNo || saved.electricityNo)) {
+      badge.className = 'badge badge-live';
+      badge.textContent = '✓ Saved locally';
+    } else {
+      badge.className = 'badge badge-warn';
+      badge.textContent = '— Not entered';
+    }
+  }
+
+  let _osmInfraLayer = null;
+
+  async function loadOSMInfrastructure() {
+    if (!_state.fieldCenter || !_state.map) return;
+    const [lat, lng] = _state.fieldCenter;
+    const radius = 2000;
+    if (_osmInfraLayer) {
+      _state.map.removeLayer(_osmInfraLayer);
+      _osmInfraLayer = null;
+    }
+    toast('🔍 Loading nearby infrastructure...');
+    try {
+      const query = `
+        [out:json][timeout:25];
+        (
+          node["man_made"="pipeline"]["substance"="water"](around:${radius},${lat},${lng});
+          way["man_made"="pipeline"]["substance"="water"](around:${radius},${lat},${lng});
+          node["power"="pole"](around:${radius},${lat},${lng});
+          node["power"="tower"](around:${radius},${lat},${lng});
+          way["power"="line"](around:${radius},${lat},${lng});
+          node["water"="well"](around:${radius},${lat},${lng});
+          node["water"="pump"](around:${radius},${lat},${lng});
+          way["waterway"="canal"](around:${radius},${lat},${lng});
+          node["emergency"="fire_hydrant"](around:${radius},${lat},${lng});
+        );
+        out body;
+      `;
+      const response = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(query)
+      });
+      if (!response.ok) throw new Error('Overpass API error: ' + response.status);
+      const data = await response.json();
+      if (!data.elements || data.elements.length === 0) {
+        toast('No public infrastructure found nearby (OSM)');
+        return;
+      }
+      const features = [];
+      data.elements.forEach(el => {
+        if (el.type === 'node' && el.lat && el.lon) {
+          features.push({
+            type: 'Feature',
+            properties: {
+              type: el.tags?.man_made || el.tags?.power || el.tags?.water || el.tags?.waterway || 'infrastructure',
+              name: el.tags?.name || '',
+              substance: el.tags?.substance || ''
+            },
+            geometry: { type: 'Point', coordinates: [el.lon, el.lat] }
+          });
+        } else if (el.type === 'way' && el.geometry) {
+          const coords = el.geometry.map(g => [g.lon, g.lat]);
+          features.push({
+            type: 'Feature',
+            properties: {
+              type: el.tags?.man_made || el.tags?.power || el.tags?.waterway || 'infrastructure',
+              name: el.tags?.name || '',
+              substance: el.tags?.substance || ''
+            },
+            geometry: { type: 'LineString', coordinates: coords }
+          });
+        }
+      });
+      const geojson = { type: 'FeatureCollection', features };
+      const getStyle = (feature) => {
+        const t = (feature.properties.type || '').toLowerCase();
+        if (t.includes('pipeline')) return { color: '#3498db', weight: 3, opacity: 0.8 };
+        if (t.includes('power') || t.includes('pole') || t.includes('tower') || t.includes('line')) return { color: '#f39c12', weight: 2, opacity: 0.8 };
+        if (t.includes('water') || t.includes('canal') || t.includes('ditch') || t.includes('well') || t.includes('pump') || t.includes('hydrant')) return { color: '#2ecc71', weight: 2, opacity: 0.8 };
+        return { color: '#95a5a6', weight: 1, opacity: 0.6 };
+      };
+      const getIcon = (feature) => {
+        const t = (feature.properties.type || '').toLowerCase();
+        if (t.includes('pipeline')) return '🔵';
+        if (t.includes('power')) return '⚡';
+        if (t.includes('water') || t.includes('canal')) return '💧';
+        return '📍';
+      };
+      _osmInfraLayer = L.geoJSON(geojson, {
+        style: (f) => getStyle(f),
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+          radius: 6, ...getStyle(f), fillOpacity: 0.9
+        }),
+        onEachFeature: (f, layer) => {
+          const p = f.properties;
+          const title = p.name || p.type;
+          const subtitle = [p.substance].filter(Boolean).join(' • ');
+          layer.bindPopup(`<b>${title}</b>${subtitle ? '<br><small>' + subtitle + '</small>' : ''}<br><small>OSM public data</small>`);
+          layer.bindTooltip(getIcon(f) + ' ' + (title || p.type), { permanent: false, direction: 'top' });
+        }
+      }).addTo(_state.map);
+      toast(`✓ Loaded ${data.elements.length} infrastructure items from OpenStreetMap`);
+      if (_osmInfraLayer.getBounds().isValid()) {
+        _state.map.fitBounds(_osmInfraLayer.getBounds().pad(0.15));
+      }
+    } catch (e) {
+      console.warn('[OSM] Infrastructure load failed:', e);
+      toast('⚠️ Could not load OSM data (offline or API blocked)', 'err');
+    }
+  }
+
+  function clearOSMInfrastructure() {
+    if (_osmInfraLayer && _state.map) {
+      _state.map.removeLayer(_osmInfraLayer);
+      _osmInfraLayer = null;
+      toast('Infrastructure overlay cleared');
+    }
+  }
+
+  function saveJournalEntry() {
+    if (!_state.fieldCenter) return toast('Select a field first', 'err');
+    const textarea = $('journalTextarea');
+    if (!textarea) return;
+    const text = textarea.value.trim();
+    if (!text) return toast('Write something first', 'err');
+    const key = journalStorageKey();
+    if (!key) return;
+    const entry = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      text,
+      timestamp: new Date().toISOString(),
+      synced: false
+    };
+    let entries = [];
+    try {
+      const existing = localStorage.getItem(key);
+      if (existing) entries = JSON.parse(existing);
+    } catch (e) { /* ignore */ }
+    entries.unshift(entry);
+    localStorage.setItem(key, JSON.stringify(entries));
+    textarea.value = '';
+    renderJournalEntries();
+    toast('📝 Journal entry saved');
+  }
+
+  function loadJournalEntries() {
+    if (!_state.fieldCenter) return;
+    const key = journalStorageKey();
+    if (!key) return;
+    renderJournalEntries();
+  }
+
+  function renderJournalEntries() {
+    const container = $('journalEntriesList');
+    if (!container || !_state.fieldCenter) return;
+    const key = journalStorageKey();
+    if (!key) return;
+    let entries = [];
+    try {
+      const existing = localStorage.getItem(key);
+      if (existing) entries = JSON.parse(existing);
+    } catch (e) { /* ignore */ }
+    if (entries.length === 0) {
+      container.innerHTML = '<div class="hint" style="font-size:0.75rem;color:var(--text-faint)">No entries yet. Start writing your field observations below.</div>';
+      return;
+    }
+    container.innerHTML = entries.map(e => {
+      const date = new Date(e.timestamp);
+      const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const syncIcon = e.synced ? '☁️' : '💾';
+      return `
+        <div class="journal-entry" style="padding:10px;border-bottom:1px solid #e9ecef;background:#fafafa;border-radius:6px;margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <small style="color:var(--text-faint);font-size:0.7rem;">${syncIcon} ${dateStr}</small>
+            <button onclick="FH.deleteJournalEntry('${e.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.8rem;padding:2px 6px;" title="Delete">✕</button>
+          </div>
+          <div style="font-size:0.85rem;line-height:1.5;white-space:pre-wrap;">${e.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function deleteJournalEntry(entryId) {
+    if (!_state.fieldCenter) return;
+    const key = journalStorageKey();
+    if (!key) return;
+    let entries = [];
+    try {
+      const existing = localStorage.getItem(key);
+      if (existing) entries = JSON.parse(existing);
+    } catch (e) { /* ignore */ }
+    entries = entries.filter(e => e.id !== entryId);
+    localStorage.setItem(key, JSON.stringify(entries));
+    renderJournalEntries();
+    toast('Entry deleted');
+  }
+
+  function exportJournal() {
+    if (!_state.fieldCenter) return toast('Select a field first', 'err');
+    const key = journalStorageKey();
+    if (!key) return;
+    let entries = [];
+    try {
+      const existing = localStorage.getItem(key);
+      if (existing) entries = JSON.parse(existing);
+    } catch (e) { /* ignore */ }
+    if (!entries.length) return toast('No entries to export', 'err');
+    const csv = 'Date,Time,Entry\n' + entries.map(e => {
+      const d = new Date(e.timestamp);
+      return `"${d.toLocaleDateString()}","${d.toLocaleTimeString()}","${e.text.replace(/"/g, '\"\"')}"`;
+    }).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `field-journal-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('📥 Journal exported as CSV');
+  }
+
+  function showAISourceIndicator(source) {
+    const el = $('aiSourceIndicator');
+    if (!el) return;
+    const labels = {
+      ollama: { text: '🟢 Self-hosted AI (Ollama)', color: '#2ecc71' },
+      gemini: { text: '🔵 Cloud AI (Gemini)', color: '#3498db' },
+      expert: { text: '🟡 Built-in Expert System', color: '#f39c12' },
+      fallback: { text: '🟠 Offline Fallback', color: '#e67e22' }
+    };
+    const info = labels[source] || labels.expert;
+    el.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:12px;background:${info.color}15;color:${info.color};font-size:0.75rem;font-weight:600;border:1px solid ${info.color}40;">${info.text}</span>`;
+    el.style.display = 'inline-block';
+  }
+
+  function hideAISourceIndicator() {
+    const el = $('aiSourceIndicator');
+    if (el) el.style.display = 'none';
   }
 
   // ═══════════ YIELD PROJECTION RENDER ═══════════
@@ -1463,6 +1982,7 @@ const FH_UI = (function() {
     handleLogin,
     handleGoogleLogin,
     selectGoogleAccount,
+    updateLoginUI,
     renderScenes,
     selectScene,
     renderEnhancedScenes,
@@ -1493,6 +2013,10 @@ const FH_UI = (function() {
     applyPlaceToLandInfo,
     openLandPortal,
     updateLandStatus,
+    autoScanLocation,
+    importLandRecordsCSV,
+    matchCSVRecord,
+    renderLocationScan,
     updateLegend,
     renderYieldProjection,
     renderPestRiskCards,
@@ -1512,6 +2036,18 @@ const FH_UI = (function() {
     deleteFieldFromDashboard,
     exportFieldGeoJSON,
     fieldStatusOf,
-    healthScoreOf
+    healthScoreOf,
+    // Infrastructure & Journal
+    saveInfrastructure,
+    loadInfrastructure,
+    loadOSMInfrastructure,
+    clearOSMInfrastructure,
+    saveJournalEntry,
+    loadJournalEntries,
+    renderJournalEntries,
+    deleteJournalEntry,
+    exportJournal,
+    showAISourceIndicator,
+    hideAISourceIndicator
   };
 })();
