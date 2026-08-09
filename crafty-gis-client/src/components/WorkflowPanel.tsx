@@ -10,7 +10,13 @@ import {
   Play,
   Pause,
 } from "lucide-react";
-import type { WorkflowTask } from "@/app/page";
+interface WorkflowTask {
+  id: string;
+  title: string;
+  tool: string;
+  status: "pending" | "running" | "completed" | "failed";
+  progress: number;
+}
 
 interface WorkflowPanelProps {
   tasks: WorkflowTask[];

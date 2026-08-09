@@ -54,12 +54,15 @@ git push -u origin main
 
 | Key | Value |
 |-----|-------|
-| `SENTINEL_HUB_CLIENT_ID` | your Sentinel Hub Client ID |
-| `SENTINEL_HUB_CLIENT_SECRET` | your Sentinel Hub Client Secret |
-| `GEMINI_API_KEY` | your Gemini API key |
+| `GEE_SERVICE_ACCOUNT` | your GEE service-account email |
+| `GEE_PRIVATE_KEY` | the **single-line** PEM with `\n` escapes (paste as-is from `.env`) |
+| `GEMINI_API_KEY` | your Gemini API key (optional fallback) |
+| `SENTINEL_HUB_CLIENT_ID` | your Sentinel Hub Client ID (optional fallback) |
+| `SENTINEL_HUB_CLIENT_SECRET` | your Sentinel Hub Client Secret (optional fallback) |
+| `OLLAMA_BASE_URL` | leave unset unless you run a self-hosted Ollama |
 
-5. Click **Deploy** — wait ~2 minutes
-6. Your backend URL will be `https://farmhealth-backend.onrender.com`
+5. Click **Deploy** — wait ~2 minutes (free-tier cold start can take a few more)
+6. Your backend URL will be `https://farmhealth1-backend.onrender.com`
    (or a custom name if you changed it — copy the URL shown in the dashboard)
 
 ---
@@ -94,8 +97,8 @@ And update `netlify.toml`:
 1. Netlify → **Add new site** → **Import from Git**
 2. Connect your GitHub repo
 3. Build settings:
-   - **Build command:** *(leave blank — no build step)*
-   - **Publish directory:** `.`  (the root)
+   - **Build command:** `bash build.sh` (keeps `www/` fresh; Netlify serves the root)
+   - **Publish directory:** `.`  (the root — `netlify.toml` already handles the rest)
 4. Click **Deploy site**
 
 Netlify auto-reads `netlify.toml`. All `/api/*` requests are proxied to your Render backend.
@@ -131,7 +134,7 @@ cp .env.example .env
 
 # Start the backend server
 npm start
-# Server runs on http://localhost:3001
+# Server runs on http://localhost:3001 (frontend served from the same origin)
 
 # Open the frontend
 # Just open index.html in your browser, or:
@@ -151,9 +154,12 @@ Browser
         │
         ├── /api/sentinel/token     → Fetches Sentinel Hub OAuth token
         ├── /api/gemini-analysis    → Proxies Gemini AI request
+        ├── /api/vision-analysis    → Crop-photo AI (disease detection)
         ├── /api/gee/ndvi           → Google Earth Engine NDVI
         ├── /api/gee/sar            → Sentinel-1 SAR soil moisture
-        └── /api/gee/time-series    → NDVI time series
+        ├── /api/gee/time-series    → NDVI time series
+        ├── /api/infrastructure    → Nearby power/water/wells (OSM)
+        └── /api/gee/health        → Health check + keep-alive target
 ```
 
 ---
@@ -164,12 +170,12 @@ Render free services sleep after 15 minutes of inactivity. To keep it awake:
 
 **Option 1 — UptimeRobot (free)**
 1. Go to https://uptimerobot.com → Create free account
-2. Add HTTP monitor → URL: `https://farmhealth-backend.onrender.com/api/gee/health`
+2. Add HTTP monitor → URL: `https://farmhealth1-backend.onrender.com/api/gee/health`
 3. Check every 5 minutes
 
 **Option 2 — cron-job.org (free)**
 1. Go to https://cron-job.org
-2. Create a job pinging `https://farmhealth-backend.onrender.com/api/gee/health` every 5 minutes
+2. Create a job pinging `https://farmhealth1-backend.onrender.com/api/gee/health` every 5 minutes
 
 ---
 
@@ -177,10 +183,12 @@ Render free services sleep after 15 minutes of inactivity. To keep it awake:
 
 | Variable | Where to set | Description |
 |----------|-------------|-------------|
-| `SENTINEL_HUB_CLIENT_ID` | Render dashboard | Satellite data OAuth |
-| `SENTINEL_HUB_CLIENT_SECRET` | Render dashboard | Satellite data OAuth |
-| `GEMINI_API_KEY` | Render dashboard | AI crop advice |
-| `GOOGLE_APPLICATION_CREDENTIALS` | Render dashboard | GEE service account (optional) |
-| `GOOGLE_CLOUD_PROJECT` | Render dashboard | GEE project ID (optional) |
+| `GEE_SERVICE_ACCOUNT` | Render dashboard | GEE service-account email |
+| `GEE_PRIVATE_KEY` | Render dashboard | Single-line PEM with `\n` escapes |
+| `GEMINI_API_KEY` | Render dashboard | AI crop advice (fallback after Ollama) |
+| `SENTINEL_HUB_CLIENT_ID` | Render dashboard | Satellite data OAuth (fallback) |
+| `SENTINEL_HUB_CLIENT_SECRET` | Render dashboard | Satellite data OAuth (fallback) |
+| `OLLAMA_BASE_URL` | Render dashboard | Self-hosted Ollama endpoint (optional) |
+| `OLLAMA_MODEL` | Render dashboard | e.g. `deepseek-r1:7b` (optional) |
 | `PORT` | Render auto-sets | Server port |
 | `NODE_ENV` | Render auto-sets | `production` |

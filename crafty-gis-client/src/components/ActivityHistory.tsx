@@ -11,7 +11,13 @@ import {
   Clock,
   Trash2,
 } from "lucide-react";
-import { Activity } from "../page";
+// Activity type - define locally for this component
+interface Activity {
+  id: string;
+  action: string;
+  description: string;
+  created_at: string;
+}
 
 interface ActivityHistoryProps {
   activities: Activity[];

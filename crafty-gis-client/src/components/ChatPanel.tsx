@@ -12,7 +12,13 @@ import {
   Lightbulb,
   ArrowRight,
 } from "lucide-react";
-import type { Message } from "@/app/page";
+interface Message {
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  ts: string;
+  type: string;
+}
 
 interface ChatPanelProps {
   messages: Message[];

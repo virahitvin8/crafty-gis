@@ -8,6 +8,9 @@ type Role = "user" | "assistant" | "system";
 type Msg = { id: string; role: Role; content: string; ts: string };
 type Task = { id: string; title: string; tool: string; status: "pending"|"running"|"completed"|"failed"; progress: number };
 type OutFile = { id: string; name: string; type: string; size: string; url?: string };
+export type Message = Msg;
+export type OutputFile = OutFile;
+export type WorkflowTask = Task;
 
 const SUGGESTIONS = [
   "Show me crop health using NDVI for my fields",

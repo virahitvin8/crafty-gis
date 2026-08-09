@@ -579,9 +579,9 @@ const FH_API = (function() {
           
           // Measure mean NDVI from pixels to use for the health grid overlay
           const gridMean = preferMean || _state.analysisData?.meanNdvi || 0.6;
-          // Draw a semi-transparent health grid on top of the image overlay
+          // Grid overlay disabled — showing only satellite image
           // This gives the user clear colored blocks they can read at a glance
-          drawHealthGridForRealData(gridMean, cropPeak, paneName, indexType);
+          // drawHealthGridForRealData(gridMean, cropPeak, paneName, indexType);
           if (!paneName) {
             setDataStatus(true, 'LIVE — real satellite imagery (' + (FH_CONFIG.INDEX_INFO[indexType]?.name || indexType).toUpperCase() + ' · ' + dateStr + ')');
           }
@@ -613,7 +613,9 @@ const FH_API = (function() {
       if (stale()) return emptyStats;
       // Use the passed preferred mean, or read from existing analysis, or generate a reasonable value
       const fallbackMean = preferMean || _state.analysisData?.meanNdvi || (0.55 + Math.random() * 0.25);
-      return generateSimulatedGrid(fallbackMean, cropPeak, paneName, indexType);
+      // Grid overlay disabled — showing only satellite image
+      // return generateSimulatedGrid(fallbackMean, cropPeak, paneName, indexType);
+      return emptyStats;
     }
   }
 

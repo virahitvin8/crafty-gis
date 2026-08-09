@@ -24,13 +24,15 @@
 
 | Resource | Free Tier Limit | For FarmHealth |
 |----------|----------------|----------------|
-| VM (AMD) | 4 cores, 24GB RAM | ✅ Use 4 cores, 4GB RAM |
-| VM (ARM) | 4 cores, 24GB RAM | ✅ Use 4 cores, 4GB RAM (ARM) |
-| Block Storage | 2x 200GB volumes | ✅ Use 100GB for app + data |
-| Bandwidth | 10TB/month | ✅ More than enough |
+| VM (ARM Ampere) | 4 OCPUs, **24GB RAM** (Always Free) | ✅ use all 4 OCPUs / 24GB |
+| VM (AMD E2.1.Micro) | 1/8 OCPU, **1GB RAM** (Always Free) | ❌ too small for this stack |
+| Block Storage | 200GB total (Always Free) | ✅ 100GB boot volume |
+| Bandwidth | 10TB/month (Always Free) | ✅ More than enough |
 | **Cost** | **$0/month** | **$0/month** |
 
-**Recommendation**: Use **ARM-based VM** (4 cores, 24GB RAM) — better performance, lower cost.
+**Recommendation**: Use the **ARM (Ampere A1) shape — `VM.Standard.A1.Flex`**.
+It's the only Always-Free shape with enough RAM (24GB) for Docker + Ollama.
+The AMD free shape (1GB RAM) will OOM — don't use it for this stack.
 
 ---
 
@@ -94,19 +96,27 @@
 
 ### **Phase 3: Configure Firewall** (2 min)
 
+⚠️ **Oracle's cloud firewall is separate from the OS firewall** — both must
+allow traffic. If the Dokploy dashboard or the app "doesn't load" while
+`curl localhost` works on the VM, this is why.
+
 1. In instance details, go to **"Subnet"** → Click VCN
-2. Go to **"Security Lists**"
-3. Click **"Add Ingress Rule"** (add 3 rules):
+2. Go to **"Security Lists"** → **"Add Ingress Rule"** (add 6 rules):
 
 | Rule | Source | Protocol | Port |
 |------|--------|----------|------|
 | SSH | 0.0.0.0/0 | TCP | 22 |
 | HTTP | 0.0.0.0/0 | TCP | 80 |
 | HTTPS | 0.0.0.0/0 | TCP | 443 |
+| Dokploy UI | 0.0.0.0/0 | TCP | 3000 |
+| FarmHealth app | 0.0.0.0/0 | TCP | 8080 |
+| Monitoring | 0.0.0.0/0 | TCP | 3002 |
 
 **Save** all rules.
 
-**Note**: Dokploy will auto-configure internal firewall rules on first run.
+**Note**: the install script also opens the same ports inside the VM (UFW).
+Both layers must agree — if you skip one, you'll get a timeout, not a refused
+connection, when connecting from outside.
 
 ---
 
@@ -131,26 +141,29 @@ df -h    # Should show ~100GB disk
 
 ---
 
-### **Phase 5: Install Dokploy** (5 min)
+### **Phase 5: Install Dokploy — ONE script** (5 min)
 
-**Run this ONE command** (official installer):
+The repo ships a one-command installer that provisions the box, installs
+Dokploy, waits for the UI, and pre-creates the `farmhealth` project:
 
 ```bash
+# From your laptop — copy the script up, then run it on the VM:
+scp scripts/install-dokploy.sh ubuntu@YOUR_VM_IP:/tmp/
+ssh ubuntu@YOUR_VM_IP "sudo bash /tmp/install-dokploy.sh"
+```
+
+The script (runs on the VM) does:
+- `apt` update/upgrade + base packages (retry-aware, won't die on dpkg locks)
+- Opens ports 22, 80, 443, 3000, 8080, **3002** via UFW (port 22 failure =
+  abort, no SSH lockout) — matching the Oracle Security List below
+- Adds 8 GB swap if the box reports < 8 GB RAM
+- Runs the official Dokploy installer (Docker, Nginx, LetsEncrypt)
+- Waits until the UI answers on `:3000`
+- Creates the `farmhealth` project via API when you pass `--api-token`
+
+Equivalent manual install, if you prefer:
+```bash
 curl -sSL https://dokploy.com/install.sh | sh
-```
-
-**What it does** (takes ~3-5 minutes):
-- Installs Docker Engine
-- Installs Docker Compose
-- Creates `dokploy` user
-- Deploys Dokploy on ports 3000, 80, 443
-- Sets up Nginx reverse proxy
-- Configures firewall (UFW)
-
-**Wait for completion**. You'll see:
-```
-✅ Dokploy installed successfully!
-🌐 Access at: http://YOUR_VM_IP:3000
 ```
 
 ---
@@ -167,152 +180,76 @@ curl -sSL https://dokploy.com/install.sh | sh
 
 ---
 
-### **Phase 7: Deploy FarmHealth** (5 min)
+### **Phase 7: Deploy the whole stack — one Docker Compose resource** (5 min)
 
-#### **7.1: Add GitHub Connection**
+The repo's `docker-compose.dokploy.yml` is the **entire stack in one file** —
+no separate frontend/backend split needed. It builds FarmHealth from the
+repo's Dockerfile and adds Ollama, PostGIS, and Uptime Kuma:
 
-1. Click **"Settings"** (⚙️ icon)
-2. Go to **"Git Providers**"
-3. Click **"GitHub"**
-4. Click **"Connect GitHub"**
-5. Authorize Dokploy to access your repos
-6. Select: **`virahitvin8/crafty-gis`**
+| Service | Port | Role |
+|---|---|---|
+| farmhealth | 8080 | App + backend (built from repo) |
+| ollama | 11434 | Self-hosted AI (internal) |
+| postgis | 5432 | Saved farms / land records |
+| uptime-kuma | 3002 | Monitoring (optional) |
 
-#### **7.2: Create New Project**
+1. **Projects → `farmhealth`** (pre-created by the script, or create it)
+2. **Add Resource → Docker Compose**
+3. Connect GitHub → select `virahitvin8/crafty-gis` (branch `main`)
+   **Compose path**: `docker-compose.dokploy.yml`
+4. Create → **Deploy** (first build ~5–10 min: Docker image + Ollama model pull)
 
-1. Click **"Projects"** → **"New Project"**
-2. Name: `farmhealth`
-3. Click **"Create"**
-
-#### **7.3: Deploy Application**
-
-1. In `farmhealth` project, click **"Add New"**
-2. Select **"Git Repository"**
-3. Fill in:
-   - **Repository**: `virahitvin8/crafty-gis`
-   - **Branch**: `main`
-   - **Build Command** (if any): Leave empty (static site)
-   - **Publish Directory**: `.` (root)
-4. Click **"Deploy"**
-
-**Dokploy will**:
-- Clone your repo
-- Build static files (if needed)
-- Deploy to Nginx on port 80
-- Auto-configure HTTPS via LetsEncrypt
-
-**Wait 2-3 minutes** for deployment.
+> **Old two-service split:** earlier guides had you deploy the frontend as a
+> static site and the backend as a separate `node:20-alpine` service. You no
+> longer need that — one compose resource runs everything, and the Dockerfile
+> already bundles the frontend + Node backend in one container.
 
 ---
 
-### **Phase 8: Configure Backend** (3 min)
+### **Phase 8: Add secrets in the Dokploy dashboard** (2 min)
 
-Dokploy deploys the frontend, but you also need the **Node.js backend** running.
-
-#### **Option A: Deploy Backend as Separate Service** (Recommended)
-
-1. In `farmhealth` project, click **"Add New"**
-2. Select **"Docker Compose"**
-3. Name: `farmhealth-backend`
-4. Paste this `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  backend:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - ./server:/app/server
-      - ./js:/app/js
-      - ./package.json:/app/package.json
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      # Add your secrets here (or use Dokploy Secrets Manager)
-      - SENTINEL_HUB_CLIENT_ID=${SENTINEL_HUB_CLIENT_ID}
-      - SENTINEL_HUB_CLIENT_SECRET=${SENTINEL_HUB_CLIENT_SECRET}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - GEE_SERVICE_ACCOUNT=${GEE_SERVICE_ACCOUNT}
-      - GEE_PRIVATE_KEY=${GEE_PRIVATE_KEY}
-      - OLLAMA_URL=http://ollama:11434
-    command: sh -c "cd /app/server && npm install && node server.js"
-    restart: always
-    networks:
-      - farmhealth-net
-
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    restart: always
-    networks:
-      - farmhealth-net
-
-volumes:
-  ollama_data:
-
-networks:
-  farmhealth-net:
-    driver: bridge
-```
-
-5. Click **"Deploy**"
-6. Wait for backend to start
-
-#### **Option B: Use Render for Backend** (Easier)
-
-If Dokploy backend is complex, just use **Render** (free tier, sleeps after 15min):
-
-```bash
-# Follow instructions in DEPLOY_NOW.md for Render
-# Frontend stays on Dokploy (always-on)
-# Backend sleeps on Render (wakes on request)
-```
-
----
-
-### **Phase 9: Configure Environment Variables** (2 min)
-
-In Dokploy:
-
-1. Go to **farmhealth** project → **farmhealth-backend** service
-2. Click **"Environment Variables**"
-3. Add these secrets:
+1. In Dokploy → your compose service → **Environment** tab
+2. Add (paste the GEE key as **one line** with its `\n` escapes — the server
+   unescapes it, exactly like Render):
 
 | Variable | Value | Where to Get |
 |----------|-------|--------------|
-| `SENTINEL_HUB_CLIENT_ID` | Your ID | https://apps.sentinel-hub.com |
-| `SENTINEL_HUB_CLIENT_SECRET` | Your secret | https://apps.sentinel-hub.com |
-| `GEMINI_API_KEY` | Your key | https://aistudio.google.com |
-| `GEE_SERVICE_ACCOUNT` | Your email | Google Cloud Console |
-| `GEE_PRIVATE_KEY` | Your JSON key | Download from GCP |
+| `GEE_SERVICE_ACCOUNT` | `gee-backend-account@braided-analyst-500314-c5.iam.gserviceaccount.com` | GCP IAM |
+| `GEE_PRIVATE_KEY` | Single-line PEM with `\n` | GCP service-account key |
+| `OLLAMA_MODEL` | `deepseek-r1:7b` (or `deepseek-r1:1.5b` on tight RAM) | — |
+| `OLLAMA_VISION_MODEL` | `llava-phi3` (or `llava`) | — |
+| `GEMINI_API_KEY` | Your key (optional fallback) | https://aistudio.google.com |
+| `SENTINEL_HUB_CLIENT_ID` / `_SECRET` | Optional fallback | https://apps.sentinel-hub.com |
+| `POSTGRES_PASSWORD` | Change from default | — |
 
-4. Click **"Save**"
-5. **Restart** the backend service
+3. **Save** — no `.env` mounts anywhere (see the compose header: use shell env
+   on the laptop, dashboard env on Dokploy).
+
+---
+
+### **Phase 9: Auto-deploy from GitHub (CI/CD)** (2 min)
+
+1. Dokploy → your service → **Settings → Advanced → Deploy Hook** → copy the URL
+2. GitHub → repo → **Settings → Secrets and variables → Actions** → add
+   `DOKPLOY_DEPLOY_URL` = that URL
+3. Push to `main` → `.github/workflows/deploy-dokploy.yml` verifies the build
+   and triggers Dokploy automatically.
 
 ---
 
 ### **Phase 10: Test Your Deployment** (1 min)
 
 ```bash
-# Test frontend (from your computer):
-curl https://your-custom-domain.com
-# OR
-curl http://YOUR_VM_IP
+# App + health endpoints (from your computer):
+curl http://YOUR_VM_IP:8080/api/health        # backend alive
+curl http://YOUR_VM_IP:8080/api/gee/health    # satellite backend
+curl http://YOUR_VM_IP:8080/api/ai/health     # Ollama-backed advice
+curl -I http://YOUR_VM_IP:8080                # frontend
 
-# Test backend health:
-curl http://YOUR_VM_IP:3001/api/health
-
-# Test API:
-curl -X POST http://YOUR_VM_IP:3001/api/analyze \
+# Sample API call (real route — NDVI for a field's bounding box):
+curl -X POST http://YOUR_VM_IP:8080/api/gee/ndvi \
   -H "Content-Type: application/json" \
-  -d '{"lat": 28.6139, "lon": 77.2090}'
+  -d '{"bounds":{"west":77.20,"south":28.60,"east":77.22,"north":28.62},"date":"2024-01-15"}'
 ```
 
 ---
@@ -370,22 +307,18 @@ sudo systemctl restart sshd
 # SSH into VM
 ssh ubuntu@YOUR_VM_IP
 
-# Check Dokploy:
-docker ps | grep dokploy
+# Check stack (Dokploy's compose resource creates its own project containers):
+docker ps | grep -E 'dokploy|farmhealth|ollama|uptime'
 
-# Check backend:
-docker ps | grep farmhealth
-
-# Check logs:
-docker logs farmhealth-backend -f
+# Check the farmhealth service logs:
+docker ps --format '{{.Names}}' | grep -i farmhealth | xargs -I{} docker logs {} -f
 ```
 
 ### **Update FarmHealth**
 
-When you push to GitHub, Dokploy **auto-deploys** (if configured).
-
-Manual trigger:
-1. Dokploy Dashboard → `farmhealth` project
+Push to `main` → GitHub Actions (`.github/workflows/deploy-dokploy.yml`)
+auto-triggers Dokploy. Manual trigger:
+1. Dokploy Dashboard → `farmhealth` project → the compose service
 2. Click **"Redeploy"**
 
 ### **Backup**
@@ -403,26 +336,36 @@ Dokploy auto-backups to:
 ### **Issue: Dokploy not accessible**
 
 ```bash
-# Check if Dokploy is running:
+# Is Dokploy up on the VM itself?
 docker ps | grep dokploy
+curl -s -o /dev/null -w '%{http_code}' http://localhost:3000   # should be 200/302
 
-# Check logs:
-docker logs dokploy -f
-
-# Check ports:
-sudo netstat -tlnp | grep 3000
+# VM is fine but your browser times out?
+# → Oracle Security List rule for TCP 3000 is missing (Phase 3), or UFW blocks it.
+sudo ufw status
 ```
 
-### **Issue: Backend not starting**
+### **Issue: App / API not reachable from outside**
 
 ```bash
-# Check backend logs:
-docker logs farmhealth-backend -f
+# Works on the VM but times out externally? Same two-layer firewall story:
+curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/health
+# → add TCP 8080 to the Oracle Security List AND open it in UFW.
+```
 
-# Common issues:
-# - Missing environment variables → Add in Dokploy
-# - Port conflict → Change port in docker-compose
-# - Memory limit → Increase in Dokploy settings
+### **Issue: Service keeps restarting / OOM**
+
+```bash
+# 4GB RAM with default models can OOM. Either:
+#  - set OLLAMA_MODEL=deepseek-r1:1.5b + OLLAMA_VISION_MODEL=llava (small)
+#  - or add swap:  sudo fallocate -l 8G /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+```
+
+### **Issue: HTTPS not working**
+
+```bash
+# Ensure ports 80/443 are open in the Oracle Security List AND UFW,
+# and the domain's A record points at YOUR_VM_IP.
 ```
 
 ### **Issue: HTTPS not working**
@@ -471,15 +414,15 @@ docker logs nginx-proxy -f
 ## 📋 Post-Deployment Checklist
 
 - [ ] Oracle Cloud account created
-- [ ] VM instance created (ARM or AMD)
-- [ ] Firewall rules configured (22, 80, 443)
+- [ ] ARM (Ampere A1) instance created — 4 OCPUs / 24GB (not the 1GB AMD shape)
+- [ ] Cloud firewall: TCP 22, 80, 443, **3000, 8080, 3002** in Security List
 - [ ] SSH access working
-- [ ] Dokploy installed
-- [ ] Dokploy dashboard accessible
-- [ ] FarmHealth frontend deployed
-- [ ] Backend service deployed (or Render connected)
-- [ ] Environment variables configured
-- [ ] Health check passing (`/api/health`)
+- [ ] `scripts/install-dokploy.sh` run (or manual Dokploy install)
+- [ ] Dokploy dashboard accessible (`:3000`)
+- [ ] `docker-compose.dokploy.yml` deployed as one compose resource
+- [ ] Secrets added in Dokploy env tab (GEE key as single line, models, postgres pw)
+- [ ] Health checks passing: `/api/health`, `/api/gee/health`, `/api/ai/health`
+- [ ] GitHub Actions `DOKPLOY_DEPLOY_URL` secret set (auto-deploy on push)
 - [ ] HTTPS working (via LetsEncrypt)
 - [ ] Custom domain configured (optional)
 - [ ] Billing alerts set ($0 limit)
@@ -504,9 +447,10 @@ Your FarmHealth instance is now:
 ## 📚 Additional Resources
 
 - **Oracle Cloud Docs**: https://docs.oracle.com/en-us/iaas/Content/home.htm
+- **Oracle Always Free FAQ**: https://www.oracle.com/cloud/free/faq.html
 - **Dokploy Docs**: https://dokploy.com/docs
 - **FarmHealth GitHub**: https://github.com/virahitvin8/crafty-gis
-- **Oracle Free Tier FAQ**: https://www.oracle.com/cloud/free/faq.html
+- Sibling guides: `DOKPLOY_DEPLOY.md` (general), `SELFHOST_MIGRATION.md` (laptop)
 
 ---
 

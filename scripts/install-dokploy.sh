@@ -116,8 +116,9 @@ if command -v ufw &>/dev/null; then
   ufw allow 443/tcp || true
   ufw allow 3000/tcp || true   # Dokploy UI
   ufw allow 8080/tcp || true   # FarmHealth app
+  ufw allow 3002/tcp || true   # Uptime Kuma (monitoring)
   ufw --force enable || warn "Could not enable UFW — check manually."
-  ok "Firewall: ports 22, 80, 443, 3000, 8080 opened"
+  ok "Firewall: ports 22, 80, 443, 3000, 8080, 3002 opened"
 fi
 
 # Swap for low-RAM boxes (Dokploy + Ollama need headroom)

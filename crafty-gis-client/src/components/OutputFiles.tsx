@@ -10,7 +10,13 @@ import {
   RefreshCw,
   FolderOpen,
 } from "lucide-react";
-import type { OutputFile } from "@/app/page";
+interface OutputFile {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  url?: string;
+}
 
 interface OutputFilesProps {
   files: OutputFile[];

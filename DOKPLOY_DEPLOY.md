@@ -24,7 +24,8 @@
 - A **GitHub account** to import this repo into Dokploy
 
 **Cheap VPS options:** Hetzner CX21/32 (~€5–10/mo), DigitalOcean $12 droplet,
-Vultr $12, Oracle Cloud free tier.
+Vultr $12 — or **$0/month on Oracle Cloud Always Free** (ARM Ampere, 24GB RAM)
+using the step-by-step guide in `ORACLE_CLOUD_DOKPLOY.md`.
 
 ---
 

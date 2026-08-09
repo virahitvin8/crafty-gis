@@ -1,209 +1,124 @@
 # ⚡ Deploy FarmHealth NOW
 
-## 🎯 Choose Your Deployment Method
+> **Your stack (chosen):** 🥇 **Netlify (frontend) + Render (backend)** — primary,
+> live today. 🛟 **Docker (self-hosted)** — backup/offline/advanced path.
+> (Dokploy remains an optional all-in-one alternative — see `DOKPLOY_DEPLOY.md`.)
 
 ---
 
-## Option 1: Dokploy (RECOMMENDED - 24/7 Self-Hosted)
+## 🥇 PRIMARY: Netlify + Render (live now)
 
-**Best for**: Always-on deployment, full control, $5-10/month
+**Best for**: the always-free, zero-maintenance setup you're running today —
+`https://farmhealth1-backend.onrender.com` + your Netlify site.
 
-### Prerequisites
-- VPS with 8GB+ RAM (DigitalOcean, Vultr, Hetzner, Oracle Cloud)
-- Ubuntu 22.04/24.04
-- SSH access
+### Backend — Render (already deployed)
 
-### Deployment Steps
+```
+1. render.com → New → Blueprint → select repo (render.yaml auto-detects)
+2. Environment tab → add secrets (mark Secret):
+     GEE_SERVICE_ACCOUNT
+     GEE_PRIVATE_KEY        ← ONE line, \n escapes intact
+     GEMINI_API_KEY
+     SENTINEL_HUB_CLIENT_ID / _SECRET   (optional fallbacks)
+3. Manual Deploy → Deploy latest commit
+4. Verify:
+     https://farmhealth1-backend.onrender.com/api/health
+     https://farmhealth1-backend.onrender.com/api/gee/health
+```
+
+### Frontend — Netlify (already deployed)
+
+```
+1. app.netlify.com → Add new site → Import from Git → select repo
+2. Build settings: publish directory = ".", branch = main
+3. Deploy — netlify.toml already proxies /api/* → Render (zero config)
+4. Live at your Netlify URL (e.g. https://fastidious-yeot-0c0d83.netlify.app)
+```
+
+**Update flow:** `git push origin main` → Netlify rebuilds the frontend;
+Render redeploys the backend (or trigger via Manual Deploy).
+
+---
+
+## 🛟 BACKUP: Docker (self-hosted)
+
+**Best for**: a VPS/laptop you control, offline use, or if Netlify/Render
+ever have an outage or free-tier limits bite.
+
+### Single server (simplest)
 
 ```bash
-# 1. SSH into your VPS
-ssh root@your-server-ip
-
-# 2. Install Dokploy (2 minutes)
-curl -sSL https://dokploy.com/install.sh | sh
-
-# 3. Access Dokploy dashboard
-# Open browser: http://your-server-ip:3000
-# Create admin account
-
-# 4. Create project
-# Projects → Create Project → Name: farmhealth
-
-# 5. Add Git Repository
-# Add Resource → Git Repository
-# Repository: https://github.com/virahitvin8/crafty-gis.git
-# Branch: main
-# Docker Compose Path: docker-compose.coolify.yml
-
-# 6. Add environment variables (from your .env file)
-# Settings → Environment → Add variables:
-# - SENTINEL_HUB_CLIENT_ID
-# - SENTINEL_HUB_CLIENT_SECRET
-# - GEMINI_API_KEY
-# - GEE_SERVICE_ACCOUNT
-# - GEE_PRIVATE_KEY
-
-# 7. Deploy!
-# Deployments → Deploy
-# Wait 5-10 minutes (first time)
-
-# 8. Access your app
-# http://your-server-ip:8080
-```
-
-### Enable HTTPS (Optional)
-```
-# 1. Point domain to server (A record)
-# 2. In Dokploy: Domains → Add Domain
-# 3. Enter: farmhealth.yourdomain.com
-# 4. Auto-generate SSL certificate
-# 5. Done! https://farmhealth.yourdomain.com
-```
-
----
-
-## Option 2: Render + Netlify (FREE Tier)
-
-**Best for**: Testing, no cost, no VPS needed
-
-### Backend (Render)
-```
-1. Go to https://render.com
-2. Sign in with GitHub
-3. New → Blueprint
-4. Select repo: virahitvin8/crafty-gis
-5. Render auto-detects render.yaml
-6. Add secrets (from .env file):
-   - SENTINEL_HUB_CLIENT_ID
-   - SENTINEL_HUB_CLIENT_SECRET
-   - GEMINI_API_KEY
-   - GEE_SERVICE_ACCOUNT
-   - GEE_PRIVATE_KEY
-7. Apply → Deploys in 3 minutes
-
-Result: https://farmhealth1-backend.onrender.com
-```
-
-### Frontend (Netlify)
-```
-1. Go to https://app.netlify.com
-2. Sign in with GitHub
-3. Add new site → Import existing project
-4. Select repo: virahitvin8/crafty-gis
-5. Build settings:
-   - Publish directory: .
-   - Branch: main
-6. Deploy site
-
-Result: https://farmhealth1.netlify.app
-
-Note: Netlify auto-proxies /api/* to Render backend
-```
-
----
-
-## Option 3: Docker Compose (Simplest)
-
-**Best for**: Single server, no fancy UI
-
-```bash
-# On your server (Ubuntu/Debian):
-
 # 1. Install Docker
 curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
 
-# 2. Clone repo
+# 2. Clone + configure
 git clone https://github.com/virahitvin8/crafty-gis.git farmhealth
 cd farmhealth
+# export secrets into the shell (see docker-compose.selfhost.yml header —
+# no .env mounts, they break the GEE key):
+set -a; source .env; set +a
 
-# 3. Configure
-cp .env.example .env
-nano .env  # Add your secrets
+# 3. Deploy the full stack (app+backend, Ollama, PostGIS, Uptime Kuma)
+docker compose -f docker-compose.selfhost.yml --env-file /dev/null up -d --build
 
-# 4. Deploy
-docker compose -f docker-compose.coolify.yml up -d
-
-# 5. Access
-# http://your-server-ip:8080
-
-# 6. View logs
-docker compose -f docker-compose.coolify.yml logs -f
+# 4. Access
+#   App:  http://your-server-ip:8080
+#   Monitoring: http://your-server-ip:3002 (Uptime Kuma)
+#   Logs: docker compose -f docker-compose.selfhost.yml logs -f
 ```
+
+> `--env-file /dev/null` matters: without it, Docker Compose auto-loads the
+> repo `.env` and rejects `GEE_PRIVATE_KEY`'s `\n` escapes. Details in the
+> compose file header and `SELFHOST_MIGRATION.md`.
+
+### With Dokploy (optional all-in-one, GUI + HTTPS + auto-deploy)
+
+```
+scripts/install-dokploy.sh   →  one-command install (provisions + installs + project)
+docker-compose.dokploy.yml   →  the stack as a Dokploy resource
+.github/workflows/deploy-dokploy.yml → auto-deploy on push (needs DOKPLOY_DEPLOY_URL secret)
+```
+Full walkthrough: `DOKPLOY_DEPLOY.md` · Oracle Free Tier ($0): `ORACLE_CLOUD_DOKPLOY.md`
 
 ---
 
-## 📊 Quick Comparison
+## 📊 Comparison (why this order)
 
-| Feature | Dokploy | Render+Netlify | Docker Compose |
-|---------|---------|----------------|----------------|
-| Cost | $5-10/month | Free | $5-10/month |
-| 24/7 Uptime | ✅ Yes | ❌ Sleeps after 15min | ✅ Yes |
-| HTTPS | ✅ Auto | ✅ Auto | ⚠️ Manual |
-| Monitoring | ✅ Built-in | ❌ No | ⚠️ Manual |
-| Auto-Restart | ✅ Yes | ✅ Yes | ✅ Yes |
-| UI Dashboard | ✅ Beautiful | ⚠️ Separate | ❌ CLI only |
-| Databases | ✅ Built-in | ⚠️ Add-on | ⚠️ Manual |
-| Difficulty | Easy | Easiest | Medium |
+| Feature | Netlify+Render | Docker self-host | Dokploy |
+|---------|----------------|------------------|---------|
+| Cost | **$0** | VPS (~$5–10/mo or free Oracle) | VPS cost |
+| Effort | **Lowest — live now** | Medium | Medium |
+| 24/7 uptime | Backend sleeps after 15 min free-tier | ✅ Always-on | ✅ Always-on |
+| HTTPS | ✅ Auto | ⚠️ Manual (or Traefik) | ✅ Auto |
+| Auto-deploy on push | ✅ Native | ⚠️ Script it | ✅ Workflow included |
+| Offline / no internet | ❌ | ✅ Full stack runs locally | ✅ |
+| Monitoring | ❌ | Uptime Kuma in stack | ✅ Built-in |
 
 ---
 
 ## ✅ What's Already Done
 
-- ✅ Code pushed to GitHub: https://github.com/virahitvin8/crafty-gis
-- ✅ Commit: e7cdc26 (latest)
-- ✅ Deployment configs ready:
-   - `render.yaml` (Render backend)
-   - `netlify.toml` (Netlify frontend)
-   - `docker-compose.coolify.yml` (Dokploy/Coolify)
-- ✅ Environment variables documented in `.env.example`
-- ✅ All features built and tested
+- ✅ **Live:** Render backend (`farmhealth1-backend.onrender.com`) + Netlify site
+- ✅ `render.yaml` (Render blueprint with GEE/Gemini/Sentinel secrets)
+- ✅ `netlify.toml` (`/api/*` proxy → Render, publish dir `.`)
+- ✅ `Dockerfile` + `docker-compose.selfhost.yml` (full backup stack)
+- ✅ `docker-compose.dokploy.yml` + `scripts/install-dokploy.sh` + CI workflow
+- ✅ `www/` built and in sync (Netlify serves it)
+- ✅ All docs cross-linked below
 
 ---
 
-## 🎯 My Recommendation
+## 📖 Guides
 
-**For production use**: **Dokploy**
-- 24/7 uptime (Render sleeps)
-- Full control
-- Beautiful UI
-- Built-in monitoring
-- One-click updates
-
-**For testing**: **Render + Netlify**
-- Free
-- 5 minutes setup
-- No VPS needed
-
----
-
-## 📖 Detailed Guides
-
-- **Dokploy**: See `DOKPLOY_DEPLOY.md`
-- **Coolify**: See `COOLIFY_DEPLOY.md`
-- **Self-Hosted**: See `SELFHOST_MIGRATION.md`
-- **General**: See `DEPLOYMENT.md`
+- **Netlify + Render (primary):** `DEPLOY.md`, `DEPLOYMENT.md`
+- **Docker self-host (backup):** `SELFHOST_MIGRATION.md`, `docker-compose.selfhost.yml`
+- **Dokploy (optional):** `DOKPLOY_DEPLOY.md` · `ORACLE_CLOUD_DOKPLOY.md` (free tier)
+- **Coolify (optional):** `COOLIFY_DEPLOY.md`
 
 ---
 
 ## 🚀 Deploy Now
 
-**Pick one and go**:
-
-1. **Dokploy**: `ssh root@your-server && curl -sSL https://dokploy.com/install.sh | sh`
-2. **Render**: https://render.com → New → Blueprint
-3. **Netlify**: https://app.netlify.com → Add new site
-
-**All methods use the same GitHub repo**: https://github.com/virahitvin8/crafty-gis
-
----
-
-## 🆘 Quick Help
-
-| Platform | Docs |
-|----------|------|
-| Dokploy | https://docs.dokploy.com |
-| Render | https://render.com/docs |
-| Netlify | https://docs.netlify.com |
-| Docker | https://docs.docker.com |
-
+1. **Backend:** render.com → Blueprint → apply → add secrets → deploy
+2. **Frontend:** app.netlify.com → import repo → deploy
+3. **Backup:** Docker compose on any server (commands above)
