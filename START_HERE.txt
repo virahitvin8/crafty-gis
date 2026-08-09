@@ -1,0 +1,129 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║   🛰️  FarmHealth — Precision Satellite Crop Monitor              ║
+║                                                                  ║
+║   Status: ✅ CODE COMPLETE — READY TO DEPLOY                     ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 WHAT YOU HAVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Complete crop monitoring system
+✅ Sentinel-2 satellite data (NDVI, EVI, NDMI, NDWI)
+✅ AI advice (Ollama → Gemini → Expert fallback)
+✅ Crop photo disease detection (LLaVA vision AI)
+✅ Land records tracking (survey/khata/owner)
+✅ Infrastructure tracking (motor/pipeline/electricity)
+✅ Field journal (offline-first, CSV export)
+✅ OSM infrastructure overlay (pipelines, power lines)
+✅ AI source indicator (see which AI responded)
+✅ authentik OIDC + Firebase auth
+✅ GEE + Sentinel Hub + STAC API integration
+✅ Weather, terrain, soil analysis
+✅ Farm dashboard with saved fields
+✅ Android app support (Capacitor)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 DEPLOYMENT OPTIONS (CHOOSE ONE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌──────────────────────────────────────────────────────────────┐
+│ 1. DOKPLOY (RECOMMENDED) — 24/7 Self-Hosted                 │
+│    Cost: $5-10/month | Uptime: 24/7 | HTTPS: Auto            │
+│                                                              │
+│    Quick:                                                    │
+│    1. Get VPS (8GB+ RAM, Ubuntu)                            │
+│    2. ssh root@your-server                                   │
+│    3. curl -sSL https://dokploy.com/install.sh | sh          │
+│    4. Open http://your-ip:3000 → Create project              │
+│    5. Add Git: https://github.com/virahitvin8/crafty-gis.git │
+│    6. Compose: docker-compose.coolify.yml                    │
+│    7. Add env vars (from .env) → Deploy                      │
+│                                                              │
+│    Guide: DOKPLOY_DEPLOY.md                                  │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ 2. RENDER + NETLIFY — FREE TIER                             │
+│    Cost: $0 | Uptime: Sleeps after 15min | HTTPS: Auto       │
+│                                                              │
+│    Backend (Render):                                         │
+│    1. Go to https://render.com → New → Blueprint             │
+│    2. Connect: virahitvin8/crafty-gis                        │
+│    3. Add secrets → Deploy                                    │
+│                                                              │
+│    Frontend (Netlify):                                       │
+│    1. Go to https://app.netlify.com → Add new site           │
+│    2. Connect: virahitvin8/crafty-gis                        │
+│    3. Deploy                                                  │
+│                                                              │
+│    Guide: DEPLOYMENT.md, DEPLOY_NOW.md                       │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ 3. DOCKER COMPOSE — SIMPLEST                                 │
+│    Cost: $5-10/month | Uptime: 24/7 | HTTPS: Manual          │
+│                                                              │
+│    Quick:                                                    │
+│    1. ssh root@your-server                                   │
+│    2. curl -fsSL https://get.docker.com | sh                  │
+│    3. git clone https://github.com/virahitvin8/crafty-gis.git│
+│    4. cd crafty-gis && cp .env.example .env                  │
+│    5. nano .env (add secrets)                                │
+│    6. docker compose -f docker-compose.coolify.yml up -d     │
+│    7. Access: http://your-ip:8080                            │
+│                                                              │
+│    Guide: DEPLOYMENT.md, SELFHOST_MIGRATION.md               │
+└──────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 BEFORE DEPLOYING — PREPARE THESE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gather these from your .env file:
+
+[ ] SENTINEL_HUB_CLIENT_ID (from Sentinel Hub dashboard)
+[ ] SENTINEL_HUB_CLIENT_SECRET (from Sentinel Hub dashboard)
+[ ] GEMINI_API_KEY (from https://aistudio.google.com/app/apikey)
+[ ] GEE_SERVICE_ACCOUNT (from Google Cloud IAM)
+[ ] GEE_PRIVATE_KEY (from Google Cloud service account JSON)
+
+Optional:
+[ ] OLLAMA_BASE_URL (if self-hosting Ollama)
+[ ] OLLAMA_MODEL (default: deepseek-r1:7b)
+[ ] OLLAMA_VISION_MODEL (default: llava-phi3)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 DOCUMENTATION FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+START_HERE.txt      ← You are here
+DEPLOY_NOW.md       ← Quick deployment guide (all methods)
+DOKPLOY_DEPLOY.md   ← Detailed Dokploy guide
+COOLIFY_DEPLOY.md   ← Coolify guide (if you change your mind)
+DEPLOYMENT.md       ← General deployment guide
+SELFHOST_MIGRATION.md ← Full self-hosting details
+BUILT_FEATURES.md   ← All features documented
+README.md           ← Project overview
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 IMPORTANT LINKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GitHub Repo:  https://github.com/virahitvin8/crafty-gis
+Latest Commit: e7cdc26
+Branch: main
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 NEXT STEP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👉 Open DEPLOY_NOW.md and follow the instructions for your
+   chosen platform (Dokploy, Render+Netlify, or Docker Compose)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Built with ❤️ — FarmHealth v2.0 — 100% Open Source
+
