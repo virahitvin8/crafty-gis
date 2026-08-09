@@ -2,7 +2,8 @@
 # FarmHealth — SELF-HOSTED stack (for the always-on laptop)
 #
 #   Deploy:
-#     docker compose -f docker-compose.selfhost.yml up -d --build
+#     set -a; source .env; set +a
+#     docker compose -f docker-compose.selfhost.yml --env-file /dev/null up -d --build
 #
 #   This stack is Coolify/Dokploy friendly: every service is a
 #   plain container with named volumes and healthchecks, so you
@@ -14,7 +15,20 @@
 #     11434 → Ollama (LAN only — do NOT expose publicly, it has no auth)
 #     5432  → PostgreSQL + PostGIS (LAN only)
 #
-#   See SELFHOST_MIGRATION.md for the full phased roadmap.
+#   SECRETS: NO .env volume mount. Docker Compose interpolates the
+#   ${VAR} references below from your SHELL environment (passes values
+#   verbatim — required for the GEE private key's \n escapes).
+#
+#   IMPORTANT: the repo's .env file must NOT be auto-loaded — compose
+#   parses it as KEY=VALUE lines and rejects the GEE key's \n, which
+#   breaks `up` even when the mount is gone. Use --env-file /dev/null
+#   to disable auto-load, with vars exported into the shell:
+#
+#     set -a; source .env; set +a
+#     docker compose -f docker-compose.selfhost.yml --env-file /dev/null up -d --build
+#
+#   (Or run the platform dashboard injection on Coolify/Dokploy instead.)
+#   See SELFHOST_MIGRATION.md.
 # ═══════════════════════════════════════════════════════════
 
 services:
@@ -35,10 +49,10 @@ services:
       - SENTINEL_HUB_CLIENT_ID=${SENTINEL_HUB_CLIENT_ID:-}
       - SENTINEL_HUB_CLIENT_SECRET=${SENTINEL_HUB_CLIENT_SECRET:-}
       # Optional: Google Earth Engine service account
+      # (paste GEE_PRIVATE_KEY as ONE line with \n escapes intact — the
+      # container-side code unescapes it; see the header comment above)
       - GEE_SERVICE_ACCOUNT=${GEE_SERVICE_ACCOUNT:-}
       - GEE_PRIVATE_KEY=${GEE_PRIVATE_KEY:-}
-    volumes:
-      - ./.env:/app/.env:ro
     depends_on:
       ollama:
         condition: service_healthy

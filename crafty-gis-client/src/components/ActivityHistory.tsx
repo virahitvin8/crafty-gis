@@ -11,7 +11,7 @@ import {
   Clock,
   Trash2,
 } from "lucide-react";
-import type { Activity } from "@/app/page";
+import { Activity } from "../page";
 
 interface ActivityHistoryProps {
   activities: Activity[];

@@ -174,7 +174,8 @@ A production-oriented stack is provided in **`docker-compose.selfhost.yml`**:
 
 ```bash
 # Deploy the whole self-hosted stack:
-docker compose -f docker-compose.selfhost.yml up -d --build
+set -a; source .env; set +a
+docker compose -f docker-compose.selfhost.yml --env-file /dev/null up -d --build
 
 # Monitor:
 docker compose -f docker-compose.selfhost.yml ps
@@ -316,7 +317,8 @@ curl http://localhost:11434/api/tags
 cd server && npm install && npm start          # → http://localhost:3001
 
 # Self-host stack
-docker compose -f docker-compose.selfhost.yml up -d --build
+set -a; source .env; set +a
+docker compose -f docker-compose.selfhost.yml --env-file /dev/null up -d --build
 docker compose -f docker-compose.selfhost.yml logs -f ollama
 
 # Test the AI chain (Ollama → Gemini → expert fallback)

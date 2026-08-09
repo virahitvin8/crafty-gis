@@ -1,30 +1,33 @@
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — Production stack for Coolify / Dokploy
+# FarmHealth — Dokploy stack
 #
-#   In Coolify / Dokploy: New Resource → Docker Compose → paste
-#   the contents of this file (or point it at this repo).
+#   In Dokploy:
+#     Projects → farmhealth → Add Resource → Docker Compose
+#     → point at this file in the repo (or paste its contents).
 #
-#   NOTE: do NOT rely on the ./.env volume mount below — platform env
-#   injection (Coolify / Dokploy dashboards) passes secrets verbatim,
-#   while .env interpolation chokes on the GEE private key's \n escapes.
-#   Paste the GEE key as ONE line in the dashboard instead.
+#   This stack builds FarmHealth from THIS repo's Dockerfile
+#   (no external registry image required), then adds the
+#   self-hosted companions:
 #
-#   Services:
-#     8080 → FarmHealth app + backend (public)
-#     11434 → Ollama (internal only — LAN 127.0.0.1)
-#     3002 → Uptime Kuma (optional — reverse-proxy for auth)
+#     farmhealth    :8080   app + backend (public entrypoint)
+#     ollama        :11434  self-hosted LLM + vision (internal)
+#     postgis       :5432   saved farms / land records / STAC index
+#     uptime-kuma   :3002   monitoring + alerts (optional)
 #
-#   All external APIs are FALLBACKS — the app runs fully on these
-#   services even with zero internet. Sentinel Hub / Gemini are
-#   only consulted when the free local path (GEE / Ollama) fails.
+#   SECRETS: do NOT mount ./.env. Instead, add each variable in
+#   Dokploy → your service → Environment (paste the GEE private
+#   key as ONE line with its \n escapes — Dokploy passes it
+#   verbatim into the container, unlike a .env file).
+#
+#   Requires: 8 GB+ RAM. Model defaults can be lowered for small
+#   boxes (OLLAMA_MODEL=deepseek-r1:1.5b, OLLAMA_VISION_MODEL=llava).
 # ═══════════════════════════════════════════════════════════
 
 services:
   # ─── FarmHealth app + backend (public entrypoint on 8080) ───
   farmhealth:
-    image: ghcr.io/virahitvin8/crafty-gis:latest  # or build from this repo
-    # To build from this repo instead of a registry image, use:
-    # build: .
+    build:
+      context: .
     ports:
       - "8080:8080"
     environment:
@@ -34,15 +37,13 @@ services:
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_MODEL=${OLLAMA_MODEL:-deepseek-r1:7b}
       - OLLAMA_VISION_MODEL=${OLLAMA_VISION_MODEL:-llava-phi3}
-      # ── Google Earth Engine (PRIMARY satellite source, free) ──
+      # ── Google Earth Engine (free satellite source) ──
       - GEE_SERVICE_ACCOUNT=${GEE_SERVICE_ACCOUNT:-}
       - GEE_PRIVATE_KEY=${GEE_PRIVATE_KEY:-}
-      # ── Legacy FALLBACKS (kept for backwards compatibility) ──
+      # ── Cloud FALLBACKS (kept working) ──
       - SENTINEL_HUB_CLIENT_ID=${SENTINEL_HUB_CLIENT_ID:-}
       - SENTINEL_HUB_CLIENT_SECRET=${SENTINEL_HUB_CLIENT_SECRET:-}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-    volumes:
-      - ./.env:/app/.env:ro
     depends_on:
       ollama:
         condition: service_healthy
@@ -56,7 +57,7 @@ services:
       retries: 3
       start_period: 15s
 
-  # ─── Ollama — self-hosted LLM + Vision (PRIMARY AI) ───
+  # ─── Ollama — self-hosted LLM + vision (PRIMARY AI) ───
   ollama:
     image: ollama/ollama:latest
     environment:
@@ -73,6 +74,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    # Pull the configured models on first boot (kept running via `wait`)
     entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull ${OLLAMA_MODEL:-deepseek-r1:7b} || true && ollama pull ${OLLAMA_VISION_MODEL:-llava-phi3} || true && wait"]
 
   # ─── PostgreSQL + PostGIS — saved farms, land records, STAC/ODC index ───
@@ -92,7 +94,7 @@ services:
       timeout: 5s
       retries: 3
 
-  # ─── Uptime Kuma — health monitoring + alerts (optional but recommended) ───
+  # ─── Uptime Kuma — health monitoring + alerts (optional) ───
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     ports:

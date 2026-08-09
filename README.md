@@ -627,6 +627,275 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
+# 🚀 Build & Deployment
+
+## Prerequisites
+
+| Tool | Version | Install |
+|------|---------|---------|
+| Node.js | 18+ | https://nodejs.org |
+| npm | 9+ | Included with Node.js |
+| Python 3 | 3.10+ | https://python.org |
+| pip | 23+ | Included with Python |
+| Flutter | 3.12+ | https://flutter.dev |
+| Docker | 24+ | https://docker.com |
+| Git | 2+ | https://git-scm.com |
+
+## Build the Project
+
+### 1. Build the Next.js Frontend
+
+```bash
+cd crafty-gis-client
+npm install
+npm run build
+```
+
+The frontend build output goes to `crafty-gis-client/.next/`.
+
+### 2. Build the Node.js Express Server
+
+```bash
+cd server
+npm install
+# Production build (optional, produces a minified bundle)
+npx esbuild server/server.js --outfile=server.min.js --format=esm --platform=node --bundle
+```
+
+### 3. Build the Python FastAPI Backend
+
+```bash
+cd crafty-gis-server
+pip install --quiet -r requirements.txt
+pip freeze > requirements.lock
+```
+
+### 4. Copy Frontend Assets to www/
+
+```bash
+# Copy Next.js build output to www directory
+rm -rf www
+mkdir -p www
+cp -r crafty-gis-client/.next www/
+cp -r crafty-gis-client/public www/
+cp package.json www/
+cp tsconfig.json www/
+cp eslint.config.mjs www/
+cp postcss.config.mjs www/
+cp vite.config.ts www/
+cp css/ www/
+cp js/ www/
+```
+
+### 5. Run the Full Build
+
+```bash
+bash build.sh
+```
+
+This builds everything in one step:
+1. Frontend (Next.js)
+2. Node.js server
+3. Python backend
+4. Docker image (if Docker is available)
+
+### 6. Run Locally
+
+```bash
+# Start the full application
+node server/server.js
+
+# Or with Docker
+docker compose -f docker-compose.yml up -d
+```
+
+## Build Targets
+
+### Development Build (Full Development)
+
+```bash
+# Start the full development stack
+bash build.sh
+# Or manually:
+cd server && npm start  # Node.js dev server
+cd ../crafty-gis-client && npm run dev  # Next.js dev server
+cd ../crafty-gis-server && python main.py  # Python backend
+```
+
+### Production Build (Docker)
+
+```bash
+# Build the Docker image
+docker build -t farmhealth:latest .
+
+# Run locally
+docker run -p 8080:8080 farmhealth:latest
+
+# Or deploy to a cloud platform
+docker run -p 3001:8080 farmhealth:latest
+```
+
+### Android App (Capacitor)
+
+```bash
+# 1. Install Capacitor CLI
+npm install @capacitor/cli @capacitor/core @capacitor/android
+
+# 2. Build web assets
+./build.sh
+
+# 3. Sync with Capacitor
+npx cap sync android
+
+# 4. Open in Android Studio
+npx cap open android
+```
+
+## Build Artifacts
+
+The build produces the following artifacts:
+
+| Artifact | Location | Description |
+|----------|----------|-------------|
+| `www/` | Project root | Built frontend (HTML, CSS, JS) |
+| `crafty-gis-client/.next/` | Frontend directory | Next.js production build |
+| `server/` | Server directory | Node.js Express app |
+| `crafty-gis-server/` | Server directory | Python FastAPI backend |
+| `requirements.lock` | Server directory | Python dependency freeze |
+| `docker-compose.yml` | Project root | Docker Compose config |
+| `Dockerfile` | Project root | Production Dockerfile |
+| `docker-compose.coolify.yml` | Project root | Coolify/Dokploy config |
+
+## Build Troubleshooting
+
+### Node.js not found
+```bash
+# Install Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+### Python not found
+```bash
+# Install Python 3
+sudo apt-get install -y python3 python3-pip
+```
+
+### Flutter not found
+```bash
+# Install Flutter
+git clone https://github.com/flutter/flutter.git -b v3.22.x $HOME/flutter
+export PATH="$HOME/flutter/bin:$PATH"
+flutter --version
+```
+
+### Docker not found
+```bash
+# Install Docker
+# See https://docs.docker.com/get-docker/ for installation instructions
+```
+
+### "Port already in use" error
+```bash
+# Kill existing processes on the port
+lsof -i :3001
+kill -9 <PID>
+# Or change the port
+PORT=8080 node server/server.js
+```
+
+### Backend fails to start
+```bash
+# Check if the .env file has all required variables
+cat .env
+
+# Check if the server is listening
+netstat -tlnp | grep 3001
+
+# Check logs
+tail -f /tmp/fh-server.log
+```
+
+### "GEE not initialized"
+```bash
+# Check if GEE service account credentials are set
+echo $GEE_SERVICE_ACCOUNT
+echo $GEE_PRIVATE_KEY
+
+# Try to initialize GEE
+curl -X POST http://localhost:3001/api/gee/init
+```
+
+## Docker Compose (Full Stack)
+
+```bash
+# Build and run the full stack
+docker compose -f docker-compose.yml up -d
+
+# Or for the self-hosted version
+docker compose -f docker-compose.selfhost.yml up -d
+
+# Or for Coolify/Dokploy
+docker compose -f docker-compose.coolify.yml up -d
+```
+
+## Architecture
+
+The project uses a **Primary → Fallback** architecture:
+
+| Component | Primary | Fallback |
+|-----------|---------|----------|
+| Authentication | authentik (self-hosted) | Firebase Auth |
+| AI Advisory | Ollama + DeepSeek | Gemini API |
+| Satellite Data | Google Earth Engine | Sentinel Hub |
+| Hosting | Coolify/Dokploy | Render |
+| Monitoring | Uptime Kuma | Manual checks |
+| Satellite Data (alt.) | STAC API / Open Data Cube | Sentinel Hub |
+
+## Quick Start (Docker)
+
+```bash
+# One-command deployment
+docker compose -f docker-compose.yml up -d
+
+# Or use Coolify
+docker compose -f docker-compose.coolify.yml up -d
+```
+
+## Quick Start (Local)
+
+```bash
+# 1. Start the backend
+node server/server.js
+
+# 2. Open in your browser
+# http://localhost:3001
+```
+
+## Build Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `build.sh` | Full build (frontend + server + Python + Docker) |
+| `build-frontend.py` | Build Next.js frontend only |
+| `build-web.ps1` | Build web assets (Windows) |
+| `deploy.ps1` | Deploy to Google Cloud Run |
+
+## Build Artifacts
+
+The build produces the following outputs:
+
+- **`www/`** — Static frontend (HTML, CSS, JS) — **production build**
+- **`crafty-gis-client/.next/`** — Next.js production build — **frontend output**
+- **`server/`** — Node.js Express server — **backend output**
+- **`crafty-gis-server/`** — Python FastAPI backend — **backend output**
+- **`requirements.lock`** — Python dependency freeze — **for reproducible builds**
+- **`docker-compose.yml`** — Docker Compose configuration — **deployment**
+- **`Dockerfile`** — Production Docker image — **container build**
+- **`docker-compose.coolify.yml`** — Coolify/Dokploy config — **deployment**
+
+---
+
 <div align="center">
 
 **Made with ❤️ for Global Agriculture** 🌾🛰️

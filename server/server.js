@@ -926,6 +926,117 @@ app.post('/api/vision-analysis', async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+// STAC / MICROSOFT PLANETARY COMPUTER — Free Sentinel-2 source
+// Zero-cost fallback for Sentinel Hub. No account/API key needed
+// for search; band reads use free SAS token signing.
+// Chain: GEE (primary) → STAC/Planetary Computer (free) → Sentinel Hub (legacy)
+// ═══════════════════════════════════════════════════════════
+const PC_STAC_URL = 'https://planetarycomputer.microsoft.com/api/stac/v1';
+const PC_SIGN_URL = 'https://planetarycomputer.microsoft.com/api/sas/v1/sign';
+
+// Sign a Planetary Computer asset href (free, no auth)
+async function pcSign(href) {
+  const res = await fetch(`${PC_SIGN_URL}?href=${encodeURIComponent(href)}`, {
+    signal: AbortSignal.timeout(15000)
+  });
+  if (!res.ok) throw new Error('PC sign failed: ' + res.status);
+  const data = await res.json();
+  return data.href || data.url || href;
+}
+
+// Compute NDVI mean over a polygon from a STAC item's red/nir bands.
+// Uses a coarse overview read so it works without rasterio/titiler.
+async function stacNdviFromItem(item, polygonCoords) {
+  const red = item.assets?.B04?.href;
+  const nir = item.assets?.B08?.href;
+  if (!red || !nir) throw new Error('STAC item missing B04/B08 assets');
+
+  // Use the free Planetary Computer tile/statistics service (titiler)
+  // to get band statistics inside the polygon without downloading rasters.
+  const [redUrl, nirUrl] = await Promise.all([pcSign(red), pcSign(nir)]);
+  const geojson = JSON.stringify({ type: 'Polygon', coordinates: [polygonCoords] });
+
+  async function bandMean(url) {
+    const api = `https://planetarycomputer.microsoft.com/api/data/v1/item/statistics` +
+      `?url=${encodeURIComponent(url)}&feature=${encodeURIComponent(geojson)}`;
+    const r = await fetch(api, { signal: AbortSignal.timeout(30000) });
+    if (!r.ok) throw new Error('titiler statistics ' + r.status);
+    const j = await r.json();
+    // titiler returns { properties: { statistics: { b1: { mean } } } } or similar
+    const stats = j?.properties?.statistics || j?.statistics || {};
+    const b1 = stats.b1 || stats[Object.keys(stats)[0]] || {};
+    return typeof b1.mean === 'number' ? b1.mean : null;
+  }
+
+  const [redMean, nirMean] = await Promise.all([bandMean(redUrl), bandMean(nirUrl)]);
+  if (redMean == null || nirMean == null || (nirMean + redMean) === 0) {
+    throw new Error('Could not derive band means from STAC item');
+  }
+  const ndvi = (nirMean - redMean) / (nirMean + redMean);
+  return { ndvi: Math.round(ndvi * 10000) / 10000, redMean, nirMean };
+}
+
+app.post('/api/stac/ndvi', async (req, res) => {
+  try {
+    const { coordinates, startDate, endDate, maxCloud } = req.body;
+    if (!coordinates || !coordinates.length) {
+      return res.status(400).json({ error: 'No coordinates provided' });
+    }
+
+    // Normalise to a closed [lng,lat] ring
+    const ring = coordinates.map(c => [c[1], c[0]]);
+    if (ring[0][0] !== ring[ring.length - 1][0] || ring[0][1] !== ring[ring.length - 1][1]) {
+      ring.push(ring[0]);
+    }
+    const lons = ring.map(c => c[0]);
+    const lats = ring.map(c => c[1]);
+    const bbox = [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)];
+
+    const end = endDate || new Date().toISOString().split('T')[0];
+    const start = startDate || new Date(Date.now() - 30 * 864e5).toISOString().split('T')[0];
+    const cloud = typeof maxCloud === 'number' ? maxCloud : 30;
+
+    // Search Planetary Computer STAC for least-cloudy Sentinel-2 L2A item
+    const searchRes = await fetch(`${PC_STAC_URL}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        collections: ['sentinel-2-l2a'],
+        bbox: bbox,
+        datetime: `${start}T00:00:00Z/${end}T23:59:59Z`,
+        query: { 'eo:cloud_cover': { lt: cloud } },
+        limit: 10,
+        sortby: [{ field: 'properties.eo:cloud_cover', direction: 'asc' }]
+      }),
+      signal: AbortSignal.timeout(20000)
+    });
+    if (!searchRes.ok) throw new Error('STAC search failed: ' + searchRes.status);
+    const searchData = await searchRes.json();
+    const item = searchData.features?.[0];
+    if (!item) {
+      return res.status(404).json({ error: 'No Sentinel-2 scenes found for this area/date', source: 'stac' });
+    }
+
+    const { ndvi, redMean, nirMean } = await stacNdviFromItem(item, ring);
+
+    res.json({
+      success: true,
+      source: 'planetary-computer-stac',
+      indexType: 'ndvi',
+      mean: ndvi,
+      redMean, nirMean,
+      sceneId: item.id,
+      datetime: item.properties?.datetime,
+      cloudCover: item.properties?.['eo:cloud_cover'],
+      thumbnail: item.assets?.rendered_preview?.href || null
+    });
+  } catch (e) {
+    console.error('[STAC] NDVI error:', e.message);
+    res.status(500).json({ success: false, error: e.message, source: 'stac' });
+  }
+});
+
 // ─── Start Server ───
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n  🛰️  FarmHealth Server is running!`);
@@ -936,6 +1047,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`        GET  /api/gee/health     — Connection status`);
   console.log(`        POST /api/gee/init       — Initialize GEE`);
   console.log(`        POST /api/gee/ndvi       — Compute NDVI`);
+  console.log(`        POST /api/stac/ndvi      — Free NDVI via Planetary Computer (no key)`);
   console.log(`        POST /api/gee/time-series — Time series`);
   console.log(`        POST /api/gemini-analysis — AI advice (Ollama → Gemini → expert fallback)`);
   console.log(`        POST /api/vision-analysis — Crop photo disease detection (LLaVA)`);

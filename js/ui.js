@@ -696,6 +696,9 @@ const FH_UI = (function() {
   // ═══════════ GUIDED ONBOARDING ═══════════
   let _onboardingActive = false;
   let _onboardingStep = 0;
+  // Cards the tour had to reveal (they start hidden); restored on finish so a
+  // farmer who ends the tour without a field isn't left with empty cards.
+  let _tourRevealedCards = new Set();
   
   function startOnboarding() {
     _onboardingActive = true;
@@ -749,6 +752,14 @@ const FH_UI = (function() {
       if (target) {
         if (step.target !== '#map') {
           target.classList.add('onboard-highlight-target');
+          // Some targets live inside cards that start hidden (e.g. the Land
+          // Info card with the CSV import). Reveal the enclosing card so the
+          // highlighted element is actually visible during the tour.
+          const card = target.closest('.card');
+          if (card && card.style.display === 'none') {
+            card.style.display = 'block';
+            _tourRevealedCards.add(card);
+          }
         }
         // Scroll sidebar to show target
         const sidebar = document.getElementById('sidebar');
@@ -784,6 +795,16 @@ const FH_UI = (function() {
       overlay.innerHTML = '';
     }
     document.querySelectorAll('.onboard-highlight-target').forEach(el => el.classList.remove('onboard-highlight-target'));
+    // Restore cards the tour revealed so the UI returns to its normal state.
+    // The Land Info card stays visible only if a field is actually selected
+    // (setFieldBoundary shows it anyway when one is chosen).
+    _tourRevealedCards.forEach(card => {
+      const isLandCard = card.id === 'landRecordCard';
+      if (!(isLandCard && _state.fieldCenter)) {
+        card.style.display = 'none';
+      }
+    });
+    _tourRevealedCards.clear();
     localStorage.setItem('fh_onboarding_done', 'true');
     toast('Tour complete! You\'re ready to analyze fields.');
   }
@@ -968,13 +989,16 @@ const FH_UI = (function() {
       if (r.motor) recLines.push(`Motor: <b>${esc(r.motor)}</b>`);
       if (r.pipeline) recLines.push(`Pipeline: <b>${esc(r.pipeline)}</b>`);
       if (r.electricity) recLines.push(`Electricity: <b>${esc(r.electricity)}</b>`);
+      const howMatched = csvRecord.matchBy === 'village'
+        ? 'matched by village/district'
+        : (csvRecord.dist ? Math.round(csvRecord.dist) + ' m from this field' : 'at this location');
       parts.push(`
         <div style="background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.4);border-radius:8px;padding:8px;font-size:0.72rem;margin-top:6px">
-          <div style="font-weight:700;color:var(--green-light);margin-bottom:4px">✅ My record found — ${csvRecord.dist ? Math.round(csvRecord.dist) + ' m from this field' : 'at this location'}</div>
+          <div style="font-weight:700;color:var(--green-light);margin-bottom:4px">✅ My record found — ${howMatched}</div>
           ${recLines.join('<br>')}
         </div>`);
     } else if (csvImportCount() > 0) {
-      parts.push(`<div style="font-size:0.68rem;color:var(--text-faint);margin-top:6px">ℹ️ ${csvImportCount()} of your records imported — none within 500 m of this field.</div>`);
+      parts.push(`<div style="font-size:0.68rem;color:var(--text-faint);margin-top:6px">ℹ️ ${csvImportCount()} of your records imported — none matched within 500 m or in this village/district.</div>`);
     }
 
     // OSM infrastructure summary (grouped, with distances)
@@ -1007,20 +1031,88 @@ const FH_UI = (function() {
     try { return JSON.parse(localStorage.getItem('fh_land_records_csv') || '[]').length; } catch (e) { return 0; }
   }
 
-  // Find the nearest imported record within 500 m of the field center.
+  // Normalize a place name for comparison: lowercase, strip whitespace and
+  // punctuation, but KEEP all letters including Devanagari (हिंदी) and other
+  // regional scripts so Hindi village names still match.
+  function normPlace(s) {
+    return String(s || '').toLowerCase().replace(/[^\w\u0900-\u097F]/g, '');
+  }
+
+  // Normalize a CSV row's lat/lng if present (returns null when absent/invalid).
+  function rowCoord(r) {
+    if (r.lat === undefined || r.lng === undefined) return null;
+    const la = Number(String(r.lat).trim());
+    const lo = Number(String(r.lng).trim());
+    if (isNaN(la) || isNaN(lo) || la === 0 || lo === 0) return null;
+    return { lat: la, lng: lo };
+  }
+
+  // Find the imported record that matches this field. Two strategies:
+  //   1. COORDINATES — nearest row with lat/lng within 500 m of the field
+  //      center (most precise).
+  //   2. VILLAGE + DISTRICT fallback — for rows WITHOUT coordinates, match
+  //      the row's village/district/state against the reverse-geocoded place
+  //      of the current field. Uses the Land Info card inputs (auto-filled
+  //      by reverse geocoding), so farmers can import records with just
+  //      village + district names and still get auto-matching.
+  // Returns { ...row, dist, matchBy: 'coords' | 'village' } or null.
   function matchCSVRecord(lat, lng) {
     let rows = [];
     try { rows = JSON.parse(localStorage.getItem('fh_land_records_csv') || '[]'); } catch (e) { return null; }
-    if (!rows.length || !_state.fieldCenter) return null;
+    if (!rows.length) return null;
+
+    // Strategy 1: nearest coordinate row within 500 m
     let best = null;
     rows.forEach(r => {
-      if (r.lat === undefined || r.lng === undefined) return;
-      const d = haversineM(lat, lng, Number(r.lat), Number(r.lng));
+      const c = rowCoord(r);
+      if (!c) return;
+      const d = haversineM(lat, lng, c.lat, c.lng);
       if (d <= 500 && (!best || d < best.dist)) {
-        best = { ...r, dist: d };
+        best = { ...r, dist: d, matchBy: 'coords' };
       }
     });
-    return best;
+    if (best) return best;
+
+    // Strategy 2: village + district fallback for rows without coordinates
+    // (or outside 500 m). Read the current field's place from the Land Info
+    // inputs, which are auto-filled by reverse geocoding in map.js.
+    const fieldVillage = normPlace($('lrVillageInput')?.value);
+    const fieldDistrict = normPlace($('lrDistrictInput')?.value);
+    const fieldState = normPlace($('lrStateInput')?.value);
+    if (!fieldVillage && !fieldDistrict) return null;
+
+    let placeMatch = null;
+    let bestScore = -1;
+    rows.forEach(r => {
+      const rowVillage = normPlace(r.village);
+      const rowDistrict = normPlace(r.district);
+      const rowState = normPlace(r.state);
+      if (!rowVillage && !rowDistrict) return;
+      // District conflict guard: village names repeat across districts in
+      // India, so a row whose district is KNOWN to differ from the field's
+      // district is never accepted — no false matches on the wrong plot.
+      const districtConflict = !!(rowDistrict && fieldDistrict && rowDistrict !== fieldDistrict);
+
+      let ok = false;
+      if (rowVillage && fieldVillage && rowVillage === fieldVillage) ok = !districtConflict;
+      else if (!fieldVillage && rowDistrict && fieldDistrict && rowDistrict === fieldDistrict) ok = true;
+      else if (rowDistrict && fieldDistrict && rowDistrict === fieldDistrict &&
+               (!fieldVillage || !rowVillage) && (rowState === fieldState || !fieldState || !rowState)) ok = !districtConflict;
+      if (ok) {
+        // Prefer the row that matches on the MOST fields (village > district >
+        // state), breaking ties toward the row that also has coordinates
+        // (more precise than a name-only row).
+        const score = (rowVillage === fieldVillage && rowVillage ? 3 : 0) +
+                      (rowDistrict === fieldDistrict && rowDistrict ? 2 : 0) +
+                      (rowState === fieldState && rowState ? 1 : 0) +
+                      (rowCoord(r) ? 0.5 : 0);
+        if (score > bestScore) {
+          bestScore = score;
+          placeMatch = { ...r, matchBy: 'village' };
+        }
+      }
+    });
+    return placeMatch;
   }
 
   // The full auto-scan: pincode + OSM infra + own-record match.
@@ -1103,15 +1195,23 @@ const FH_UI = (function() {
         const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
         if (lines.length < 2) return show('CSV needs a header row + at least 1 data row', false);
         const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        // Keep every row that is USABLE: either it has valid lat/lng OR it has
+        // a village/district/state name (matched as a fallback). Rows with
+        // nothing at all are dropped.
         const rows = lines.slice(1).map(line => {
           const cells = line.split(',').map(c => c.trim());
           const row = {};
           headers.forEach((h, i) => { row[h] = cells[i] !== undefined ? cells[i] : ''; });
           return row;
-        }).filter(r => r.lat && r.lng && !isNaN(Number(r.lat)) && !isNaN(Number(r.lng)));
-        if (!rows.length) return show('No valid rows (need numeric lat and lng columns)', false);
+        }).filter(r => {
+          const c = rowCoord(r);
+          const hasPlace = !!(r.village || r.district || r.state);
+          return c || hasPlace;
+        });
+        if (!rows.length) return show('No usable rows — each row needs lat+lng OR village/district', false);
+        const withCoords = rows.filter(r => rowCoord(r)).length;
         localStorage.setItem('fh_land_records_csv', JSON.stringify(rows));
-        show(`✅ ${rows.length} records imported — they will auto-match when you click a field nearby`, true);
+        show(`✅ ${rows.length} records imported (${withCoords} with coordinates, ${rows.length - withCoords} by village/district) — they auto-match when you click a field nearby`, true);
         // Re-scan the current field so the match appears immediately
         autoScanLocation();
       } catch (e) {

@@ -73,8 +73,12 @@ Render auto-deploys the backend; Netlify auto-deploys the frontend.
 ```csv
 lat,lng,survey,khata,owner,motor,pipeline,electricity,village,district,state,pincode
 25.4358,81.8463,124,345/12,Ram Singh,MTR-2024-0451,TWL-03,EB-789456123,Kandhai,Pratapgarh,Uttar Pradesh,230001
+,,125,345/13,Sita Devi,,,,,Kandhai,Pratapgarh,Uttar Pradesh,230001
 ```
-Only `lat` and `lng` are required — the rest are optional and shown when a field is clicked within 500 m.
+**Matching is automatic with two strategies:**
+1. **Coordinates** — rows with `lat`/`lng` match when a field is clicked within **500 m**.
+2. **Village + district fallback** — rows WITHOUT coordinates still match by `village` (then `district`, then `state`)
+   against the clicked field's auto-detected location. Only `village` or `district` is required to import a row.
 
 ---
 

@@ -197,6 +197,13 @@ const FH_CONFIG = (function() {
       target: '#aiCard',
       desc: 'Get personalized field advice from Gemini AI.\n• Paste your Gemini API key in Settings\n• Click "Get AI Analysis" for actionable recommendations\n• Export your report as CSV, GeoJSON, or copy to clipboard',
       tip: 'Come back every week to track changes with the Time Series chart!'
+    },
+    {
+      icon: '📁',
+      title: 'My Land Records (auto-match)',
+      target: '#landRecordsCsvInput',
+      desc: 'Make every field auto-show YOUR records — survey, khata, owner, motor, pipeline, electricity.\n\nHow to build the CSV from official records:\n1. Open your state\'s land portal (UP Bhulekh, MP Bhulekh, etc.)\n2. Select District → Tehsil → Village\n3. Open the Khatauni → note the Khata & Khasra numbers and owner name\n4. Open a spreadsheet (Excel / Google Sheets)\n5. Header row: lat, lng, survey, khata, owner, motor, pipeline, electricity, village, district, state, pincode\n6. One row per plot — only village or district is required\n7. Save as CSV and upload it here',
+      tip: 'No coordinates? No problem — village + district is enough; the app matches by name.'
     }
   ];
 

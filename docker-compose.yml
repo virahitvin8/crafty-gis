@@ -6,6 +6,13 @@
 #
 #   For the full always-on-laptop stack (with PostGIS + Uptime Kuma)
 #   use: docker compose -f docker-compose.selfhost.yml up -d
+#
+#   SECRETS: do NOT rely on the ./.env mount below — compose auto-loads
+#   the repo .env for interpolation and REJECTS the GEE private key's \n
+#   escapes (line 19 parse error), breaking `up`. Export vars into your
+#   shell and run with `--env-file /dev/null` (see docker-compose.selfhost.yml
+#   header for the exact commands). The mount is kept only for the non-GEE
+#   vars and will be removed once the split is clean.
 # ═══════════════════════════════════════════════════════════
 
 services:
@@ -30,11 +37,11 @@ services:
       # Uncomment and fill in for Sentinel Hub:
       # - SENTINEL_HUB_CLIENT_ID=your-client-id
       # - SENTINEL_HUB_CLIENT_SECRET=your-client-secret
-    volumes:
-      # Mount Google Cloud credentials (if using GEE)
-      # - ./credentials:/credentials:ro
-      # Mount .env file
-      - ./.env:/app/.env:ro
+      # NOTE: the old `- ./.env:/app/.env:ro` mount was REMOVED — it breaks
+      # `up` because compose parses the repo .env for interpolation and
+      # rejects GEE_PRIVATE_KEY's \n escapes. Use shell-exported vars +
+      # `--env-file /dev/null` instead (see header). If you need GEE
+      # credentials mounted, add a `volumes:` list here (never .env).
     depends_on:
       ollama:
         condition: service_healthy

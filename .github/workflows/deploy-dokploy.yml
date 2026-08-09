@@ -1,0 +1,87 @@
+name: Deploy to Dokploy
+
+# Auto-deploy FarmHealth to your Dokploy instance whenever code lands on main.
+#
+# ── ONE-TIME SETUP ─────────────────────────────────────────────────────────
+# 1. Dokploy dashboard → your `farmhealth` application → Settings → Advanced
+#    → copy the **Deploy Hook / Deploy Token** URL
+#    (looks like: https://dokploy.yourdomain.com/api/deploy/<random-token>)
+# 2. GitHub repo → Settings → Secrets and variables → Actions → add:
+#      DOKPLOY_DEPLOY_URL  = the full deploy-hook URL from step 1
+#    (If your Dokploy version gives you only a bare token, set
+#      DOKPLOY_DEPLOY_URL  = https://dokploy.yourdomain.com/api/deploy
+#      DOKPLOY_DEPLOY_TOKEN = <the random token>)
+# ────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+    # docs-only / meta changes don't need a redeploy
+    paths-ignore: ['*.md', 'docs/**', '.github/**', '*.png', '*.jpg']
+  workflow_dispatch: # also lets you trigger it manually from the Actions tab
+
+jobs:
+  trigger-dokploy:
+    name: Trigger Dokploy deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify the build works (fail fast — don't deploy a broken build)
+        run: |
+          bash build.sh
+          # sanity: frontend built and JS is syntactically valid
+          for f in js/api.js js/ui.js js/map.js js/app.js; do node --check "$f"; done
+          echo "Build verified ✓"
+
+      - name: Trigger Dokploy deployment
+        env:
+          DOKPLOY_DEPLOY_URL: ${{ secrets.DOKPLOY_DEPLOY_URL }}
+          DOKPLOY_DEPLOY_TOKEN: ${{ secrets.DOKPLOY_DEPLOY_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${DOKPLOY_DEPLOY_URL:-}" ]; then
+            echo "::error::Missing DOKPLOY_DEPLOY_URL secret — set it in repo Settings → Secrets."
+            exit 1
+          fi
+
+          # Support two shapes:
+          #   A) URL already contains /api/deploy/<token>   (full deploy hook)
+          #   B) URL is the bare /api/deploy base + separate token
+          if [[ "$DOKPLOY_DEPLOY_URL" == *"/api/deploy/"* ]]; then
+            HOOK="$DOKPLOY_DEPLOY_URL"
+          elif [ -n "${DOKPLOY_DEPLOY_TOKEN:-}" ]; then
+            HOOK="${DOKPLOY_DEPLOY_URL%/}/api/deploy/${DOKPLOY_DEPLOY_TOKEN}"
+          else
+            echo "::error::Set either a full deploy-hook URL, or DOKPLOY_DEPLOY_URL base + DOKPLOY_DEPLOY_TOKEN."
+            exit 1
+          fi
+
+          # Show only the host (never the token)
+          echo "Triggering deployment at: $(echo "$HOOK" | sed -E 's#(https?://[^/]+).*#\1#') (token redacted)"
+          # Dokploy deploy hooks accept a GET; some versions prefer POST.
+          # Try POST first, fall back to GET. Only 2xx counts as success — a
+          # 401/403/500 must fail the job, never silently pass.
+          code=$(curl -sS -o /tmp/dokploy.out -w '%{http_code}' -X POST --max-time 60 "$HOOK" || true)
+          if [ "${code:-000}" -ge 200 ] && [ "${code:-000}" -lt 300 ]; then
+            echo "✅ Dokploy deploy triggered (POST, HTTP $code)"
+          else
+            code=$(curl -sS -o /tmp/dokploy.out -w '%{http_code}' --max-time 60 "$HOOK" || true)
+            if [ "${code:-000}" -ge 200 ] && [ "${code:-000}" -lt 300 ]; then
+              echo "✅ Dokploy deploy triggered (GET, HTTP $code)"
+            else
+              echo "::error::Dokploy trigger failed (HTTP ${code:-timeout}). Verify the deploy hook URL/token."
+              exit 1
+            fi
+          fi
+
+          # Show any response body (URL / deployment id) without leaking secrets
+          if [ -s /tmp/dokploy.out ]; then
+            head -c 500 /tmp/dokploy.out | sed 's/[?&]token=[^& ]*//g'
+            echo
+          fi
+
+      - name: Report
+        run: echo "Deploy triggered — watch it at your Dokploy dashboard → farmhealth → Deployments."

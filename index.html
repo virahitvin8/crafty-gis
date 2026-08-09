@@ -188,7 +188,23 @@
       </div>
       <div class="hint" style="font-size:0.65rem;margin-bottom:6px">
         Upload your own records CSV — clicking a field then shows the matching row automatically. Columns: <code style="color:var(--green-light)">lat, lng, survey, khata, owner, motor, pipeline, electricity, village, district, state, pincode</code>
+        <br>No coordinates? No problem — rows with <b>village + district</b> are matched by name against the clicked field's location.
+        <br>💡 Use the <b>Download sample CSV template</b> button below — open it in Excel/Google Sheets, replace the example rows with your own plots, and save back as CSV.
       </div>
+      <!-- HOW TO BUILD THE CSV — collapsible, no JS needed -->
+      <details style="margin-bottom:6px;font-size:0.68rem;color:var(--text-dim)">
+        <summary style="cursor:pointer;color:var(--green-light);font-weight:600">❓ How to build this CSV from official records</summary>
+        <div style="margin-top:6px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;line-height:1.8">
+          <b>1.</b> Open your state's official land portal (button above) — e.g. UP Bhulekh.<br>
+          <b>2.</b> Select <b>District → Tehsil → Village</b>.<br>
+          <b>3.</b> Open the <b>Khatauni</b> → note the <b>Khata number</b>, <b>Khasra/Survey number</b> and <b>Owner name</b>.<br>
+          <b>4.</b> Open a spreadsheet (Excel / Google Sheets).<br>
+          <b>5.</b> Make a header row: <code style="color:var(--green-light)">lat, lng, survey, khata, owner, motor, pipeline, electricity, village, district, state, pincode</code><br>
+          <b>6.</b> Add one row per plot — only <b>village</b> or <b>district</b> is required; coordinates are optional.<br>
+          <b>7.</b> Save as <b>CSV (UTF-8)</b> and upload it here — clicking a field now shows its row automatically.
+        </div>
+      </details>
+      <a class="btn-secondary btn-sm" href="assets/land-records-template.csv" download style="margin-bottom:6px;width:100%;text-align:center;text-decoration:none;display:block;box-sizing:border-box">⬇️ Download sample CSV template</a>
       <input type="file" id="landRecordsCsvInput" accept=".csv" style="font-size:0.7rem;margin-bottom:6px"
              onchange="FH.importLandRecordsCSV(this)">
       <div id="csvImportStatus" style="font-size:0.68rem;color:var(--text-dim);display:none"></div>
