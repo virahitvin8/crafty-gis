@@ -506,7 +506,29 @@
     <h3 class="card-collapse" onclick="FH.toggleCard(this)">
       🗺️ Management Zones <span class="badge badge-new">SSMZ</span>
     </h3>
-    <div class="card-body" id="mgmtBody"></div>
+    <div class="card-body" id="mgmtBody">
+      <button class="btn-primary btn-sm" onclick="FH.runManagementZones()">🗺️ Delineate Management Zones</button>
+      <div class="hint" style="font-size:0.62rem">Clusters the zone-feature grid into 3–5 management zones — auto-chains the per-zone Yield Forecast.</div>
+    </div>
+  </div>
+
+  <!-- ─── ZONE YIELD FORECAST (agronomy-14-01975) ─── -->
+  <div class="card" id="zoneYieldCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      🌾 Zone Yield Forecast <span class="badge badge-new">RS-ML</span>
+    </h3>
+    <div class="card-body" id="zoneYieldBody">
+      <div class="row" style="align-items:center;gap:6px;margin-bottom:8px">
+        <label style="font-size:0.7rem;color:var(--text-muted)">Crop:</label>
+        <select id="zoneYieldCrop" style="min-width:110px"></select>
+        <button class="btn-primary btn-sm" onclick="FH.runZoneYieldPrediction()">🌾 Predict Yield</button>
+      </div>
+      <div class="hint" style="font-size:0.62rem">
+        Crop-specific yield coefficients (potential, NDVI power, water sensitivity, slope penalty, trend response) × each
+        management zone's feature vector (NDVI · NDWI · slope · trend). Runs automatically after Management Zones clustering.
+      </div>
+      <div id="zoneYieldResult"></div>
+    </div>
   </div>
 
   <!-- ─── WEATHER ─── -->

@@ -161,6 +161,10 @@ const FH = (function() {
     runManagementZones: FH_INTEL.runManagementZones,
     renderManagementZones: FH_INTEL.renderManagementZones,
     exportMgmtZonesCSV: FH_INTEL.exportMgmtZonesCSV,
+    // Zone yield forecast (agronomy-14-01975)
+    runZoneYieldPrediction: FH_INTEL.runZoneYieldPrediction,
+    renderZoneYield: FH_INTEL.renderZoneYield,
+    exportZoneYieldCSV: FH_INTEL.exportZoneYieldCSV,
     // Crop health surveillance (pone.0324347 / 09119071)
     renderSurveillance: FH_INTEL.renderSurveillance,
     refreshSurveillance: FH_INTEL.refreshSurveillance,

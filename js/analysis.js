@@ -1086,6 +1086,8 @@ const FH_ANALYSIS = (function() {
           if (diseaseCard) diseaseCard.style.display = '';
           const mgmtCard = $('mgmtCard');
           if (mgmtCard) mgmtCard.style.display = '';
+          const zoneYieldCard = $('zoneYieldCard');
+          if (zoneYieldCard) zoneYieldCard.style.display = '';
           const researchCard = $('researchCard');
           if (researchCard) researchCard.style.display = '';
           // Crop health surveillance (pone.0324347)

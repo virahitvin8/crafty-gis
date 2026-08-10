@@ -26,6 +26,7 @@ const FH_RESEARCH = (function() {
     diseaseGIS:  { label: 'Disease outbreak GIS (geotag + heatmap + temporal)',      status: 'built' },
     diseaseEWS:  { label: 'Weather-based disease early warning (blight/rust risk)',  status: 'built' },
     mgmtZones:   { label: 'Site-specific management zones (geostatistical clusters)', status: 'built' },
+    zoneYield:   { label: 'Per-zone yield forecast (crop coefficients × zone vectors)', status: 'built' },
     cnnVision:   { label: 'CNN / vision disease detection (Ollama LLaVA photo)',     status: 'built' },
     sarPulse:    { label: 'Polarimetric SAR (full PolSAR decomposition)',            status: 'roadmap' },
     gediBiomass: { label: 'GEDI LiDAR biomass / carbon stock',                       status: 'roadmap' },
@@ -130,7 +131,7 @@ const FH_RESEARCH = (function() {
       ],
       dataPulls: ['sentinel2', 'landsat', 'mlRf', 'trends', 'cnnVision'],
       requiredPulls: ['Hyperspectral + UAV imagery (optional)', 'Multispectral time series', 'Soil sample spectra for classification'],
-      craftyBuild: 'The app already ships the review\'s core stack — Random Forest stress model, Sentinel-2/Landsat composites, per-zone trends and CNN-style photo diagnosis — plus CHIRPS rainfall and SAR soil moisture.'
+      craftyBuild: 'The app already ships the review\'s core stack — Random Forest stress model, Sentinel-2/Landsat composites, per-zone trends and CNN-style photo diagnosis — plus CHIRPS rainfall, SAR soil moisture, and a per-zone Yield Forecast card that applies crop-specific coefficients to each management zone\'s feature vector (NDVI · NDWI · slope · trend).'
     },
     {
       id: 'remotesensing-13-02486',

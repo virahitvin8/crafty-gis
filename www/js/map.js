@@ -988,6 +988,23 @@ const FH_MAP = (function() {
     if (_mgmtLayer) { _mgmtLayer.clearLayers(); }
   }
 
+  // ═══════════ ZONE YIELD LAYER (research agronomy-14-01975) ═══════════
+  // Colored per-zone patches showing the predicted yield per management
+  // zone (crop-specific coefficients × zone feature vectors).
+  let _yieldLayer = null;
+
+  function getYieldLayer() {
+    if (!_state.map) return null;
+    if (!_yieldLayer) {
+      _yieldLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _yieldLayer;
+  }
+
+  function clearYieldOverlay() {
+    if (_yieldLayer) { _yieldLayer.clearLayers(); }
+  }
+
   return {
     setStateRef,
     findSavedField,
@@ -1027,6 +1044,8 @@ const FH_MAP = (function() {
     // ML zone overlay
     getZoneLayer,
     clearZoneOverlay,
+    getYieldLayer,
+    clearYieldOverlay,
     // Disease outbreak layer
     getOutbreakLayer,
     clearOutbreakLayer,

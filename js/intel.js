@@ -460,6 +460,9 @@ const FH_INTEL = (function() {
       _drawManagementZones(clusters);
       hideLoading();
       toast(`🗺️ ${clusters.length} management zones delineated (geostatistical clustering)`);
+      // Auto-chain: once zones are clustered, run the zone-level yield
+      // forecast silently so the Yield card fills in immediately.
+      try { runZoneYieldPrediction({ silent: true }); } catch (e) { console.warn('Yield chain skipped:', e.message); }
     } catch (e) {
       hideLoading();
       toast('⚠️ Zone clustering failed: ' + e.message, 'err');
@@ -607,6 +610,178 @@ const FH_INTEL = (function() {
     }));
     downloadBlob(rows.join('\n'), 'crafty_gis_management_zones.csv', 'text/csv');
     toast('Management zones CSV exported');
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 5b. ZONE YIELD PREDICTION (per management zone)
+  //     Crop-specific empirical yield model built from the RS+ML
+  //     yield stack reviewed in agronomy-14-01975 (Wang 2024):
+  //     potential yield × non-linear NDVI response × water (NDWI)
+  //     × slope × vigour-trend modifiers, evaluated against each
+  //     management zone's feature vector (NDVI · NDWI · slope ·
+  //     trends) — the zone-level counterpart of the classic
+  //     field-level Yield Projection.
+  // ═══════════════════════════════════════════════════════════
+  // Crop-specific modifiers. yieldMax + peak come from
+  // FH_CONFIG.YIELD_COEFFICIENTS so they stay consistent with the
+  // classic Yield Projection; these extend it with the RS-ML
+  // response shapes the review reports for yield prediction.
+  const YIELD_MODIFIERS = {
+    wheat:      { power: 0.85, waterSens: 0.35, slopePen: 0.020, slopeTol: 5, trendGain: 50 },
+    rice:       { power: 0.80, waterSens: 0.50, slopePen: 0.010, slopeTol: 3, trendGain: 40 },
+    maize:      { power: 0.82, waterSens: 0.40, slopePen: 0.020, slopeTol: 5, trendGain: 45 },
+    cotton:     { power: 0.85, waterSens: 0.30, slopePen: 0.020, slopeTol: 6, trendGain: 40 },
+    sugarcane:  { power: 0.78, waterSens: 0.45, slopePen: 0.010, slopeTol: 4, trendGain: 35 },
+    mustard:    { power: 0.85, waterSens: 0.25, slopePen: 0.020, slopeTol: 6, trendGain: 45 },
+    soybean:    { power: 0.82, waterSens: 0.35, slopePen: 0.020, slopeTol: 5, trendGain: 45 },
+    potato:     { power: 0.80, waterSens: 0.45, slopePen: 0.010, slopeTol: 4, trendGain: 40 },
+    pulses:     { power: 0.85, waterSens: 0.25, slopePen: 0.020, slopeTol: 6, trendGain: 40 },
+    vegetables: { power: 0.80, waterSens: 0.40, slopePen: 0.010, slopeTol: 5, trendGain: 45 },
+    orchards:   { power: 0.82, waterSens: 0.35, slopePen: 0.010, slopeTol: 8, trendGain: 35 },
+    generic:    { power: 0.80, waterSens: 0.35, slopePen: 0.020, slopeTol: 5, trendGain: 45 }
+  };
+
+  function _populateZoneYieldCrop() {
+    const sel = $('zoneYieldCrop');
+    if (!sel || sel.options.length > 1) return;
+    const crops = (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.CROPS) || {};
+    const current = ($('cropSelect') && $('cropSelect').value) || 'generic';
+    sel.innerHTML = Object.keys(crops).map(id =>
+      `<option value="${id}" ${id === current ? 'selected' : ''}>${crops[id].icon} ${crops[id].name}</option>`
+    ).join('');
+  }
+
+  // Main runner — predict yield for every management zone from its
+  // feature vector. opts.silent skips the loading overlay + toast
+  // (used when auto-chained from Management Zones clustering).
+  function runZoneYieldPrediction(opts) {
+    const el = $('zoneYieldResult');
+    if (!el) return;
+    const silent = !!(opts && opts.silent);
+    const full = _state.proAnalysis || _state.proData?.full;
+    const clusters = _state.mgmtZones;
+    if (!clusters || !clusters.length) {
+      el.innerHTML = `<div class="hint">Run <b>Management Zones</b> first — the model predicts yield for each delineated zone from its feature vector.</div>`;
+      return;
+    }
+    _populateZoneYieldCrop();
+    const cropId = ($('zoneYieldCrop') && $('zoneYieldCrop').value) || 'generic';
+    const base = (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.YIELD_COEFFICIENTS[cropId])
+      || (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.YIELD_COEFFICIENTS.generic)
+      || { peak: 0.8, yieldMax: 10, unit: 't/ha', name: 'Crop' };
+    const mods = YIELD_MODIFIERS[cropId] || YIELD_MODIFIERS.generic;
+    const fieldHa = (full && full.areaHa) || _state.fieldAreaHa || FH_UTILS.areaHa(_state.fieldLL) || 1;
+
+    if (!silent) showLoading('Running zone yield model…', 40);
+    try {
+      const zones = clusters.map(z => {
+        const ndviRatio = Math.min(1, Math.max(0.05, z.avgNdvi / base.peak));
+        const veg = Math.pow(ndviRatio, mods.power);
+        const water = Math.min(1.25, Math.max(0.6, 1 + mods.waterSens * Math.max(-0.6, Math.min(0.6, z.avgNdwi - 0.1))));
+        const slope = Math.max(0.7, 1 - mods.slopePen * Math.max(0, z.avgSlope - mods.slopeTol));
+        const trend = Math.min(1.15, Math.max(0.85, 1 + mods.trendGain * (z.avgTrend || 0)));
+        // Clamp so a zone can never forecast more than ~20% above its
+        // crop potential (favorable trend/water can boost, but the
+        // agronomy review caps RS-yield estimates near the ceiling).
+        const perHa = Math.min(base.yieldMax * 1.2, base.yieldMax * veg * water * slope * trend);
+        const zoneArea = fieldHa * (parseFloat(z.pct) || 0) / 100;
+        const total = perHa * zoneArea;
+        return {
+          label: z.label, color: z.color, rank: z.rank, pct: z.pct, zoneCount: z.zoneCount,
+          avgNdvi: z.avgNdvi ?? 0, avgNdwi: z.avgNdwi ?? 0,
+          avgSlope: z.avgSlope ?? 0, avgTrend: z.avgTrend ?? 0,
+          perHa, zoneArea, total, factors: { veg, water, slope, trend },
+          cells: z.zones || []   // carry the cell grid for the map overlay
+        };
+      });
+      const fieldTotal = zones.reduce((a, z) => a + z.total, 0);
+      const weightedPerHa = zones.reduce((a, z) => a + z.perHa * (parseFloat(z.pct) || 0), 0) / 100;
+      const avgRatio = zones.reduce((a, z) => a + z.avgNdvi / base.peak, 0) / (zones.length || 1);
+      const confidence = avgRatio > 0.85 ? 'high' : avgRatio > 0.65 ? 'medium' : 'low';
+
+      _state.zoneYield = {
+        zones, fieldTotal, weightedPerHa, cropId, cropName: base.name, unit: base.unit,
+        fieldHa, confidence, ts: Date.now()
+      };
+      renderZoneYield();
+      _drawYieldOverlay(zones, base);
+      if (!silent) hideLoading();
+      if (!silent) toast(`🌾 Yield forecast: ${fieldTotal.toFixed(1)} ${base.unit} across ${zones.length} zones (${base.name})`);
+    } catch (e) {
+      if (!silent) hideLoading();
+      if (!silent) toast('⚠️ Yield model failed: ' + e.message, 'err');
+    }
+  }
+
+  function renderZoneYield() {
+    const el = $('zoneYieldResult');
+    if (!el || !_state.zoneYield) return;
+    const y = _state.zoneYield;
+    const card = $('zoneYieldCard');
+    if (card) card.style.display = '';
+    const maxPer = Math.max(...y.zones.map(z => z.perHa), 0.001);
+    const potential = (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.YIELD_COEFFICIENTS[y.cropId]?.yieldMax) || '—';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-input);border-radius:10px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:0.9rem">🌾 ${y.cropName}: <span style="color:var(--green-light)">${y.fieldTotal.toFixed(1)} ${y.unit}</span> expected</div>
+          <div style="color:var(--text-muted);font-size:0.64rem">Field ${y.fieldHa.toFixed(2)} ha · weighted avg <b>${y.weightedPerHa.toFixed(1)} ${y.unit}/ha</b> · potential ${potential} ${y.unit}/ha</div>
+          <span class="badge ${y.confidence === 'high' ? 'badge-live' : y.confidence === 'medium' ? 'badge-new' : 'badge-warn'}">confidence ${y.confidence}</span>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="FH.exportZoneYieldCSV()">⬇️ CSV</button>
+      </div>
+      ${y.zones.map(z => `
+        <div style="border-left:3px solid ${z.color};background:var(--bg-input);border-radius:8px;padding:8px;margin-bottom:6px;font-size:0.7rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:800;color:${z.color}">${z.label} zone (${z.pct}% of field)</span>
+            <span style="font-weight:800">${z.perHa.toFixed(1)} ${y.unit}/ha</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;margin:4px 0;overflow:hidden">
+            <div style="width:${(z.perHa / maxPer * 100).toFixed(0)}%;height:100%;background:${z.color}"></div>
+          </div>
+          <div style="color:var(--text-muted);font-size:0.62rem">
+            NDVI ${z.avgNdvi.toFixed(3)} · NDWI ${z.avgNdwi.toFixed(3)} · slope ${z.avgSlope.toFixed(1)}° · trend ${(z.avgTrend * 1000).toFixed(1)}‰/day
+            → <b>${z.total.toFixed(1)} ${y.unit}</b> on ${z.zoneArea.toFixed(2)} ha
+          </div>
+        </div>`).join('')}
+      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">Yield model: potential × (NDVI/peak)<sup>power</sup> × water (NDWI) × slope × trend factors per zone — RS-ML yield stack per agronomy-14-01975 (Wang et al. 2024).</div>`;
+  }
+
+  // Colour the map by predicted yield per management-zone patch.
+  function _drawYieldOverlay(zones, base) {
+    if (!_state.map || !window.FH_MAP || !FH_MAP.getYieldLayer) return;
+    const layer = FH_MAP.getYieldLayer();
+    if (!layer) return;
+    layer.clearLayers();
+    zones.forEach(z => {
+      (z.cells || []).forEach(cell => {
+        if (cell.ndvi === null || cell.ndvi === undefined) return;
+        const halfLat = (cell.cellH || 0.003) / 2;
+        const halfLng = (cell.cellW || 0.003) / 2;
+        L.rectangle([
+          [cell.lat - halfLat, cell.lng - halfLng],
+          [cell.lat + halfLat, cell.lng + halfLng]
+        ], {
+          color: z.color, weight: 0.8, opacity: 0.9,
+          fillColor: z.color, fillOpacity: 0.5
+        }).bindTooltip(
+          `<b style="color:${z.color}">${z.label} zone — ${z.perHa.toFixed(1)} ${base.unit}/ha</b><br>Predicted ${z.total.toFixed(1)} ${base.unit} (${z.pct}% of field)`,
+          { sticky: true }
+        ).addTo(layer);
+      });
+    });
+  }
+
+  function exportZoneYieldCSV() {
+    const y = _state.zoneYield;
+    if (!y) return toast('Run Zone Yield Forecast first', 'err');
+    const rows = ['zone_label,pct_of_field,area_ha,mean_ndvi,mean_ndwi,mean_slope_deg,mean_trend_per_day,yield_per_ha_' + y.unit + ',zone_total_' + y.unit];
+    y.zones.forEach(z => rows.push(
+      [z.label, z.pct, z.zoneArea.toFixed(4), z.avgNdvi.toFixed(4), z.avgNdwi.toFixed(4), z.avgSlope.toFixed(2), z.avgTrend.toFixed(6), z.perHa.toFixed(2), z.total.toFixed(2)].join(',')
+    ));
+    rows.push(['FIELD_TOTAL', '', '', '', '', '', '', y.weightedPerHa.toFixed(2), y.fieldTotal.toFixed(2)].join(','));
+    downloadBlob(rows.join('\n'), 'crafty_gis_zone_yield_forecast.csv', 'text/csv');
+    toast('Zone yield forecast CSV exported');
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -866,6 +1041,10 @@ const FH_INTEL = (function() {
     runManagementZones,
     renderManagementZones,
     exportMgmtZonesCSV,
+    // Zone yield prediction (agronomy-14-01975)
+    runZoneYieldPrediction,
+    renderZoneYield,
+    exportZoneYieldCSV,
     // Crop health surveillance
     renderSurveillance,
     refreshSurveillance,
