@@ -339,7 +339,7 @@ async def execute_analysis(session_id: str):
     workflow = await workflow_engine.create_workflow(
         project_id=session.get("project_id", "default"),
         session_id=session_id,
-        user_input=intent.get("summary", "Execute analysis"),
+        user_input=intent.get("description", "Execute analysis"),
         context=intent,
     )
     

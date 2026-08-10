@@ -7,6 +7,7 @@ node_modules/
 server/node_modules/
 backend/venv/
 backend/__pycache__/
+crafty-gis-server/venv/
 
 # Build outputs
 www/
@@ -37,6 +38,8 @@ server/models/
 server/labels/
 
 # Python caches
+__pycache__/
+*.pyc
 crafty-gis-server/app/__pycache__/
 
 # OS
@@ -55,6 +58,9 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+# Local build logs
+BUILD_COMPLETE.txt
 
 # Coverage
 coverage/
