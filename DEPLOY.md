@@ -1,6 +1,6 @@
-# 🛰️ FarmHealth — Deployment Guide
+# 🛰️ Crafty GIS — Deployment Guide
 
-FarmHealth is a two-piece system:
+Crafty GIS is a two-piece system:
 - **Frontend** — static HTML/JS/CSS files → deployed to **Netlify** (free)
 - **Backend** — Node.js Express server → deployed to **Render** (free)
 
@@ -24,8 +24,8 @@ You need accounts at:
 cd "AGRI APP"
 git init
 git add .
-git commit -m "Initial FarmHealth web app"
-git remote add origin https://github.com/YOUR_USERNAME/farmhealth.git
+git commit -m "Initial Crafty GIS web app"
+git remote add origin https://github.com/YOUR_USERNAME/crafty_gis.git
 git push -u origin main
 ```
 
@@ -49,7 +49,7 @@ git push -u origin main
 
 1. Go to https://render.com → **New** → **Blueprint**
 2. Connect your GitHub repo
-3. Render auto-reads `render.yaml` — it sets up `farmhealth-backend`
+3. Render auto-reads `render.yaml` — it sets up `crafty_gis-backend`
 4. In the service settings → **Environment** tab, add these secrets:
 
 | Key | Value |
@@ -117,7 +117,7 @@ To use your own Firebase project:
 
 To add your Netlify domain to the existing project:
 1. Firebase Console → operationorigami-a33e0 → Authentication → Settings → Authorized domains
-2. Add your Netlify URL (e.g., `farmhealth.netlify.app`)
+2. Add your Netlify URL (e.g., `crafty_gis.netlify.app`)
 
 ---
 

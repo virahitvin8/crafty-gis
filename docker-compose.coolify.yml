@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — Production stack for Coolify / Dokploy
+# Crafty GIS — Production stack for Coolify / Dokploy
 #
 #   In Coolify / Dokploy: New Resource → Docker Compose → paste
 #   the contents of this file (or point it at this repo).
@@ -10,7 +10,7 @@
 #   Paste the GEE key as ONE line in the dashboard instead.
 #
 #   Services:
-#     8080 → FarmHealth app + backend (public)
+#     8080 → Crafty GIS app + backend (public)
 #     11434 → Ollama (internal only — LAN 127.0.0.1)
 #     3002 → Uptime Kuma (optional — reverse-proxy for auth)
 #
@@ -20,8 +20,8 @@
 # ═══════════════════════════════════════════════════════════
 
 services:
-  # ─── FarmHealth app + backend (public entrypoint on 8080) ───
-  farmhealth:
+  # ─── Crafty GIS app + backend (public entrypoint on 8080) ───
+  crafty_gis:
     image: ghcr.io/virahitvin8/crafty-gis:latest  # or build from this repo
     # To build from this repo instead of a registry image, use:
     # build: .
@@ -79,15 +79,15 @@ services:
   postgis:
     image: postgis/postgis:16-3.4
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-farmhealth}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-farmhealth}
-      - POSTGRES_DB=${POSTGRES_DB:-farmhealth}
+      - POSTGRES_USER=${POSTGRES_USER:-crafty_gis}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-crafty_gis}
+      - POSTGRES_DB=${POSTGRES_DB:-crafty_gis}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgis_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-farmhealth} -d ${POSTGRES_DB:-farmhealth}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-crafty_gis} -d ${POSTGRES_DB:-crafty_gis}"]
       interval: 30s
       timeout: 5s
       retries: 3

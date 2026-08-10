@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════
-#  FarmHealth — Full Build System
+#  Crafty GIS — Full Build System
 #  Builds: Flutter app, Node.js Express server, Next.js frontend,
 #          Python FastAPI backend, Docker images, and production artifacts.
 # ═══════════════════════════════════════════════════════
@@ -43,7 +43,7 @@ print_error() {
 # ── Check prerequisites ─────────────────────────────────────────────────────────────
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║  🛰️  FarmHealth — Full Build System                      ║"
+echo "║  🛰️  Crafty GIS — Full Build System                      ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -107,9 +107,9 @@ cp package.json "$BUILD_DIR/package.json" 2>/dev/null || true
 cp .env.example "$BUILD_DIR/.env.example" 2>/dev/null || true
 
 # Extra standalone demo/landing pages (optional)
-cp -r farmhealth_dashboard "$BUILD_DIR/farmhealth_dashboard" 2>/dev/null || true
+cp -r crafty_gis_dashboard "$BUILD_DIR/crafty_gis_dashboard" 2>/dev/null || true
 cp -r field_analytics_ai_advice "$BUILD_DIR/field_analytics_ai_advice" 2>/dev/null || true
-cp -r farmhealth_precision "$BUILD_DIR/farmhealth_precision" 2>/dev/null || true
+cp -r crafty_gis_precision "$BUILD_DIR/crafty_gis_precision" 2>/dev/null || true
 cp -r learning_module "$BUILD_DIR/learning_module" 2>/dev/null || true
 cp -r my_fields "$BUILD_DIR/my_fields" 2>/dev/null || true
 
@@ -153,8 +153,8 @@ print_step "5/5: Building production Docker image"
 
 if command -v docker &>/dev/null; then
   echo "  Building Docker image..."
-  docker build -t farmhealth:latest .
-  print_success "Docker image built: farmhealth:latest"
+  docker build -t crafty_gis:latest .
+  print_success "Docker image built: crafty_gis:latest"
 
   echo ""
   echo "  ───────────────────────────────────────────────────────────────────────"
@@ -175,7 +175,7 @@ if command -v docker &>/dev/null; then
   echo "    # Run the server directly"
   echo "    node server/server.js"
   echo "    # Or with Docker:"
-  echo "    docker run -p 3001:8080 farmhealth:latest"
+  echo "    docker run -p 3001:8080 crafty_gis:latest"
   echo "    # Or with Docker Compose:"
   echo "    docker compose -f docker-compose.yml up -d"
 else

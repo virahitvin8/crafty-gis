@@ -1,4 +1,4 @@
-# 🚀 Deploy FarmHealth on Coolify / Dokploy (Production, 24×7)
+# 🚀 Deploy Crafty GIS on Coolify / Dokploy (Production, 24×7)
 
 > Replace Render (which sleeps after 15 min) with a **self-hosted always-on** platform.
 > Keep everything: Render still works as a fallback — this is additive, not breaking.
@@ -37,8 +37,8 @@ sudo usermod -aG docker $USER
 
 # Clone the repo
 cd ~
-git clone https://github.com/virahitvin8/crafty-gis.git farmhealth
-cd farmhealth
+git clone https://github.com/virahitvin8/crafty-gis.git crafty_gis
+cd crafty_gis
 
 # Configure (OPTIONAL — all fallbacks stay available)
 cp .env.example .env
@@ -55,7 +55,7 @@ sudo docker compose -f docker-compose.coolify.yml up -d
 
 | Service | URL |
 |---|---|
-| FarmHealth App | http://YOUR-IP:8080 |
+| Crafty GIS App | http://YOUR-IP:8080 |
 | Uptime Kuma (monitoring) | http://YOUR-IP:3002 |
 
 ### 3. First-run AI model download (one time, ~10-20 min)
@@ -82,11 +82,11 @@ curl -fsSL https://coolify.io/install | bash
 
 ### 2. Create the project
 - Open Coolify → **Projects → New**
-- Name it `farmhealth`
+- Name it `crafty_gis`
 - Add a **New Resource → Docker Compose**
 - Point it at the repo `https://github.com/virahitvin8/crafty-gis.git`
 - Select `docker-compose.coolify.yml` as the compose file
-- Set domain: `farmhealth.yourdomain.com`
+- Set domain: `crafty_gis.yourdomain.com`
 - Port: `8080`
 - Click **Deploy**
 
@@ -130,11 +130,11 @@ Nothing breaks if a new service is unreachable — each has a graceful fallback 
 
 ## Land Records (Survey / Khata number)
 
-FarmHealth **never invents** land records.
+Crafty GIS **never invents** land records.
 
 - **What it does:** auto-detects your State, District, Tehsil, Village & PIN from the boundary you draw, then deep-links you to the **official state portal** (UP Bhulekh, MP Bhulekh, Mahabhumi, Dharani, Mee Bhoomi, etc. — all 36 states mapped).
-- **Where records come from:** the official government portals only (after OTP verification — that is a legal privacy requirement, not something FarmHealth can bypass).
-- **You save** the survey/khata number and owner name locally, and FarmHealth remembers them for that field next time.
+- **Where records come from:** the official government portals only (after OTP verification — that is a legal privacy requirement, not something Crafty GIS can bypass).
+- **You save** the survey/khata number and owner name locally, and Crafty GIS remembers them for that field next time.
 
 See the **Land Info** card after selecting a boundary.
 
@@ -160,7 +160,7 @@ Get alerts on Telegram/Discord/Email when anything goes down.
 
 ```bash
 # Logs
-sudo docker compose -f docker-compose.coolify.yml logs -f farmhealth
+sudo docker compose -f docker-compose.coolify.yml logs -f crafty_gis
 sudo docker compose -f docker-compose.coolify.yml logs -f ollama
 
 # Restart

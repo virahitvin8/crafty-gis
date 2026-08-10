@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Vercel Serverless Function
+   Crafty GIS — Vercel Serverless Function
    Gemini agricultural advisory (with expert fallback)
    ═══════════════════════════════════════════════════════════ */
 
@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
   }
 
   const prompt = `
-    You are FarmHealth's Lead Agronomist AI, powered by satellite and soil telemetry.
+    You are Crafty GIS's Lead Agronomist AI, powered by satellite and soil telemetry.
     Analyze the following crop and field telemetry:
     - Field Name: ${fieldName || "Unknown"}
     - Crop / Cover: ${crop || "Wheat"}

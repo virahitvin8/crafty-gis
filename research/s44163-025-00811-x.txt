@@ -1,0 +1,1431 @@
+Maged et al. Discover Artificial Intelligence (2026) 6:344                                                                   Discover Artificial Intelligence
+https://doi.org/10.1007/s44163-025-00811-x
+
+
+
+
+ RESEARCH                                                                                                                                                     Open Access
+
+
+Deep learning and GIS integration for plant
+disease diagnosis and management
+Waleed Maged1,2*, Abdelrahman Elsayed3,4, Rehab Mahmoud1 and Mostafa Thabet1
+
+*Correspondence:
+Waleed Maged                             Abstract
+waleedmaged@yahoo.com                    Plant diseases pose a major threat to global food security, particularly in agricultural
+1
+ Faculty of Computers and Artificial
+Intelligence, Fayoum University,         regions such as Egypt. This study presents an integrated framework that combines
+Fayoum, Egypt                            deep learning (DL) with Geographic Information Systems (GIS) for the automated
+2
+ National Gene Bank, Agricultural        diagnosis and spatial monitoring of tomato and potato diseases. Three deep
+Research Center, Giza, Egypt
+3
+ Faculty of Information Technology,      learning models were developed and evaluated: DenseNet169, MobileNetV2, and
+Isra University, Amman, Jordan           a Custom-CNN baseline. Comparative experiments on the test dataset showed
+4
+ Climate Change Information              that DenseNet169 achieved the highest evaluation accuracy of 98.24%, followed
+Center and Renewable Energy
+and Expert Systems, Agricultural         by MobileNetV2 with 94.66%, while the Custom-CNN obtained a lower accuracy of
+Research Center, Giza, Egypt             82.60%, reflecting the limitations of shallow architectures trained from scratch. Owing
+                                         to its superior performance, DenseNet169 was selected for integration with the GIS
+                                         module. The GIS component geotags disease predictions and visualizes outbreaks
+                                         through interactive crop-specific layers, heatmaps, and temporal tracking, enabling
+                                         early detection and targeted interventions. This spatial–temporal integration allows
+                                         stakeholders to monitor disease progression, assess risk under varying environmental
+                                         conditions, and optimize resource allocation for precision agriculture. The final system
+                                         also incorporates a bilingual web interface (Arabic/English) enhanced with Grad-CAM
+                                         visualizations, which improve interpretability and build trust among local farming
+                                         communities. Field validation conducted in Beheira Governorate, Egypt, confirmed
+                                         the accuracy and practical utility of the system in real-world agricultural settings.
+                                         By integrating AI-based diagnostics with geospatial intelligence, the proposed
+                                         framework provides a scalable and sustainable decision-support tool, offering a
+                                         valuable pathway toward data-driven plant disease management in developing
+                                         regions.
+                                         Keywords Plant disease, Deep learning, CNN, GIS, MobileNetV2, Disease mapping,
+                                         Egypt, Smart agriculture
+
+
+                                       1 Introduction
+                                       Agriculture represents a fundamental pillar of the Egyptian economy, accounting
+                                       for approximately 11.3% of the national Gross Domestic Product (GDP) and employ-
+                                       ing nearly 28% of the labor force. The productivity and quality of agricultural crops are
+                                       highly susceptible to climatic and environmental variations, which in turn influence eco-
+                                       nomic stability and the country’s competitiveness in international markets. On a global
+
+
+                                       © The Author(s) 2026. Open Access This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use,
+                                       sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the
+                                       source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article
+                                       are included in the article’s Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the
+                                       article’s Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to
+                                       obtain permission directly from the copyright holder. To view a copy of this licence, visit http://creativecommons.org/licenses/by/4.0/.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                    Page 2 of 33
+
+
+
+
+                   scale, plant-based products constitute over 80% of the human diet, underscoring the
+                   central role of crop health in ensuring food security. However, plant diseases—originat-
+                   ing from bacterial, fungal, or viral pathogens—continue to pose a significant threat to
+                   agricultural output. According to the Food and Agriculture Organization (FAO), plant
+                   pests and diseases are responsible for an estimated 20–40% of annual crop losses world-
+                   wide, thereby presenting a critical obstacle to the sustainability of food systems [1]. In
+                   the Egyptian context, enhancing plant disease management is imperative for achieving
+                   both sustainable food security and economic resilience.
+                     Timely and accurate diagnosis of plant diseases is essential to minimizing crop dam-
+                   age, as early detection enables targeted treatment before the disease spreads extensively.
+                   Among the various indicators of plant health, leaf symptoms remain the most visible
+                   and informative, making leaf image analysis a practical and accessible diagnostic tool.
+                   Despite this, Egypt suffers from a noticeable shortage of agricultural extension person-
+                   nel, limiting farmers’ access to expert guidance. Consequently, many farmers resort to
+                   self-diagnosis or depend on unverified online resources, which often leads to inaccurate
+                   identification of diseases and the implementation of inappropriate management strate-
+                   gies [2].
+                     Recent advancements in Artificial Intelligence (AI), particularly in deep learning, have
+                   opened new frontiers in the development of automated plant disease detection systems.
+                   The proliferation of smartphones and the accessibility of GPU-powered computing
+                   have further facilitated the deployment of such technologies in real-world agricultural
+                   contexts. Among various AI techniques, Convolutional Neural Networks (CNNs) have
+                   exhibited remarkable efficacy in image-based classification tasks, including plant dis-
+                   ease identification. Several studies have demonstrated the successful application of CNN
+                   architectures such as VGG16, InceptionV3, DenseNet201, and MobileNetV2, achieving
+                   high classification accuracy while maintaining computational efficiency [3, 4].
+                     Concurrently, GIS have gained prominence as a powerful tool for analyzing, managing,
+                   and visualizing spatially referenced data. GIS integrates hardware, software, and analyti-
+                   cal methodologies to support the geospatial representation of phenomena, including the
+                   spread of plant diseases [5]. By enabling the construction of spatial distribution maps,
+                   GIS contributes to identifying disease hot-spots, monitoring crop health dynamics, and
+                   informing precision agriculture practices [6]. The integration of GIS with real-time plant
+                   disease diagnostics offers the potential to support early warning systems and enhance
+                   evidence-based agricultural planning and interventions.
+                     Despite these parallel advancements, current research efforts often treat deep learn-
+                   ing-based diagnosis and GIS applications as distinct domains. Most AI-driven plant dis-
+                   ease detection models are limited to classifying disease symptoms from images, lacking
+                   spatial contextualization or actionable insights for decision support. Conversely, GIS
+                   applications in agriculture frequently rely on manually reported data and rarely incor-
+                   porate automated, real-time diagnostic outputs. This gap underscores the need for an
+                   integrated approach that combines deep learning and GIS to enhance both the accuracy
+                   of disease detection and the spatial intelligence of agricultural decision-making.
+
+                   1.1 Research gap and motivation
+                   Most existing deep learning-based plant disease diagnosis systems are limited to static
+                   image classification, overlooking the spatial and temporal aspects of disease occurrence.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                    Page 3 of 33
+
+
+
+
+                   This shortcoming prevents stakeholders from understanding not only where diseases
+                   appear but also how they evolve and spread over time, thereby constraining opportuni-
+                   ties for timely intervention and strategic disease management.
+                     To overcome this limitation, the present study aims to integrate deep learning–based
+                   disease diagnosis with GIS, enabling spatial visualization and dynamic monitoring of
+                   plant health. This integration bridges the gap between image-level recognition and field-
+                   scale management, fostering precision agriculture and proactive decision-making.
+                     The motivation for this research is both scientific and practical. In countries like
+                   Egypt—where agriculture is central to food security and rural livelihoods—timely and
+                   accurate diagnosis of crop diseases can minimize losses and reduce excessive pesticide
+                   use. Moreover, by deploying lightweight deep learning models connected to GIS visual-
+                   ization tools, the framework offers an accessible and cost-effective solution that empow-
+                   ers smallholder farmers and agricultural officers with real-time, actionable insights.
+                     The major contributions of this research can be summarized as follows. First, among
+                   the evaluated deep learning architectures, DenseNet169 achieved the highest classifica-
+                   tion accuracy of 98.24% across 13 tomato and potato disease classes from the PlantVil-
+                   lage datasets, confirming its robustness and generalization ability. Second, this study
+                   introduces a novel integration of CNNs and GIS that enables real-time geospatial visu-
+                   alization and spatio-temporal monitoring of plant disease outbreaks, thereby advancing
+                   beyond existing frameworks that focus primarily on static visualization or image-based
+                   diagnosis, such as DeepAgroVis, SmartFarmGIS, and the recently proposed AgroDetect
+                   [7]. Unlike these systems, which primarily focus on individual plant-level analysis, the
+                   proposed framework extends to dynamic, large-scale monitoring by transforming model
+                   outputs into interactive GIS layers for real-time disease tracking and management.
+                   Third, a predictive disease spread estimation component is implemented to correlate
+                   environmental and geographical factors with disease occurrence density, offering early-
+                   warning capabilities for agricultural stakeholders. Fourth, a bilingual web-based deci-
+                   sion-support platform has been developed to ensure accessibility for both local farmers
+                   and researchers. Furthermore, model interpretability is enhanced using Grad-CAM
+                   visualization, which highlights the most relevant regions of infected leaves to promote
+                   transparency and explainable in diagnostic decisions. Finally, field validation conducted
+                   in El-Beheira governorate, Egypt, confirmed the framework’s practical utility and adapt-
+                   ability to real-world agricultural environments, establishing it as a comprehensive pre-
+                   cision agriculture tool that unites automated diagnosis, spatial analytics, and decision
+                   support.
+                     This paper is organized as follows: Sect. 2 reviews related work on deep learning and
+                   GIS for plant disease diagnosis. Section 3 describes the methodology and evaluation of
+                   DenseNet169, MobileNetV2, and Custom-CNN. Section 4 outlines the experimental
+                   setup, while Sect. 5 presents the results and GIS integration. Finally, Sects. 6–8 discuss
+                   limitations, future directions, and conclusions.
+
+                   2 Literature review
+                   2.1 Deep learning in plant disease diagnosis
+                   Deep learning has revolutionized plant disease diagnosis by enabling automated,
+                   image-based recognition of visual symptoms on leaves. Over the past decade, CNNs
+                   have emerged as the dominant architecture due to their hierarchical feature extraction
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 4 of 33
+
+
+
+
+                   capabilities and high classification accuracy. Existing research on CNN-based diagnosis
+                   can be conceptually grouped into three major themes: (1) model architecture and trans-
+                   fer learning approaches, (2) hybrid and optimized network designs, and (3) lightweight
+                   and mobile-oriented architectures for field deployment.
+
+                      (1) Model Architecture and Transfer Learning Approaches.
+                          Numerous studies have demonstrated the effectiveness of pretrained CNNs for plant
+                          disease recognition using benchmark datasets such as PlantVillage. For instance [8],
+                          achieved 98.75% test accuracy, while [9] compared VGG16, InceptionV3, ResNet152V2,
+                          and DenseNet201, identifying DenseNet201 as the top performer (99.30% validation
+                          accuracy). Similarly, Too [10] reported that DenseNet121 outperformed other
+                          architectures with 99.75% accuracy on 54,306 images, reinforcing the effectiveness of
+                          deep transfer learning in plant pathology.
+                      (2) Hybrid and Optimized Network Designs.
+                          Recent research has advanced beyond conventional CNNs toward hybrid and
+                          ensemble architectures that enhance feature representation and robustness. In [11],
+                          a Region-based Convolutional Neural Network–Region-based Fully Convolutional
+                          Network (RCNN–RFCN) hybrid model achieved 98.5% accuracy, while [12] proposed
+                          UnitedModel, a combined CNN framework that reached 99.17% accuracy for grape
+                          leaf disease detection. These hybridization strategies reflect a growing trend toward
+                          model fusion for improved generalization and contextual understanding.
+                       (3) Lightweight and Mobile-Oriented Architectures.
+                          Given the demand for real-time diagnosis in agricultural environments, lightweight
+                          CNNs have gained increasing attention. In [13] employed depthwise separable
+                          convolutions to reduce computational cost while maintaining 99.56% accuracy
+                          across 38 diseases, making the model suitable for mobile deployment. Similarly [14],
+                          found that ShuffleNet achieved a reasonable 83.68% accuracy with significantly fewer
+                          parameters, illustrating the balance between model complexity and efficiency.
+
+                   Despite these advancements, several studies in [15] highlight ongoing challenges related
+                   to dataset variability, background noise, and environmental conditions that hinder
+                   model generalization beyond controlled datasets such as PlantVillage. Therefore, inte-
+                   grating deep learning with contextual and geospatial tools like GIS represents a crucial
+                   step toward developing field-ready, intelligent decision-support systems for sustainable
+                   agriculture.
+
+                   2.2 GIS in plant disease monitoring and management
+                   GIS and Remote Sensing (RS) technologies have become indispensable tools in modern
+                   plant disease monitoring and management, providing spatial and temporal insights that
+                   enhance early detection, forecasting, and intervention. Existing research in this area can
+                   be grouped into three major thematic domains: (1) environmental and epidemiologi-
+                   cal mapping, (2) precision agriculture and decision-support systems, and (3) geospatial
+                   forecasting and sustainability applications.
+                     (1) Environmental and Epidemiological Mapping.
+                     Several studies have demonstrated how GIS and RS facilitate the visualization and
+                   analysis of environmental factors driving plant disease dynamics. In [16] integrated GIS
+                   and RS to map disease–environment interactions across multiple crops, enabling early
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                        Page 5 of 33
+
+
+
+
+                   detection of wheat yellow rust, rice sheath blight, and potato late blight. Similarly [17],
+                   employed high-resolution satellite imagery and Unmanned Aerial Vehicle (UAV) data to
+                   assess spatial variability in crop health, illustrating how geospatial layers can reveal early
+                   symptoms before visible damage occurs.
+                     (2) Precision Agriculture and Decision-Support Systems.
+                     The use of GIS-based mobile and web platforms for real-time agricultural monitoring
+                   has expanded rapidly [18]. developed an Android-based GIS application for pest and dis-
+                   ease monitoring, demonstrating strong reliability and user adoption [19]. reviewed GIS–
+                   RS advancements in oil palm management, emphasizing the integration of machine
+                   learning and deep learning to optimize precision agriculture workflows. Likewise [20],
+                   demonstrated the use of GIS, Global Navigation Satellite System (GNSS), and hyper-
+                   spectral remote sensing within precision agriculture frameworks for targeted disease
+                   management, achieving reduced pesticide application and improved decision efficiency.
+                     (3) Geospatial Forecasting and Sustainable Management.
+                     Forecasting models using GIS have proven valuable for proactive disease control and
+                   sustainable planning [21, 22]. highlighted the role of geospatial forecasting in develop-
+                   ing disease-resistant crop strategies and timely interventions. Previous studies demon-
+                   strated how GIS–RS integration supports early detection and large-scale surveillance,
+                   while [23, 24] emphasized its capacity to assess both biotic and abiotic stressors influ-
+                   encing plant health and productivity.
+                     Collectively, these studies confirm GIS and RS as vital components of plant dis-
+                   ease management ecosystems. However, most implementations remain crop-specific,
+                   regional, and detached from AI-driven diagnosis systems. This gap underscores the need
+                   for integrated DL–GIS frameworks capable of combining image-based diagnosis with
+                   spatial and environmental intelligence to enable predictive, data-informed agricultural
+                   decision-making.
+
+                   2.3 Integration of deep learning and GIS in agriculture
+                   While DL demonstrates strong capabilities in classifying plant diseases from leaf images
+                   and GIS excel in spatial analysis, their integration in real-time agricultural decision-
+                   support systems remains limited. DL models typically lack spatial and temporal context,
+                   whereas GIS often depends on manually collected or delayed data. By combining the
+                   two, static image-based diagnoses can be transformed into dynamic, location-aware
+                   insights that enable visualization of disease hotspots, detection of temporal trends, and
+                   more efficient resource allocation.
+                     Although some recent studies, such as Suresh et al. [7], have applied deep learning
+                   (DL) for plant disease monitoring, most approaches remain experimental or limited in
+                   scope, often lacking real-time functionality or large-scale validation. This underscores a
+                   critical research gap, which the present study addresses by developing a unified DL–GIS
+                   framework specifically designed for the diagnosis, mapping, and management of tomato
+                   and potato diseases.
+
+                   2.4 Summary and research gap
+                   The reviewed literature confirms that CNN-based deep learning models achieve
+                   high diagnostic accuracy, while GIS and remote sensing play critical roles in spatial
+                   analysis and disease monitoring. However, these two domains have largely evolved
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 6 of 33
+
+
+
+
+                   independently, limiting the delivery of real-time, spatially aware decision-support sys-
+                   tems. Deep learning models typically lack geospatial context, and GIS-based monitoring
+                   systems often depend on delayed or manually collected data.
+                     To address this research gap, this study proposes an integrated deep learning–GIS
+                   framework for intelligent plant disease management. Three models—DenseNet169,
+                   MobileNetV2, and a Custom-CNN—were comparatively evaluated, with DenseNet169
+                   demonstrating the best performance (98.24% accuracy). Accordingly, DenseNet169 was
+                   selected for GIS integration to visualize disease hotspots and analyze potential spread
+                   dynamics using environmental parameters.
+                     This integration enables automatic mapping of diagnosed cases, temporal tracking of
+                   outbreaks, and early identification of high-risk zones. By linking diagnostic intelligence
+                   with geospatial analytics, the proposed system contributes a practical, scalable, and
+                   sustainable solution to enhance agricultural resilience and support data-driven disease
+                   management.
+
+                   3 Methodology
+                   3.1 Overview of the proposed model
+                   In this study, three deep learning models were developed to classify healthy and dis-
+                   eased tomato and potato leaves using the PlantVillage dataset with a 70/15/15 split for
+                   training, validation, and testing. The models included two transfer learning architec-
+                   tures—DenseNet169 and MobileNetV2—alongside a Custom-CNN built from scratch.
+                   Experimental results showed that DenseNet169 achieved the highest accuracy (98.24%),
+                   followed by MobileNetV2 (94.66%), while the Custom-CNN recorded a lower accuracy
+                   (82.60%) due to its shallow depth and limited feature extraction capability.
+                     Based on these results, DenseNet169 was selected for integration with the GIS mod-
+                   ule, as it provided superior accuracy and robustness, making it suitable for precise and
+                   reliable deployment.
+                     The proposed framework integrates DenseNet169-based diagnosis with GIS, enabling
+                   both automated classification and spatial visualization of disease outbreaks. CNN archi-
+                   tectures effectively capture hierarchical features from leaf images, while transfer learning
+                   accelerates convergence and improves generalization. The overall pipeline combines pre-
+                   processing, prediction, and geospatial mapping to deliver a scalable and practical deci-
+                   sion-support system for agriculture (Fig. 1).
+                     Recent works have emphasized the value of transfer learning and spatially enabled
+                   deep-learning frameworks in agricultural image analysis. For example, In [25] proposed
+                   an automated annotation and segmentation framework for multi-date aerial image anal-
+                   ysis, demonstrating how deep neural networks can extract spatially meaningful patterns
+                   from agricultural imagery. Inspired by this line of research, the present study adopts a
+                   similar deep-learning-driven approach for spatially referenced disease detection, inte-
+                   grating CNN-based diagnosis with GIS visualization to enhance interpretability and
+                   decision support.
+
+                   3.2 Tomato and potato leaf disease dataset
+                   This study utilized a curated subset of the PlantVillage dataset comprising 18,163 high-
+                   resolution RGB images of tomato and potato leaves across 13 classes (9 for tomato and 4
+                   for potato), covering both healthy and diseased samples such as Early Blight, Late Blight,
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 7 of 33
+
+
+
+
+                   Fig. 1 Overall workflow of the proposed system framework
+
+                   Septoria Leaf Spot, Yellow Leaf Curl Virus, and bacterial infections. To ensure balanced
+                   representation, stratified sampling was applied. The dataset was divided into 70% for
+                   training, 15% for validation, and 15% for testing.
+                     To provide a more intuitive overview of the dataset, Fig. 2 presents representative sam-
+                   ples from the 13 tomato and potato classes. This visual summary highlights the diversity
+                   of disease symptoms and healthy leaves, illustrating the variability that the models must
+                   learn to distinguish during classification.
+
+                   3.3 Image preprocessing
+                   To ensure consistency and optimize model performance, all images were resized from
+                   256 × 256 to 224 × 224 pixels, aligning with the input requirements of the selected CNN-
+                   based architectures (DenseNet169, MobileNetV2, and a Custom-CNN). Pixel values
+                   were normalized to the range [0, 1] by dividing each RGB channel by 255, which stabi-
+                   lized the learning process, standardized input distributions, and facilitated faster conver-
+                   gence. These preprocessing steps effectively conditioned the dataset for robust training
+                   and evaluation across the four models.
+
+                   3.4 Augmentation process
+                   To enhance CNN robustness and mitigate overfitting, data augmentation was applied
+                   using TensorFlow’s ImageDataGenerator. Transformations included horizontal and ver-
+                   tical flips, random rotations (± 20°), zooming (± 20%), width and height shifts, shearing,
+Maged et al. Discover Artificial Intelligence    (2026) 6:344                                                    Page 8 of 33
+
+
+
+
+                   Fig. 2 Presents representative samples from the 13 tomato and potato classes
+
+                   brightness adjustments, and rescaling, simulating natural variations in leaf orientation,
+                   size, and lighting conditions. Augmentation was applied consistently for DenseNet169,
+                   MobileNetV2, and a Custom-CNN, while a lighter augmentation pipeline was adopted
+                   for the custom CNN to reduce training complexity. This approach contributed to
+                   improved generalization and stability across all evaluated models.
+
+                   3.5 Dataset partitioning and evaluation strategy
+                   The dataset was partitioned using a stratified 70:15:15 split, resulting in 12,709 images
+                   for training, 2,719 for validation, and 2,735 for testing, with balanced representation
+                   across all 13 classes. This ensured fair evaluation and prevented data leakage between
+                   the training, validation, and testing sets. The same partitioning strategy was applied con-
+                   sistently across all three models: DenseNet169, MobileNetV2, and Custom-CNN.
+                     Early stopping was implemented during training to prevent overfitting and improve
+                   generalization. Model performance was assessed using multiple metrics, including
+                   Accuracy, Precision, Recall, F1-score, and Support, complemented by confusion matri-
+                   ces for class-specific evaluation. Training and validation curves were monitored to track
+                   convergence, while ROC curves and AUC scores provided additional insight into each
+                   model’s discriminative capability across disease classes.
+                     This evaluation framework enabled a robust comparison of the three architectures,
+                   highlighting their relative trade-offs in terms of accuracy, efficiency, and practical
+                   deployment suitability.
+
+                   3.6 Fine-tuning strategy
+                   Fine-tuning was performed by optimizing key hyperparameters such as batch size, opti-
+                   mizer, learning rate, and validation strategy [10]. For DenseNet169 and MobileNetV2,
+                   training was conducted in two stages: 20 frozen epochs followed by 20 unfrozen epochs,
+                   allowing gradual adaptation of pre-trained weights. In contrast, the Custom-CNN was
+                   trained in a single stage of 40 epochs. Early stopping was applied consistently across all
+                   models to prevent overfitting and ensure fair comparison under unified experimental
+                   conditions.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 9 of 33
+
+
+
+
+                   3.7 Model comparison strategy
+                   To ensure an objective and reproducible assessment of model performance, the three
+                   architectures—DenseNet169, MobileNetV2, and the Custom-CNN—were trained and
+                   evaluated under identical experimental conditions, using the same data splits, augmen-
+                   tation settings, and optimization parameters. The comparative analysis focused on accu-
+                   racy, loss, and generalization ability across the test dataset.
+                     To statistically validate whether the observed performance differences were signifi-
+                   cant, McNemar’s test was applied for pairwise model comparisons. This non-parametric
+                   test evaluates the degree of agreement and disagreement between two classifiers on the
+                   same dataset, offering a robust framework for assessing comparative performance reli-
+                   ability [26]. This statistical evaluation approach aligns with recent methodological stan-
+                   dards for comparative deep learning model validation, which emphasize the integration
+                   of significance testing to ensure that observed performance differences are not due to
+                   random variation [27].
+
+                   3.8 Training the models
+                   Three models were trained for tomato and potato disease classification: DenseNet169,
+                   MobileNetV2, and a Custom-CNN. The Custom-CNN was designed with three convo-
+                   lutional blocks followed by fully connected layers, while the transfer learning models
+                   (DenseNet169 and MobileNetV2) adopted a unified classification head during fine-tun-
+                   ing. All models were trained using the same dataset partitioning and evaluation strategy
+                   described earlier, ensuring consistency in comparison.
+
+                   3.9 Feature extraction and Explain-ability
+                   The three models adopted distinct feature extraction strategies. DenseNet169 utilized
+                   dense connectivity across layers, facilitating efficient feature reuse and enabling the
+                   extraction of highly discriminative representations for fine-grained disease classification.
+                   MobileNetV2 employed depth-wise separable convolutions and inverted residual blocks
+                   with linear bottlenecks, producing compact yet expressive feature maps that are particu-
+                   larly suitable for lightweight deployment in real-time systems. In contrast, the Custom-
+                   CNN, although less accurate, learned hierarchical features from scratch, progressing
+                   from low-level edges and textures to higher-level symptomatic leaf structures.
+                     To enhance interpretability, Grad-CAM was applied to DenseNet169 and Mobile-
+                   NetV2, producing class-discriminative heatmaps that highlight the leaf regions most rel-
+                   evant to model predictions. These visualizations validated that the models consistently
+                   attend to disease-affected areas, thereby reinforcing their reliability and transparency in
+                   practical applications. Similar applications of Grad-CAM in plant pathology have dem-
+                   onstrated its effectiveness in confirming model focus on symptomatic regions in grape
+                   leaves [28] and in pest detection frameworks [29]. Representative examples from our
+                   study are presented in Fig. 3 (sample from the training dataset) and Fig. 4 (field sam-
+                   ple from Badr Village, Beheira, January 2025), illustrating both accuracy and robustness
+                   under real conditions.
+                     These visual comparisons validated the model’s transferability and practical relevance
+                   in real agricultural environments.
+Maged et al. Discover Artificial Intelligence     (2026) 6:344                                                   Page 10 of 33
+
+
+
+
+                   Fig. 3 An image from the PlantVillage dataset used during training
+
+
+
+
+                   Fig. 4 A real-field image captured from Badr village, Beheira Governorate, Egypt
+
+                   3.10 GIS-Driven disease monitoring and environmental integration
+                   3.10.1 Role of GIS in plant disease management
+                   Geographic Information Systems (GIS) provide a spatial framework for analyzing the
+                   distribution of plant diseases and their environmental determinants. Because disease
+                   outbreaks are strongly influenced by climatic and ecological factors, GIS facilitates early
+                   detection, continuous monitoring, and the design of targeted intervention strategies.
+                   Previous studies have demonstrated that integrating GIS with AI-based diagnostic mod-
+                   els enhances the tracking and prediction of plant diseases, particularly for potato late
+                   blight and viral infections in tomato crops.
+                     In this study, GIS was combined with deep learning models to map the spatial occur-
+                   rence of tomato and potato diseases across different regions. This integration enabled
+                   not only accurate disease diagnosis at the leaf level but also the visualization of disease
+                   spread patterns at both field and regional scales. By linking diagnosis with geospatial
+                   insights, the framework provides stronger decision-support tools for farmers and poli-
+                   cymakers, promoting rapid interventions to mitigate large-scale outbreaks.
+
+                   3.10.2 GIS-Based visualization and Multi-Crop layering
+                   The integration of DenseNet169 outputs into an interactive GIS platform was achieved
+                   using Leaflet.js, enabling real-time visualization of disease occurrences. Each diagnostic
+                   result was geotagged and displayed on the map as a color-coded marker: red for tomato
+                   diseases and brown for potato diseases. To enhance interpretability, the system supports
+                   multi-layer visualization, allowing users to toggle crop-specific layers independently.
+                   This functionality provides a clear spatial overview of disease dynamics across crops,
+                   facilitates comparative analysis, and supports targeted management interventions at
+                   both farm and regional levels.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 11 of 33
+
+
+
+
+                   3.10.3 Diagnosis logging and metadata recording
+                   All disease predictions generated by DenseNet169 are automatically logged within
+                   the system together with detailed metadata, including the confidence score, detection
+                   timestamp, crop type, GPS coordinates, and key environmental parameters (e.g., tem-
+                   perature, humidity, and soil moisture). This structured logging framework ensures full
+                   traceability of diagnostic outputs and provides a reliable basis for historical trend analy-
+                   sis across different seasons and geographic regions. By capturing both spatial and tem-
+                   poral dimensions, the recorded data support advanced epidemiological studies, enabling
+                   the modeling of disease spread dynamics, identification of high-risk areas, and evalua-
+                   tion of intervention outcomes. Furthermore, this metadata-driven approach strength-
+                   ens data-informed agricultural decision-making, offering actionable insights for farmers,
+                   policymakers, and researchers to enhance crop health monitoring and implement sus-
+                   tainable disease management strategies.
+
+                   3.10.4 Integration of environmental data and spread prediction
+                   To enhance the predictive capability of the proposed framework, real-time environmen-
+                   tal parameters—namely temperature (°C), relative humidity (%), wind speed (m/s), and
+                   general weather conditions—were dynamically retrieved using the OpenWeatherMap
+                   API. These parameters were incorporated into a disease spread model designed to esti-
+                   mate the potential infection radius based on localized climatic variations [30, 31].
+                     The predicted spread radius (R) for each detected disease case was computed as fol-
+                   lows (Eq. 1):
+
+                          R = B × (1 + α · ∆T) × (1 + β · H) × (1 + γ · W) × δ (1)
+
+                   Where: B: Base radius (5 km) [32], ΔT: Normalized temperature deviation [33], H:
+                   Humidity factor [31], W: Wind speed factor [31], δ: Disease-specific coefficient [34].
+
+                      • 	 - 1.8 for viral diseases.
+                      • 	 - 1.5 for fungal or bacterial diseases.
+                      • 	 - 1.3 for pest-related issues.
+
+                   This adaptive equation ensures sensitivity to microclimatic fluctuations, enabling more
+                   realistic modeling of potential disease propagation. The resulting buffer zones were
+                   automatically visualized on the GIS interface as circular regions surrounding each
+                   infected site, providing an intuitive and actionable tool for hotspot detection and early
+                   intervention.
+                     Since the PlantVillage dataset does not include spatial metadata, representative coordi-
+                   nates corresponding to major tomato and potato production areas in Egypt (e.g., Beheira
+                   governorate) were assigned based on national agricultural data and expert consultation.
+                   These coordinates reflect actual agricultural regions but were used only to demonstrate
+                   GIS integration rather than precise sampling locations.
+                     The coefficients (α, β, γ) in Eq. (1) were derived from established epidemiological stud-
+                   ies [31–34] and were empirically fine-tuned to match realistic environmental conditions
+                   observed in Egypt. A sensitivity analysis with ± 20% parameter variation revealed that
+                   β (humidity) had the strongest influence on the predicted spread radius, confirming its
+                   dominant role in foliar disease epidemiology.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                    Page 12 of 33
+
+
+
+
+                     The current implementation integrates live weather data with static GIS layers (soil
+                   type, NDVI, and land use), achieving a balance between adaptability and reproducibility.
+                   Future work will focus on integrating dynamic field-level observations to further refine
+                   the real-time predictive capacity of the GIS-based monitoring system.
+                     Model Validation:
+                     To validate the predictive equation, the estimated spread radii were compared with
+                   ranges reported in previous epidemiological and modeling studies for similar crop–
+                   pathogen systems. Specifically, the predicted infection radii (4–9 km for fungal and bac-
+                   terial diseases, and 6–11 km for viral diseases under humid and windy conditions) were
+                   consistent with literature findings [30–33]. This agreement supports the reliability of
+                   the model’s environmental sensitivity and its suitability for regional-scale monitoring.
+                   Field-based calibration under real conditions will be conducted in future work to refine
+                   empirical coefficients.
+                     Leveraging these parameters, the GIS-integrated system dynamically computes buf-
+                   fer radii for each diagnosed case based on temperature deviations, relative humidity,
+                   wind speed, and disease type. Local deployment confirmed real-time integration of spa-
+                   tial visualization, environmental data, and disease spread prediction, demonstrating full
+                   operational capability and readiness for future online extension.
+
+                   4 Experimental setup and discussion
+                   4.1 Hardware and software configuration
+                   Experiments were conducted across cloud-based and local computing environments
+                   to ensure flexibility in training, evaluation, and GIS integration. Three models—
+                   DenseNet169, MobileNetV2, and a Custom CNN—were trained to balance accuracy,
+                   interpretability, and computational efficiency. Training was performed on Google Colab
+                   using an NVIDIA Tesla T4 GPU, which significantly reduced training time for the
+                   deeper DenseNet169 architecture. GIS visualization and local testing utilized CPU and
+                   GPU resources on a Windows 10 (64-bit) machine with an Intel Core i5 processor, 12
+                   GB RAM, and an NVIDIA GeForce GTX GPU.
+                     The software stack included:
+
+                      • 	 Programming Language: Python 3.10.9.
+                      • 	 Deep Learning Framework: TensorFlow 2.8 with Keras API.
+                      • 	 Data Handling: NumPy, Pandas.
+                      • 	 Visualization: Matplotlib, Seaborn.
+                      • 	 Evaluation: scikit-learn.
+                      • 	 Web Deployment: Flask.
+                      • 	 Geospatial Mapping: Leaflet.js (HTML/JavaScript frontend).
+
+                   This setup supported the full experimental pipeline, enabling model training, evaluation,
+                   and interactive GIS-based visualization for all four architectures, as well as integration
+                   with environmental and spatial data.
+
+                   4.2 Dataset summary and preprocessing recap
+                   The dataset contained 18,163 labeled images across 13 tomato and potato leaf classes. All
+                   images were resized to 224 × 224 pixels and normalized to the range [0, 1]. A stratified
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                     Page 13 of 33
+
+
+
+
+                   split of 70% for training, 15% for validation, and 15% for testing was applied to ensure
+                   balanced representation across all subsets.
+                     To enhance generalization and reduce overfitting, data augmentation was performed
+                   using TensorFlow’s ImageDataGenerator, incorporating random rotations, horizontal/
+                   vertical flips, zooming, and brightness adjustments to simulate real-world variability.
+                     This uniform preprocessing pipeline was consistently applied to the three models—
+                   DenseNet169, MobileNetV2, and Custom CNN—ensuring a fair and comparable per-
+                   formance evaluation across architectures.
+
+                   4.3 Summary of model architectures
+                   Three deep learning models were developed and evaluated: DenseNet169, MobileNetV2,
+                   and a Custom CNN.
+                     DenseNet169 and MobileNetV2 were initialized with ImageNet pre-trained weights
+                   and fine-tuned using a unified classification head (GlobalAveragePooling2D →
+                   Dense(256, ReLU) → BatchNormalization → Dropout(0.4) → Dense(13, Softmax)).
+                   These transfer learning architectures leverage pre-trained feature extractors to enhance
+                   generalization capability and accelerate convergence.
+                     In contrast, the Custom CNN was designed and trained entirely from scratch. It con-
+                   sists of a single convolutional block (Conv2D → BatchNormalization → ReLU → Max-
+                   Pooling2D) followed by a Flatten layer and two fully connected layers (Dense(256, ReLU)
+                   → BatchNormalization → Dropout(0.5) → Dense(NUM_CLASSES, Softmax)). This
+                   architecture serves as a simple baseline model to benchmark the performance of transfer
+                   learning approaches.
+
+                   4.4 Training environment and monitoring
+                   Training of the three models—DenseNet169, MobileNetV2, and Custom CNN—was
+                   conducted under identical experimental conditions. Model performance was con-
+                   tinuously monitored using real-time accuracy and loss curves, with early stopping
+                   (patience = 5) applied to mitigate overfitting.
+                     For DenseNet169 and MobileNetV2, training was performed in two phases: a frozen
+                   stage (20 epochs) followed by an unfrozen stage (20 epochs), allowing gradual adap-
+                   tation of pre-trained weights. The Custom CNN was trained in a single stage for 40
+                   epochs; however, training was terminated earlier by early stopping once convergence
+                   was achieved.
+                     The results highlighted the superiority of transfer learning approaches (DenseNet169
+                   and MobileNetV2) over training from scratch. Although the Custom CNN produced sta-
+                   ble results, it exhibited weaker generalization and lower validation accuracy, emphasiz-
+                   ing the advantages of utilizing pre-trained architectures for plant disease classification.
+
+                   4.5 Integration with GIS system
+                   Following the comparative evaluation of the three architectures (DenseNet169, Mobile-
+                   NetV2, and Custom CNN), DenseNet169 was selected for deployment as it provided the
+                   best balance between accuracy, convergence speed, and computational efficiency, mak-
+                   ing it suitable for real-time use in resource-constrained environments.
+                     The deployed model was integrated into a GIS interface powered by Leaflet.js,
+                   enabling spatial visualization of disease predictions across tomato and potato fields.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                    Page 14 of 33
+
+
+
+
+                   Each prediction was geotagged and displayed as an interactive map marker: Red markers
+                   indicated tomato diseases, Brown markers indicated potato diseases.
+                     Interactive layer toggles allowed users to filter results by crop type, facilitating the
+                   analysis of disease distribution patterns. This GIS integration enhanced interpretability,
+                   supported timely field interventions, and provided a robust tool for data-driven deci-
+                   sion-making in precision agriculture and sustainable disease management.
+
+                   4.6 Logging and environmental data integration
+                   The system incorporates a comprehensive logging mechanism that records all diagnostic
+                   outputs from DenseNet169, alongside relevant environmental data. Each prediction—
+                   including the identified disease and its confidence score—is automatically logged with
+                   metadata such as date, time, and, when available, geographical location. Environmental
+                   parameters, including temperature, humidity, and other weather conditions, can also be
+                   captured either via user input or through external APIs. This approach ensures a com-
+                   plete record of both plant health status and the contextual factors influencing disease
+                   occurrence.
+                     Currently, logs are stored locally within the application directory, providing immediate
+                   access for analysis. Future implementations may extend this functionality to a central-
+                   ized or cloud-based database, enabling enhanced accessibility, control, and integration
+                   with GIS platforms. Such integration facilitates spatiotemporal disease tracking, sup-
+                   ports advanced analytics, and allows the development of predictive models, ultimately
+                   improving the precision of disease monitoring and enabling informed, data-driven inter-
+                   ventions in crop management.
+
+                   4.7 Predictive spread modeling
+                   Leveraging environmental parameters and the disease-specific spread model (Eq. 1,
+                   Sect. 3.9.4), the system computes a dynamic buffer radius for each diagnosed case. This
+                   radius, displayed as a circular overlay on the GIS map, adapts based on four key vari-
+                   ables: temperature deviations (ΔT), relative humidity (H), wind speed (W), and disease
+                   type (δ).
+                     This predictive modeling approximates potential zones of disease propagation, pro-
+                   viding stakeholders with spatially explicit insights. The visualization supports early
+                   intervention, optimized resource allocation, and risk-aware decision-making, enabling
+                   proactive management of high-risk areas before outbreaks escalate.
+
+                   5 Results and analysis
+                   5.1 Training the models and performance comparison
+                   Three deep learning models—DenseNet169, MobileNetV2, and Custom CNN—were
+                   trained and evaluated for classifying 13 tomato and potato leaf conditions using an aug-
+                   mented subset of the PlantVillage dataset with a 70/15/15 split for training, validation,
+                   and testing.
+
+                   5.1.1 DenseNet169 training and architecture
+                   Architecture: DenseNet169 is a deep convolutional network featuring densely connected
+                   layers that promote feature reuse, improve gradient flow, and reduce the number of
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                       Page 15 of 33
+
+
+
+
+                   parameters relative to its depth. This design enables highly discriminative feature extrac-
+                   tion, particularly effective for fine-grained plant disease classification.
+                      Training: DenseNet169 was fine-tuned using transfer learning. Initially, the convolu-
+                   tional base pre-trained on ImageNet was frozen for 20 epochs, training only the clas-
+                   sification head. Subsequently, all layers were unfrozen and jointly optimized for another
+                   20 epochs using the Adam optimizer (lr = 1e-4) with early stopping. Regularization tech-
+                   niques—including dropout, batch normalization, and data augmentation (rotations,
+                   flips, shearing, brightness adjustment)—ensured robust generalization.
+
+                   5.1.2 MobileNetV2 training and architecture
+                   Architecture: MobileNetV2 is a lightweight CNN based on depthwise separable con-
+                   volutions and inverted residual blocks with linear bottlenecks, reducing computational
+                   cost while maintaining expressive power. Its efficiency makes it suitable for deployment
+                   in resource-constrained environments.
+                     Training: MobileNetV2 followed a similar two-stage fine-tuning approach: a frozen
+                   stage (20 epochs) followed by an unfrozen stage (20 epochs) with Adam (lr = 1e-4) and
+                   early stopping. Extensive augmentation and regularization ensured stable learning.
+
+                   5.1.3 Custom-CNN training and architecture
+                   Architecture: The Custom CNN serves as a baseline, consisting of three convolutional
+                   blocks followed by fully connected layers with a Softmax output. It is trained from
+                   scratch using randomly initialized weights, making it more challenging to achieve high
+                   accuracy and highlighting the trade-offs between simplicity and generalization.
+                     Training: The Custom CNN was trained in a single stage for 40 epochs, with early
+                   stopping applied to terminate training once no further improvement was observed. Data
+                   augmentation, batch normalization, and dropout were applied consistently. The overall
+                   architecture is illustrated in Fig. 5, showing the flow of feature extraction and classifica-
+                   tion through convolutional, pooling, activation, and dropout layers.
+
+                   5.1.4 Comparative analysis of transfer learning vs. Custom-CNN
+                   To better understand the observed performance differences, this subsection provides
+                   a comparative analysis between transfer learning–based models (DenseNet169 and
+                   MobileNetV2) and the Custom-CNN trained from scratch. Transfer learning architec-
+                   tures leverage pretrained weights derived from large-scale datasets such as ImageNet,
+                   enabling efficient feature reuse and faster convergence. These pretrained models already
+                   capture low- and mid-level visual patterns (e.g., edges, textures, and shapes), which
+                   are highly relevant for plant disease symptoms. Consequently, both DenseNet169 and
+                   MobileNetV2 exhibited superior generalization, stability, and accuracy across all classes.
+                     In contrast, the Custom-CNN model, although effective as a conceptual baseline,
+                   lacks such pretrained priors. Being trained entirely from scratch with random weight
+                   initialization and limited depth (three convolutional layers), it requires a substantially
+                   larger dataset and longer optimization cycles to achieve comparable performance. The
+                   higher validation loss and early convergence indicate underfitting and reduced learning
+                   capacity.
+                     While the simplicity of the Custom-CNN facilitates interpretability and low compu-
+                   tational demand, it inherently limits hierarchical feature extraction. To provide a more
+Maged et al. Discover Artificial Intelligence     (2026) 6:344                                                                       Page 16 of 33
+
+
+
+
+                   Fig. 5 Block diagram of the proposed Custom-CNN architecture, illustrating the sequence of convolutional, pool-
+                   ing, activation, and dropout layers
+
+                   balanced comparison, future work may employ more advanced lightweight baselines
+                   such as EfficientNet-B0 or ResNet50, which combine compactness with richer feature
+                   representations.
+                     The schematic diagram (Fig. 5) illustrates the architecture of the proposed Custom-
+                   CNN model for plant disease classification. The network begins with an input layer of
+                   size 224 × 224 × 3, followed by three convolutional blocks, each consisting of Conv2D
+                   layers with ReLU activation, max-pooling for spatial downsampling, and dropout for
+                   regularization. The feature maps are then flattened and passed through a fully connected
+                   dense layer with dropout, before reaching the output layer with 13 neurons represent-
+                   ing the disease classes using Softmax activation. This simple yet effective architecture
+Maged et al. Discover Artificial Intelligence    (2026) 6:344                                                                      Page 17 of 33
+
+
+
+
+                   enables end-to-end learning directly from scratch, providing a baseline comparison with
+                   transfer learning models such as MobileNetV2 and DenseNet169.
+                     Performance Analysis.
+                     In terms of performance analysis, Fig. 6 illustrates that DenseNet169 and Mobile-
+                   NetV2 achieved smoother convergence trends, higher stability in validation accuracy,
+                   and better generalization capability compared to the Custom-CNN. The combined
+                   training and validation accuracy/loss plots offer a comprehensive visualization of each
+                   model’s learning behavior. Table 1 presents a comparative summary of key performance
+                   metrics derived from the 70/15/15 dataset split, including evaluation accuracy, valida-
+                   tion loss, number of epochs to convergence, computational efficiency, and deployment
+                   suitability.
+
+                      The comprehensive comparison presented in Table 1 reveals that the proposed
+                   DenseNet169 model achieved the highest accuracy (98.24%) among the tested archi-
+                   tectures, closely aligning with or surpassing other state-of-the-art models reported
+                   in previous studies, such as DenseNet201 (98.70%) and ResNet50 (92.10%). This con-
+                   firms its robustness and strong generalization capability in identifying diverse tomato
+                   and potato leaf diseases. The dense connectivity mechanism of DenseNet169 facilitates
+                   effective gradient flow and feature reuse, enabling the extraction of highly discriminative
+                   disease-related patterns—making it particularly suitable for deployment scenarios that
+                   can accommodate higher computational demands.
+                      In contrast, MobileNetV2 provided slightly lower accuracy (94.66%) but exhibited
+                   excellent computational efficiency and lightweight design, making it highly suitable for
+                   real-time web-based and GIS-integrated diagnostic systems. The baseline Custom CNN
+                   model, despite its faster convergence and lower complexity, achieved reduced accuracy
+                   (82.60%), emphasizing the advantage of transfer learning and deeper architectures over
+                   shallow, scratch-built networks. Overall, these findings validate the superiority and prac-
+                   ticality of the proposed models, particularly DenseNet169 and MobileNetV2, for scal-
+                   able and accurate plant disease diagnosis applications.
+                      The selected DenseNet169 model was integrated into a GIS platform (Leaflet.js) to
+                   geospatially visualize disease occurrences. This integration enables spatial monitoring
+                   of tomato and potato diseases, comparative analysis of crop-specific disease layers, and
+                   informed decision support for timely interventions. By coupling the diagnostic precision
+
+
+
+
+                   Fig. 6 Comparative learning curves showing training and validation accuracy and loss for DenseNet169, Mobile-
+                   NetV2, and Custom CNN models across epochs
+                                                                                                                                                                                         Maged et al. Discover Artificial Intelligence
+
+
+
+
+Table 1 Performance analysis of the proposed and existing deep learning models on the plantvillage dataset
+Model                        Dataset Used        No. of Classes   Evaluation Ac-   Validation   Epochs to             Size / Speed         Suitability for Deployment            Ref-
+                                                                  curacy (%)       Loss         Convergence                                                                      er-
+                                                                                                                                                                                         (2026) 6:344
+
+
+
+
+                                                                                                                                                                                 ence
+DenseNet169 (proposed)       PlantVillage        13               98.24            0.0584       40                    Heavy & Moderate     High accuracy; suitable when higher   This
+                                                                                                                                           computation is acceptable             study
+MobileNetV2 (proposed)       PlantVillage        13               94.66            0.1687       40                    Lightweight & Fast   Ideal for real-time web-based GIS     This
+                                                                                                                                           integration                           study
+Custom CNN (baseline)        PlantVillage        13               82.60            0.6257       13 (Early stopping)   Moderate             Lower accuracy; not optimal for       This
+                                                                                                                                           deployment                            study
+DenseNet201                  PlantVillage        15               98.70            –            –                     –                    –                                      [9]
+ResNet50                     PlantVillage        10               92.10            –            –                     –                    –                                      [36]
+VGG16                        PlantVillage        10               89.70            –            –                     –                    –                                      [4]
+Faster R-CNN                 PlantVillage        13               94.60            –            –                     –                    –                                      [37]
+                                                                                                                                                                                         Page 18 of 33
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 19 of 33
+
+
+
+
+                   of DenseNet169 with GIS-based spatiotemporal mapping, the system provides a scal-
+                   able framework for precision agriculture, combining accurate plant-level diagnosis with
+                   actionable geographic insights that support sustainable disease management.
+                      As illustrated in Fig. 6 the combined learning curves clearly compare the training and
+                   validation performance trends of DenseNet169, MobileNetV2, and the Custom CNN
+                   model. The DenseNet169 curve exhibited a nearly flat descent in loss and a smooth rise
+                   in accuracy, indicating early convergence and stable optimization during fine-tuning.
+                   This stability reflects the network’s ability to generalize efficiently with minimal param-
+                   eter updates, unlike the MobileNetV2 and Custom CNN models that showed higher
+                   fluctuations due to their lighter architectures and greater sensitivity to learning rate
+                   adjustments.
+                      Among the three evaluated models, DenseNet169 achieved the highest validation
+                   accuracy (98.24%) and the lowest validation loss (0.0584), confirming the robustness of
+                   its densely connected architecture in capturing complex patterns of tomato and potato
+                   leaf diseases. Its deeper structure and efficient feature reuse contributed to superior con-
+                   vergence and more reliable generalization compared to the other models.
+                      MobileNetV2, while achieving slightly lower accuracy (94.66%) and a higher validation
+                   loss (0.1687), demonstrated a strong balance between predictive performance, conver-
+                   gence stability, and computational efficiency. Its lightweight design makes it particularly
+                   attractive for real-time deployment in resource-constrained environments and for seam-
+                   less integration into GIS-based diagnostic systems.
+                      The Custom CNN, which reached early stopping at Epoch 13 due to lack of improve-
+                   ment, achieved only 82.60% accuracy with a relatively high validation loss (0.6257). This
+                   behavior highlights the inherent limitations of training shallow, scratch-built models on
+                   agricultural datasets, where transfer learning with pre-trained architectures provides
+                   clear advantages in both accuracy and stability.
+                      Overall, DenseNet169 was selected as the most reliable model for deployment, pro-
+                   viding the highest diagnostic precision, while MobileNetV2 remains a practical can-
+                   didate for applications requiring lightweight, real-time processing. The Custom CNN,
+                   although less effective in terms of accuracy, contributed valuable insights by underscor-
+                   ing the importance of advanced architectures and transfer learning for plant disease
+                   classification.
+
+                   5.1.5 Model efficiency metrics and ROC–AUC comparison
+                   To comprehensively evaluate the practical deploy-ability of the models within GIS and
+                   web-based systems, both predictive performance and computational efficiency were
+                   assessed on a Graphics Processing Unit GPU-enabled setup in Google Colab. Table 2
+                   summarizes accuracy, Receiver Operating Characteristic–Area Under Curve ROC–
+                   AUC, inference time, and memory usage for DenseNet169, MobileNetV2, and the Cus-
+                   tom CNN model.
+                     DenseNet169 achieved the highest accuracy (95.8%) and ROC–AUC (0.98), confirm-
+                   ing its robustness for reliable plant disease diagnosis. However, it exhibited a slower
+                   inference time (91.82 ms per image) and substantial GPU memory consumption
+                   (1724.8 MB) relative to the other models. MobileNetV2 demonstrated faster inference
+                   (69.43 ms/image) with slightly lower accuracy (93.5%) and ROC–AUC (0.96), mak-
+                   ing it suitable for real-time GIS visualization and mobile deployment. The Custom
+Maged et al. Discover Artificial Intelligence     (2026) 6:344                                                    Page 20 of 33
+
+
+
+
+                   Table 2 Predictive performance and computational efficiency of the evaluated models
+                   Model                Accuracy (%)    ROC–AUC   Inference Time (ms/image)   Memory Usage (MB)
+                   DenseNet169          95.8            0.98      91.82                       1724.8
+                   MobileNetV2          93.5            0.96      69.43                       1833.6
+                   CustomCNN            91.2            0.94      63.92                       1912.1
+
+                   CNN model showed the fastest inference (63.92 ms/image) with intermediate accuracy
+                   (91.2%) and (ROC–AUC) (0.94), providing a balance between predictive reliability and
+                   computational efficiency.
+                     These results highlight the trade-off between model complexity, predictive perfor-
+                   mance, and computational efficiency in GPU-enabled environments. Model selection
+                   should consider both the specific requirements of GIS integration and real-time applica-
+                   tion constraints.
+
+                   5.2 Model evaluation and confusion matrix analysis
+                   Classification performance was evaluated using precision, recall, F1-score, and overall
+                   accuracy across all 13 tomato and potato leaf classes. The complete classification reports
+                   for the three models are presented in Table 3, providing a detailed view of model perfor-
+                   mance at the class level.
+                     Among the models, DenseNet169 achieved the highest overall accuracy (98.24%), con-
+                   sistently outperforming the other networks with near-perfect scores across most disease
+                   categories. This superior performance reflects the benefits of its deep layered connectiv-
+                   ity and strong feature extraction capacity, which enabled accurate discrimination even in
+                   visually similar leaf conditions.
+                     MobileNetV2 attained 94.66% accuracy, offering a strong trade-off between classifica-
+                   tion accuracy, convergence speed, and computational efficiency. While its performance
+                   was slightly lower than DenseNet169, its lightweight architecture makes it particularly
+                   suitable for deployment in resource-constrained environments and for integration into
+                   GIS-based real-time diagnostic systems.
+                     The Custom-CNN, built and trained from scratch, achieved an accuracy of 82.60%,
+                   reflecting higher variability and misclassification rates. While valuable for interpretabil-
+                   ity and baseline experimentation, its limited performance highlights the challenges of
+                   training deep neural networks without transfer learning, especially when using agricul-
+                   tural datasets with complex intra-class variability.
+                     Class-wise analysis highlighted key trends:
+                     Both DenseNet169 and MobileNetV2 produced near-perfect predictions for Tomato__
+                   Tomato_YellowLeaf__Curl_Virus (F1-score > 0.98), confirming their strength in identify-
+                   ing distinct and visually unique disease symptoms.
+                     More challenging classes such as Tomato_Early_blight and Tomato__Target_Spot
+                   showed lower F1-scores in the Custom-CNN (0.56–0.76), reflecting difficulties in distin-
+                   guishing diseases with overlapping symptom patterns.
+                     Minority classes such as Potato___healthy were particularly misclassified by the Cus-
+                   tom-CNN (F1 = 0.71), whereas DenseNet169 achieved robust results (F1 = 0.97).
+                     These patterns are reflected in the confusion matrices (Fig. 7a–c) where inter-class
+                   misclassifications are noticeably more frequent in the Custom-CNN compared to
+                   the transfer learning models. Overall, the results underscore the advantage of pre-
+                   trained deep learning architectures like DenseNet169 and MobileNetV2 over shallow,
+                                                                                                                                                                                 Maged et al. Discover Artificial Intelligence
+
+
+
+
+Table 3 Classification report: MobileNetV2, DenseNet169 and Custom-CNN
+Class Name                              Precision       Recall          F1              Precision       Recall          F1              Precision      Recall         F1 (Cus-
+                                        (MobileNetV2)   (MobileNetV2)   (MobileNetV2)   (DenseNet169)   (DenseNet169)   (DenseNet169)   (Custom-CNN)   (Custom-CNN)   tom-CNN)
+Potato___Early_blight                   0.9867          0.9867          0.9867          0.9934          1.0000          0.9967          0.8848         0.9733         0.9270
+Potato___Late_blight                    0.9803          0.9933          0.9868          0.9933          0.9933          0.9933          0.9254         0.8267         0.8732
+                                                                                                                                                                                 (2026) 6:344
+
+
+
+
+Potato___healthy                        1.0000          1.0000          1.0000          0.9600          1.0000          0.9796          0.6000         0.8750         0.7119
+Tomato_Bacterial_spot                   0.9778          0.9625          0.9701          0.9969          0.9969          0.9969          0.9742         0.9437         0.9587
+Tomato_Early_blight                     0.9811          0.6933          0.8125          1.0000          0.9200          0.9583          0.7301         0.7933         0.7604
+Tomato_Late_blight                      0.9274          0.9791          0.9525          0.9828          0.9930          0.9879          0.9228         0.8328         0.8755
+Tomato_Leaf_Mold                        0.9851          0.9167          0.9496          1.0000          0.9583          0.9787          0.9894         0.6458         0.7815
+Tomato_Septoria_leaf_spot               0.9214          0.9663          0.9433          0.9852          1.0000          0.9926          0.7242         0.9738         0.8307
+Tomato_Spider_mites_Two_spotted_spi-    0.9952          0.8294          0.9048          0.9915          0.9286          0.9590          1.0000         0.3730         0.5434
+der_mite
+Tomato__Target_Spot                     0.7591          0.9811          0.8560          0.8714          0.9906          0.9272          0.7724         0.4481         0.5672
+Tomato__Tomato_YellowLeaf__Curl_Virus   0.9958          0.9793          0.9874          1.0000          0.9917          0.9958          0.9537         0.9834         0.9683
+Tomato__Tomato_mosaic_virus             0.9344          1.0000          0.9661          1.0000          0.9825          0.9912          0.8667         0.9123         0.8889
+Tomato_healthy                          0.9484          0.9958          0.9715          0.9917          0.9958          0.9938          0.5430         1.0000         0.7038
+Overall Accuracy                        –               –               0.9466          –               –               0.9824          –              –              0.8260
+                                                                                                                                                                                 Page 21 of 33
+Maged et al. Discover Artificial Intelligence    (2026) 6:344                                                       Page 22 of 33
+
+
+
+
+                   custom-built networks, while also illustrating the trade-offs between accuracy, computa-
+                   tional cost, and deployment feasibility.
+                     To further analyze the classification behavior, a combined confusion matrix visual-
+                   ization was generated for all three models—DenseNet169, MobileNetV2, and Custom-
+                   CNN (Fig. 7a–c). This composite figure provides a comparative overview of correct
+                   classifications (diagonal cells) and misclassifications (off-diagonal cells), highlighting the
+                   relative strengths and weaknesses of each model.
+                     DenseNet169 exhibits near-perfect class separability with minimal off-diagonal errors,
+                   confirming its superior feature extraction capability and robustness in distinguishing
+                   visually similar diseases.
+                     MobileNetV2 demonstrates strong performance with only minor confusion, particu-
+                   larly between Tomato_Early_blight and Potato___Late_blight, maintaining a favorable
+                   balance between accuracy and computational efficiency.
+                     Custom-CNN shows higher inter-class confusion, especially among similar tomato
+                   diseases such as Target_Spot and Septoria_leaf_spot, and in minority classes like
+                   Potato___healthy, reflecting the challenges of limited training data and absence of trans-
+                   fer learning.
+                     Key Insights:
+                     DenseNet169 achieved the highest overall accuracy98.24%, confirming its reliability
+                   and generalization strength.
+                     MobileNetV2 reached 94.66% accuracy, offering a practical compromise between
+                   accuracy and model efficiency for real-time deployment.
+                     Custom-CNN attained 82.60% accuracy, serving as a useful baseline to assess the
+                   advantages of transfer learning.
+
+                   6 Conclusion
+                   The comparative analysis confirms DenseNet169 as the most effective model, balancing
+                   high accuracy, robustness, and deployment feasibility. Therefore, it was selected for inte-
+                   gration into the GIS-based web platform to support precise disease diagnosis and spatial
+                   monitoring for sustainable agricultural management.
+
+                   6.1 Statistical significance testing
+                   To ensure the robustness and reliability of the observed performance differences among
+                   the three models, McNemar’s test was conducted on the test dataset (2,735 images). This
+                   non-parametric test evaluates whether the difference in classification accuracy between
+                   two models is statistically significant based on their pairwise disagreements. The test
+                   statistic is computed as follows:
+                          2
+                              (b − c| − 1|) 2
+                                           = x
+                                 b+c
+
+                   where b represents the number of samples correctly classified by Model A but misclassi-
+                   fied by Model B, and c represents the number of samples correctly classified by Model B
+                   but misclassified by Model A. The results of the pairwise comparisons are summarized
+                   in Table 4, which presents the McNemar’s test outcomes for all model pairs.
+                      The results confirm that the performance differences between all model pairs are sta-
+                   tistically significant (p < 0.001), indicating that the superior accuracy of DenseNet169
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                        Page 23 of 33
+
+
+
+
+                   Fig. 7 Combined Confusion Matrices of MobileNetV2, DenseNet169, and Custom-CNN
+Maged et al. Discover Artificial Intelligence    (2026) 6:344                                                              Page 24 of 33
+
+
+
+
+                   Table 4 McNemar’s test results for pairwise model comparisons
+                   Model Comparison                 b           c    χ² (Chi-Square)   p-value   Significance (α = 0.05)
+                   DenseNet169 vs. MobileNetV2      70          25   20.77             < 0.001   Significant
+                   DenseNet169 vs. Custom-CNN       180         40   85.38             < 0.001   Significant
+                   MobileNetV2 vs. Custom-CNN       150         55   49.58             < 0.001   Significant
+                   Interpretation
+
+
+                   and MobileNetV2 over the Custom-CNN is not due to random variation. These find-
+                   ings further validate the robustness of the transfer learning–based models and justify the
+                   selection of DenseNet169 as the most reliable model for integration into the GIS-based
+                   diagnostic system.
+                     This statistical validation approach aligns with recent methodological standards for
+                   comparative model evaluation, as recommended by Li [35] Journal of Digital Imaging,
+                   DOI: https://doi.org/10.1007/s10278-025-01518-2).
+
+                   6.2 Evaluation on validation and Real-World images
+                   The three models—DenseNet169, MobileNetV2, and Custom-CNN—were evaluated
+                   on both validation samples and a real-world potato farm image collected from Badr,
+                   Beheira, Egypt (January 2025).
+                     DenseNet169: Correctly classified the real-world field images with very high confi-
+                   dence, validating its superior performance on unseen practical data and confirming its
+                   suitability for deployment in operational settings.
+                     MobileNetV2: Also produced accurate classifications for the field samples, demon-
+                   strating strong reliability while maintaining computational efficiency, which is advanta-
+                   geous for real-time diagnostic systems.
+                     Custom-CNN: Showed weaker performance in real-world conditions, with occasional
+                   misclassifications, reflecting the limitations of training a CNN from scratch on limited
+                   datasets without leveraging pre-trained features.
+                     Figures 8 and 9 illustrate the complete diagnostic workflow, including:
+                     Image upload and disease classification,
+                     GIS-based geolocation of detected cases,
+                     Integration of real-time weather data,
+                     Automatic logging of predictions,
+                     Predictive spread visualization through heatmaps indicating case density and potential
+                   hotspots.
+                     These findings confirm the robustness of DenseNet169 and MobileNetV2 under both
+                   validation and real-world conditions, while also highlighting the comparative limitations
+                   of Custom-CNN. Together, the results validate the readiness of the proposed framework
+                   for operational disease monitoring, enabling early warnings and informed decision-
+                   making in crop management.
+                     In addition to the controlled PlantVillage dataset used for model training and
+                   validation, a limited field-level evaluation was performed using real potato leaf
+                   images collected from farms in Beheira, Egypt. Despite the modest sample size, the
+                   DenseNet169-based model successfully identified all tested cases, demonstrating strong
+                   generalization beyond controlled laboratory conditions. A representative field image
+                   and a corresponding sample from the training dataset were compared visually, showing
+                   consistent feature extraction despite variations in lighting and background.
+Maged et al. Discover Artificial Intelligence       (2026) 6:344                                                                            Page 25 of 33
+
+
+
+
+                   Fig. 8 Disease classification and GIS localization using a sample from the training dataset. Note: Five representative
+                   points per disease were selected to illustrate spatial distribution across major crop-growing areas in Egypt.
+Maged et al. Discover Artificial Intelligence      (2026) 6:344                                                                          Page 26 of 33
+
+
+
+
+                   Fig. 9 Real-world diagnosis and GIS mapping using a field-acquired potato leaf image (Badr, Beheira, Egypt—
+                   January 2025). Note: Five representative points per disease were selected to illustrate spatial distribution across
+                   major crop-growing areas in Egypt.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                     Page 27 of 33
+
+
+
+
+                      This preliminary field validation, combined with the local deployment of the bilingual
+                   diagnostic interface via the Flask framework, provided an end-to-end proof of concept
+                   under real agricultural conditions. The system effectively handled image upload, infer-
+                   ence, and bilingual disease reporting with Grad-CAM visual explanations, confirming
+                   its operational reliability.
+                      Nevertheless, given the limited scope of field testing, this work should be considered
+                   a prototype establishing the feasibility of automated disease diagnosis, spatial mapping,
+                   and spread visualization. Future efforts will expand the field dataset across diverse envi-
+                   ronments and geographical regions to improve robustness and scalability.
+
+                   6.3 Practical impact of GIS integration
+                   This study demonstrates the integration of deep learning-based plant disease diagnosis
+                   with GIS for real-time spatial monitoring of tomato and potato crops. Each classified leaf
+                   image is geotagged and visualized on an interactive web map using Leaflet.js, enabling
+                   timely detection and tracking of disease outbreaks (Figs. 8 and 9).
+                     The GIS module provides:
+                     Crop-specific layers for tomato and potato diseases,
+                     Heatmaps highlighting high-density disease zones,
+                     Predictive spread buffers based on environmental parameters such as temperature,
+                   humidity, and wind speed (see Sect. 3.10.4).
+                     The bilingual interface (Arabic and English) delivers both diagnosis and treatment rec-
+                   ommendations, enhancing accessibility and adoption among local farmers.
+                     Among the evaluated models, DenseNet169 demonstrated the highest accuracy and
+                   reliability, making it the most suitable for deployment when computational resources are
+                   available. MobileNetV2, while slightly less accurate, offers a practical trade-off between
+                   performance and efficiency, enabling real-time GIS-based monitoring even in resource-
+                   constrained environments. Custom-CNN, though achieving lower performance,
+                   remains valuable for interpretability, experimental benchmarking, and as a baseline for
+                   future model development.
+                     Overall, the integration of robust models (DenseNet169 and MobileNetV2) with GIS
+                   visualization enables early warning, informed decision-making, and proactive inter-
+                   ventions, thereby supporting sustainable crop management in real-world agricultural
+                   settings.
+                     To ensure practical validation, the GIS-integrated diagnostic web system was locally
+                   deployed for functional testing. Through this implementation, all modules—including
+                   spatial visualization, environmental data integration, and disease spread prediction—
+                   were successfully evaluated in real time. Although the current system operates in a local
+                   environment, it demonstrates full operational capability and can be readily extended to
+                   an online deployment in future work.
+
+                   6.4 Comparative analysis of deep learning models
+                   A comparative evaluation was conducted on three deep learning architectures using the
+                   same 13-class PlantVillage subset, each trained under identical conditions for 40 epochs.
+                     DenseNet169 achieved the highest classification accuracy of 98.24%, confirming the
+                   strength of deep transfer learning and its ability to capture complex hierarchical repre-
+                   sentations for fine-grained plant disease classification.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 28 of 33
+
+
+
+
+                      MobileNetV2 attained 94.66% accuracy, providing a strong balance between accuracy
+                   and computational efficiency. Its lightweight nature makes it particularly well-suited for
+                   real-time GIS-based deployment in agricultural settings where resource constraints are
+                   a major concern.
+                      In contrast, the Custom-CNN model, built and trained from scratch, achieved 82.60%
+                   accuracy. While its performance was lower than the transfer learning models, it estab-
+                   lishes an important baseline and demonstrates the limitations of shallow architectures
+                   when applied to complex agricultural datasets without pre-trained knowledge.
+                      This comparative assessment highlights a clear trade-off: transfer learning–based
+                   models (DenseNet169 and MobileNetV2) significantly outperform models trained from
+                   scratch, yet MobileNetV2 retains an edge in deployability due to its lightweight design.
+                   Meanwhile, DenseNet169 sets the benchmark for maximum achievable accuracy in this
+                   study, albeit with higher computational cost.
+                      To contextualize these outcomes, Table 3 presents a comparative overview of the three
+                   models, emphasizing the balance between classification accuracy, computational effi-
+                   ciency, and practical deployability in precision agriculture.
+                      The comparative analysis demonstrates that DenseNet169 achieved the highest accu-
+                   racy (98.24%), reflecting its superior ability to capture fine-grained disease features.
+                   MobileNetV2 achieved 94.66%, offering a strong trade-off between accuracy, stability,
+                   and computational efficiency, while the Custom-CNN reached 82.60%, highlighting the
+                   limitations of training models from scratch without leveraging transfer learning.
+                      Although MobileNetV2 provided a more lightweight and efficient option,
+                   DenseNet169 was ultimately selected for deployment due to its superior diagnos-
+                   tic precision and robustness across all disease classes. This higher accuracy makes
+                   DenseNet169 particularly reliable for real-world agricultural scenarios where mini-
+                   mizing misclassification is critical. Despite its heavier computational cost compared to
+                   MobileNetV2, the performance gains of DenseNet169 justify its use, especially in a GIS-
+                   enabled framework where diagnostic reliability is prioritized over inference speed.
+                      Overall, DenseNet169 represents the best compromise between accuracy and practical
+                   applicability in this study. By experimenting with three distinct models—DenseNet169,
+                   MobileNetV2, and Custom-CNN—the evaluation clearly showed that DenseNet169
+                   provides the most reliable diagnostic outcomes. Its integration with the GIS module
+                   enables precise geospatial disease mapping, early outbreak detection, and predictive
+                   spread analysis, thereby enhancing the system’s value as a decision-support tool for sus-
+                   tainable crop management.
+
+                   6.5 GIS integration process
+                   The integration of Geographic Information Systems (GIS) into the plant disease diagno-
+                   sis pipeline establishes a spatial–temporal framework for enhanced monitoring, analy-
+                   sis, and prediction. Once a disease is classified by the DenseNet169 model, the system
+                   automatically geotags the result, records the timestamp, and plots each diagnosis on an
+                   interactive Leaflet-based map. Diagnoses are categorized by crop type and disease class,
+                   while layered views for tomato and potato, combined with filters for disease type, sever-
+                   ity, and date, allow users to visualize outbreaks, detect spatial clustering, and track dis-
+                   ease progression over time.
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 29 of 33
+
+
+
+
+                     A key feature of the system is the integration of a disease risk prediction module that
+                   computes localized risk scores based on environmental parameters, including tempera-
+                   ture, humidity, and wind speed, retrieved through the OpenWeatherMap API. Following
+                   the formulation in Eq. (1), these risk scores are visualized as a dynamic heatmap over-
+                   lay on the GIS interface, where warmer colors denote high-risk zones and cooler colors
+                   indicate lower risk areas. This predictive visualization facilitates early intervention and
+                   supports proactive management of potential outbreaks.
+                     In addition, the GIS module provides downloadable CSV datasets that include disease
+                   diagnosis records (class, coordinates, date, and confidence level), real-time weather data,
+                   and an optional merged file for customized offline analysis. By combining the high diag-
+                   nostic precision of DenseNet169 with environmental integration and interactive geospa-
+                   tial visualization, the GIS component functions as a robust decision-support tool. This
+                   empowers stakeholders to monitor ongoing outbreaks, anticipate future risks, and opti-
+                   mize resource allocation in precision agriculture, thereby advancing sustainable crop
+                   management.
+
+                   6.6 Diagnosis logging and decision support features
+                   The system automatically records each diagnosis generated by the DenseNet169 model,
+                   including the timestamp, predicted disease, crop type, and geographic location. These
+                   records are stored in a downloadable CSV file, enabling users to track disease progres-
+                   sion over time and conduct offline analyses. Furthermore, crop-specific GIS layers for
+                   tomato and potato facilitate spatial visualization of disease distribution, where each
+                   interactive marker provides detailed metadata for real-time, location-aware monitoring.
+                   To enhance interpretability and trust, Grad-CAM visualizations are integrated, high-
+                   lighting the image regions that most influenced the model’s predictions.
+                      Beyond image-based diagnostics, the framework incorporates real-time environmen-
+                   tal data from the OpenWeatherMap API, providing contextual insights that strengthen
+                   proactive disease management. By uniting automated logging, explainable AI tech-
+                   niques, and environmental data integration, the system operates as a comprehensive
+                   decision-support platform. This empowers farmers, agronomists, and policymakers to
+                   implement timely, evidence-based interventions, minimizing yield losses and promoting
+                   long-term agricultural sustainability.
+                      In future implementations, access to diagnosis logs and downloadable datasets may
+                   be restricted to administrators only, ensuring that sensitive data is centrally analyzed to
+                   support more strategic decision-making and improve disease management policies at
+                   the regional or national level.
+
+                   7 Limitations
+                   Although the system achieved high classification accuracy and showed strong potential
+                   for practical use, several limitations remain. First, the training process relied solely on
+                   the PlantVillage dataset, which was collected under controlled experimental settings.
+                   This reliance may limit the model’s ability to generalize effectively to real-world agricul-
+                   tural fields, where images often contain complex backgrounds, varying illumination, leaf
+                   occlusions, and environmental noise.
+                     Second, the model is restricted to 13 predefined disease classes. It does not support
+                   open-set recognition for previously unseen diseases or multi-label detection when
+Maged et al. Discover Artificial Intelligence   (2026) 6:344                                                      Page 30 of 33
+
+
+
+
+                   multiple infections occur simultaneously. Moreover, class imbalance within the dataset
+                   could reduce sensitivity toward underrepresented diseases, lowering detection reliability.
+                     Third, the GIS component currently relies on predefined coordinates instead of real-
+                   time GPS input, which restricts the precision of outbreak mapping. Additionally, the
+                   system requires stable internet connectivity to retrieve live weather data and generate
+                   real-time GIS visualizations, potentially limiting usability in remote or low-connectivity
+                   areas.
+                     Taken together, these limitations affect the system’s generalizability, real-time applica-
+                   bility, and scalability for adoption in diverse agricultural contexts.
+
+                   8 Future work
+                   Future research and development could focus on several key enhancements. Integration
+                   of time-series satellite imagery and vegetation indices such as NDVI may enable early
+                   detection of plant stress and yield forecasting. Developing an offline-capable mobile
+                   application would also support deployment in low-connectivity regions, ensuring acces-
+                   sibility for farmers in rural areas.
+                     Expanding multilingual support is another promising direction, allowing the system
+                   to serve diverse farming communities across different regions. Incorporating explain-
+                   able AI techniques could improve model interpretability and farmer trust, while auto-
+                   mated alert systems triggered by weather conditions or spatial clustering of cases could
+                   strengthen disease management responses.
+                     Furthermore, combining the platform with historical climate records may enhance
+                   predictive modeling of disease spread, while linking it to economic analysis modules
+                   could help quantify the financial impact of crop diseases on productivity and market
+                   dynamics. Collectively, these improvements aim to enhance robustness, accessibility,
+                   and practical relevance, transforming the system into a comprehensive decision-support
+                   framework for precision agriculture.
+
+                   9 Conclusion
+                   This study presented an integrated framework that combines deep learning with Geo-
+                   graphic Information Systems (GIS) to enable accurate diagnosis and spatial moni-
+                   toring of tomato and potato diseases. Three models were comparatively evaluated:
+                   DenseNet169 (98.24% accuracy), MobileNetV2 (94.66%), and a Custom-CNN baseline
+                   (82.60%). The results highlight the clear superiority of transfer learning approaches, with
+                   DenseNet169 achieving the highest performance, while the Custom-CNN underscored
+                   the limitations of shallow architectures trained from scratch. Importantly, the best-per-
+                   forming model (DenseNet169) was selected and fully integrated with the GIS module,
+                   ensuring that the most accurate predictions are directly leveraged for spatial analysis
+                   and decision support.
+                      In addition to classification, the system provides a bilingual web interface (Arabic/Eng-
+                   lish) enriched with Grad-CAM visualizations, enhancing interpretability and building
+                   user trust. Disease predictions are geotagged and integrated into a GIS module, enabling
+                   spatial visualization, environmental data integration, and predictive analysis of potential
+                   disease outbreaks. Validation in Beheira, Egypt, showed strong alignment with expert
+                   assessments, confirming the system’s robustness and practical utility in real-world agri-
+                   cultural settings.
+Maged et al. Discover Artificial Intelligence                     (2026) 6:344                                                                                                                  Page 31 of 33
+
+
+
+
+                     Beyond its technical contributions, the proposed system also demonstrates substan-
+                   tial practical and economic benefits. Early and accurate diagnosis enables farmers to
+                   minimize unnecessary pesticide use, thereby reducing production costs and mitigating
+                   environmental impact. By preventing large-scale disease outbreaks, the framework helps
+                   safeguard crop yield and stabilize market supply. Moreover, GIS integration supports
+                   agricultural authorities in optimizing resource allocation by targeting high-risk zones
+                   with tailored interventions, reducing both operational costs and response time. Collec-
+                   tively, these outcomes emphasize the system’s role not only as a technological innovation
+                   but also as an economically sustainable solution for precision agriculture.
+                     Future work will focus on extending coverage to additional crops and disease types,
+                   developing offline-capable mobile applications to support farmers in low-connectivity
+                   regions, and strengthening collaboration with agricultural authorities to facilitate large-
+                   scale adoption. Overall, this research demonstrates the transformative potential of
+                   integrating AI-based diagnostics with geospatial intelligence, providing a scalable and
+                   sustainable decision-support system for precision agriculture.
+
+                   Abbreviations
+                   AI	Artificial Intelligence
+                   CNN	Convolutional neural network
+                   DL	Deep learning
+                   FAO	Food and agriculture organization
+                   GDP	Gross domestic product
+                   GIS	Geographic information system
+                   GNSS	Global navigation satellite system
+                   GPU	Graphics processing unit
+                   RCNN	Region-based convolutional neural network
+                   RFNN	Region-based fully convolutional network
+                   ROC–AUC	Receiver operating characteristic–area under curve
+                   RS	Remote sensing
+                   UAV	Unmanned aerial vehicle
+                   Acknowledgements
+                   Not applicable.
+                   Author contributions
+                   Waleed Maged¹˒³*: Conceptualization of the study; dataset collection and preparation; development and training of the
+                   deep learning models (DenseNet169, MobileNetV2, Custom-CNN); GIS module integration; system implementation;
+                   performance evaluation; and drafting the manuscript. Abdelrahman Elsayed²: Research supervision and continuous
+                   follow-up; guidance on experimental design; proposing comparative analyses and suitable deep learning models;
+                   validation of the results; and critical revision of the manuscript. Rehab Mahmoud³: Supervision and academic guidance;
+                   contribution to GIS integration; support in spatial data analysis; and manuscript review. Mostafa Thabet³: Supervision and
+                   academic oversight; contribution to the design of the GIS integration framework; review of spatial analysis components;
+                   project administration; and critical revision of the manuscript. All authors read and approved the final manuscript.
+                   Funding
+                   The authors received no specific funding for this work.
+                   Data availability
+                   The PlantVillage dataset used in this study is publicly available on Kaggle at: h      ​ ​t​t​p​s​​:​/​/​w​w​w​​.​k​a​g​g​​l​e​.​c​​o​m​/​d​a​t​a​s​e​t​s​/​e​m​m​a​r​e​x​
+                   /​p​l​a​n​t​d​i​s​e​a​s​e​. The dataset was originally developed by Hughes and Salathé (2015).
+
+
+                   Declarations
+                   Ethical approval and consent to participate
+                   Not applicable.
+                   Consent for publication
+                   Not applicable.
+                   Competing interests
+                   The authors declare no competing interests.
+
+                   Received: 26 September 2025 / Accepted: 26 December 2025
+Maged et al. Discover Artificial Intelligence                  (2026) 6:344                                                                                                         Page 32 of 33
+
+
+
+
+                   References
+                   1. Food and Agriculture Organization of the United Nations (FAO). Plant health and food security. FAO, Rome. 2017. Available
+                       at: https://www.fao.org/3/I7829EN/i7829en.pdf
+                   2. Mohamed A, Abdel-Gaber S, Nasr M, Hazman M. An intelligent approach to mitigate the effects of climate change and
+                       insects on crops. Int J Comput Sci Inf Secur. 2020;18(3):75–9.
+                   3. Venkatesh N, Nagaraju Y, Sahana TS, Swetha S, Hegde SU. Transfer learning-based convolutional neural network model for
+                       classification of mango leaves infected by anthracnose. In: 2020 IEEE Int Conf Innov Technol (INOCON), pp. 1–7. IEEE. 2020. ​
+                       h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​1​​0​9​/​I​N​​O​C​O​N​5​​0​5​3​9​.​2​​0​2​0​.​​9​2​9​8​2​6​9
+                   4. Peyal HI, Shahriar SM, Sultana A, Jahan I, Mondol MH. Detection of tomato leaf diseases using transfer learning architec-
+                       tures: A comparative analysis. In: 2021 Int Conf Autom Control Mechatron Ind 4.0 (ACMI), pp. 1–6. IEEE. 2021. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​
+                       g​/​1​​0​.​1​1​​0​9​/​A​C​​M​I​5​3​8​​7​8​.​2​0​2​​1​.​9​5​​2​8​1​9​9
+                   5. Ranjan R, Vinayak S. Application of remote sensing and GIS in plant disease management. In: Chourasia HK, Acharya K,
+                       Singh VK, editors. Precision agriculture and sustainable crop production. New Delhi: Today & Tomorrow’s Printers and;
+                       2020. pp. 509–22.
+                   6. Hammonds T. Use of GIS in agriculture. Cornell Small Farms Program, pp. 1–13. 2017. Available at: ​h​t​t​p​s​:​​/​/​s​m​a​​l​l​f​a​r​m​​s​.​c​o​​r​n​e​
+                       l​l​​.​e​d​u​/​​2​0​1​7​/​0​​4​/​u​s​​e​-​o​f​-​g​i​s​/
+                   7. Suresh G, Narla VL, Tummalapalli G, Peddinti AS, Al-Mdallal QM. AgroDetect: smart plant pathology from leaf images. Eng
+                       Rep. 2025;7:e70384. https://doi.org/10.1002/eng2.70384.
+                   8. Nanda S, Yadav RP. Traditional CNN-based plant disease classification using the PlantVillage dataset. In: Nanda S, Yadav
+                       RP, editors. Data Science and Intelligent Computing Techniques. Computing & Intelligent Systems, SCRS, India; 2023. pp.
+                       47–54. https://doi.org/10.56155/978-81-955020-2-8-5
+                   9. Bakr M, et al. Tomato disease detection model based on densenet and transfer learning. Appl Comput Sci.
+                       2022;18(2):51–60.
+                   10. Too EC, Yujian L, Njuki S, Yingchun L. A comparative study of fine-tuning deep learning models for plant disease identifica-
+                       tion. Comput Electron Agric. 2019;161:272–9. https://doi.org/10.1016/j.compag.2018.03.032.
+                   11. Poornima S, et al. Hybrid convolutional neural network for plant diseases prediction. Intell Autom Soft Comput.
+                       2023;36(2):345–52. https://doi.org/10.32604/iasc.2023.025897.
+                   12. Ji M, Zhang L, Wu Q. Automatic grape leaf disease identification via unitedmodel based on multiple convolutional neural
+                       networks. Inf Process Agric. 2020;7(3):418–26. https://doi.org/10.1016/j.inpa.2020.02.002.
+                   13. Hassan SM, et al. Identification of plant-leaf diseases using CNN and transfer-learning approach. Electronics.
+                       2021;10(12):1388. https://doi.org/10.3390/electronics10121388.
+                   14. Hong H, Lin J, Huang F. Tomato disease detection and classification by deep learning. In: 2020 Int Conf Big Data Artif Intell
+                       IoT Eng (ICBAIE). IEEE. 2020. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​1​​0​9​/​I​C​​B​A​I​E​4​​9​9​9​6​.​2​​0​2​0​.​​9​3​3​9​0​4​8
+                   15. Tugrul B, Elfatimi E, Eryigit R. Convolutional neural networks in detection of plant leaf diseases: a review. Agriculture.
+                       2022;12(8):1192. https://doi.org/10.3390/agriculture12081192.
+                   16. Haggag WM, Ali RR, Al-Ansary NA. Geographic information systems and remote sensing: innovative tools for plant health.
+                       Int J Agric Technol. 2023;19(6):2449–64.
+                   17. Yashkumar GD, Ayushi T, et al. Application of remote sensing and GIS in precision agriculture. J Agric Innov.
+                       2023;3(11):45–54.
+                   18. Durango DB. Crops pests and diseases management system using android and GIS platform for the department of Agri-
+                       culture, Province of Samar. South Fla J Dev. 2022;3(2):2546–53. https://doi.org/10.46932/sfjdv3n2-150.
+                   19. Baharim MSA, et al. A review: progression of remote sensing (RS) and geographical information system (GIS) applications
+                       in oil palm management and sustainability. IOP Conf Ser Earth Environ Sci. 2022;1051(1):012002. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​0​​8​8​/​1​
+                       7​​5​5​-​1​3​​1​5​/​1​0​5​​1​/​1​/​​0​1​2​0​0​2.
+                   20. Patel N, Singh SK, Mishra D. Precision agriculture and Geospatial techniques for sustainable disease control. Indian Phyto-
+                       pathol. 2021;74(4):875–84. https://doi.org/10.1007/s42360-021-00334-2.
+                   21. Roberts DP, et al. Precision agriculture and Geospatial techniques for sustainable disease control. Indian Phytopathol.
+                       2021;74(2):287–305. https://doi.org/10.1007/s42360-021-00311-9.
+                   22. Charaya MU, et al. Plant disease forecasting: past practices to emerging technologies. In: Nehra S, editor. Plant disease:
+                       management strategies. Rajasthan, India: Agrobios Research; 2021. pp. 1–30.
+                   23. Anwer A, Singh G. Geo-spatial technology for plant disease and insect pest management. Bull Environ Pharm Life Sci.
+                       2019;8(12):1–12.
+                   24. Sabtu NM, Idris NH, Ishak MHI. The role of Geospatial technology in plant pests and diseases: an overview. IOP Conf Ser
+                       Earth Environ Sci. 2018;169(1):012018. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​0​​8​8​/​1​7​​5​5​-​1​3​​1​5​/​1​6​9​​/​1​/​0​​1​2​0​1​8.
+                   25. Rana A, Sharma R, Kumar V, et al. Automated annotation and segmentation frameworks using transfer learning for multi-
+                       date aerial image analysis. Agronomy. 2024;14(9):2052. https://doi.org/10.3390/agronomy14092052.
+                   26. McNemar Q. Note on the sampling error of the difference between correlated proportions or percentages. Psychometrika.
+                       1947;12(2):153–7. https://doi.org/10.1007/BF02295996.
+                   27. Li X. Enhancing statistical robustness in AI-based diagnostic model evaluation: practical standards for clinical imaging
+                       research. J Digit Imaging. 2025;38(2):70384. https://doi.org/10.1007/s10278-025-01518-2.
+                   28. El-Naggar S, El-Shafai W, El-Sayed H. Enhancing agriculture through real-time grape leaf disease classification via an edge
+                       device with a lightweight CNN architecture and Grad-CAM. Sci Rep. 2024;14:12345. ​h​t​t​p​s​:​/​/​d​o​i​.​o​r​g​/​1​0​.​1​0​3​8​/​s​4​1​5​9​8​-​0​2​4​-​6​
+                       6​9​8​9​-​9​​​​.​​​
+                   29. Murugesan K, et al. GradCAM-PestDetNet: a deep learning-based hybrid model with explainable AI for pest detection and
+                       classification. Comput Electron Agric. 2025;212:108123. https://doi.org/10.1016/j.compag.2025.108123.
+                   30. Madden LV, Hughes G, van den Bosch F. The study of plant disease epidemics. St. Paul, MN: American Phytopathological
+                       Society; 2007.
+                   31. Bregaglio S, Donatelli M, Confalonieri R. Development and evaluation of a dynamic model for predicting downy mildew
+                       on grapevine. Agric Meteorol. 2017;246:139–50. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​0​​1​6​/​j​.​​a​g​r ​f​o​​r​m​e​t​.​2​​0​1​7​.​​0​6​.​0​0​8.
+                   32. Meyer M, Cox JA, et al. Spatial scaling of plant disease spread. Phytopathology. 2020;110(7):1281–92. ​h​t​t​p​s​:​/​/​d​o​i​.​o​r​g​/​1​0​.​1​0​
+                       9​4​/​P​H​Y ​T​O​-​0​7​-​1​9​-​0​2​6​8​-​R​​​​.​​​
+Maged et al. Discover Artificial Intelligence               (2026) 6:344                                                                                                Page 33 of 33
+
+
+
+
+                   33. Garrett KA, Dendy SP, Frank EE, et al. Climate change effects on plant disease: genomes to ecosystems. Annu Rev Phyto-
+                       pathol. 2006;44:489–509. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​1​​4​6​/​a​n​​n​u​r​e​v​​.​p​h​y​t​o​​.​4​4​.​​0​7​0​5​0​5​.​1​4​3​4​2​0.
+                   34. Jeger MJ. Analysis of disease progress as a basis for evaluating disease management practices. Annu Rev Phytopathol.
+                       2004;42:61–82. ​h​t​t​p​s​:​​/​/​d​o​i​​.​o​r​g​/​1​​0​.​1​1​​4​6​/​a​n​​n​u​r​e​v​​.​p​h​y​t​o​​.​4​2​.​​0​4​0​8​0​3​.​1​4​0​4​2​7.
+                   35. Li X, Zhang Y, Chen J. Deep learning-based comparative evaluation of medical image classification models: statistical and
+                       graphical standards for reproducibility. J Digit Imaging. 2025;38:70384. https://doi.org/10.1007/s10278-025-01518-2.
+                   36. Sun X, Li G, et al. Research on plant disease identification based on CNN. J Phys Conf Ser. 2022;2200(1):012020. ​h​t​t​p​s​:​​/​/​d​o​i​​.​
+                       o​r​g​/​1​​0​.​1​0​​8​8​/​1​7​​4​2​-​6​5​​9​6​/​2​2​0​​0​/​1​/​​0​1​2​0​2​0.
+                   37. Kumar S, Chaudhary V, Chandra SK. Plant disease detection using CNN. Turk J Comput Math Educ. 2021;12(12):2106–12.
+
+
+                   Publisher’s note
+                   Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+

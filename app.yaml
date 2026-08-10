@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════
-#  FarmHealth — Google App Engine (Flexible Environment)
+#  Crafty GIS — Google App Engine (Flexible Environment)
 #  Runs the Node.js server + static frontend 24x7 on GCP.
 #  Deploy:  gcloud app deploy app.yaml
 #  Note: uses the project Dockerfile (runtime: custom).

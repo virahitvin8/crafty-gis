@@ -1,4 +1,4 @@
-# 🚀 FarmHealth Deployment Script
+# 🚀 Crafty GIS Deployment Script
 
 ## Quick Deploy (One Command)
 
@@ -146,4 +146,4 @@ git push origin main --force
 - **Render Docs**: https://render.com/docs
 - **Netlify Docs**: https://docs.netlify.com
 - **GitHub Docs**: https://docs.github.com
-- **FarmHealth Issues**: https://github.com/virahitvin8/crafty-gis/issues
+- **Crafty GIS Issues**: https://github.com/virahitvin8/crafty-gis/issues

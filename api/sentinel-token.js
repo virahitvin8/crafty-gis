@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Vercel Serverless Function
+   Crafty GIS — Vercel Serverless Function
    Sentinel Hub OAuth token proxy
    ═══════════════════════════════════════════════════════════ */
 

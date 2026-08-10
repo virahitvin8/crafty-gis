@@ -23,7 +23,7 @@
    - Select repository: `virahitvin8/crafty-gis`
    - Configure:
      ```
-     Name: farmhealth-backend
+     Name: crafty_gis-backend
      Environment: Node
      Build Command: npm install && cd server && npm install
      Start Command: node server/server.js
@@ -33,7 +33,7 @@
 
 3. **Wait for Deployment:**
    - Render will automatically deploy (2-3 minutes)
-   - You'll get a URL like: `https://farmhealth-backend.onrender.com`
+   - You'll get a URL like: `https://crafty_gis-backend.onrender.com`
 
 4. **Copy Your Render URL**
 
@@ -53,7 +53,7 @@
    - Go to: https://app.netlify.com/drop
    - Drag the `www/` folder
    - Wait for upload (1 minute)
-   - You'll get a URL like: `https://farmhealth.netlify.app`
+   - You'll get a URL like: `https://crafty_gis.netlify.app`
 
 **Option B: Netlify CLI**
 ```bash
@@ -112,7 +112,7 @@ export GCP_PROJECT_ID=your-project-id
 bash deploy-gcr.sh
 
 # Get your live URL
-# Output: https://farmhealth-xyz.a.run.app
+# Output: https://crafty_gis-xyz.a.run.app
 ```
 
 **Pros:**
@@ -179,15 +179,15 @@ bash deploy-gcr.sh
 
 After deployment, you'll have:
 
-**Frontend:** `https://farmhealth.netlify.app` (or similar)
-**Backend:** `https://farmhealth-backend.onrender.com` (or similar)
-**Health Check:** `https://farmhealth-backend.onrender.com/api/gee/health`
+**Frontend:** `https://crafty_gis.netlify.app` (or similar)
+**Backend:** `https://crafty_gis-backend.onrender.com` (or similar)
+**Health Check:** `https://crafty_gis-backend.onrender.com/api/gee/health`
 
 ---
 
 ## 🎉 Congratulations!
 
-Your **FarmHealth Satellite Crop Monitor** is now:
+Your **Crafty GIS Satellite Crop Monitor** is now:
 - ✅ On GitHub
 - ✅ Ready for 24x7 deployment
 - ✅ Production-ready

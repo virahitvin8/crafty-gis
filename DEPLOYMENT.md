@@ -1,10 +1,10 @@
-# FarmHealth Self-Hosted Deployment Guide
+# Crafty GIS Self-Hosted Deployment Guide
 
 ## Architecture Overview
 
 ```
 Your Server/VPS
-├── FarmHealth (Node.js backend)  Port 3001
+├── Crafty GIS (Node.js backend)  Port 3001
 ├── Ollama (DeepSeek + LLaVA)     Port 11434
 └── Uptime Kuma (Monitoring)       Port 3002
 ```
@@ -71,7 +71,7 @@ docker run -d -p 3002:3002 -v uptime-kuma:/app/data \
   --name uptime-kuma --restart unless-stopped louislam/uptime-kuma:1
 
 # Add monitors:
-# - FarmHealth Backend: http://localhost:3001/api/health
+# - Crafty GIS Backend: http://localhost:3001/api/health
 # - Ollama AI: http://localhost:3001/api/ai/health
 # - GEE: http://localhost:3001/api/gee/health
 ```
@@ -85,7 +85,7 @@ curl -O https://goauthentik.io/docker-compose.yml
 docker compose up -d
 
 # Configure at https://your-domain:9443
-# Create OAuth2 app for FarmHealth
+# Create OAuth2 app for Crafty GIS
 ```
 
 ## Cost Estimate

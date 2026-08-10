@@ -1,0 +1,1475 @@
+               remote sensing
+Review
+Computer Vision, IoT and Data Fusion for Crop Disease
+Detection Using Machine Learning: A Survey and
+Ongoing Research
+Maryam Ouhami 1,2, * , Adel Hafiane 2 , Youssef Es-Saady 1 , Mohamed El Hajji 1                                  and Raphael Canals 2
+
+                                          1   IRF-SIC Laboratory, Ibn Zohr University, BP 8106—Cite Dakhla, 80000 Agadir, Morocco;
+                                              y.essaady@uiz.ac.ma (Y.E.-S.); m.elhajji@uiz.ac.ma (M.E.H.)
+                                          2   INSA CVL, University of Orléans, PRISME Laboratory, EA 4229, F18022 Bourges, France;
+                                              adel.hafiane@insa-cvl.fr (A.H.); raphael.canals@univ-orleans.fr (R.C.)
+                                          *   Correspondence: maryam.ouhami1@insa-cvl.fr
+
+                                          Abstract: Crop diseases constitute a serious issue in agriculture, affecting both quality and quan-
+                                          tity of agriculture production. Disease control has been a research object in many scientific and
+                                          technologic domains. Technological advances in sensors, data storage, computing resources and
+                                          artificial intelligence have shown enormous potential to control diseases effectively. A growing body
+                                          of literature recognizes the importance of using data from different types of sensors and machine
+                                          learning approaches to build models for detection, prediction, analysis, assessment, etc. However,
+                                          the increasing number and diversity of research studies requires a literature review for further
+                                          developments and contributions in this area. This paper reviews state-of-the-art machine learning
+                                          methods that use different data sources, applied to plant disease detection. It lists traditional and
+         
+                                   deep learning methods associated with the main data acquisition modalities, namely IoT, ground
+Citation: Ouhami, M.; Hafiane, A.;
+                                          imaging, unmanned aerial vehicle imaging and satellite imaging. In addition, this study examines
+Es-Saady, Y.; El Hajji, M.; Canals, R.    the role of data fusion for ongoing research in the context of disease detection. It highlights the
+Computer Vision, IoT and Data             advantage of intelligent data fusion techniques, from heterogeneous data sources, to improve plant
+Fusion for Crop Disease Detection         health status prediction and presents the main challenges facing this field. The study concludes with
+Using Machine Learning: A Survey          a discussion of several current issues and research trends.
+and Ongoing Research. Remote Sens.
+2021, 13, 2486. https://doi.org/          Keywords: plant disease; machine learning; remote sensing; intelligent sensors; data fusion
+10.3390/rs13132486
+
+
+Academic Editor: Clement Atzberger
+
+                                          1. Introduction
+Received: 12 April 2021
+Accepted: 22 June 2021
+                                               According to the FAO [1], pest attacks and plant diseases are considered as two
+Published: 25 June 2021
+                                          of the main causes of decreasing food availability and food hygiene. Plant diseases
+                                          vary seasonally depending on the presence of pathogen, environmental conditions and
+Publisher’s Note: MDPI stays neutral
+                                          the crop type. Crops can experience environmental stress due to the following factors:
+with regard to jurisdictional claims in
+                                          abiotic (drought, water logging, salinity, etc.), biotic (insects, pests, weeds, viruses,
+published maps and institutional affil-   etc.) or climate change [2]. On the other hand, pathogen is the organism that causes
+iations.                                  disease whether it is virus, a bacterium or a fungus. Determined by the disease and the
+                                          development stage, the damages on the crops range from simple physiological defects
+                                          to plant death. In addition to biological agents, other physical agents such as abrupt
+                                          climate change [3] can cause diseases and harm the plant. Reliance on pesticides is the
+Copyright: © 2021 by the authors.
+                                          common practice to limit damages caused by these microorganisms [4]. In addition
+Licensee MDPI, Basel, Switzerland.
+                                          to their negative impacts on nature, the unreasonable use of pesticides can lead to the
+This article is an open access article
+                                          death of auxiliary insects used in biological control and/or the development of genetic
+distributed under the terms and           resistance [5]. Localization of infected areas in plantations can reduce chemical use.
+conditions of the Creative Commons        Conventional methods for detecting and locating plant diseases include direct visual
+Attribution (CC BY) license (https://     diagnosis by visual identification of disease symptoms appearing on plant leaves or by
+creativecommons.org/licenses/by/          chemical techniques that involve molecular tests on plant leaves [6]. These methods are
+4.0/).                                    time-consuming and require a large number of people.
+
+
+
+Remote Sens. 2021, 13, 2486. https://doi.org/10.3390/rs13132486                                     https://www.mdpi.com/journal/remotesensing
+Remote Sens. 2021, 13, 2486                                                                                                 2 of 24
+
+
+
+
+                                          Promising approaches for detecting and locating diseases were proposed in recent
+                                     years using automatic monitoring and recognition systems. Advances in sensor technolo-
+                                     gies and data processing have opened new perspectives for the detection and diagnosis of
+                                     crop anomalies. Disease surveillance can be performed by capturing data from the soil and
+                                     plant cover or using sensors, such as remote sensing (RS) or ground equipment, as well as
+                                     with developing and testing machine learning algorithms [7]. Implementing management
+                                     practices with smart algorithms optimizes profitability, sustainability and protection of
+                                     land resources. Overall, it allows effective treatment to be delivered in the right place, at
+                                     the right time, and with the right rate [8,9].
+                                          Furthermore, the agriculture field can be supplied with multiple sensors measuring
+                                     environmental characteristics, plant canopy, leaves indices extracted from remote sensing
+                                     imagery and IoT sensors. Given a variety of data extracted, data fusion techniques are
+                                     required to assemble those types of data to better understand crop growing conditions
+                                     and disease symptoms development. In addition, machine learning-based data fusion
+                                     has undergone important development, and when used on agriculture data would have a
+                                     great impact on plant protection field, in particular, disease and early disease detection.
+                                     Therefore, several multi-sensors and remote sensing based fusion techniques have been
+                                     used in agriculture for this purpose [10,11].
+                                          The use of agriculture related data from different acquisition tools along with machine
+                                     learning and fusion algorithms has led to extensive research in the field of digital agricul-
+                                     ture, especially for plant monitoring, control and protection, generating a considerable
+                                     scientific literature. Over the last decade, several survey papers have been proposed on the
+                                     use of machine learning approaches for agriculture mainly based on one of the different
+                                     extracted data, such as IoT data, ground imagery or remote sensing imagery. Table 1
+                                     summarizes the review papers that have addressed different crop monitoring problems,
+                                     covering acquisition techniques using wireless sensors, multispectral cameras, thermal
+                                     cameras, hyperspectral cameras and satellite sensors. Nonetheless, as far as we know, there
+                                     is no specific survey study covering IoT techniques, ground imagery, unmanned aerial
+                                     vehicle (UAV) imagery and satellite imagery for disease detection using machine learning.
+                                          The literature still lacks comprehensive insight on this field of study regarding the
+                                     different data sources in the agriculture field and the fusion of these data for disease
+                                     detection. In this paper, we review crop disease detection methods based on unimodal data
+                                     sources (wireless sensor networks, ground imagery, UAV imagery and satellite imagery)
+                                     using machine learning algorithms. For each data source, these algorithms are broadly
+                                     divided into two main categories: traditional machine learning and deep learning. We
+                                     highlight the combination of multi-source data for agricultural applications and discuss
+                                     data fusion approaches. The recent data fusion advances are presented. Current existing
+                                     issues are also analyzed, particularly for disease detection.
+
+                              Table 1. Recent review paper in the agricultural domain using machine learning.
+
+                                                      Topics Covered                                            Year   Review
+                               IoT applications in agro-industrial and environmental field.                     2017    [12]
+                     Precision farming techniques in semi-arid West Africa for labor productivity.              2017    [13]
+                       IoT technologies in several smart farming scenarios recognition, transport,
+                                                                                                                2018    [14]
+                                              communication and treatment.
+      IOT            Crucial technologies of the internet of things in protected agriculture for plant
+                                                                                                                2019    [15]
+                   management, animal farming and food/agricultural product supply traceability.
+                  The role of wireless sensor networks for greenhouses and the models and techniques
+                                                                                                                2019    [16]
+                               adopted for efficient integration and management of WSN.
+                                      Crop yield prediction using machine learning.                             2020    [17]
+Remote Sens. 2021, 13, 2486                                                                                               3 of 24
+
+
+
+
+                                                             Table 1. Cont.
+
+                                                    Topics Covered                                       Year        Review
+                   Hyperspectral image analysis techniques for the detection and classification of the
+                                                                                                         2017          [18]
+                                          early onset of plant disease and stress.
+                     Data collection and handling of plants close range hyperspectral imaging and
+                                                                                                         2017          [19]
+                       presentation of recent applications of plant assessment using those images.
+                   UAV-Based Sensors, data processing and applications for agriculture and forestry.     2017          [20]
+                               Applied sensing systems and data analytics in agriculture.                2018          [21]
+                           Hyperspectral Image Analysis for unmixing and classification tasks.           2018          [22]
+                                               Deep learning in agriculture.                             2018          [23]
+                  Plant disease detection applications using neural networks and hyperspectral images.   2018           [8]
+                               Unmanned aerial sensing solutions in precision agriculture.               2019          [24]
+                      Images and machine learning techniques for nutrition deficiencies detection.       2019          [25]
+                    Unmanned Aerial Vehicles and Imaging Sensors applications for monitoring and
+   Imaging                                                                                               2019          [26]
+                                                 assessing plant stresses.
+                        Monitoring plant diseases and pests through remote sensing technology.           2019           [9]
+                                 Applications of remote sensing in precision agriculture.                2020          [27]
+                           High-resolution satellite imagery applications in crop phenotyping.           2020          [28]
+                                 Remote sensing satellite missions for land monitoring.                  2020          [29]
+                                              Remote sensing in agriculture.                             2020          [30]
+                    Plant diseases identification and early disease detection using machine learning
+                                                                                                         2020          [31]
+                                            techniques applied to crop images.
+                   Hyperspectral imaging and 3D technologies for plant phenotyping from satellite to
+                                                                                                         2020          [32]
+                                                   close-range sensing.
+                                             Deep learning for plant diseases.                           2020          [33]
+                             Applications of UAV thermal imagery in precision agriculture.               2020          [34]
+                  Remote sensing and precision agriculture technologies for crop disease detection and
+                                                                                                         2020          [35]
+                                                       management.
+                      Multisensory fusion applications and consensus filtering for sensor networks.      2015          [10]
+                                            Remote sensing feature-level fusion.                         2018          [11]
+                             Multisource and multitemporal data fusion in remote Sensing.                2018          [36]
+    Fusion
+                                Internet of things applications using data fusion methods.               2019          [37]
+                          Multilevel data fusion for the internet of things in smart agriculture.        2020          [38]
+                          Utilization of multi-sensors and data fusion in precision agriculture.         2020          [39]
+
+
+                                        The rest of the paper is organized as follows. Section 2 provides an overview of crop
+                                   disease detection techniques for precision agriculture, the use of monitoring systems in
+                                   agriculture and the current state of the art for crop disease detection techniques, from
+                                   ground to aerial imagery and satellites imaging techniques. Section 3 analyzes fusion
+                                   approach opportunities for agriculture. The discussion and conclusion is presented in
+                                   Section 4.
+
+                                   2. Crop Disease Detection
+                                        Natural plant growth depends on multiple interactions with many environmental
+                                   characteristics: soil properties, cultivation techniques, weed growth and microclimatic
+                                   conditions. Unsuitable conditions such as sudden changes in temperature and humidity
+                                   can eventually cause plant diseases. Since early treatments are the most effective in
+                                   protecting agricultural production, knowledge of the elements of infection is essential
+                                   to ultimately develop targeted control methods against pathogens. Therefore, precision
+                                   agriculture (PA) attempts to consider all these characteristics to equip decision systems and
+                                   agricultural machines with information provided by sensors, since many recent sensors
+                                   enable monitoring and mapping of various field parameters [40]. In the literature, several
+                                   acquisition protocols have been proposed to acquire crop spectral images. One of the
+                                   most used in this domain is the protocol for imaging leaves of isolated plants. The choice
+                                   of the acquisition tools depends on the purpose of the study, it can vary from a simple
+                                   smartphone camera to a highly sophisticated hyperspectral camera mounted on an aerial
+Remote Sens. 2021, 13, 2486                                                                                            4 of 24
+
+
+
+
+                              vehicle. The images’ quality and processing tools can vary dependently on the acquisition
+                              system and acquisition conditions used.
+                                   In the next subsections we present different types of sensors deployed for dis-
+                              ease detection using machine learning, i.e., ground cameras, UAV for aerial imaging,
+                              satellites and pedoclimatic sensors. Note that for the rest of the paper, IoT refers to
+                              pedoclimatic sensors.
+
+                              2.1. Ground Imaging
+                                    Crop ground imaging is the technique of acquiring crops’ fruit and leave images at
+                              ground level using smartphones or digital cameras. Since visual symptoms on the crops and
+                              plant leaves are important for disease detection, researchers tried to capture plant leaves in
+                              field conditions [41,42], raising the challenge of dealing with complex background, shadows
+                              and unstable luminosity. On the other hand, other studies have examined the sensitivity
+                              of spectrometry to chemical and organic characteristics of plants. When plants suffer
+                              from stress the normal chlorophyll production decreases, thus absorption decreases which
+                              causes a significant growth of reflectance [43,44]. As a result, the spectral characteristics of
+                              plants are affected by diseases, leading researchers to invest in the detection of infected and
+                              uninfected leaves and the classification of different disease severity degrees with visual
+                              symptoms and even before visual symptoms appearance [45]. A modern approach for
+                              disease detection relies on machine learning algorithms to explore data from different
+                              acquisition systems:
+                                    Traditional machine learning algorithms were used for the purpose of disease detec-
+                              tion. Support vector machine (SVM) models are commonly used for plant disease detection
+                              due to their prediction efficiency. In [45], SVM was used for early detection of drought
+                              stress in barley with close range hyperspectral imaging. The model was trained on the
+                              extracted information from labels and selected vegetation indices (Red Edge Normalized
+                              Difference Vegetation Index (RENDVI) and Plant Senescence Reflectance Index (PSRI)).
+                              Similarly, manual extraction of lesion characteristics and combination of multiple SVM
+                              classifiers (color, texture and shape characteristics) for diseases recognition on plant leaves
+                              have been proposed in order to reduce misclassification [46–49]. Statistical analysis of some
+                              indices using the principal component analysis (PCA) model successfully differentiated
+                              between healthy plants and infected golden potato disease progression [50]. The authors
+                              first extracted the vegetation indices, simple ratio (SR) and Normalized Difference Vege-
+                              tation Index (NDVI) from acquired hyperspectral images of infected potatoes at different
+                              disease development stages. The analysis results demonstrated the ability of spectral data
+                              to distinguish healthy from diseased plants. In the same way, the authors in [51] used
+                              K-nearest neighbor (KNN) and the decision tree-based classifier C5.0 to classify grey mold
+                              infection severities on tomato leaves using hyperspectral images. Results indicate that the
+                              full range model can differentiate between healthy and infected leaves with an accuracy of
+                              92.86% and 85.71% for KNN and C5.0, respectively. In [52], the authors aimed to estimate
+                              the severity of three diseases on wheat using an artificial neural network composed of one
+                              hidden layer; the classification accuracy reached 81%.
+                                    Deep learning models were then used to improve the prediction quality and address
+                              larger types of diseases and crops. This subsection presents deep learning models deployed
+                              on RGB images, multispectral images and hyperspectral images for early disease detection.
+                                    In [53], the authors tested several deep learning models from scratch and with transfer
+                              learning. The tests were carried out on the PlantVillage dataset of plant leaves images [54].
+                              The ResNet34 model outperformed all other models by achieving an accuracy of 99.67%.
+                              In [42], the authors proposed a conditional convolutional neural network derived from
+                              the ResNet50 topology. To test their approach, they generated a dataset of five crops
+                              images acquired with a smartphone under real conditions. The approach outperformed the
+                              conventional method using only visual information with an accuracy of 98%. Some authors
+                              have tested EfficientNet on the PlantVillage dataset [55]; the model outperformed state-of-
+                              the-art deep learning models achieving 99.91% and 99.97% in the original and augmented
+Remote Sens. 2021, 13, 2486                                                                                            5 of 24
+
+
+
+
+                              datasets, respectively. Likewise, in [56], a smaller dataset of infected tomato plant leaves
+                              images was divided into different pest attacks and plant diseases. The detection method
+                              achieved an accuracy of 95.65% using the DensNet161 with transfer learning.
+                                    For better practicability for farmers, researchers developed mobile applications for
+                              disease detection using deep learning adaptable models with mobile computing capacity
+                              and energy. In [57], the authors proposed a model inspired by MobileNet Google models for
+                              tomato disease detection. The model was able to distinguish tomato leaves diseases through
+                              image recognition with accuracy reaching 89.2%. Similarly, MobileNet was deployed to
+                              detect diseases from apple leaves [58]. Compared to the state-of-the-art model, ResNet,
+                              MobileNet was the most efficient with three times less computing time. In [59], MobileNet
+                              was tested for citrus disease detection and compared to another CNN model, such as
+                              Self-Structured (SSCNN) classifiers. The results showed that SSCNN was more accurate
+                              for citrus leaf disease classification on mobile phone images.
+                                    In a pre-symptom disease detection task exploiting hyperspectral images, the authors
+                              in [60] used the extreme learning machine (ELM) classifier model on full wavelengths of
+                              hyperspectral tomato leaves images. The identification results were very satisfying, with an
+                              overall classification accuracy of 100%, however, the classification was time-consuming. To
+                              solve this issue, they re-established the ELM model based only on the effective wavelengths
+                              selected by the successive projection algorithm (SPA). The model performed the disease
+                              classification task with an accuracy of 77.7%. In a similar way, the authors in [61] attempted
+                              to detect the tobacco mosaic virus (TMV) on tobacco leaves using the ELM classifier.
+                              They selected the effective wavelengths that contain much disease information in order
+                              to avoid instability of convergence in predictive models (high correlation between bands).
+                              The overall classification accuracy (healthy, 2 DPI (days post-infection), 4 DPI or 6 DPI)
+                              reached 98% using input spectral data. In the same context, [41] developed a method to
+                              detect fusarium head blight disease in wheat using hyperspectral images and a specific
+                              acquisition protocol considering the field conditions. The authors were able to classify
+                              infected and healthy wheat head crops using hyperspectral images. The accuracy reached
+                              84.6% using a two-dimensional convolutional bidirectional gated recurrent unit neural
+                              network (2D-CNN-BidGRU) hybrid model.
+                                    Ground imagery is an interesting technology in smart farming. Deep models using
+                              this type of acquisition guarantee high detection accuracy thanks to the close level leaf
+                              imaging with high resolution, Table 2 summarizes the effective wavelengths used for
+                              disease detection for close range imaging presented in this section. However, this strategy
+                              fails to monitor and diagnose plant diseases at a large scale. Moreover, these techniques
+                              are time-consuming in a wide range study area.
+
+                              Table 2. Effective wavelengths for disease detection.
+
+                                                      Effective Wavelengths                              Indices      Ref.
+                                697.44, 639.04, 938.22, 719.15, 749.90, 874.91, 459.58 and 971.78 nm        -         [61]
+                                                      full range 750–1350 nm
+                                                                                                            -         [62]
+                                                            700–1105 nm
+                                                         665 nm and 770 nm                                 SR
+                                                                                                                      [50]
+                                                     670, 695, 735 and 945 nm                             NDVI
+                                                     655, 746, and 759–761 nm                               -         [51]
+                                             445 nm, 500 nm, 680 nm, 705 nm, 750 nm                    RENDVI, PSRI   [45]
+                                                   442, 508, 573, 696 and 715 nm                            -         [60]
+                                                      Full range 400–1000 nm                                -         [41]
+
+
+                              2.2. UAV Imaging
+                                    UAVs are exploited also as a precision agriculture (PA) solution for monitoring and
+                              controlling crops growth [25,63], eventual disease development and weed detection [64,65],
+                              thanks to their ability to collect higher resolution images at lower costs. It has an effective
+                              role in agriculture considering the cost reduction by avoiding the need for a field expert
+                              to go through the whole culture several times for monitoring. UAVs equipped with
+Remote Sens. 2021, 13, 2486                                                                                            6 of 24
+
+
+
+
+                              embedding cameras and sensors perform efficient field data acquisition for field scale
+                              visualization and analysis. Additional elements can help enhance performances of crop
+                              monitoring techniques, such as the choice of appropriate sensors and intelligent recognition
+                              models. As spectrometry is sensitive to diseases, multispectral cameras are more often
+                              used for disease detection studies. The combination of cameras mounted on a low-altitude
+                              remote sensing platform allows real-time image acquisition in precise location and with
+                              different wavelengths.
+                                    For systems using these types of sensors, a large amount of data is first stored in large-
+                              scale databases provided by information systems such as the geographical information
+                              system (GIS). In fact, the information system enables the visualization and analysis this
+                              data. Data collected provide information on soil and vegetation cover characteristics,
+                              such as soil organic content and soil moisture, biomass quantity, weed existence and early
+                              detection of crop stress with eventual disease stage evaluation.
+                                    Traditional machine learning algorithms are used for plant disease detection using
+                              UAV images. One of the first models attempting to predict infection severity on plants from
+                              images is the Backpropagation NN (BPNN) [62], in which the authors extracted spectral
+                              data from remote sensing hyperspectral images of tomato plants. Afterwards the authors
+                              rated the images according to the light blight severity based on five stages and tested the
+                              BPNN on the data extracted. The results showed that ANN with backpropagation could
+                              be used in spectral prediction for disease detection. In the same context, the authors in [66]
+                              attempted to detect leafroll disease using the Classification and Regression Tree. Their
+                              approach was based on spectral and spatial signatures extracted from UAV hyperspec-
+                              tral images of grapevine. Correspondingly, the authors in [67] extracted spectral bands,
+                              vegetation indices and biophysical parameters of diseased and healthy plants from UAV
+                              multispectral images. The ROC analysis was then exploited to estimate the capacity of
+                              the selected variables for disease detection. In [68], the authors adopted a segmentation
+                              approach based on the Simple Linear Iterative Clustering (SLIC) for soybean foliar diseases
+                              detection. This method employs the k-means algorithm for superpixels. After segmenta-
+                              tion, the images were classified using SVM achieving a precision of 98.34%. In another
+                              study [69], authors covered the wheat yellow rust infection using UAV multispectral im-
+                              ages. The approach based on random forest classifier was able to discriminate the disease
+                              in different development stages with an accuracy reaching 89.3%. In [70], UAV images were
+                              utilized for the detection of citrus canker in several disease development stages. The au-
+                              thors used radial basis function (RBF) for classification; RBF is an artificial neural network
+                              that performs supervised machine learning. The classification achieved a disease detection
+                              accuracy of 92%. In another study [71], the authors extracted vegetation indices (VIs) from
+                              multispectral images to enhance information on plant characteristics. The results showed
+                              that the VIs feature compressed with PCA and combined with the value of the original data
+                              generated an accuracy of 100% using AdaBoost algorithm. Multilayer perceptrons (MLP)
+                              were also applied for classification tasks using hyperspectral data collected on healthy
+                              and diseased avocado trees [72]. Similarly, the SVM classifier was used to detect a fungus
+                              attacking olive trees based on hyperspectral and thermal images captured from a UAV [73].
+                              The model achieved an accuracy of 80% using an optimal set of spectral bands.
+                                    To conclude, the performance of traditional machine learning approaches is limited
+                              and can easily vary according to different growing periods and with different acquisition
+                              equipment. In addition, the low performance can also be due to the feature engineering
+                              process, which provokes important information loss.
+                                    Deep learning models have also been developed and used to tackle the limitations
+                              of traditional machine learning for plant disease detection using UAV images. In [74], a
+                              sliding window was used on each plot image, moving in small steps along the image. The
+                              classification task was performed using a convolutional neural network (CNN) architecture;
+                              the results obtained had a mean absolute error value of 11.72% and a relatively low variance.
+                              In [75], the classification between healthy and diseased maize leaves was performed using
+                              ResNet model, achieving a test accuracy of 97.85%. Similarly, with the aim of detecting
+Remote Sens. 2021, 13, 2486                                                                                           7 of 24
+
+
+
+
+                              disease symptoms in grape leaves [76], the authors used the CNN approach by performing
+                              a relevant combination of image features and color spaces. Images were converted into
+                              different colorimetric spaces to separate the intensity information from chrominance. The
+                              CNN model Net-5 was tested on multiple combinations of input data and three patch
+                              sizes. The best result using combination obtained an accuracy of 95.86%. In [77], the
+                              authors proposed a novel deep learning architecture for the detection of yellow rust in
+                              winter wheat at different observation times across the wheat growing. The architecture
+                              consists of multiple Inception-ResNet blocks combining the Inception and ResNet models
+                              for deep feature extraction. The model reached an overall accuracy of 85%. In another
+                              study [78], the authors attempted to detect disease in pinus trees using UAV images.
+                              The classification model was designed based on a combination of deep convolutional
+                              generative adversarial networks (DCGANs), and an AdaBoost classifier. The motivation
+                              behind using Adaboost classifier is to create a reinforcement learning combining the other
+                              classification models for better precision. The proposed approach achieved a recall value
+                              of 95.7%. In [79], the authors developed a deep learning approach to combine visible and
+                              near-infrared images obtained from two different sensors in order to detect the grapevine
+                              mildew symptoms. The first step consisted of overlaying the two types of images, using an
+                              optimized image registration, and resulting images were used with semantic segmentation
+                              approach (SegNet architecture) to delineate and detect the vine symptoms. Their approach
+                              achieved an accuracy of 92% for detection at grapevine level. The same authors recently
+                              proposed a deep learning architecture that combines multispectral and depth information
+                              for vine symptom detection [80].
+
+                              2.3. Satellite Imaging
+                                   Even if UAV are available, the temporal aspect in the historical monitoring task may be
+                              missing. Conversely, satellites covering wider land areas offer historical images of the study
+                              area depending on satellite acquisition frequency. Plant health status can also be monitored
+                              using satellite imaging [81]. Indeed, satellites can provide multispectral images with very
+                              high spatial resolution that can range from 0.5 m to more than 30 m. For example, Landsat
+                              and Sentinel-2 satellite sensors provide the most widely accessible medium-to-high spatial
+                              resolution multispectral data that can be used for vegetation phenology. Table 3 details
+                              commercial satellite sensors collecting multispectral images with a spatial resolution from
+                              0.5 m to 30 m (Satellite Imaging Corporation (SIC)). Table 3 shows that satellites with high
+                              spectral resolution have quite large revisit periods. Conversely, high temporal resolution
+                              satellites have very low spectral resolution [82]. For instance, the MODIS sensor for the
+                              Terra/Aqua satellite collects daily images. However, its images have a spatial resolution of
+                              250 m (band 1, 2), 500 m (bands 3–7) and 1000 m (bands 8–36). A spatio-temporal fusion
+                              can be useful to carry out a vegetation monitoring study using these data [83].
+                                   Several machine learning methods have been used to perform land monitoring from
+                              satellite images, for instance: mapping of urban fabric [84–86], crop classification and field
+                              boundaries [87,88] and pest detection [89].
+                                   Traditional machine learning was used to test the usage of satellite images for disease
+                              detection. In [90], the authors developed a detection application using SPOT-6 images
+                              with a supervised classification algorithm called spectral angle mapper (SAM) to map
+                              powdery mildew of winter wheat. The classification was based on selected bands (green
+                              and red) and indices of disease-sensitive vegetation. The approach achieved an overall
+                              mapping accuracy of 78%. Similarly, the authors in [91] collected images from Sentinel
+                              2 for stress detection in rice. The types of stress detected in this study were pests and
+                              disease stress, heavy metal stress or double stress combining the two first types. The
+                              study demonstrated the usefulness of satellite imagery to distinguish the causes of stress in
+                              different areas using the coefficients of spatio-temporal variation (CSTV) derived from the
+                              stress-sensitive VIs related to red edge bands. In [92], the authors were able to discriminate
+                              severity levels of yellow rust infection (i.e., healthy, slight, and severe) in winter wheat
+                              using multispectral bands for the Sentinel 2 sensor and hyperspectral data acquired at
+Remote Sens. 2021, 13, 2486                                                                                                        8 of 24
+
+
+
+
+                                      canopy level. To achieve the classification task, a new multispectral index, the Red Edge
+                                      Disease Stress Index (REDSI) was proposed. This index was based on the sensitive bands
+                                      B4 (Red), B5 (Re1), and B7 (Re3) and validated with an overall identification accuracy of
+                                      85.2% using the optimal threshold. SVM was deployed in [93] for disease detection in
+                                      winter wheat. The proposed approach was based on growth indices and environmental
+                                      factors calculated from Landsat-8 images. The model achieved an overall accuracy of 80%.
+                                      In [94], the naive Bayes algorithm was tested on spectral signatures of coffee berry necrosis
+                                      issued from Landsat 8 OLI satellite images in the aim of disease detection; the classification
+                                      reached an accuracy of 50%. Nevertheless, accurate disease detection predictions require
+                                      smart data processing using a smart method.
+
+           Table 3. Satellite sensors collecting multispectral images with spatial resolution (0.5–30 m) and spatial resolution.
+
+                                                                                           Revisit
+        Satellite                     Sensor                 Spatial Resolution                                   Lunched
+                                                                                           Cycle
+     WorldView-2                Multispectral sensor     0.46 m: 8 multispectral bands     1.1 day             8 October 2009
+                                                            1.24 m: multispectral
+     WorldView-3                Multispectral sensor              resolution              <1.0 day             13 August 2014
+                                                                 3.7 m: SWIR
+     WorldView-4                Multispectral sensor            1.24 m: VNIR               4.5 days            7 January 2019
+      Pleiades-1A               Multispectral sensor              2 m: VNIR                 1 day             16 December 2011
+       QuickBird                Multispectral sensor        2.62 m to 2.90 m VNIR         1–3.5 days           18 October 2001
+       Gaofen-2                 Multispectral sensor           3.2 m: B1, 2, 3, 4          5 days              19August 2014
+                                  Optical Satellite      2.88 m multispectral imagery      3.3 days            7 October, 2015
+         Jiline-1
+                               Hyperspectral sensor      5 m: 28 hyperspectral bands                           21 January 2019
+       RapidEye                 Multispectral sensor              5 m: VNIR                5.5 days            29 August 2008
+        THEOS                   Multispectral sensor             15 m: VNIR                26 days             1 October 2008
+                                                           10 m: (VNIR) B2, 3, 4, 8
+       Sentinel 2             MSI (Sentinel 2A and 2B)   20 m: B5, 6, 7, 8A, 11, 12, 60    10 days     23 June 2015 and 7 March 2017
+                                                               30 m: B1, 9, 10
+                                 OLI+ (Landsat-8)            30 m: VNIR + SWIR             16 days            11 February 2013
+        Landsat                                                  30 m: VNIR
+                                 ETM+(Landsat-7)                                           16 days              15 April 1999
+                                                                  60 m: TIR
+       HJ-1A/1B                        WVC                       30 m: VNIR                4 days             6 September 2008
+         TH-01                  Multispectral sensor             10 m: VNIR                5 days              24 August 2010
+         ALOS                        AVNIR-2                     10 m: VNIR                46 days             24 January 2006
+        SPOT-7                  Multispectral sensor              6 m: VNIR                 1 day                30 June 2014
+        SPOT-6                  Multispectral sensor              6 m: VNIR                 1 day             9 September 2012
+                                                                 10 m: VNIR
+        SPOT-5                  Multispectral sensor                                      2–3 days               4 May 2002
+                                                                 20 m: SWIR
+                                                                 15 m: VNIR
+         ASTER                  Multispectral sensor                                       16 days            18 December 1999
+                                                                 30 m: SWIR
+
+
+                                           Deep learning has proven its high performance for disease detection also using satellite
+                                      images. In [95], the authors proposed a gated recurrent unit (GRU)-based model to predict
+                                      development of sudden death syndrome (SDS) disease in soybean quadrats. Twelve
+                                      PlanetScope satellite images were conducted in this study. The method incorporated
+                                      time-series information for the classification task in different scenarios, each scenario
+                                      having a different sequence size. Interestingly, the highest accuracy value was reached
+                                      in the fourth scenario with the highest sequence size, which means that when enough
+                                      historical images are available, precision improves. However, the study suffers from a
+Remote Sens. 2021, 13, 2486                                                                                            9 of 24
+
+
+
+
+                              limited dataset, which has the effect of unbalancing the development of the SDS. The issue
+                              was addressed by assigning weights to diseased samples. The high spatial resolution is
+                              an important criterion for plant disease detection. In fact, the range of 10 m resolution
+                              and above are barely enough for crop classification task, which becomes challenging for
+                              disease detection [96]. To bridge the gap of lacking data and improve the prediction,
+                              several analysts recommended incorporating satellite images with aerial images and other
+                              data sources such as wireless sensor networks that capture environmental parameters for
+                              disease detection [97].
+
+                              2.4. Internet of Things Sensors
+                                   IoT sensors are one of the most widely used technologies in PA, due to their efficiency,
+                              ease of installation and low cost. A typical wireless monitoring system must contain
+                              multiple sensors connected in each zone to an installed node, with sensors and nodes
+                              communicating via radio-frequency. In addition, a gateway is also needed to accomplish
+                              connection between sensors and the user [98–100]. Once connected to the Internet server,
+                              the user can access the collected data. In case the WSN is unavailable, one of the existing al-
+                              ternative solutions is the weather station [101] which provides different local measurements
+                              in real-time for various agricultural applications. Several studies have been established to
+                              collect wireless sensor network data for disease detection. In [102], the authors developed
+                              an IoT monitoring system that collects the environmental and soil information data using a
+                              wireless sensor network. Collected data have been used for early detection of tomato and
+                              potato disease. In [103], the authors developed a monitoring and prediction system for
+                              mildew prediction in a vineyard. The approach was based on temperature, humidity and
+                              rainfall observations and the Goldanich model for prediction and alarming. Analyzing
+                              the resulting data is an essential key to ensure phytosanitary protection. Nevertheless, the
+                              classic methods used for disease detection are limited and it is more interesting to take
+                              advantage of machine learning algorithms to generate efficient prediction models.
+                                   Traditional machine learning: Many research studies have been carried out to control
+                              and monitor plants, as well as predict their health status based on specific physical sensors,
+                              since abiotic factors help to determine the health status of crops. In [104], the authors
+                              developed a surveillance system to identify the risk of grape disease in its early stages using
+                              the Hidden Markov model. Sensors for temperature, relative humidity and leaf humidity
+                              are placed in the vineyard to collect the necessary data. These data were transferred
+                              to a server via Zig-Bee communication (standard designed for low-power wireless data
+                              transmission). For the classification task, the favorable conditions for those responsible for
+                              the spread of diseases in grapes were provided by the National Center for Research on
+                              Grapevines (CNRG), as shown in Table 4. A naive Bayes kernel model was used in [105]
+                              for disease prediction based on environmental and soil information extracted using an IoT
+                              monitoring system. A KNN model was deployed for the early detection of agricultural
+                              diseases [106]. The prediction was based on multiparameters extracted from the field,
+                              namely atmospheric temperature, atmospheric humidity, CO2 concentration, illumination
+                              intensity, soil moisture, soil temperature and leaf wetness. The model achieved promising
+                              results, proving the validity of environmental data for early disease detection. Similarly,
+                              in [107], the authors proposed a system to predict the health status of tomato plants. Since
+                              abiotic factors such as temperature, soil moisture and humidity help to determine whether
+                              the plant is growing in healthy conditions or not, the system used two sensors: a soil
+                              moisture sensor and a temperature-humidity sensor. Two supervised learning algorithms
+                              (SVM and Random Forest) and an unsupervised learning technique (K-means clustering)
+                              were tested. The algorithms achieved test accuracies of 99.3% for SVM, 99.6% for Random
+                              Forest and 99.5% for K-means.
+                                   Deep learning: In [108], the authors developed an approach for prediction of cotton dis-
+                              ease and pests occurrence. The approach was designed based on weather and atmospheric
+                              circulation time series collected from six different zones in India. Bidirectional-LSTM
+                              (Bi-LSTM) was then introduced for prediction; it achieved an accuracy of 87.84% and an
+Remote Sens. 2021, 13, 2486                                                                                         10 of 24
+
+
+
+
+                              overall area under the curve (AUC) score of 0.95. Nevertheless, we noticed that the amount
+                              of IoT papers established for disease detection using machine learning is not sufficient,
+                              which may be due to the fact that these data are not efficient in prediction crop health
+                              status. Thus, these inputs coupled with other types of data can provide valuable results
+                              by using appropriate fusion techniques and adequate AI models for good adjustments to
+                              these complex multivariate data.
+
+                              Table 4. Favorable conditions for disease spread in grapevine. Reprinted with permission from
+                              ref. [104]. Copyright 2016 Rajarambapu Institute of Technology.
+
+                                     Disease          Temperature (◦ C)     Moisture (%)        Leaf Wetness Duration
+                                Bacterial Leaf Spot         25–30             80–90                        -
+                                Powdery Mildew              21–27           More than 48                   -
+                                 Downy Mildew              17–32.5          More than 48                  2–3
+                                  Anthracnose               24–26                -                        12
+                                 Bacterial Cancer           25–30               >80                        -
+                                       Rust                  24                 75                         -
+
+
+                              2.5. Summary
+                                    Some of the most innovative technologies in plant protection are connected sensor
+                              networks, since there is a correlation between variations in microclimatic conditions and
+                              plant stress. Numerous research studies were carried out to control and monitor crops,
+                              and also predict plant health based on meteorological characteristics [100,104,107]. In
+                              addition, images can be a better representation of crop health state. This is due to the
+                              spectral signature of symptoms on the crops and plant leaves. Ground images, UAV
+                              images [74,76,109] and satellite images [91,92] have proven effective in detecting plant
+                              diseases. Table 5 is a summary of the research studies presented previously.
+                                    We noticed that a new tendency in disease detection application is spreading widely,
+                              characterized by the use of deep learning. This may be due to the high performance of
+                              deep learning (DL) models compared to conventional machine learning models [60]. DL
+                              eliminates the manual feature extraction phase that can sometimes result in low prediction
+                              performance and requires less effort for feature engineering [23]. In addition, DL models
+                              have been used to efficiently classify diseases in challenging environments with complex
+                              backgrounds and overlapping plant leaves. Conversely, traditional machine learning
+                              cannot effectively distinguish symptoms of disease with similar characteristics, nor can it
+                              take advantage of a larger number of trainings [42].
+                                    Nevertheless, there are still considerable drawbacks to DL regarding training time
+                              that can reach weeks depending on the processor capacity of the computer used, dataset
+                              size and model complexity. In the context of plant disease detection, datasets are not
+                              sufficiently available or are inadequate, especially when it concerns the task of early
+                              disease detection. Prior knowledge of the crop and the history of the parcels containing
+                              diseases and pests that occur is a preliminary task. To tackle this issue, researchers opt
+                              for creating their own dataset by monitoring and capturing the natural development
+                              of the infestation if it occurs [54] or by inoculating the fungus causing the disease in
+                              an experimental greenhouse [50,51]. Regarding acquisition, a hyperspectral image, for
+                              example, requires relatively expensive instruments and experts for the data collection
+                              protocol [61]. In addition, annotation is a mandatory step for creating a new dataset. The
+                              task is time-consuming and involves agriculture experts for the annotation of different
+                              diseases since the task is not within the reach of ordinary volunteers. As researchers
+                              tend to use data augmentation methods for small datasets, these methods are not always
+                              efficient and cannot exceed a certain threshold to avoid overfitting. Once the dataset is
+                              available, it can suffer from imbalance, where samples of healthy plants are more important
+                              than samples of diseased plants, as well as seasonal and regional difficulties with various
+                              categories of crop diseases [95,111].
+Remote Sens. 2021, 13, 2486                                                                                              11 of 24
+
+
+
+
+      Table 5. Summary of various crop disease detection using imaging techniques, IoT and data fusion techniques, based on
+      traditional machine learning (TML) and deep learning (DL) methods.
+
+  Types of Data                Method                   Crop                      Data                   Accuracy       Ref.
+                                      SVM              Barely                 204 images                   68%           [45]
+                                      SVM              Tomato                 284 images                  93.90%        [110]
+                                      SVM                Rice                 120 images                  73.33%         [48]
+                         TML
+                                      PCA              Potato                 120 images                     -           [50]
+                                      KNN              Tomato                 212 images                  92.86%         [51]
+                                      ANN               wheat           630 multispectral images           81%           [52]
+                                       ELM             Tomato           310 hyperspectral images           100%         [60]
+      Ground
+                                       ELM             Tobacco          180 hyperspectral images            98%         [61]
+      imaging
+                                     ResNet            Multiple              55,038 images                99.67%.       [53]
+                                2D-CNN-BidGRU           Wheat                  90 images                   84.6%        [41]
+                                  ResNet-MC-1          multiple              121,955 images                 98%         [42]
+                          DL
+                                    Adapted
+                                                       tomato                 7176 images                 89.2%         [57]
+                                   MobileNet
+                                     SSCNN              citrus                2939 images                  99%          [59]
+                                   MobileNet            apple                  334 images                 73.50%        [58]
+                                    DensNet            Tomato                  666 images                 95.65%        [56]
+                                   EfficientNet        multiple              55,038 images                99.97%        [55]
+                                    BPNN               Tomato            Hyperspectral images                 -         [62]
+                                     CART             Vine grape         Hyperspectral images              94.1%        [66]
+                                 ROC analysis         Vine grape         Multispectral images                 -         [67]
+                                  SLIC + SVM           Soybean               RGB images                   98.34%.       [68]
+                         TML     Random forest          Wheat            Multispectral images              89.3%        [69]
+                                      RBF               Citrus           Multispectral images               96%         [70]
+                                   AdaBoost             Citrus           Multispectral images              100%         [71]
+                                                                       Thermal and hyperspectral
+                                      SVM               Olive                                              80%          [73]
+                                                                                images
+   UAV imaging                        MLP              Avocado           Hyperspectral images              94%          [72]
+                                     ResNet             Maize               RGB images                    97.85%        [109]
+                                      CNN               Potato           Multispectral images                 -          [74]
+                                      Net-5           grapevine          Multispectral images             95.86%         [76]
+                                      CNN               Maize               RGB images                     95.1%         [75]
+                          DL
+                                     DCNN               Wheat            Hyperspectral images               85%          [77]
+                                    DCGAN +
+                                                      Pinus Tree              RGB images                     -          [78]
+                                    inception
+                                     SegNet           grapevine           Multispectral images               -          [79]
+                                     VddNet           grapevine           Multispectral images            93.72%        [80]
+                                     SAM                Wheat                  (SPOT-6)                    78%          [90]
+                                Optimal threshold       Wheat             1 image (Sentinel-2)            85.2%         [92]
+      Satellite          TML
+                                     SVM                Wheat            3 images (Landsant-8)             80%          [93]
+      imagery                     Naive Bayes           Coffee            3 images (landsat-8)             50%          [94]
+                          DL          GRU              Soybean          12 images (PlanetScrope)          82.5%         [95]
+                                                                     Temperature, relative humidity
+                                      HMM               Grape                                             90.9%         [104]
+                                                                            and leaf humidity
+                                                                       Temperature, humidity and
+                                      SVM               Rose                                                 -          [100]
+                                                                               brightness
+                         TML   Naive Bayes Kernel      multiple       Soil and environmental data            -          [105]
+      IoT data                       KNN                              Soil and environmental data         95.9%         [106]
+                                                                       Temperature, humidity and
+                                Goidanich model          Vine                                                -          [103]
+                                                                                 Rainfall
+                                                                     Temperature, soil moisture and
+                                 Random forest         Tomato                                             99.6%         [107]
+                                                                                humidity
+                                                                    Weather + atmospheric circulation
+                          DL        Bi-LSTM            Cotton                                             87.84%        [108]
+                                                                                indexes
+Remote Sens. 2021, 13, 2486                                                                                          12 of 24
+
+
+
+
+                              3. Data Fusion Potential for Disease Detection
+                                    As the data comes from multiple sources, it seems more judicious to combine them to
+                              achieve a better performance in disease detection. Multimodal fusion for disease detection
+                              is still an ongoing area of study. In fact, researchers have started to notice the importance
+                              of merging heterogeneous types of data from different sensors [39,97]. Nevertheless,
+                              important effort must be done in order to integrate sophisticated fusion techniques on
+                              multimodal data. This will allow a better understanding of crop behavior and thus improve
+                              the prediction quality. A deeper understanding of plant features can be achieved by fusing
+                              data from multiple sensors to provide more accurate and efficient predictions.
+                                    Data fusion is the combination and simultaneous use of data and information from
+                              multiple sources to achieve better performance than using data sources separately. It is
+                              often related to the need to perceive different environmental variables from sensors [112].
+                              Multimodal data fusion is a challenging task because it deals with a combination of
+                              heterogenous data from different modalities (images, signals, times series, etc.) [113].
+                              Compared to classical probabilistic fusion methods, machine learning techniques have
+                              proven their capacity to provide more accurate predictions for fusion [114]. In this section,
+                              we review data fusion techniques, namely measurement fusion, feature fusion, decision
+                              fusion, hybrid fusion and tensor fusion, and explore the data fusion applications using
+                              machine learning for agriculture. Finally, we will discuss the major challenges in applying
+                              data fusion in agriculture.
+
+                              3.1. Data Sources
+                                   Data sources can provide useful information about the studied phenomena; for uni-
+                              modal data source a simple data concatenation can be enough for prediction purposes [104].
+                              Otherwise, when we have several types of sensors, advanced data fusion is necessary [115].
+                              Data from several sensors first require data analysis to characterize, order or correlate
+                              the different available data sources, and then to decide on the strategy or algorithm to
+                              be used to merge the data. Among the relationships that exist, we can find distribution,
+                              complementarity, heterogeneity, redundancy, contradiction, concordance, discordance,
+                              synchronization and difference in granularity [112].
+
+                              3.2. Data Fusion Categories
+                                   In literature, data fusion methods are divided into three main categories: probability-
+                              based methods, evidence-based methods and knowledge-based methods. Probability-
+                              based methods [37] such as the Kalman filter [116], the Bayesian fusion [117] and the
+                              Hidden Markov model [118] are limited to low-dimensional or homogeneous data
+                              and suffer from high computational complexity. Therefore, they are not adequate
+                              for complex problems. Evidence-based methods [119], such as the Dempster Shafer
+                              theory [120,121], are used to deal with missing information, additional assumptions and
+                              solve the problem of uncertainty. Nevertheless, they present estimation limitations that
+                              restrict their applications.
+                                   Conversely, knowledge-based methods have proven to be effective in feature extrac-
+                              tion, data reduction, classification and decision-making [122,123]. This type of method
+                              allows the fusion center to extract useful information from large imprecise datasets.
+
+                              3.3. Intelligent Multimodal Fusion
+                                   Multimodal fusion based on machine learning [124] is capable of learning represen-
+                              tations of different modalities at various levels of abstraction [125], with significantly im-
+                              proved performances [126]. Multimodal fusion can be split into two main categories [123]:
+                              model-based approaches that explicitly address fusion in their construction, and model-
+                              agnostic approaches which are general and flexible and do not directly depend on a
+                              specific machine learning method. Depending on data abstraction level, different fusion
+                              architectures for the agnostic fusion [37,123,127] are possible.
+Remote Sens. 2021, 13, 2486                                                                                          13 of 24
+
+
+
+
+                                    Measurement fusion (or early fusion), also known as first level data fusion, allows
+                              the immediate integration and presentation of sensor data using feature vectors. Data are
+                              generally concatenated [104], which makes fusion limited when dealing with heterogeneous
+                              data. This architecture is the most widely used because of its simplicity: it is easy to align
+                              data. In [128], the authors tried to predict the rate of photosynthesis and calculate the
+                              optimal CO2 concentration based on real-time environmental information via a WSN
+                              system in greenhouses for tomato seedling stage cultivation. The BPNN prediction model
+                              takes as input parameters the environmental variables (temperature, CO2 concentration,
+                              humidity and luminosity) and the photosynthesis rate of the individual leaf array as the
+                              output parameter.
+                                    Feature fusion combines the results of early fusion and individual unimodal predictors
+                              by merging feature vectors, allowing heterogeneous data from different data sources to be
+                              combined. In [129], deep fusion architectures were implemented to detect defects in a plan-
+                              etary gearbox using four types of signals as inputs. Deep Convolutional Neuron Networks
+                              (DCNNs) were used on multiple levels of multimodal data fusion. The feature level fusion
+                              with feature learning from raw data was performed after the raw data extraction phase.
+                              DCNNs were applied on each type of data to learn features, and then the outputs were
+                              extracted as the learned features. The learned features were finally combined and fed to
+                              another DCNN for feature-level fusion classification.
+                                    Decision fusion (or late fusion) involves processing data from each sensor separately to
+                              obtain high-level inference decisions, which are then combined in a second stage [130]. The
+                              decision-level fusion method combines information from different sensors after each sensor
+                              has made a preliminary decision. The combination can be simple or weighted. In [131],
+                              a use case of weighted decision fusion architecture on multiple sensors is presented. In
+                              addition to the sensor data, two classical characteristics (power and median frequency)
+                              were extracted from each signal corresponding to each sensor and entered the individual
+                              channel classifier. Then, the method of weighted majority voting (WMV) was used to
+                              merge the resulting vectors, with each sensor data being weighted by a confidence measure
+                              (or weight).
+                                    Hybrid fusion merges information at two or more levels. In the hybrid approach
+                              proposed in [115], the authors developed the merging technique of different CNN classifiers
+                              for object detection in changing environments. Three types of input modalities were used:
+                              RGB, depth and optical flow. The CifarNet architecture was designed as the single expert
+                              model, and then the outputs of each expert network model were fused with weights
+                              determined by an additional network called gating network. This approach was called
+                              Mixture of Deep Experts (MoDE).
+                                    Tensor Fusion (TFM) consists mainly of a tensor fusion layer that models unimodal,
+                              bimodal and trimodal interactions using a three-fold Cartesian product from modality inte-
+                              gration [132]. The architecture has been improved to lower the computational complexity;
+                              the resulting architecture is called low rank tensor fusion (LMF) model [133]. LMF has been
+                              proposed to identify the emotions of speakers according to their verbal and non-verbal
+                              behaviors, based on visual, audio and language data. Three YouTube videos databases
+                              were used with annotation of feelings, speaker traits and emotions. The learning network
+                              for acoustic and visual modalities was represented by a two-layer neural network, and
+                              for linguistic modalities, a Long Short-Term Memory (LSTM) network was used to extract
+                              the representations. The LMF model, compared to the tensor fusion model, performed
+                              significantly better for all datasets and measurements. Moreover, the LMF significantly
+                              reduced the computational complexity from exponential to linear.
+                                    Multimodal Search Architecture Fusion (MFAS) is a generic architecture that creates
+                              a large number of possible fusion architectures, scans the neural architecture and choses
+                              the best performing architectures [126]. The MFAS is inspired by the progressive neural
+                              architecture search (PAS) [134] where the search is efficiently guided for architecture
+                              sampling using temperature-based sampling [135]. Testing three datasets, the MFAS has
+                              proven its efficacity against the state-of-the-art results on those datasets.
+Remote Sens. 2021, 13, 2486                                                                                         14 of 24
+
+
+
+
+                                    In [136], the authors performed a comparison between four types of fusion (late, MoE,
+                              LFM and MiD) on image and signal modalities for automatic texture detection of objects.
+                              Fusion methods provided latent vectors which were introduced in the corresponding artifi-
+                              cial neural networks ANNs. The most efficient fusion method in the texture classification
+                              task was the LMF which achieved an average test accuracy of 88.7%. Tested on degra-
+                              dation scenarios, the Late, MoE and Mid fusion methods behaved similarly. The fusion
+                              architecture potentially allowed ANN to achieve good results in the texture detection task.
+                              Nevertheless, the performance without the main modality (images) decreased significantly.
+                                    To conclude, machine learning-based multimodal fusion approaches have an impor-
+                              tant potential to solve open issues in agriculture by merging different types of data. We
+                              believe that exploiting these advanced techniques for disease detection issues can provide a
+                              better understanding of the plant environment and thus improve prediction performance.
+
+                              3.4. Data Fusion Applications in Agriculture
+                                    Even if advanced fusion techniques are a rapidly growing area in agriculture,
+                              literature still lacks studies on disease detection in this domain. Different applications
+                              on data fusion in agriculture are presented in literature, specifically data fusion for
+                              yield prediction [63,137,138], crop identification [96,139], land monitoring [140,141]
+                              and disease detection [111,142,143].
+
+                              3.4.1. Data Fusion for Yield Prediction
+                                   In [63], the authors investigated the relationship between canopy thermal information
+                              and grain yield, using data fusion of data from different sensors. They extracted spectral
+                              (VIs), structure (vegetation fraction (VF), canopy height (CH)), thermal (normalized relative
+                              canopy temperature (NRCT)) and texture information from canopy using multi-sensors
+                              installed on a UAV. Two fusion models were used in this study, input-level feature fusion
+                              DNN (DNN-F1) and intermediate-level feature fusion DNN (DNN-F2). The DNN-F2
+                              outperformed DNN-F1 in terms of prediction accuracy, spatial adaptability and robustness
+                              across different types of models.
+                                   In [138], datasets of summer and winter rice yield, meteorology data and area
+                              data from 81 counties in a Chinese region were used. To predict rice yield, the authors
+                              proposed a deep learning fusion model named BBI model combining backpropagation
+                              neural networks (BPNNs) with an independent recurrent neural network (IndRNN).
+                              The model first captured deep spatial and temporal features from the input data, then
+                              combined these deep features by fusing the outputs and then learned the relationship
+                              between these features and yield values. The proposed model accurately predicted both
+                              summer and winter rice yield.
+                                   In another study [137], extreme learning regression machine (ELR) was used to phe-
+                              notype estimation from several sensors. First, the authors simultaneously collected RGB,
+                              multispectral and thermal images from sensors installed on a drone. Then, vegetation traits
+                              (color, physical structure, spectral and thermal features) were extracted from the images.
+                              The features were combined and fed into the ELR prediction model. Compared to other
+                              classifiers, with multisensory combinations, ELR provided relatively accurate results of
+                              plant features estimation.
+
+                              3.4.2. Data Fusion for Crop Identification
+                                   In this study [139], the authors exploited spatio-temporal data to segment satellite
+                              images of vegetation fields. The data used are images captured by the Gaofen 1 and
+                              2 satellite. The authors developed a CNN 3D active architecture to extract information for
+                              the multi-temporal images. The 3D tensor is composed of the spectral, spatial and temporal
+                              characteristics of each element in each band. The convolution is done at spatial-spectral
+                              or spatial-temporal scale. In the same context, some researchers tested the feasibility of
+                              temporal CNNs (TempCNNs) for satellite images classification [96]. To do so, they collected
+                              46 images during one year from the Formasat-2 satellite. Three bands (NIR, red (R) and
+Remote Sens. 2021, 13, 2486                                                                                         15 of 24
+
+
+
+
+                              green (G)) and three VIs were used (NDVI, Normalized Difference Water Index (NDWI)
+                              and Brilliance Index (IB)). The proposed algorithm consisted of three convolutional filters
+                              applied consecutively. The results obtained showed that the overall accuracy of the CNN
+                              models increased when more features were added, regardless of their type. The proposed
+                              model using the spectral bands in the feature vector outperformed all other combinations
+                              by a variation between 1% and 3%, achieving an accuracy of 93.4%.
+
+                              3.4.3. Data Fusion for Land Monitoring
+                                    Nearly all studies on satellite images agree that a very high resolution is the key to
+                              achieving interesting results. Thus, the required resolution is not frequently available.
+                              Therefore, some researchers have attempted to develop resolution improvement techniques
+                              to solve this issue using data fusion. In this context, the authors in [83] developed an
+                              extended super-resolution convolutional neural network (ESRCNN) for data fusion frame-
+                              work, specifically to blend Landsat-8 and Sentinel-2 images of 20 m and 10 m spatial
+                              resolution, respectively. The study produced temporally dense observations of land sur-
+                              faces at short time intervals using Landsat-8 and Sentinel-2 data. In the same context, the
+                              authors in [140] proposed a method for exploiting UAV remote sensing data by fusing high-
+                              and low-resolution images. The resulting data were then transmitted to a deep semantic
+                              segmentation module to provide a useful reference for sunflower lodging assessment and
+                              mapping. The fusion approach outperformed the no-fusion approach using the same mod-
+                              els, and the best accuracies were achieved using the SegNet method reaching 84.4% and
+                              89.8% without and with image fusion, respectively, on the test set. In another study [141],
+                              the authors suggested a satellite/UAV fusion technique for monitoring soybean fields
+                              using machine learning. They combined spectral canopy information (vegetation indices)
+                              extracted from Worldview-2/3 data with canopy structure features (canopy cover and
+                              height) calculated from UAV RGB images. These features were combined and fed into their
+                              ELR dual activation prediction model for plant characteristics predictions. Their results
+                              showed that predictions based on the combination of multi-sensors (Satellite/UAV) data
+                              outperformed those using single-sensor features.
+
+                              3.4.4. Data Fusion for Disease Detection
+                                    Plant monitoring tools for disease identification and classification produce a huge
+                              amount of data. One way of dealing with these data is either to analyze each type of
+                              modality separately to compare results and evaluate the method validity [144,145], or to
+                              fuse and combine data for a better understanding of disease conditions. One of the first
+                              attempts to integrate multisource data for disease detection was developed using both
+                              meteorological data and satellite scenes [142]. The classification task was based on logistic
+                              regression and the effective characteristics extracted from both modalities. Results showed
+                              great potential for the multimodal data integration for disease detection. In [111], the
+                              authors proposed a multi-context fusion network for crop disease detection. The approach
+                              was based on images collected in the field, in addition to contextual information (season,
+                              geographical location, temperature and humidity). The proposed model was composed
+                              of three major parts: CNN backbone for visual features extraction, ContextNet for fusion
+                              of the contextual features, and a fully connected network for fusion of all features and
+                              final predictions. The proposed approach achieved an identification accuracy of 97.5%.
+                              Nonetheless, their method suffers from imbalanced data due to seasonal and regional
+                              difficulty with various categories of crop diseases. In another study [143], aiming to detect
+                              diseases in mixed and complex African landscapes, the researchers split the study into
+                              three main parts: pixel-based banana classification, object-based banana localization and
+                              disease detection. The classification was established using SVM in which the inputs were a
+                              combination of multispectral bands with vegetation indices extracted from the multi-level
+                              satellite images (Sentinel 2, PlanetScope and WorldView-2) and UAV (MicaSense RedEdge)
+                              images. For banana plant detection in the field, they trained the object detection model
+                              RetinaNet on UAV RGB images and developed a custom classifier for simultaneous banana
+Remote Sens. 2021, 13, 2486                                                                                             16 of 24
+
+
+
+
+                                tree localization and disease classification. Compared to the VGG model, the custom
+                                classifier provided the best results with an accuracy reaching 92%. Although the approach
+                                has good classification results, it suffers from considerably important training time.
+
+                                3.4.5. Summary
+                                      The applications of data fusion in agriculture presented in this section can be divided
+                                into three types. Spatio-spectral fusion is a multi-band fusion that constitutes a fine-spatial
+                                and fine-spectral fusion. Spatio-temporal fusion is based on blending data with fine spatial
+                                resolution and coarse temporal resolution (temporal revisit frequency) with data that have
+                                fine temporal resolution, but coarse spatial resolution, with the objective being to create a
+                                fine spatio-temporal resolution. Finally, multimodal fusion corresponds to heterogeneous
+                                multisensory fusion. Table 6 summaries data fusion applications in agriculture presented
+                                in this subsection.
+
+                                         Table 6. Data fusion applications in agriculture.
+
+    Fusion
+                       Crop           Sensor                 Data Type            Model Type     Model Output          Ref.
+     Type
+                                  Landsat-8 and                                                  High resolution
+    Spatio-              -                                     Images              ESRCNN                              [83]
+                                Sentinel-2 satellites                                              land image
+   temporal
+                     Multiple   Formasat-2 satellite           Images             TempCNNs      Crop classification     [96]
+     fusion
+                     Multiple   Gaofen 1, 2 satellite          Images              CNN 3D       Crop classification    [139]
+                                                         RGB, multispectral                      Crop phenotype
+                     Soybean    Multi-sensors UAV                                     ELR                              [137]
+     Spatio-                                             and thermal images                        estimation
+    Spectral                                                  RGB and
+                                                                                                    Lodging
+     fusion         Sunflower   Multi-sensors UAV           multispectral           SegNet                             [140]
+                                                                                                  identification
+                                                               images
+                                                         RGB, multispectral
+                     Canopy     Multi-sensors UAV                                   DNN-F2       Yield prediction      [63]
+                                                         and thermal images
+                                                              Yield and
+                       Rice        Multi-sensors                                      BBI       Yield classification   [138]
+                                                          meteorology data
+ Multimodal                                                                                     Vegetation feature
+   fusion             Soyben       Satellite/UAV            Satellite/UAV             ELR                              [141]
+                                                                                                   prediction
+                                                             Satellite +            Logistic
+                      Wheat     Satellite/IoT sensors                                           Disease detection      [142]
+                                                         meteorological data       regression
+                                                              images +
+                     Multiple   Camera /IoT sensors                                  MCFN       Disease detection      [111]
+                                                         meteorological data
+                      Banana       Satellite/UAV           Satellite/UAV         Custom model   Disease detection      [143]
+
+
+                                3.5. Data Fusion Challenges for Agriculture
+                                     Data fusion is only worthwhile if it increases the quality of predictions and relevance
+                                of decisions based on the data combination. These data are likely to be insignificant,
+                                noisy or flawed [113]. If the algorithm decisions are of poor quality, they may have a
+                                negative impact on the expected results. Therefore, it is imperative to reduce this noise and
+                                eliminate these errors to improve the accuracy [10]. In addition to noise, observed data
+                                may be characterized by non-commensurability, different resolutions and incompatible
+                                sizes or alignment, and consideration should be given to exploit a pre-processing model to
+                                solve this problem [79]. Furthermore, different data sources may provide contradictory
+                                data or missing values. A data analysis step is therefore required. Once data are ready
+                                for the learning process, unbalanced data, which are basically unequal representation,
+                                can also affect the prediction rate. Thus, the biggest constraint of data fusion is the
+                                multimodality with data from distinct types of sensors, different fusion architectures can
+                                be adopted [133,136]. However, the exploitation of these advanced models in agriculture,
+                                precisely in the disease detection area, is still budding.
+Remote Sens. 2021, 13, 2486                                                                                            17 of 24
+
+
+
+
+                              4. Discussion and Conclusions
+                                   This review enabled to map the various research works of disease detection using
+                              machine learning with different data modalities. Spectral imaging can be an essential tool
+                              to assess crop health status. This is due to the different reflectance of healthy and diseased
+                              crops. Therefore, researchers exploited plant leaves images using machine learning and
+                              deep learning techniques for automatic disease detection which has led to interesting
+                              accuracies. Multispectral and hyperspectral images were very useful and provided higher
+                              precision for disease detection. That is tied to the spectral measurements sensitivity to
+                              stress and change at different stages of crop growth and disease severity. Nevertheless,
+                              hyperspectral data acquisition protocol is difficult to apply in field conditions. Moreover,
+                              the spectral reflectance can also be influenced by several factors, such as technical properties
+                              (resolution, brightness, etc.), sample preparation conditions (laboratory or field) and sample
+                              properties (size, texture, humidity, etc.). Further analysis of reflectance based on crop
+                              vegetation indices, during crop growth at all stages of infection, is required. In addition
+                              to RGB and hyperspectral images, thermal images have proven to be very useful in the
+                              detection of plant diseases. The main motivation is the fact that plant leaf temperature
+                              can help predict plant health status. Several researchers have explored this type of images
+                              for disease detection approaches at the leaf level, and others have combined these images
+                              with multispectral data for effective early detection at the ground vehicle and aerial vehicle
+                              level since plant leaves acquisition requires involving people to drill down the whole
+                              field to acquire images, which is an energy and time-consuming strategy. Indeed, the
+                              plant disease detection issue has strongly benefited from the aerial vehicles for the crop
+                              monitoring process at plot scale. Several types of cameras were used for that purpose and
+                              mounted on a drone. Based on the acquired images, combined with machine learning
+                              models, researchers were able to efficiently determine healthy and infected crops.
+                                   Spectral imaging using UAV provides important information on soil and the upper
+                              part of plants in a large spectrum, therefore, UAVs are used more often. Nevertheless,
+                              the difficulty arises in evaluating the state of fruits in plants and lower to plant leaves.
+                              Merging the two technologies can also broaden the spectrum of plants to be processed while
+                              ensuring early detection accuracy. However, UAVs suffer from environmental and logistic
+                              constraints such as high-speed wind and rain, battery capacity and a fundamental need for
+                              a trained person to start and manage flights. Satellites can be an excellent alternative to
+                              UAVs to monitor healthy plant growth depending on the spatial and spectral resolution. A
+                              promising new field in the detection of plant disease on a larger scale is UAVs and satellites
+                              imaging which has proved its usefulness in many agriculture applications.
+                                   Despite the usefulness of satellite images, this area of research faces several challenges.
+                              Clouds and their shadows represent a major obstacle when it comes to processing and
+                              extracting disease signature from high-resolution satellite images; when clouds cover
+                              vegetation, the acquired images become unexploitable. The main obstacles to the crop
+                              monitoring application and disease detection using satellites are rapid changes in agricul-
+                              tural land cover in relatively short time intervals, differences in seeding dates, atmospheric
+                              conditions and fertilization strategies; since it is difficult to predict whether the reflectance
+                              changes are due to disease or to those factors, an in-situ study is required to validate
+                              predictions. High-resolution satellite images can be a key approach for very large-scale
+                              disease detection.
+                                   The current technologies of imaging sensors have many limitations for earlier disease
+                              detection. The association of multiple sensors data can provide a better understanding of
+                              the growth and health status of the crop and thus better prediction rates. This explains a
+                              growing interest in the scientific community for the multimodal data fusion in the field of
+                              crop disease detection. The most known meteorological sensors used for disease detection
+                              are temperature [43], humidity [146], soil moisture and light intensity sensors [147]. One
+                              can benefit from the power of AI algorithms to process the multimodal data sources and
+                              predict crop diseases in earlier stages.
+Remote Sens. 2021, 13, 2486                                                                                                      18 of 24
+
+
+
+
+                                   Indeed, neural networks and deep neural network models demonstrated a significant
+                              capacity in the agriculture field to monitor the healthy crop growth and capture anomalies
+                              outperforming traditional machine learning algorithms. An example of the high perfor-
+                              mance of DL compared to conventional method can be seen in [140]. The authors compared
+                              the classification results of SVM with FCN (Fully Convolutional Network) and SegNet on
+                              multispectral images. SegNet and FCN outperformed SVM model in both experimental
+                              fields and with different combinations of image bands as shown in Table 7; where RGBMS
+                              and NIRMS are respectively visual and near-infrared (NIR) bands of multispectral image,
+                              FRGBMS and FNIRMS with high resolution are respectively fusion results of RGBMS and
+                              NIRMS. In addition, from the table we can clearly see the impact of image fusion on the
+                              recognition results and the accuracies improved for all the models, including the traditional
+                              machine learning model.
+
+                              Table 7. Comparison of machine learning, deep learning and image fusion performances. Adapted
+                              with permission from ref [140]. Copyright 2020 College of Mechanical and Electronic Engineering,
+                              Northwest A&F University.
+
+                                                                                 SVM                    FCN                SegNet
+                               UAV Images
+                                                                           Field 1   Field 2   Field 1    Field 2     Field 1   Field 2
+                                          RGB (3 bands)                    66.8%     55.3%      83.8%         72.2%   84.9%     73.1%
+                               original
+                                          RGBMS + NIRMS (6 bands)          68.2%     56.0%      82.4%         72.5%   83.7%     72.8%
+                                          FRGBMS + FNIRMS (6 bands)        70.9%     56.9%      85.1%         76.2%   86.5%     76.8%
+                               Fusion
+                                          RGBMS + FNIRMS (6 bands)         69.0%     57.7%      86.7%         76.4%   87.1%     78.2%
+
+
+                                   Thus, the correct diagnosis depends on the choice of DL architecture and the type,
+                              quantity and the quality of the data. Hence the fusion of all different important components
+                              can lead to an efficient disease detection system. The application of multimodal deep
+                              learning involves the selection of a learning architecture and algorithm. Lately, multimodal
+                              fusion has proven an inescapable potential and is increasingly used in several domains such
+                              as healthcare, sentiment analysis, human–robot interaction, human activity recognition or
+                              object detection. In the agriculture field, several deep learning fusion approaches have been
+                              proposed, such as applications in yield prediction, land monitoring, crop identification and
+                              disease detection.
+                                   The most widely used type of fusion in agriculture is the fusion of multi-sensors data
+                              from aerial vehicles, fusion of multi-resolution satellites data and the fusion of satellite
+                              and UAV images. This fusion is employed to improve the detection process for tasks such
+                              as crop monitoring or plant classification. Thus, for our specific task, the use of other
+                              data sources can enhance early disease detection performance. However, few multimodal
+                              fusion studies have been conducted, particularly for disease detection. Promising results
+                              of multimodal fusion were presented in this paper, demonstrating the high potential of
+                              deep learning fusion models for prediction when using multimodal data, which creates an
+                              opportunity for further research works.
+
+                              Author Contributions: Writing—original draft preparation, M.O. and A.H.; writing—review and
+                              editing, M.O., A.H., R.C., Y.E.-S. and M.E.H. All authors have read and agreed to the published
+                              version of the manuscript.
+                              Funding: This research was funded by Campus France, Eiffel Scholarship Program of Excellence
+                              2020 grant number 96XXXF, and the PHC Toubkal/21/121.
+                              Conflicts of Interest: The authors declare no conflict of interest.
+Remote Sens. 2021, 13, 2486                                                                                                            19 of 24
+
+
+
+
+References
+1.    FAO; WHO. The Second Global Meeting of the FAO/WHO International Food Safety Authorities Network; World Health Organization:
+      Geneva, Switzerland, 2019.
+2.    Venkateswarlu, B.; Shanker, A.K.; Shanker, C.; Maheswari, M. Crop Stress and Its Management: Perspectives and Strategies; Springer:
+      Dordrecht, Germany, 2013; pp. 1–18.
+3.    Jullien, P.; Alexandra, H. Agriculture de precision. In Agricultures et Territoires; Éditions L’Harmattan: Paris, France, 2005;
+      pp. 1–15.
+4.    Lamichhane, J.R.; Dachbrodt-Saaydeh, S.; Kudsk, P.; Messéan, A. Toward a reduced reliance on conventional pesticides in
+      european agriculture. Plant Dis. 2016, 100, 10–24. [CrossRef]
+5.    Sánchez-Bayo, F.; Baskaran, S.; Kennedy, I.R. Ecological relative risk (EcoRR): Another approach for risk assessment of pesticides
+      in agriculture. Agric. Ecosyst. Environ. 2002, 91, 37–57. [CrossRef]
+6.    Rochon, D.A.; Kakani, K.; Robbins, M.; Reade, R. Molecular aspects of plant virus transmission by olpidium and plasmodiophorid
+      vectors. Annu. Rev. Phytopathol. 2014, 42, 211–241. [CrossRef] [PubMed]
+7.    Lary, D.J.; Alavi, A.H.; Gandomi, A.H.; Walker, A.L. Machine learning in geosciences and remote sensing. Geosci. Front. 2016, 7,
+      3–10. [CrossRef]
+8.    Golhani, K.; Balasundram, S.K.; Vadamalai, G.; Pradhan, B. A review of neural networks in plant disease detection using
+      hyperspectral data. Inf. Process. Agric. 2018, 5, 354–371. [CrossRef]
+9.    Zhang, J.; Huang, Y.; Pu, R.; Gonzalez-Moreno, P.; Yuan, L.; Wu, K.; Huang, W. Monitoring plant diseases and pests through
+      remote sensing technology: A review. Comput. Electron. Agric. 2019, 165, 104943. [CrossRef]
+10.   Li, W.; Wang, Z.; Wei, G.; Ma, L.; Hu, J.; Ding, D. A Survey on multisensor fusion and consensus filtering for sensor networks.
+      Discret. Dyn. Nat. Soc. 2015, 2015, 1–12. [CrossRef]
+11.   Liao, W.; Chanussot, J.; Philips, W. Remote sensing data fusion: Guided filter-based hyperspectral pansharpening and graph-
+      based feature-level fusion. In Mathematical Models for Remote Sensing Image Processing; Moser, G., Zerubia, J., Eds.; Springer:
+      Berlin/Heidelberg, Germany, 2017; pp. 243–275.
+12.   Talavera, J.M.; Tobón, L.E.; Gómez, J.A.; Culman, M.A.; Aranda, J.; Parra, D.T.; Quiroz, L.A.; Hoyos, A.; Garreta, L.E. Review of
+      IoT applications in agro-industrial and environmental fields. Comput. Electron. Agric. 2017, 142, 283–297. [CrossRef]
+13.   Aune, J.B.; Coulibaly, A.; Giller, K.E. Precision farming for increased land and labour productivity in semi-arid West Africa. A
+      review. Agron. Sustain. Dev. 2017, 37, 16. [CrossRef]
+14.   Bacco, M.; Berton, A.; Ferro, E.; Gennaro, C.; Gotta, A.; Matteoli, S.; Paonessa, F.; Ruggeri, M.; Virone, G.; Zanella, A. Smart
+      farming: Opportunities, challenges and technology enablers. In Proceedings of the 2018 IoT Vertical and Topical Summit on
+      Agriculture—Tuscany (IOT Tuscany), Tuscan, Italy, 8–9 May 2018; pp. 1–6.
+15.   Shi, X.; An, X.; Zhao, Q.; Liu, H.; Xia, L.; Sun, X.; Guo, Y. State-of-the-art internet of things in protected agriculture. Sensors 2019,
+      19, 1833. [CrossRef]
+16.   Kochhar, A.; Kumar, N. Wireless sensor networks for greenhouses: An end-to-end review. Comput. Electron. Agric. 2019,
+      163, 104877. [CrossRef]
+17.   van Klompenburg, T.; Kassahun, A.; Catal, C. Crop yield prediction using machine learning: A systematic literature review.
+      Comput. Electron. Agric. 2020, 177, 105709. [CrossRef]
+18.   Lowe, A.; Harrison, N.; French, A.P. Hyperspectral image analysis techniques for the detection and classification of the early
+      onset of plant disease and stress. Plant Methods 2017, 13, 1–12. [CrossRef]
+19.   Mishra, P.; Asaari, M.S.M.; Herrero-Langreo, A.; Lohumi, S.; Diezma, B.; Scheunders, P. Close range hyperspectral imaging of
+      plants: A review. Biosyst. Eng. 2017, 164, 49–67. [CrossRef]
+20.   Adão, T.; Hruška, J.; Pádua, L.; Bessa, J.; Peres, E.; Morais, R.; Sousa, J.J. Hyperspectral Imaging: A review on uav-based sensors,
+      data processing and applications for agriculture and forestry. Remote Sens. 2017, 9, 1110. [CrossRef]
+21.   Basnet, B.; Bang, J. The state-of-the-art of knowledge-intensive agriculture: A review on applied sensing systems and data
+      analytics. J. Sensors 2018, 2018, 1–13. [CrossRef]
+22.   Maggiori, E.; Plaza, A.; Tarabalka, Y. Models for hyperspectral image analysis: From unmixing to object-based classification. In
+      Mathematical Models for Remote Sensing Image Processing; Moser, G., Zerubia, J., Eds.; Springer: Cham, Switzerland, 2017; pp. 37–80.
+23.   Kamilaris, A.; Prenafeta-Boldú, F.X. Deep learning in agriculture: A survey. Comput. Electron. Agric. 2018, 147, 70–90. [CrossRef]
+24.   Mukherjee, A.; Misra, S.; Raghuwanshi, N.S. A survey of unmanned aerial sensing solutions in precision agriculture. J. Netw.
+      Comput. Appl. 2019, 148, 102461. [CrossRef]
+25.   Barbedo, J.G.A. Detection of nutrition deficiencies in plants using proximal images and machine learning: A review. Comput.
+      Electron. Agric. 2019, 162, 482–492. [CrossRef]
+26.   Barbedo, J. A Review on the use of unmanned aerial vehicles and imaging sensors for monitoring and assessing plant stresses.
+      Drones 2019, 3, 40. [CrossRef]
+27.   Sishodia, R.P.; Ray, R.L.; Singh, S.K. Applications of remote sensing in precision agriculture: A review. Remote Sens. 2020, 12, 3136.
+      [CrossRef]
+28.   Zhang, C.; Marzougui, A.; Sankaran, S. High-resolution satellite imagery applications in crop phenotyping: An over-view.
+      Comput. Electron. Agric. 2020, 175, 105584. [CrossRef]
+Remote Sens. 2021, 13, 2486                                                                                                           20 of 24
+
+
+
+
+29.   Radočaj, D.; Obhod̄aš, J.; Jurišić, M.; Gašparović, M. Global open data remote sensing satellite missions for land monitoring and
+      conservation: A review. Land 2020, 9, 402. [CrossRef]
+30.   Khanal, S.; Kc, K.; Fulton, J.; Shearer, S.; Ozkan, E. Remote sensing in agriculture—Accomplishments, limitations, and opportuni-
+      ties. Remote Sens. 2020, 12, 3783. [CrossRef]
+31.   Singh, V.; Sharma, N.; Singh, S. A review of imaging techniques for plant disease detection. Artif. Intell. Agric. 2020, 4, 229–242.
+      [CrossRef]
+32.   Liu, H.; Bruning, B.; Garnett, T.; Berger, B. Hyperspectral imaging and 3D technologies for plant phenotyping: From satellite to
+      close-range sensing. Comput. Electron. Agric. 2020, 175, 105621. [CrossRef]
+33.   Hasan, R.I.; Yusuf, S.M.; Alzubaidi, L. Review of the state of the art of deep learning for plant diseases: A broad analysis and
+      discussion. Plants 2020, 9, 1302. [CrossRef]
+34.   Messina, G.; Modica, G. Applications of UAV thermal imagery in precision agriculture: State of the art and future research
+      outlook. Remote Sens. 2020, 12, 1491. [CrossRef]
+35.   Yang, C. remote sensing and precision agriculture technologies for crop disease detection and management with a practical
+      application example. Engineering 2020, 6, 528–532. [CrossRef]
+36.   Ghamisi, P.; Gloaguen, R.; Atkinson, P.M.; Benediktsson, J.A.; Rasti, B.; Yokoya, N.; Wang, Q.; Hofle, B.; Bruzzone, L.; Bovolo, F.;
+      et al. Multisource and multitemporal data fusion in remote sensing: A comprehensive review of the state of the art. IEEE Geosci.
+      Remote Sens. Mag. 2019, 7, 6–39. [CrossRef]
+37.   Ding, W.; Jing, X.; Yan, Z.; Yang, L.T. A survey on data fusion in internet of things: Towards secure and privacy-preserving fusion.
+      Inf. Fusion 2019, 51, 129–144. [CrossRef]
+38.   Visconti, P.; de Fazio, R.; Velázquez, R.; Del-Valle-Soto, C.; Giannoccaro, N.I. Multilevel data fusion for the internet of things in
+      smart agriculture. Comput. Electron. Agric. 2020, 171, 105309.
+39.   Pantazi, X.E.; Moshou, D.; Bochtis, D. Intelligent Data Mining and Fusion Systems in Agriculture; Academis Press: Cambridge, MA,
+      USA, 2020.
+40.   Bogue, R. Sensors key to advances in precision agriculture. Sens. Rev. 2017, 37, 1–6. [CrossRef]
+41.   Jin, X.; Jie, L.; Wang, S.; Qi, H.J.; Li, S.W. Classifying wheat hyperspectral pixels of healthy heads and fusarium head blight disease
+      using a deep neural network in the wild Field. Remote Sens. 2018, 10, 395. [CrossRef]
+42.   Picon, A.; Seitz, M.; Alvarez-Gila, A.; Mohnke, P.; Ortiz-Barredo, A.; Echazarra, J. Crop conditional Convolutional neural networks
+      for massive multi-crop plant disease classification over cell phone acquired images taken on real field conditions. Comput. Electron.
+      Agric. 2019, 167, 105093. [CrossRef]
+43.   Park, D.-H.; Kang, B.-J.; Cho, K.-R.; Shin, C.-S.; Cho, S.-E.; Park, J.-W.; Yang, W.-M. A Study on greenhouse automatic control
+      system based on wireless sensor network. Wirel. Pers. Commun. 2009, 56, 117–130. [CrossRef]
+44.   Bajwa, S.G.; Rupe, J.C.; Mason, J. Soybean Disease monitoring with leaf reflectance. Remote Sens. 2017, 9, 127. [CrossRef]
+45.   Behmann, J.; Steinrücken, J.; Plümer, L. Detection of early plant stress responses in hyperspectral images. ISPRS J. Photogramm.
+      Remote Sens. 2014, 93, 98–111. [CrossRef]
+46.   Es-Saady, Y.; El Massi, I.; El Yassa, M.; Mammass, D.; Benazoun, A. Automatic recognition of plant leaves diseases based on
+      serial combination of two SVM classifiers. In Proceedings of the 2016 International Conference on Electrical and Information
+      Technologies (ICEIT), Tangiers, Morocco, 4–7 May 2016; pp. 561–566.
+47.   El Massi, I.; Es-Saady, Y.; El Yassa, M.; Mammass, D.; Benazoun, A. Automatic recognition of the damages and symptoms on plant
+      leaves using parallel combination of two classifiers. In Proceedings of the 13th Computer Graphics, Imaging and Visualization
+      (CGiV 2016), Beni Mellal, Morocco, 29 March–1 April 2016; pp. 131–136.
+48.   Prajapati, H.B.; Shah, J.P.; Dabhi, V.K. Detection and classification of rice plant diseases. Intell. Decis. Technol. 2017, 11, 357–373.
+      [CrossRef]
+49.   El Massi, I.; Es-Saady, Y.; El Yassa, M.; Mammass, D. Combination of multiple classifiers for automatic recognition of diseases and
+      damages on plant leaves. Signal Image Video Process. 2021, 15, 789–796. [CrossRef]
+50.   Atherton, D.; Choudhary, R.; Watson, D. Hyperspectral remote sensing for advanced detection of early blight (Alternaria solani)
+      disease in potato (Solanum tuberosum) plants prior to visual disease symptoms. In Proceedings of the 2017 ASABE Annual
+      International Meeting, Washington, DC, USA, 16–19 July 2017; pp. 1–10.
+51.   Xie, C.; Yang, C.; He, Y. Hyperspectral imaging for classification of healthy and gray mold diseased tomato leaves with different
+      infection severities. Comput. Electron. Agric. 2017, 135, 154–162. [CrossRef]
+52.   Bebronne, R.; Carlier, A.; Meurs, R.; Leemans, V.; Vermeulen, P.; Dumont, B.; Mercatoris, B. In-field proximal sensing of septoria
+      tritici blotch, stripe rust and brown rust in winter wheat by means of reflectance and textural features from multispectral imagery.
+      Biosyst. Eng. 2020, 197, 257–269. [CrossRef]
+53.   Brahimi, M.; Arsenovic, M.; Laraba, S.; Sladojevic, S.; Boukhalfa, K.; Moussaoui, A. Deep Learning for Plant Diseases: Detection
+      and Saliency Map Visualisation. In Human and Machine Learning, Human–Computer Interaction Series; Springer: Cham, Switzerland,
+      2018; pp. 93–117.
+54.   Hughes, D.; Salathé, M. An open access repository of images on plant health to enable the development of mobile disease
+      diagnostics. arXiv 2015, arXiv:1511.08060v2.
+55.   Atila, Ü.; Uçar, M.; Akyol, K.; Uçar, E. Plant leaf disease classification using EfficientNet deep learning model. Ecol. Inform. 2021,
+      61, 101182. [CrossRef]
+Remote Sens. 2021, 13, 2486                                                                                                           21 of 24
+
+
+
+
+56.   Ouhami, M.; Es-Saady, Y.; El Hajji, M.; Hafiane, A.; Canals, R.; El Yassa, M. Deep transfer learning models for tomato disease
+      detection. Image Signal Process ICISP 2020, 12119, 65–73. [CrossRef]
+57.   Elhassouny, A.; Smarandache, F. Smart mobile application to recognize tomato leaf diseases using Convolutional Neural
+      Networks. In Proceedings of the 2019 International Conference of Computer Science and Renewable Energies (ICCSRE), Agadir,
+      Morocco, 22–24 July 2019; pp. 1–4.
+58.   Bi, C.; Wang, J.; Duan, Y.; Fu, B.; Kang, J.-R.; Shi, Y. MobileNet based apple leaf diseases identification. Mob. Netw. Appl. 2020, 1–9.
+      [CrossRef]
+59.   Barman, U.; Choudhury, R.D.; Sahu, D.; Barman, G.G. Comparison of convolution neural networks for smartphone image based
+      real time classification of citrus leaf disease. Comput. Electron. Agric. 2020, 177, 105661. [CrossRef]
+60.   Xie, C.; Shao, Y.; Li, X.; He, Y. Detection of early blight and late blight diseases on tomato leaves using hyperspectral imaging. Sci.
+      Rep. 2015, 5, 16564. [CrossRef]
+61.   Zhu, H.; Chu, B.; Zhang, C.; Liu, F.; Jiang, L.; He, Y. Hyperspectral imaging for presymptomatic detection of tobacco disease with
+      successive projections algorithm and machine-learning classifiers. Sci. Rep. 2017, 7, 1–12. [CrossRef] [PubMed]
+62.   Wang, X.; Zhang, M.; Zhu, J.; Geng, S. Spectral prediction of Phytophthora infestans infection on tomatoes using artificial neural
+      network (ANN). Int. J. Remote Sens. 2008, 29, 1693–1706. [CrossRef]
+63.   Maimaitijiang, M.; Sagan, V.; Sidike, P.; Hartling, S.; Esposito, F.; Fritschi, F.B. Soybean yield prediction from UAV using
+      multimodal data fusion and deep learning. Remote Sens. Environ. 2020, 237, 111599. [CrossRef]
+64.   Milioto, A.; Lottes, P.; Stachniss, C. Real-time blob-wise sugar beets vs weeds classification for monitoring fields using convolu-
+      tional neural networks. ISPRS Ann. Photogramm. Remote Sens. Spat. Inf. Sci. 2017, 4, 41–48. [CrossRef]
+65.   Bah, M.D.; Hafiane, A.; Canals, R. Weeds detection in UAV imagery using SLIC and the hough transform. In Proceedings of
+      the 2017 Seventh International Conference on Image Processing Theory, Tools and Applications (IPTA), Montreal, QC, Canada,
+      28 November–1 December 2017; pp. 1–6.
+66.   MacDonald, S.L.; Staid, M.; Staid, M.; Cooper, M.L. Remote hyperspectral imaging of grapevine leafroll-associated virus 3 in
+      cabernet sauvignon vineyards. Comput. Electron. Agric. 2016, 130, 109–117. [CrossRef]
+67.   Albetis, J.; Duthoit, S.; Guttler, F.; Jacquin, A.; Goulard, M.; Poilvé, H.; Féret, J.-B.; Dedieu, G. Detection of Flavescence dorée
+      grapevine disease using unmanned aerial vehicle (uav) multispectral imagery. Remote Sens. 2017, 9, 308. [CrossRef]
+68.   Tetila, E.C.; Machado, B.B.; Belete, N.A.D.S.; Guimaraes, D.A.; Pistori, H. Identification of soybean foliar diseases using unmanned
+      aerial vehicle images. IEEE Geosci. Remote Sens. Lett. 2017, 14, 2190–2194. [CrossRef]
+69.   Su, J.; Liu, C.; Coombes, M.; Hu, X.; Wang, C.; Xu, X.; Li, Q.; Guo, L.; Chen, W.-H. Wheat yellow rust monitoring by learning from
+      multispectral UAV aerial imagery. Comput. Electron. Agric. 2018, 155, 157–166. [CrossRef]
+70.   Abdulridha, J.; Batuman, O.; Ampatzidis, Y. UAV-based remote sensing technique to detect citrus canker disease uti-lizing
+      hyperspectral imaging and machine learning. Remote Sens. 2019, 11, 1373. [CrossRef]
+71.   Lan, Y.; Huang, Z.; Deng, X.; Zhu, Z.; Huang, H.; Zheng, Z.; Lian, B.; Zeng, G.; Tong, Z. Comparison of machine learning methods
+      for citrus greening detection on UAV multispectral images. Comput. Electron. Agric. 2020, 171, 105234. [CrossRef]
+72.   Abdulridha, J.; Ampatzidis, Y.; Roberts, P.; Kakarla, S.C. Detecting powdery mildew disease in squash at different stages using
+      UAV-based hyperspectral imaging and artificial intelligence. Biosyst. Eng. 2020, 197, 135–148. [CrossRef]
+73.   Poblete, T.; Camino, C.; Beck, P.S.A.; Hornero, A.; Kattenborn, T.; Saponari, M.; Boscia, D.; Navas-Cortes, J.A.; Zarco-Tejada, P.J.
+      Detection of Xylella fastidiosa infection symptoms with airborne multispectral and thermal imagery: Assessing bandset reduction
+      performance from hyperspectral analysis. ISPRS J. Photogramm. Remote Sens. 2020, 162, 27–40. [CrossRef]
+74.   Duarte-Carvajalino, J.M.; Alzate, D.F.; Ramirez, A.A.; Santa-Sepulveda, J.D.; Fajardo-Rojas, A.E.; Soto-Suárez, M. Evaluating late
+      blight severity in potato crops using unmanned aerial vehicles and machine learning algorithms. Remote Sens. 2018, 10, 1513.
+      [CrossRef]
+75.   Wu, H.; Wiesner-Hanks, T.; Stewart, E.L.; DeChant, C.; Kaczmar, N.; Gore, M.A.; Nelson, R.J.; Lipson, H. Autonomous detection
+      of plant disease symptoms directly from aerial imagery. Plant Phenome J. 2019, 2, 1–9. [CrossRef]
+76.   Kerkech, M.; Hafiane, A.; Canals, R. Deep leaning approach with colorimetric spaces and vegetation indices for vine diseases
+      detection in UAV images. Comput. Electron. Agric. 2018, 155, 237–243. [CrossRef]
+77.   Zhang, X.; Han, L.; Dong, Y.; Shi, Y.; Huang, W.; Han, L.; González-Moreno, P.; Ma, H.; Ye, H.; Sobeih, T. A deep learning-based
+      approach for automated yellow rust disease detection from high-resolution hyper-spectral UAV images. Remote Sens. 2019,
+      13, 1554.
+78.   Hu, G.; Yin, C.; Wan, M.; Zhang, Y.; Fang, Y. Recognition of diseased Pinus trees in UAV images using deep learning and AdaBoost
+      classifier. Biosyst. Eng. 2020, 194, 138–151. [CrossRef]
+79.   Kerkech, M.; Hafiane, A.; Canals, R. Vine disease detection in UAV multispectral images using optimized image registration and
+      deep learning segmentation approach. Comput. Electron. Agric. 2020, 174, 105446. [CrossRef]
+80.   Kerkech, M.; Hafiane, A.; Canals, R. VddNet: Vine disease detection network based on multispectral images and depth map.
+      Remote Sens. 2020, 12, 3305. [CrossRef]
+81.   Santoso, H.; Gunawan, T.; Jatmiko, R.H.; Darmosarkoro, W.; Minasny, B. Mapping and identifying basal stem rot disease in oil
+      palms in North Sumatra with QuickBird imagery. Precis. Agric. 2011, 12, 233–248. [CrossRef]
+82.   Zhu, X.; Cai, F.; Tian, J.; Williams, T.K.A. Spatiotemporal fusion of multisource remote sensing data: Literature survey, taxonomy,
+      principles, applications, and future directions. Remote Sens. 2018, 10, 527. [CrossRef]
+Remote Sens. 2021, 13, 2486                                                                                                      22 of 24
+
+
+
+
+83.  Shao, Z.; Cai, J.; Fu, P.; Hu, L.; Liu, T. Deep learning-based fusion of Landsat-8 and Sentinel-2 images for a harmonized surface
+     reflectance product. Remote Sens. Environ. 2019, 235, 111425. [CrossRef]
+84. Maggiori, E.; Tarabalka, Y.; Charpiat, G.; Alliez, P. Convolutional neural networks for large-scale remote-sensing image classifica-
+     tion. IEEE Trans. Geosci. Remote Sens. 2017, 55, 645–657. [CrossRef]
+85. El Mendili, L.; Puissant, A.; Chougrad, M.; Sebari, I. Towards a multi-temporal deep learning approach for mapping urban fabric
+     using sentinel 2 images. Remote Sens. 2020, 12, 423. [CrossRef]
+86. Wang, Y.; Gu, L.; Li, X.; Ren, R. building extraction in multitemporal high-resolution remote sensing imagery using a multifeature
+     lstm network. IEEE Geosci. Remote Sens. Lett. 2020, 1–5. [CrossRef]
+87. Waldner, F.; Diakogiannis, F.I. Deep learning on edge: Extracting field boundaries from satellite images with a convolutional
+     neural network. Remote Sens. Environ. 2020, 245, 111741. [CrossRef]
+88. Karim, Z.; Van Zyl, T. Deep Learning and Transfer Learning applied to Sentinel-1 DInSAR and Sentinel-2 optical satellite imagery
+     for change detection. In Proceedings of the 2020 International SAUPEC/RobMech/PRASA Conference 2020, Cape Town, South
+     Africa, 29–31 January 2020; pp. 1–7.
+89. Donovan, S.D.; MacLean, D.A.; Zhang, Y.; Lavigne, M.B.; Kershaw, J.A. Evaluating annual spruce budworm defoliation using
+     change detection of vegetation indices calculated from satellite hyperspectral imagery. Remote Sens. Environ. 2020, 253, 112204.
+     [CrossRef]
+90. Yuan, L.; Pu, R.; Zhang, J.; Wang, J.; Yang, H. Using high spatial resolution satellite imagery for mapping powdery mildew at a
+     regional scale. Precis. Agric. 2016, 17, 332–348. [CrossRef]
+91. Liu, M.; Wang, T.; Skidmore, A.K.; Liu, X. Heavy metal-induced stress in rice crops detected using multi-temporal Sentinel-2
+     satellite images. Sci. Total Environ. 2018, 637, 18–29. [CrossRef]
+92. Zheng, Q.; Huang, W.; Cui, X.; Shi, Y.; Liu, L. New spectral index for detecting wheat yellow rust using sentinel-2 multispectral
+     imagery. Sensors 2018, 18, 4040. [CrossRef]
+93. Ma, H.; Huang, W.; Jing, Y.; Yang, C.; Han, L.; Dong, Y.; Ye, H.; Shi, Y.; Zheng, Q.; Liu, L.; et al. Integrating growth and
+     environmental parameters to discriminate powdery mildew and aphid of winter wheat using bi-temporal Landsat-8 imagery.
+     Remote Sens. 2019, 11, 846. [CrossRef]
+94. Miranda, J.D.R.; Alves, M.D.C.; Pozza, E.A.; Neto, H.S. Detection of coffee berry necrosis by digital image processing of landsat 8
+     oli satellite imagery. Int. J. Appl. Earth Obs. Geoinf. 2020, 85, 101983. [CrossRef]
+95. Bi, L.; Hu, G.; Raza, M.; Kandel, Y.; Leandro, L.; Mueller, D. A gated recurrent units (gru)-based model for early detection of
+     soybean sudden death syndrome through time-series satellite imagery. Remote Sens. 2020, 12, 3621. [CrossRef]
+96. Pelletier, C.; Webb, G.I.; Petitjean, F. Temporal convolutional neural network for the classification of satellite image time series.
+     Remote Sens. 2019, 11, 523. [CrossRef]
+97. Yashodha, G.; Shalini, D. An integrated approach for predicting and broadcasting tea leaf disease at early stage using IoT with
+     machine learning—A review. Mater. Today Proc. 2021, 37, 484–488. [CrossRef]
+98. Díaz, S.E.; Pérez, J.C.; Mateos, A.C.; Marinescu, M.C.; Guerra, B.B. A novel methodology for the monitoring of the agricultural
+     production process based on wireless sensor networks. Comput. Electron. Agric. 2011, 76, 252–265. [CrossRef]
+99. Ojha, T.; Misra, S.; Raghuwanshi, N.S. Wireless sensor networks for agriculture: The state-of-the-art in practice and future
+     challenges. Comput. Electron. Agric. 2015, 118, 66–84. [CrossRef]
+100. Rodríguez, S.; Gualotuña, T.; Grilo, C. A System for the monitoring and predicting of data in precision. Procedia Comput. Sci. 2017,
+     121, 306–313. [CrossRef]
+101. Tripathy, A.K.; Adinarayana, J.; Merchant, S.N.; Desai, U.B.; Ninomiya, S.; Hirafuji, M.; Kiura, T. Data mining and wireless sensor
+     network for groundnut pest/disease interaction and predictions—A preliminary study. Int. J. Comput. Inf. Syst. Ind. Manag. Appl.
+     2013, 5, 427–436.
+102. Khattab, A.; Habib, S.E.; Ismail, H.; Zayan, S.; Fahmy, Y.; Khairy, M.M. An IoT-based cognitive monitoring system for early plant
+     disease forecast. Comput. Electron. Agric. 2019, 166, 105028. [CrossRef]
+103. Trilles, S.; Torres-Sospedra, J.; Belmonte, Ó.; Zarazaga-Soria, F.J.; González-Pérez, A.; Huerta, J. Development of an open
+     sensorized platform in a smart agriculture context: A vineyard support system for monitoring mildew disease. Sustain. Comput.
+     Inform. Syst. 2020, 28, 100309. [CrossRef]
+104. Patil, S.S.; Thorat, S.A. Early detection of grapes diseases using machine learning and IoT. In Proceedings of the 2016 Second
+     International Conference on Cognitive Computing and Information Processing (CCIP), Mysuru, India, 12–13 August 2016;
+     pp. 1–5.
+105. Wani, H.; Ashtankar, N. An appropriate model predicting pest/diseases of crops using machine learning algorithms. In Proceed-
+     ings of the 2017 4th International Conference on Advanced Computing and Communication Systems (ICACCS), Coimbatore,
+     India, 6–7 January 2017; pp. 1–4.
+106. Materne, N.; Inoue, M. IoT monitoring system for early detection of agricultural pests and diseases. In Proceedings of the 12th
+     South East Asian Technical University Consortium (SEATUC), Yogyakarta, Indonesia, 12–13 March 2018; pp. 1–5.
+107. Khan, S.; Narvekar, M. Disorder detection of tomato plant (Solanum lycopersicum) using IoT and machine learning. J. Physics. Conf.
+     Ser. 2020, 1432. [CrossRef]
+108. Chen, P.; Xiao, Q.; Zhang, J.; Xie, C.; Wang, B. Occurrence prediction of cotton pests and diseases by bidirectional long short-term
+     memory networks with climate and atmosphere circulation. Comput. Electron. Agric. 2020, 176, 105612. [CrossRef]
+Remote Sens. 2021, 13, 2486                                                                                                       23 of 24
+
+
+
+
+109. Wiesner-Hanks, T.; Stewart, E.L.; Kaczmar, N.; DeChant, C.; Wu, H.; Nelson, R.J.; Lipson, H.; Gore, M.A. Image set for deep
+     learning: Field images of maize annotated with disease symptoms. BMC Res. Notes 2018, 11, 440. [CrossRef] [PubMed]
+110. El Massi, I.; Es-saady, Y.; El Yassa, M.; Mammass, D.; Benazoun, A. Hybrid combination of multiple svm classifiers for automatic
+     recognition of the damages and symptoms on plant leaves. In Image and Signal Processing, ICISP 2016; Lecture Notes in Computer
+     Science; Springer: Cham, Switzerland; Volume 9680. [CrossRef]
+111. Zhao, Y.; Liu, L.; Xie, C.; Wang, R.; Wang, F.; Bu, Y.; Zhang, S. An effective automatic system deployed in agricultural internet of
+     things using multi-context fusion network towards crop disease recognition in the wild. Appl. Soft Comput. 2020, 89, 106128.
+     [CrossRef]
+112. Bellot, D. Fusion de Données avec des Réseaux Bayésiens pour la Modélisation des Systèmes Dynamiques et son Application en
+     Télémédecine. Ph.D. Thesis, Université Henri Poincaré, Nancy, France, 2002.
+113. Lahat, D.; Adali, T.; Jutten, C. Multimodal Data Fusion: An Overview of Methods, Challenges, and Prospects. Proc. IEEE 2015,
+     103, 1449–1477. [CrossRef]
+114. Meng, T.; Jing, X.; Yan, Z.; Pedrycz, W. A survey on machine learning for data fusion. Inf. Fusion 2020, 57, 115–129. [CrossRef]
+115. Mees, O.; Eitel, A.; Burgard, W. Choosing smartly: Adaptive multimodal fusion for object detection in changing environments. In
+     Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), Daejeon, Korea, 9–14 October
+     2016; pp. 151–156.
+116. Liggins, M., II; Hall, D.; Llinas, J. Handbook of Multisensor Data Fusion: Theory and Practice; CRC Press: Boca Raton, FL, USA, 2009.
+117. Pavlin, G.; de Oude, P.; Maris, M.; Nunnink, J.; Hood, T. A multi-agent systems approach to distributed bayesian in-formation
+     fusion. Inf. Fusion 2010, 11, 267–282. [CrossRef]
+118. Albeiruti, N.; Al Begain, K. Using hidden markov models to build behavioural models to detect the onset of dementia. In
+     Proceedings of the 2014 Sixth International Conference on Computational Intelligence, Communication Systems and Networks,
+     Tetovo, Macedonia, 27–29 May 2014; pp. 18–26.
+119. Smith, D.; Singh, S. Approaches to multisensor data fusion in target tracking: A Survey. IEEE Trans. Knowl. Data Eng. 2006, 18,
+     1696–1710. [CrossRef]
+120. Wu, H.; Siegel, M.; Stiefelhagen, R.; Yang, J. Sensor fusion using dempster-shafer theory. In Proceedings of the IMTC/2002.
+     Proceedings of the 19th IEEE Instrumentation and Measurement Technology Conference (IEEE Cat. No.00CH37276), Anchorage,
+     AK, USA, 21–23 May 2002; pp. 7–11.
+121. Awogbami, G.; Agana, N.; Nazmi, S.; Yan, X.; Homaifar, A. An Evidence theory based multi sensor data fusion for multiclass
+     classification. In Proceedings of the 2018 IEEE International Conference on Systems, Man, and Cybernetics (SMC), Miyazaki,
+     Japan, 7–10 October 2018; pp. 1755–1760.
+122. Brulin, D. Fusion de Données Multi-Capteurs Pour L’habitat Intelligent. Ph.D. Thesis, Université d’Orléans, Orléans,
+     France, 2010.
+123. Baltrusaitis, T.; Ahuja, C.; Morency, L.P. Multimodal machine learning: A survey and taxonomy. IEEE Trans. Pattern Anal. Mach.
+     Intell. 2018, 41, 423–443. [CrossRef]
+124. Abdelmoneem, R.M.; Shaaban, E.; Benslimane, A. A survey on multi-sensor fusion techniques in iot for healthcare. In Proceedings
+     of the 2018 13th International Conference on Computer Engineering and Systems (ICCES), Cairo, Egypt, 18–19 December 2018;
+     pp. 157–162.
+125. Ramachandram, D.; Taylor, G.W. Deep Learning for Visual understanding deep multimodal learning. IEEE Signal. Process. Mag.
+     2017, 34, 96–108. [CrossRef]
+126. Pérez-Rúa, J.M.; Vielzeuf, V.; Pateux, S.; Baccouche, M.; Jurie, F. MFAS: Multimodal fusion architecture search. In Proceedings
+     of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Long Beach, CA, USA, 16–20 June 2019;
+     pp. 6966–6975.
+127. Feron, O.; Mohammad-Djafari, A. A Hidden Markov model for Bayesian data fusion of multivariate signals. J. Electron. Imaging
+     2004, 14, 1–14.
+128. Jiang, Y.; Li, T.; Zhang, M.; Sha, S.; Ji, Y. WSN-based Control System of Co2 Concentration in Greenhouse. Intell. Autom. Soft
+     Comput. 2015, 21, 285–294. [CrossRef]
+129. Jing, L.; Wang, T.; Zhao, M.; Wang, P. An adaptive multi-sensor data fusion method based on deep convolutional neural networks
+     for fault diagnosis of planetary gearbox. Sensors 2017, 17, 414. [CrossRef] [PubMed]
+130. Joze, H.R.V.; Shaban, A.; Iuzzolino, M.L.; Koishida, K. MMTM: Multimodal Transfer Module for CNN Fusion. In Proceedings
+     of the 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Seattle, WA, USA, 14–19 June 2020;
+     pp. 13286–13296.
+131. Moslem, B.; Khalil, M.; Diab, M.O.; Chkeir, A.; Marque, C.A. Multisensor data fusion approach for improving the classification
+     accuracy of uterine EMG signals. In Proceedings of the 18th IEEE International Conference Electronics Circuits, System ICECS,
+     Beirut, Lebanon, 11–14 December 2011; pp. 93–96.
+132. Zadeh, A.; Chen, M.; Poria, S.; Cambria, E.; Morency, L.-P. Tensor Fusion Network for Multimodal Sentiment Analysis. In
+     Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, Beijing, China, 17–20 September
+     2017; pp. 1103–1114.
+133. Liu, Z.; Shen, Y.; Lakshminarasimhan, V.B.; Liang, P.P.; Zadeh, A.B.; Morency, L.-P. Efficient low-rank multimodal fusion with
+     modality-specific factors. arXiv 2018, arXiv:1806.00064.
+Remote Sens. 2021, 13, 2486                                                                                                    24 of 24
+
+
+
+
+134. Liu, C.; Zoph, B.; Neumann, M.; Shlens, J.; Hua, W.; Li, L.-J.; Fei-Fei, L.; Yuille, A.; Huang, J.; Murphy, K. Progressive Neural
+     Architecture Search. In Transactions on Petri Nets and Other Models of Concurrency XV; Kounty, M., Kordon, F., Pomello, L., Eds.;
+     Springer Science and Business Media LLC: Berlin, Germany, 2018; Volume 11205, pp. 19–35.
+135. Perez-Rua, J.M.; Baccouche, M.; Pateux, S. Efficient progressive neural architecture search. arXiv arXiv:1808.00391.
+136. Bednarek, M.; Kicki, P.; Walas, K. On robustness of multi-modal fusion—Robotics perspective. Electronics 2020, 9, 1152. [CrossRef]
+137. Maimaitijiang, M.; Ghulam, A.; Sidike, P.; Hartling, S.; Maimaitiyiming, M.; Peterson, K.; Shavers, E.; Fishman, J.; Peterson, J.;
+     Kadam, S.; et al. Unmanned Aerial System (UAS)-based phenotyping of soybean using multi-sensor data fusion and extreme
+     learning machine. ISPRS J. Photogramm. Remote Sens. 2017, 134, 43–58. [CrossRef]
+138. Chu, Z.; Yu, J. An end-to-end model for rice yield prediction using deep learning fusion. Comput. Electron. Agric. 2020,
+     174, 105471. [CrossRef]
+139. Ji, S.; Zhang, C.; Xu, A.; Shi, Y.; Duan, Y. 3D convolutional neural networks for crop classification with multi-temporal remote
+     sensing images. Remote Sens. 2018, 10, 75. [CrossRef]
+140. Song, Z.; Zhang, Z.; Yang, S.; Ding, D.; Ning, J. Identifying sunflower lodging based on image fusion and deep semantic
+     segmentation with UAV remote sensing imaging. Comput. Electron. Agric. 2020, 179, 105812. [CrossRef]
+141. Maimaitijiang, M.; Sagan, V.; Sidike, P.; Daloye, A.M.; Erkbol, H.; Fritschi, F.B. Crop monitoring using satellite/uav data fusion
+     and machine learning. Remote Sens. 2020, 12, 1357. [CrossRef]
+142. Zhang, J.; Pu, R.; Yuan, L.; Huang, W.; Nie, C.; Yang, G. Integrating remotely sensed and meteorological observations to forecast
+     wheat powdery mildew at a regional scale. IEEE J. Sel. Top. Appl. Earth Obs. Remote Sens. 2014, 7, 4328–4339. [CrossRef]
+143. Selvaraj, M.G.; Vergara, A.; Montenegro, F.; Ruiz, H.A.; Safari, N.; Raymaekers, D.; Ocimati, W.; Ntamwira, J.; Tits, L.; Omondi,
+     A.B.; et al. Detection of banana plants and their major diseases through aerial images and machine learning methods: A case
+     study in DR Congo and Republic of Benin. ISPRS J. Photogramm. Remote Sens. 2020, 169, 110–124. [CrossRef]
+144. Yuan, L.; Bao, Z.; Zhang, H.; Zhang, Y.; Liang, X. Habitat monitoring to evaluate crop disease and pest distributions based on
+     multi-source satellite remote sensing imagery. Optik 2017, 145, 66–73. [CrossRef]
+145. Riskiawan, R.H. SMARF: Smart farming framework based on big data, IoT and deep learning model for plant disease detection
+     and prevention. In Proceedings of the Applied Computing to Support Industry: Innovation and Technology: First International
+     Conference, ACRIT 2019, Ramadi, Iraq, 15–16 September 2019; Revised Selected Papers. Springer: Berlin/Heidelberg, Germany,
+     2020; Volume 1174, p. 44.
+146. Huang, Y.J.; Evans, N.; Li, Z.Q.; Eckert, M.; Chèvre, A.M.; Renard, M.; Fitt, B.D. Temperature and leaf wetness duration affect
+     phenotypic expression of Rlm6-mediated resistance to Leptosphaeria maculans in Brassica napus. New Phytol. 2006, 170, 129–141.
+     [CrossRef] [PubMed]
+147. Azfar, S.; Nadeem, A.; Basit, A. Pest detection and control techniques using wireless sensor network: A review. J. Entomol. Zool.
+     Stud. 2015, 3, 92–99.
+

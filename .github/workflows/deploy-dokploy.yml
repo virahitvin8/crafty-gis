@@ -1,9 +1,9 @@
 name: Deploy to Dokploy
 
-# Auto-deploy FarmHealth to your Dokploy instance whenever code lands on main.
+# Auto-deploy Crafty GIS to your Dokploy instance whenever code lands on main.
 #
 # ── ONE-TIME SETUP ─────────────────────────────────────────────────────────
-# 1. Dokploy dashboard → your `farmhealth` application → Settings → Advanced
+# 1. Dokploy dashboard → your `crafty_gis` application → Settings → Advanced
 #    → copy the **Deploy Hook / Deploy Token** URL
 #    (looks like: https://dokploy.yourdomain.com/api/deploy/<random-token>)
 # 2. GitHub repo → Settings → Secrets and variables → Actions → add:
@@ -84,4 +84,4 @@ jobs:
           fi
 
       - name: Report
-        run: echo "Deploy triggered — watch it at your Dokploy dashboard → farmhealth → Deployments."
+        run: echo "Deploy triggered — watch it at your Dokploy dashboard → crafty_gis → Deployments."

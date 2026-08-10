@@ -1,4 +1,4 @@
-# 📋 FarmHealth Open-Source Migration — Complete Changes
+# 📋 Crafty GIS Open-Source Migration — Complete Changes
 
 ## 🎯 Objective
 
@@ -217,11 +217,11 @@ Replace external paid APIs with **open-source, self-hosted alternatives** as **P
 # 1. Deploy authentik
 docker compose -f authentik/docker-compose.yml up -d
 
-# 2. Configure FarmHealth
+# 2. Configure Crafty GIS
 localStorage.setItem('fh_authentik_issuer', 'https://auth.yourdomain.com');
-localStorage.setItem('fh_authentik_client_id', 'farmhealth');
+localStorage.setItem('fh_authentik_client_id', 'crafty_gis');
 
-# 3. Start FarmHealth
+# 3. Start Crafty GIS
 docker-compose up -d
 
 # Result: authentik (PRIMARY) + Ollama (PRIMARY) + GEE (PRIMARY)

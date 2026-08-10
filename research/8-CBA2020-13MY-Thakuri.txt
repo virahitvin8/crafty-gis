@@ -1,0 +1,1628 @@
+                                                                                                                          Review
+    APN Science Bulletin
+2025, Volume 15, Issue 1, 98–122, e-ISSN 2522-7971
+
+
+
+
+Integrating geospatial technologies in climate-smart agriculture
+planning and management: A review focused on South Asia
+
+Sudeep Thakuri a,b ∗       , Madhav Adhikari a       , Sonam Tashi c   , Pushpa Raj Acharya b           , Raju Chauhan d                ,
+                     b                               e                          f
+Bishnu Maharjan           , Pashupati Chaudhary          , Kamal Prasad Aryal       , Madan Lall Shrestha g
+
+
+                                                                                        a Central Department of Environmental
+
+     ABSTRACT                                                                           Science, Tribhuvan University, Kirtipur
+                                                                                        44613, Nepal
+     Climate change poses a signiﬁcant challenge to global food secu-                   b Graduate School of Science and Technology,
+
+     rity and agricultural sustainability, making innovative solutions                  Mid-West University, Birendranagar 21700,
+
+     essential. Integrating geospatial technologies into agricultural                   Nepal
+                                                                                        c College of Natural Resources, Royal
+     planning and management provides better opportunities to advance                   University of Bhutan, Lobesa 14001, Bhutan
+     Climate-Smart Agriculture (CSA). This review examines the role of                  d Department of Environmental Science,
+
+                                                                                        Patan Multiple Campus, Tribhuvan
+     geospatial technologies, such as Geographic Information Systems
+                                                                                        University, Lalitpur 44700, Nepal
+     (GIS), Remote Sensing (RS), and Global Navigation Satellite System                 e Asian Disaster Preparedness Center,
+
+     (GNSS), in enhancing decision-making, optimising resource use,                     Phyathai Bangkok 10400, Thailand
+                                                                                        f International Centre for Integrated
+     and building resilience. Spatial Data Infrastructures (SDIs) facilitate
+                                                                                        Mountain Development, Lalitpur 44700,
+     the exchange of information and enhance preventive and emergency                   Nepal
+     plans in agriculture. Farmers can engage in the process through                    g Nepal Academy of Science and Technology,
+
+                                                                                        Khumaltar, Nepal
+     Volunteered Geographic Information (VGI) applications. Case stud-
+                                                                                        ∗ Corresponding author.
+                             .
+
+
+     ies from South Asia demonstrate how geospatial data and tools
+                                                                                        Email: sudeep.thakuri@cdes.tu.edu.np
+     facilitate climate risk assessment, crop modelling, and precision
+     agriculture. Real-time data monitoring and Early Warning Systems
+     (EWSs) manage extreme weather events and adapt to changing
+     climatic conditions. Integrating geospatial technologies in CSA                    © The authors 2025
+
+     enhances productivity and proﬁtability, contributing to sustainable                LICENCE This work is licensed under a
+                                                                                        Creative Commons Attribution-
+     and resilient agriculture in the face of a changing climate. This                  NonCommercial 4.0 International License.
+     article underscores the need for continued research and investment
+                                                                                        DOI 10.30852/sb.2025.2977
+     in geospatial technologies to support CSA practices, ensuring food
+                                                                                        RECEIVED 02 February 2024
+     security in a warming world.                                                       PUBLISHED (HTML) 01 November 2025
+                                                                                        PUBLISHED (PDF) 01 November 2025
+
+                                                                                        CITATION Thakuri, S., Adhikari, M., Tashi,
+                                                                                        S., Acharya P, R., Chauhan, R., Maharjan, B.,
+                                                                                        Chaudhary, P., Aryal Kamal, P., & Shrestha, M.
+                                                                                        L. (2025). Integrating geospatial technologies
+                                                                                        in climate-smart agriculture planning and
+                                                                                        management: A review focused on South Asia.
+                                                                                        APN Science Bulletin, 15(1), 98–122.
+.                                                                                       https://doi.org/10.30852/sb.2025.2977
+
+
+
+     KEYWORDS CLIMATE-SMART AGRICULTURE, VOLUNTEERED GEOGRAPHIC INFORMATION,
+     SPATIAL DATA INFRASTRUCTURE, REMOTE SENSING
+
+
+
+
+                                                             98
+                                                                  APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+     HIGHLIGHTS
+
+           Geospatial technologies are vital for data-driven precision agriculture practices
+
+
+
+
+                                        .
+           CSA strategies can leverage geospatial technologies to mitigate climate change
+
+           Need to address challenges and opportunities for emerging technologies adoption
+
+.
+
+
+
+1. INTRODUCTION                                                The global disruption of traditional agriculture
+                                                           due to climate change and its resulting impact
+    Climate change has emerged as a paramount
+                                                           on food security underscores the essential role
+global challenge, signiﬁcantly impacting agriculture
+                                                           of geospatial technologies like RS and GIS in ad-
+and food security in recent decades (Shiferaw et al.,
+                                                           dressing these challenges (Altieri & Nicholls, 2017;
+2013). South Asia, including Nepal, Bhutan and Pak-
+                                                           Thakur et al., 2017). These technologies signiﬁ-
+istan, is particularly vulnerable to the adverse effects
+                                                           cantly transform decision-making and resource
+of climate change due to its agrarian economies and
+                                                           optimisation by enabling informed choices through
+geographical susceptibilities (Miyan, 2015). Agri-
+                                                           precise mapping and monitoring, thereby fostering
+cultural planning is complicated in mountainous
+                                                           sustainable agricultural practices (Erskine et al.,
+regions like Nepal, Bhutan and Pakistan due to
+                                                           2013; Shaﬁ et al., 2019).
+common issues like melting glaciers, shifting water
+                                                               On the contrary, geospatial tools offer the ability
+tables, irregular rainfall patterns, and degraded
+                                                           to gather, examine and display spatial data that are
+soil (Bhusal et al., 2016; Molden et al., 2022; Tariq
+                                                           essential for understanding agricultural systems
+et al., 2021). Therefore, developing strategies that
+                                                           under changing climatic conditions. Within the
+are successful requires an understanding of these
+                                                           framework of CSA, these technologies play a signif-
+local difficulties.
+                                                           icant important role in supporting its three pillars:
+    Insights from Nepal, Bhutan and Pakistan offer
+                                                           improving productivity through precision farming
+valuable lessons for the entire region, empha-
+                                                           and crop monitoring; strengthening adaptation by
+sising a collaborative approach to address global
+                                                           enabling early warning systems, land-use mapping
+climate change impacts on agriculture. By exploring
+                                                           and water resource management; and contributing
+geospatial technologies in smart agriculture, the
+                                                           to mitigation through carbon monitoring and sus-
+report discusses how lessons learned can beneﬁt            tainable land-use planning (Altieri & Nicholls, 2017;
+South Asia and contribute to global efforts in sus-        Malinas et al., 2025; Shaﬁ et al., 2019).
+tainable and climate-resilient agriculture (CRA). In           Spatial Data Infrastructures (SDIs) are essential
+the challenging landscapes of Nepal, Bhutan and            for facilitating data sharing in agriculture, requir-
+Pakistan, understanding local intricacies is crucial       ing active participation from organisations and
+for effective agricultural planning. Climate Smart         governments to establish them for information
+Agriculture (CSA) is a comprehensive approach              exchange and emergency planning (Rahman &
+addressing climate change challenges in the agricul-       Szabó, 2020; Vancauwenberghe et al., 2014). A co-
+tural sector (Chandra et al., 2018). This study focuses    operative approach to agricultural decision-making
+on integrating geospatial technologies into CSA            is encouraged by involving farmers through the Vol-
+planning in South Asian countries, highlighting its        unteered Geographic Information (VGI) applications
+transformative potential. Geospatial technologies,         (Corbett, 2013; Haworth et al., 2018).
+including Geographic Information Systems (GIS),                The study presents regional studies from South
+Remote Sensing (RS), and Global Navigation Satel-          Asian countries, demonstrating successful appli-
+lite System (GNSS), play a vital role in assessing and     cations of geospatial data in climate risk assess-
+managing agricultural systems (Senanayake et al.,          ment and enhancing decision-making in precision
+2020). Their integration in CSA planning offers a          agriculture (PA). Real-time monitoring and Early
+revolutionary perspective for CRA in South Asia.           Warning Systems (EWSs), facilitated by geospatial
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                           99
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+     technologies, enhance resilience to climate-related       to their dependence on agriculture (Lal, 2011). In
+     challenges, contributing to sustainable agriculture       response to these challenges, there is a growing
+     (Agbehadji et al., 2023; Girotto et al., 2023).           interest in integrating geospatial technologies into
+         While the signiﬁcance of geospatial technolo-         CSA planning and management (Barasa et al., 2021).
+     gies is widely acknowledged, a comprehensive un-              To improve agricultural practices and boost
+     derstanding of their applications is lacking in South     productivity, geospatial technologies are essential
+     Asian countries (Herold & Sawada, 2012). This re-         (Pandey & Pandey, 2023). This technique utilises
+     search aims to ﬁll this gap by exploring geospatial       remotely sensed data and imagery acquired by
+     technology integration in CSA in Nepal, Bhutan            GPS-tagged drones, satellites and aerial platforms.
+     and Pakistan, providing insights for policymakers,        This technique makes it simple to map and track
+     practitioners and researchers. The study provides         crop and soil conditions (Pandey & Pandey, 2023).
+     region-speciﬁc perspectives into the global dis-
+                                                               3.1.1. Remote sensing and GIS applications
+     course on sustainable agriculture, underscoring the
+                                                                   Remote sensing technology has been widely
+     complex interconnections among climate change,
+                                                               used in agriculture, from the allocation of area
+     agricultural practices and geospatial technologies.
+                                                               for cultivation, yield estimation, spatial distri-
+                                                               bution of crops, agricultural insurance, monitor-
+     2. METHODOLOGY
+                                                               ing agricultural disasters, and safeguarding the
+         Literature was reviewed on the available geospa-      agricultural environment. Several edited books
+     tial applications, RS, agriculture and climate change     have compiled the potential application of RS in
+     in South Asia. The review speciﬁcally concentrated        agriculture (Ahamed, 2022; Li et al., 2022; Liu &
+     on Nepal, Bhutan and Pakistan, taking into account        Jiao, 2016; Kerry & Escolà, 2021; Vadrevu et al.,
+     data and information available across various spatial     2022). Previous studies (Atzberger, 2013; Weiss
+     scales, including regional and national levels.           et al., 2020) demonstrated the utility of RS data
+         A systematic literature review approach (Dewey        for monitoring crop health, assessing land use
+     & Drahota, 2016) was used following the PRISMA            changes and predicting agricultural productivity.
+     protocol (Page et al., 2021) for this study. The review   GIS, as highlighted by Castella et al. (2007) and
+     process comprised two phases. The initial phase           Zysk et al. (2020), aids in spatial analysis, helping
+     encompassed several steps: (a) delineating the            farmers and policymakers make informed decisions
+     analysis scope to establish study boundaries; (b)         regarding land allocation and resource management
+     identifying studies based on keywords, timeframes,        (Figure 2).
+     document types and languages; and (c) scrutinising
+                                                               3.1.2. Climate data integration
+     and appraising pertinent papers. Subsequently, the
+     second phase entailed extracting and presenting               The comprehensive integration of geospatial
+                                                               technologies in the agricultural landscapes of Nepal,
+     pertinent information from the studies identiﬁed
+                                                               Bhutan and Pakistan yields transformative results,
+     and chosen in the ﬁrst phase (Thakuri et al., 2022).
+                                                               offering valuable insights and advancements in
+     The study’s conceptual framework is illustrated in
+                                                               CSA. The synthesis of RS, GIS and GNSS emerges
+     Figure 1.
+                                                               as a powerful strategy for planning and managing
+         Data utilised in this study were gathered from
+                                                               agriculture in the face of climate change chal-
+     the Web of Science database, employing the spec-
+                                                               lenges. Equally important is the incorporation of
+     iﬁed keywords: agriculture and geospatial appli-
+                                                               climate data, which helps identify location-speciﬁc
+     cations, climate-smart agriculture in South Asia
+                                                               CSA practices and supports for the development of
+     (including Nepal, Bhutan, Pakistan), and agriculture
+                                                               strategies for their broader dissemination. Research
+     and remote sensing.
+                                                               (Challinor et al., 2018; Ruane et al., 2015) empha-
+                                                               sises the signiﬁcance of incorporating historical
+     3. RESULTS AND DISCUSSION
+                                                               climate data to develop predictive models for crop
+     3.1. Geospatial technologies in agriculture               performance under changing climate conditions.
+         Climate change poses a signiﬁcant threat to           Understanding the region-speciﬁc climatic patterns
+     agriculture, affecting crop yields, water availability    in these countries is imperative for tailoring agricul-
+     and overall food security (Misra, 2014). South Asian      tural strategies.
+     countries, including Nepal, Pakistan and Bhutan,
+     are particularly vulnerable to these changes due
+
+
+     100                                                                                                    Thakuri et al.
+                                                                 APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+FIGURE 1. PRISMA ﬂow schema of the study.
+
+
+
+3.2. CSA practices                                        et al., 2015; Murthy et al., 2014; Thapa et al., 2019).
+3.2.1. Sustainable water management                       Similarly, Bhatta et al. (2017) explored the use of
+                                                          geospatial tools for assessing crop vulnerability
+    Effective water management is paramount for
+                                                          across diverse agroecological regions of Nepal,
+CSA in South Asia. Ahansal et al. (2022) proposed a
+                                                          offering insights for targeted adaptation strategies.
+geospatially informed water management strategy,
+                                                              Nepal’s topographical diversity poses unique
+optimising irrigation practices based on soil mois-
+                                                          challenges, and geospatial technologies have been
+ture content and weather patterns. This approach
+                                                          essential in mapping and managing these varied
+contributes to water conservation, addressing the
+                                                          landscapes (Uddin et al., 2015). Thapa et al. (2023)
+increasing water scarcity challenges faced by these
+                                                          applied satellite imagery and GIS to map land-
+countries.
+                                                          slide susceptibility, supporting disaster prepared-
+3.2.2. Precision agriculture (PA)                         ness in hilly farming communities. Additionally,
+    Using geospatial technologies, PA adapts farm-        Shrestha and Khanal (2020) examined the use of
+ing methods to speciﬁc microenvironments within           satellite-based data for crop production prediction,
+a ﬁeld (Singh et al., 2023). To improve resource effi-    which provided insightful information about how to
+ciency, reduce environmental impact and maximise          enhance Nepalese agricultural practices.
+yields, PA uses data-driven technologies to detect,           Pakistan, facing challenges such as water scarcity
+quantify, and react to temporal and spatial variabil-     and changing weather patterns, has seen notable
+ity in crops. It is worthwhile investigating the appli-   advancements in geospatial applications. Hassan
+cability of PA concepts in this domain further.           and Goheer (2021) explored the use of satellite
+                                                          imagery for crop monitoring and yield prediction,
+3.3. Regional perspectives: Nepal, Pakistan, and          highlighting the potential of real-time data to
+     Bhutan                                               enhance agricultural decision-making. Likewise,
+    In Nepal, where agriculture sustains a signif-        Aslam et al. (2018) investigated the integration of
+icant portion of the population, geospatial tech-         GIS and climate modelling to assess climate change
+nologies have been widely applied to soil erosion         impacts on crop suitability across regions, offering
+monitoring, watershed management and climate              valuable guidance for adaptation strategies that
+adaptation. Studies highlight the value of partici-       support sustainable agriculture.
+patory mapping in engaging local communities for              Satellite imaging is used to address Pakistan’s
+sustainable land practices (Aksha, 2018; Bhandari         water scarcity problems. Water management plans
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                          101
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+     can be made more informed and effective by using          urban areas. In Pakistan, GIS plays a pivotal role
+     this application to monitor and analyse water sup-        in optimising transportation systems, providing a
+     plies and usage trends (Basharat, 2019; Butt et al.,      sophisticated tool for monitoring and enhancing
+     2015). These applications assist in identifying areas     the efficiency of the country’s transportation in-
+     prone to water scarcity and guiding targeted inter-       frastructure. Similarly, Bhutan relies on GIS to guide
+     ventions for improved water governance.                   urban development, ensuring that the growth and
+         Bhutan’s unique topography and reliance on            planning of urban spaces are strategically aligned
+     subsistence farming make it a compelling case for         with geographic data and spatial analysis (Bhattarai
+     geospatial interventions in agriculture. Wang et al.      & Conway, 2010; Dorji et al., 2022; Hina et al., 2020;
+     (2021) highlighted the use of GIS for mapping and         Kazmi & Zubair, 2014).
+     managing high-altitude agricultural landscapes,               The healthcare sector also beneﬁts from geospa-
+     considering the nuances of a country’s agroeco-           tial technologies and tools in South Asian countries.
+     logical zones. Similarly, Dorji et al. (2022) and         Nepal uses GIS for tracking disease spread and
+     Gilani et al. (2015) explored the application of RS       planning vaccination campaigns (Dhimal et al.,
+     and GIS in assessing land-use changes and their           2015). Pakistan applies it to optimise healthcare
+     implications for agriculture, contributing to a better    facility locations based on population density and
+     understanding of the dynamic nature of land use           accessibility (Ahmed et al., 2019). Bhutan integrates
+     and guiding informed land management decisions.           geospatial tools for disease mapping and health
+     Meanwhile, in Bhutan, GIS technology also sup-            infrastructure planning, contributing to effective
+     ports high-altitude farming by analysing terrain          public health management (Ebener et al., 2018;
+     and environmental conditions, helping farmers             Tsheten et al., 2021). Together, these cases illustrate
+     make better decisions on crop selection, cultivation      how geospatial technologies serve as versatile tools
+     methods and resource management (Chhogyel et al.,         that adapt to national priorities while collectively
+     2020; Tashi, 2018).                                       advancing sustainable development in South Asia.
+         When combined, these case studies demonstrate             Satellite-based weather prediction is increas-
+     how geospatial technologies can help South Asia’s         ingly supporting CSA in South Asia, providing real-
+     climate-smart agricultural progress. Pakistan high-       time data for rainfall, temperature, humidity and
+     lights the use of crop adaptability and water scarcity,   cloud cover, which are widely used for monsoon
+     Bhutan exhibits their worth in high-altitude farm-        forecasting, early warning and agro-advisory ser-
+     ing, and Nepal demonstrates their importance in           vices. These predictions enable farmers to make
+     addressing topographical problems and disaster            informed decisions on planting schedules, irrigation
+     risks. The growing integration of RS and GIS for farm     planning and risk reduction strategies. For instance,
+     and policy decision-making is a shared strength           satellite-derived rainfall estimation and monsoon
+     among these nations. When taken as a whole, these         monitoring have been applied in the South Asian
+     examples show how geospatial technologies are             region to improve seasonal forecasts and enhance
+     gradually forming a regional route toward more            resilience to extreme weather events. Integrating
+     robust and adaptable agricultural systems, even           such systems within CSA practices ensures better
+     while national settings vary.                             preparedness against climate variability and sup-
+                                                               ports long-term sustainability of agriculture in the
+     3.4. Geospatial technologies: South Asia’s
+                                                               region (Das, 2022; Li et al., 2022a; Nadeem et al.,
+           multifaceted transformation
+                                                               2022).
+         Geospatial technologies play an important part
+     in shaping various sectors in South Asian countries,      3.4.1. Regional geospatial farming and disaster
+     with relevance in the distinctive contexts of Nepal,            management
+     Pakistan and Bhutan. These nations have harnessed             In Nepal, precision farming uses geospatial
+     the power of geospatial applications for diverse pur-     technologies to provide real-time data on soil health,
+     poses, showcasing the multifaceted impact of tech-        moisture and crops, helping farmers enhance effi-
+     nology on their development.                              ciency (Shrestha & Khanal, 2020). Similarly, Pak-
+         Nepal extends the application of GIS technol-         istan uses RS for crop health monitoring and GIS
+     ogy beyond agriculture by employing it in urban           for informed decision-making, while Bhutan ap-
+     planning initiatives, ensuring a comprehensive and        plies geospatial tools to improve farming practices
+     well-informed approach to the development of              (Hassan et al., 2022; Mayer et al., 2023).
+
+
+     102                                                                                                    Thakuri et al.
+                                                                 APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+    In disaster management, Nepal relies on geospa-           Geospatial technology is also being used in
+tial technologies for early warnings, Pakistan uses       Bhutan’s healthcare plans. Bhutan is able to make
+satellite imagery and GIS for post-disaster assess-       well-informed judgments for efficient public health
+ment, and Bhutan employs geospatial tools for             management using GIS in disease mapping and
+both warnings and assessments (Gurung et al.,             health infrastructure design. Bhutan seeks to im-
+2014; Murthy et al., 2014). Across the region, GIS        prove the entire healthcare system by comprehend-
+also supports urban planning, including land-use          ing the regional trends of illnesses and optimis-
+mapping, traffic management and strategic urban           ing medical facilities using spatial data (Jamtsho
+development (Chu, 2020; Khan et al., 2021).               et al., 2015). As a result, a geospatial tool facili-
+    EWSs play a particularly important role in this       tates the planning and execution of focused treat-
+context, as they provide timely information on            ments, which are especially important for managing
+droughts, ﬂoods and heavy precipitation events.           vector-borne illnesses.
+Geospatial technologies, including RS and GIS,            3.4.3. Environment, forest, and biodiversity
+enhance these systems by enabling real-time mon-                conservation
+itoring of rainfall, soil moisture and vegetation
+                                                              Advanced mapping and spatial analytics tech-
+stress, while integration with weather forecasting
+                                                          nologies, adapted to the distinct ecosystems of
+models strengthens predictive capacity (Van Ginkel
+                                                          Nepal, Pakistan and Bhutan, are crucial to envi-
+& Biradar, 2021). Mobile and web-based dissem-            ronmental conservation efforts in these nations.
+ination platforms further ensure that location-           GIS and satellite photography provide for thorough
+speciﬁc agro-advisories reach farming communi-            environmental monitoring in Nepal, assisting au-
+ties on time, helping them take proactive measures.       thorities in tracking changes over time in vegeta-
+Strengthening EWSs within CSA frameworks thus             tion, land cover and other ecological variables. This
+not only reduces crop losses but also supports            approach supports the identiﬁcation of potential
+farmers in making proactive decisions that build          threats and the design of targeted conservation
+long-term resilience (Thapa, 2021).                       strategies (Adhikari et al., 2018; Chettri et al., 2013).
+    For instance, in Nepal, the Department of Hy-             Nepal employs satellite imagery and GIS for
+drology and Meteorology (DHM), in collabora-              comprehensive ecosystem monitoring, enhancing
+tion with the Nepal Agricultural Research Council         its ability to observe changes in land cover, veg-
+(NARC), has piloted agro-advisory services that           etation and other ecological features over time,
+deliver weather-based crop recommendations to             thereby enabling authorities to track environmental
+farmers through mobile platforms and local ex-            changes, identify potential threats and formulate
+tension channels. Such initiatives demonstrate the        targeted conservation strategies (Adhikari et al.,
+practical potential of integrating remote sensing,        2018; Chettri et al., 2013). Pakistan relies on geospa-
+meteorological data and geospatial analysis into          tial technologies for crucial roles in water body
+operational early warning and advisory systems            and forest management, utilising satellite imagery
+(Chapagain et al., 2023). Expanding these efforts         to monitor water resources, assess water quality,
+across the region could play a vital role in reducing     detect pollution sources and implement sustainable
+climate risks, minimising crop losses and enhancing       water management measures. GIS further supports
+the resilience of smallholder farmers.                    effective forest management, enabling the moni-
+                                                          toring of forest cover, tracking deforestation trends
+3.4.2. Healthcare geospatial empowerment
+                                                          and planning conservation efforts to preserve the
+    GIS is frequently utilised in South Asia to help      country’s rich biodiversity (Khan et al., 2018; Shaﬁ
+with disease management and healthcare planning.          et al., 2020).
+In Nepal, it enables disease mapping, allowing au-            In keeping with its commitment to sustain-
+thorities to track and analyse the spread of diseases     able environmental practices and guaranteeing
+(Bhunia & Shit, 2019). To ensure effective resource       the long-term health and resilience of its diverse
+allocation based on population density and accessi-       ecosystems, Bhutan places strong emphasis on bio-
+bility, geospatial data is used to strategically design   diversity monitoring and sustainable environmental
+and site healthcare facilities in Pakistan, where op-     practices through GIS, which aids in the analysis of
+timising healthcare infrastructure is a top priority      spatial data to identify and protect critical habitats
+(Hussain et al., 2008).                                   (Penjor et al., 2021; Tshewang et al., 2021).
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                          103
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+     FIGURE 2. A variety of indices and parameters utilised for the monitoring and management of different agricultural
+     resources (Zahra et al., 2023).
+
+
+
+
+     FIGURE 3. Principles of GIS, involving the layering of maps, utilised to integrate and visualise genome data (Dolan et al.,
+     2006).
+
+
+
+         When taken as a whole, the research and meth-               and protect biodiversity across South Asia in all
+     ods used in these three nations show that, although             these contexts.
+     geospatial technologies are used for a similar goal,            3.4.4. Potential GIS layers, tools, and technologies for
+     they are not implemented consistently but rather                       CSA practice
+     are tailored to the unique priorities and context of                 Potential GIS layers relevant to CSA include
+     each nation. These technologies serve as adaptable              climate variables, soil properties, biodiversity and
+     instruments that promote sustainable resource                   conservation data. These layers serve as a foun-
+     management, strengthen environmental resilience                 dation for informed decision-making, risk as-
+
+
+     104                                                                                                             Thakuri et al.
+                                                                 APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+sessment, vulnerability analysis and the strategic        aspects such as crop monitoring, precision agricul-
+planning of CSA interventions (Table 1) e.g., Figure 3.   ture, land use change analysis, drought monitoring,
+    In the South Asian context, the most practi-          forest monitoring, and more (Tables 3 and 4). The
+cal layers are those derived from freely available        intersection of ML, RS and GIS in crop yield pre-
+datasets such as Landsat, Sentinel and MODIS,             diction exempliﬁes the multifaceted approach in
+which provide adequate spatial and temporal cov-          optimising agricultural practices (Drogkoula et al.,
+erage for agricultural monitoring. While high-            2023; Sun & Scanlon, 2019).
+resolution commercial datasets offer greater pre-             Concrete examples of how geospatial technol-
+cision, their cost often limits accessibility. Consid-    ogy is assisting CSA goals can be seen in recent South
+ering institutional and technical capacity, countries     Asian experiences. The Nepal Agricultural Research
+in the region tend to rely more on open-source
+                                                          Council (NARC) and the Department of Hydrology
+and globally accessible data products, which can
+                                                          and Meteorology (DHM) have collaborated to pro-
+be effectively used for crop mapping, drought mon-
+                                                          vide agro-advisory services in Nepal that combine
+itoring and land use assessments.
+                                                          crop-speciﬁc recommendations for farmers with
+    A range of geospatial tools and technologies are
+                                                          satellite-based weather forecasts (Chapagain et al.,
+relevant to CSA planning and management, span-
+                                                          2023). In Pakistan, precision agriculture initiatives
+ning industry-standard software such as ArcGIS
+                                                          employing RS and GIS have improved irrigation
+and QGIS to open-source platforms like Leaﬂet
+                                                          scheduling and crop monitoring, reducing resource
+and Mapbox (Table 2). This diversity enhances both
+                                                          use while enhancing yields (Aslam et al., 2018). Sim-
+accessibility and adaptability, while also highlight-
+                                                          ilarly, Bhutan is using geospatial platforms more
+ing the role of APIs, programming languages, and
+coding in geospatial data processing, visualisation       often for climate-informed land-use planning,
+and analysis (Kilsedar & Brovelli, 2020; Ledur et al.,    which aims to balance the conservation of forests
+2015).                                                    and ecosystems with agricultural productivity tar-
+    The most popular technologies in South Asia are       gets (Parker et al., 2017). These case studies show
+open-source platforms, such as Google Earth Engine        how geospatial tools are increasingly helping to
+and QGIS, due to their accessibility and affordabil-      close the gap between scientiﬁc advancements and
+ity. Although sophisticated proprietary software of-      real-world applications of CSA at the ﬁeld level.
+fers strong features, its broader use is restricted by
+                                                          3.7. Smart farming and beyond
+institutional budget constraints and licensing con-
+                                                              The integration of IoT devices with GIS for smart
+cerns. Thus, the most practical option to incorpo-
+rate geospatial technologies into CSA in the area is to   farming applications signiﬁes a shift towards real-
+
+use open-source tools in conjunction with capacity        time monitoring and data-driven decision-making
+building and regional data-sharing programmes.            in agriculture (Ayaz et al., 2019; Ferehan et al., 2022).
+                                                          Furthermore, the paper recognises the potential of
+3.5. Web-based data-sharing systems: Enhancing
+                                                          ML and AI in agriculture, highlighting their roles in
+     collaboration
+                                                          pest and disease monitoring, renewable energy con-
+    VGI emerges as a crucial component, facilitating      sumption analysis, and spatial modelling (Balaska
+collaborative approaches in disaster management           et al., 2023; Javaid et al., 2023; Shaikh et al., 2022).
+(Haworth, 2018; Moghadas et al., 2022). Existing and          While acknowledging the strides made in geospa-
+emerging geospatial technologies, including mobile        tial technology applications in CSA, the study em-
+mapping, drones and airborne photogrammetry,
+                                                          phasises existing gaps in understanding the com-
+play pivotal roles in disaster response (Mitsova,
+                                                          prehensive applications in South Asian countries.
+2019; Tomaszewski et al., 2015; Yu et al., 2018).
+                                                          It underscores the necessity for future research
+The signiﬁcance of web-based data-sharing plat-
+                                                          to delve into these gaps, proposing areas for ex-
+forms is emphasised, along with the necessity of
+                                                          ploration and innovation. We observed the lack of
+governments and organisations taking an active
+                                                          wider use of geospatial techniques in the precision
+role in creating SDIs for information sharing and
+                                                          agriculture of South Asia. Furthermore, the study
+emergency preparedness.
+                                                          recommends that future research should explore
+3.6. Use of geospatial tools in agriculture               knowledge gaps and propose areas for further ex-
+    The diverse applications of geospatial tools          ploration in geospatial technology applications for
+in agriculture are elucidated, addressing critical        agriculture planning and management.
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                          105
+                                                                                                                                                                                        APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+106
+
+
+
+
+                 TABLE 1. Potential GIS layers supportive of the CSA practices.
+
+
+                 SN       Layer                              Source                                     Characteristics                          Reference
+
+                 1        Climate Data                       Meteorological stations, satellite data,   Temperature maps, precipitation          (Feidas et al., 2014; Funk et al.,
+                                                             climate models                             maps, climate anomaly maps, climate      2012; Lelovics et al., 2014)
+                                                                                                        zoning maps
+                 2        Soil Information                   Soil surveys, RS, ground-based             Soil type maps, soil moisture maps,      (Fathololoumi et al., 2021;
+                                                             sensors                                    soil erosion maps, soil fertility maps   McBratney et al., 2003;
+                                                                                                                                                 Senanayake et al., 2020)
+                 3        Topography and                     Digital Elevation Models (DEMs),           Elevation maps, slope maps, aspect       (Isioye & Jobin, 2012; Saadat
+                          Landform                           satellite data                             maps                                     et al., 2008)
+                 4        Land Use and Land Cover            Satellite imagery, land use surveys        Land use maps, land cover change         (Horvat, 2013; Yang & Liu, 2005)
+                                                                                                        maps, cropland maps
+                 5        Water Resources                    Hydrological models, satellite data,       River and stream maps, water quality     (Baffaut et al., 2015; Pisinaras
+                                                             ground-based sensors                       maps, aquifer maps                       et al., 2010)
+                 6        Vegetation and Crop                RS, satellite data                         NDVI maps, crop health maps, crop        (Moussa Kourouma et al., 2021;
+                          Health                                                                        yield prediction maps                    Panda et al., 2010; Petersen,
+                                                                                                                                                 2018)
+                 7        Infrastructure and Access          GIS databases, government records          Road and transportation maps,            (Gutiérrez et al., 2010; Lei &
+                                                                                                        market access maps, infrastructure       Church, 2010; Vulevic et al., 2018)
+                                                                                                        maps
+                 8        Socioeconomic                      Census data, socioeconomic surveys         Population density maps, income level    (Dulin et al., 2010; Stevens et al.,
+                                                                                                        maps, education and health facility      2015)
+                                                                                                        maps
+                 9        Biodiversity and                   Biodiversity databases, conservation       Biodiversity hotspot maps, protected     (Huang et al., 2020; Signorello
+                          Conservation                       records                                    area maps, habitat maps                  et al., 2018)
+                 10       Risk and Vulnerability             Disaster records, disease surveillance     Natural disaster risk maps, disease      (Dickin et al., 2013; Petersen,
+                                                                                                        risk maps, climate vulnerability maps    2018; Van Westen, 2013)
+Thakuri et al.
+
+
+
+
+                                                                                                                                                            Continued on next page
+https://doi.org/10.30852/sb.2025.2977
+
+
+
+
+                                        TABLE 1. Continued.
+
+
+                                        SN      Layer                    Source                                  Characteristics                          Reference
+
+                                        11      Land Surface             Satellite thermal imagery (e.g.,        Monitoring land surface temperature      (Feizizadeh et al., 2013; Li et al.,
+                                                Temperature              Landsat, MODIS)                         variations, aiding in assessing heat     2013)
+                                                                                                                 stress on crops
+                                        12      Adaptation and           Climate change adaptation and           Mapping areas with high potential for    (Andrieu et al., 2021; Scherr et al.,
+                                                Mitigation Potential     mitigation models                       climate-smart practices, guiding         2012)
+                                                Maps                                                             policy decisions
+                                        13      Historical Crop          Historical crop yield data, satellite   Assessing past crop performance to       (Challinor et al., 2018; Peng et al.,
+                                                Performance              imagery                                 inform future planning and               2020)
+                                                                                                                 adaptation strategies
+                                        14      Satellite-Based          Satellite data, RS                      Monitoring and optimising irrigation     (Foster et al., 2020; Tan et al.,
+
+
+
+
+                                                                                                                                                                                                  APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+                                                Irrigation Monitoring                                            practices for water-use efficiency       2018)
+                                        15      Agro-Ecological Zone     Agro-ecological studies, climate data   Deﬁning zones with similar ecological    (Liu et al., 2017; Mugandani et al.,
+                                                Maps                                                             conditions for tailored agricultural     2012; Van Wart et al., 2013)
+                                                                                                                 practices
+                                        16      Groundwater Depth Maps   Groundwater monitoring stations,        Mapping the depth of groundwater         (Condon & Maxwell, 2015; Devia
+                                                                         hydrological models                     tables to inform irrigation strategies   et al., 2015; Maxwell et al., 2015)
+107
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+      TABLE 2. Available geospatial tools and technologies for mapping.
+
+
+      SN    Tool/Technologies              Description                                     Reference
+
+      1     ArcGIS                         Developed by Esri, ArcGIS is a                  (Bajjali, 2017; Ormsby et al., 2010)
+                                           comprehensive suite of mapping and
+                                           spatial analytics tools. It includes desktop,
+                                           web, and mobile applications for creating,
+                                           analysing and sharing maps
+
+      2     QGIS (Quantum GIS)             An open-source GIS software that offers a       (Flenniken et al., 2020; Moyroud &
+                                           user-friendly interface for creating,           Portet, 2018; Thiede et al., 2014)
+                                           editing, visualising and analysing
+                                           geospatial data
+
+      3     Google Earth                   A web-based mapping tool that enables           (Tooth, 2015; Wang et al., 2013; Yu &
+                                           users to explore the Earth in 3D, view          Gong, 2012)
+                                           satellite imagery and access various layers
+                                           of GIS
+
+      4     Leaﬂet                         A JavaScript library available as               (Edler & Vetter, 2019; Farkas, 2017)
+                                           open-source for generating interactive
+                                           maps on the web. It is lightweight and
+                                           customizable, making it suitable for web
+                                           and mobile applications.
+
+      5     Mapbox                         A mapping platform that provides                (Airlangga & Rachman, 2022;
+                                           customizable maps, geocoding and                Hidayatulloh & Airlangga, 2022;
+                                           navigation services. It offers APIs and SDKs    Rzeszewski, 2023)
+                                           for developers to integrate maps into their
+                                           applications.
+
+      6     OpenLayers                     An open-source JavaScript library for           (Farkas, 2017; Hazzard, 2011)
+                                           presenting map data within web browsers.
+                                           It supports various map providers and
+                                           allows for the creation of interactive maps.
+
+      7     Carto                          Formerly known as CartoDB, Carto is a           (Jansen & Seraj, 2020; Netek et al.,
+                                           cloud-based mapping and visualisation           2023)
+                                           platform. It enables users to create and
+                                           share interactive maps without the need
+                                           for extensive coding.
+
+      8     GRASS GIS (Geographic          An open-source GIS software that provides       (Neteler et al., 2012; Nguyen & Pearce,
+            Resources Analysis Support     powerful tools for spatial modelling,           2010; Zambelli et al., 2013)
+            System)                        geostatistics and image processing. It is
+                                           particularly useful for advanced geospatial
+                                           analysis.
+
+      9     GDAL (Geospatial Data          A library for reading and writing raster and    (Qin et al., 2014; Zhan & Qin, 2012)
+            Abstraction Library)           vector geospatial data formats. It provides
+                                           a set of tools for data transformation and
+                                           supports various GIS formats.
+
+                                                                                                         Continued on next page
+
+
+
+
+     108                                                                                                            Thakuri et al.
+                                                                         APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+ TABLE 2. Continued.
+
+
+ SN    Tool/Technologies                Description                                      Reference
+
+ 10    PostGIS                          A spatial database extension for                 (Lizardo & Davis, 2017; Shukla et al.,
+                                        PostgreSQL, enabling the storage and             2016)
+                                        analysis of geographic data within a
+                                        relational database management system
+                                        (RDBMS).
+
+ 11    GPS (Global Positioning          A satellite-based navigation system that         (Hegarty, 2017; Hofmann-Wellenhof
+       System)                          provides real-time location information.         et al., 2012; Krenn et al., 2011)
+                                        GPS technology is widely used for
+                                        mapping, navigation and geotagging.
+
+ 12    ENVI (Environment for            An RS software used for processing and           (Ferrán et al., 2012; Wang et al., 2021)
+       Visualising Images)              analysing satellite and aerial imagery. It
+                                        includes tools for image classiﬁcation,
+                                        change detection and spectral analysis.
+
+ 13    ERDAS IMAGINE                    An RS application for processing, analysing      (Wondrade et al., 2014; Razaﬁnimaro
+                                        and visualising raster data. It is widely used   et al., 2021)
+                                        for image interpretation and geospatial
+                                        modelling.
+
+ 14    CesiumJS                         An open-source JavaScript library for            (Mete et al., 2018; Prandi et al., 2015)
+                                        creating 3D globes and maps on the web.
+                                        CesiumJS is particularly suited for
+                                        visualising geospatial data in a 3D context.
+
+ 15    GeoServer                        An open-source server software that              (Kulawiak et al., 2019; Varol &
+                                        allows users to share and edit geospatial        Şanlioğlu, 2017)
+                                        data. It supports standard geospatial web
+                                        services and is often used for serving maps
+                                        over the web.
+
+ 16    ArcGIS Online                    A cloud-based platform by Esri that              (Hu et al., 2015; Kholoshyn et al.,
+                                        provides online mapping and analysis             2019)
+                                        tools. It allows users to create and share
+                                        maps, apps and data.
+
+ 17    NASA Worldview                   An interactive mapping tool that allows          (Cechini et al., 2018; Plato, 2019)
+                                        users to explore global satellite imagery of
+                                        Earth. It provides real-time data for
+                                        monitoring environmental changes.
+
+ 18    TerraSAR-X                       A satellite mission for radar RS, providing      (Janoth et al., 2012; Pitz & Miller,
+                                        high-resolution radar images for                 2010)
+                                        applications such as terrain mapping,
+                                        agriculture monitoring and disaster
+                                        management.
+
+                                                                                                         Continued on next page
+
+
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                                        109
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+      TABLE 2. Continued.
+
+
+      SN    Tool/Technologies              Description                                     Reference
+
+      19    Microsoft Power BI             While primarily a business analytics tool,      (Becker & Gould, 2019)
+                                           Power BI includes geospatial capabilities
+                                           for mapping and visualising
+                                           location-based data. It allows users to
+                                           create interactive maps within their
+                                           dashboards.
+
+      20    Sentinel Hub                   A platform for accessing and analysing          (Gomes et al., 2020; Potin et al., 2018)
+                                           satellite data, including the Sentinel series
+                                           from the European Space Agency. It
+                                           provides easy access to a wide range of
+                                           Earth observation data for mapping
+                                           applications.
+
+      21    FME (Feature Manipulation      A data integration platform that supports       (Colucci et al., 2020; Jusuf et al., 2017)
+            Engine)                        the extraction, transformation and loading
+                                           (ETL) of geospatial data. FME is used for
+                                           data conversion and interoperability.
+
+      22    ER Mapper                      A powerful image processing and GIS             (Al-Awadhi, 2010; Sugandi &
+                                           software for working with raster data. It       Somantri, 2018)
+                                           provides tools for image compression,
+                                           mosaicking and visualisation.
+
+      23    GEE (Google Earth Engine)      A cloud-based platform for analysing and        (Ghosh et al., 2022; Tamiminia et al.,
+                                           visualising satellite imagery and geospatial    2020)
+                                           datasets. It is particularly useful for
+                                           large-scale Earth observation data
+                                           analysis.
+
+      24    PostgreSQL with PostGIS        Combining PostgreSQL, a relational              (Agarwal & Rajan, 2016; Makris et al.,
+            Extension                      database system, with the PostGIS               2021)
+                                           extension enables the storage and
+                                           manipulation of geospatial data within a
+                                           database.
+
+      25    Geospatial Python Libraries    Libraries such as GeoPandas, Fiona, and         (Rajamani & Iyer, 2023; Upton, 2017;
+                                           Shapely provide geospatial capabilities in      Westra, 2015)
+                                           Python. They are used for working with
+                                           spatial data, performing analyses and
+                                           creating maps.
+
+      26    Mapillary                      A collaborative platform for street-level       (Alvarez Leon & Quinn, 2019; Zheng
+                                           imagery. Users can contribute geotagged         & Amemiya, 2023)
+                                           images, and the platform uses computer
+                                           vision to extract information for mapping
+                                           and navigation.
+
+                                                                                                           Continued on next page
+
+
+
+
+     110                                                                                                              Thakuri et al.
+                                                                             APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+
+ TABLE 2. Continued.
+
+
+ SN     Tool/Technologies                 Description                                      Reference
+
+ 27     PRIO-GRID                         It is a spatio-temporal grid system              (Suzuki, 2023; Tollefsen et al., 2012)
+                                          designed to facilitate the organisation,
+                                          administration, and examination of spatial
+                                          data within a consistent temporal
+                                          framework. It is comprised of quadratic
+                                          grid cells that collectively encompass all
+                                          land areas worldwide.
+
+ 28     GeoDa                             A free and open-source software tool that        (Anselin et al., 2022; Mariani & Fauzi,
+                                          serves as an introduction to spatial data        2017)
+                                          analysis. It provides visualisation and
+                                          analysis of spatial patterns and
+                                          relationships.
+
+
+
+
+ TABLE 3. Existing and emerging geospatial technologies.
+
+
+ SN             Geospatial Technology                                                              Reference
+
+ 1              Mobile mapping                                                                     (Puente et al., 2013)
+
+ 2              Drone and UAV                                                                      (Colomina & Molina, 2014)
+
+ 3              Airborne photogrammetry                                                            (Nex & Remondino, 2014)
+
+ 4              Geospatial data                                                                    (Řezník et al., 2017)
+
+ 5              Free and open-source software for geospatial applications (FOSS4G)                 (Brovelli et al., 2017)
+
+ 6              Airborne and ground-based Laser scanning                                           (Disney et al., 2019)
+
+ 7              Geospatial web services (Google Earth Engine)                                      (Mananze et al., 2020)
+
+ 8              APIs, coding and language                                                          (Embarak, 2018)
+
+ 9              Spatial modelling and analysis                                                     (Radmehr et al., 2021)
+
+ 10             Big data                                                                           (Deibe et al., 2020)
+
+ 11             Machine learning (ML)                                                              (Benos et al., 2021)
+
+ 12             Artiﬁcial intelligence (AI)                                                        (Bauer et al., 2021)
+
+
+
+
+      However, realising these opportunities also                  and inconsistent access to ICT infrastructure, which
+depends on overcoming several real-world con-                      constrain the reach of location-based advisory
+straints that inﬂuence practical adoption in the                   services. Addressing these issues will be essential to
+region. Effective implementation requires strong                   ensure that technological innovations are equitably
+interagency coordination among agricultural, en-                   accessible, sustainable, and capable of delivering
+vironmental and information technology sectors,                    measurable beneﬁts for farmers and communities.
+yet such collaboration often remains fragmented.
+In addition, low levels of digital literacy among                  4. CONCLUSION
+farmers, especially smallholders and marginalised                      Geospatial technologies are increasingly central
+groups, restrict the effective use of digital platforms            to advancing CSA in South Asia. Tools like RS, GIS,
+and geospatial tools. These challenges are further                 GNSS and AI/ML techniques provide precise, spa-
+compounded by limited rural internet connectivity                  tially informed insights that enhance productivity,
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                                        111
+                                                                                                                                                                                      APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+112
+
+
+
+
+                 TABLE 4. Use of geospatial tools and technologies.
+
+
+                 SN     Use                             Description                                                        Type                         Reference
+
+                 1      Crop Monitoring                 Monitor crop health (NDVI) and growth over a large area,           Sentinel-1 and               (Aduvukha et al., 2021)
+                                                        cropping pattern type classiﬁcation, yield estimation, disease     Sentinel-2
+                                                        and pest detection.
+                 2      Precision Agriculture           Provide information about phonotyping, soil health, moisture       Computer vision and          (Bauer et al., 2021; Sharma
+                                                        levels, and crop performance, weeds.                               deep learning                et al., 2023; Thorp & Tian,
+                                                                                                                                                        2004)
+                 3      Land Use and Land Cover         Identify the patterns and trends of LULC change over time.         GIS Software, RS             (Hinz et al., 2020)
+                        Change Analysis
+                 4      Drought Monitoring              Monitoring drought so that farmers can make decisions.             RS, GIS Software             (Kulkarni et al., 2020)
+                 5      Forest Monitoring               Provide information about forest health and ecosystem health.      Satellite Imagery, GIS       (Sharma et al., 2022)
+                                                                                                                           Software, RS
+                 6      Spatial Data Visualisation      Utilising tools like GIS and data visualisation software for the   GIS Software, Data           (Kamal et al., 2021)
+                                                        representation of spatial data, enabling better understanding      Visualisation Tools
+                                                        and analysis of geographic patterns.
+                 7      Urban Planning and              Applying geospatial technologies such as GIS, urban modelling      GIS Software, Urban          (Iamtrakul et al., 2022)
+                        Management                      tools and satellite imagery for city planning, infrastructure      Modelling Tools, Satellite
+                                                        development and efficient urban management.                        Imagery
+                 8      Disaster Response and           Employing geospatial tools such as GIS, satellite imagery and      GIS Software, Satellite      (Kemper & Kemper, 2020)
+                        Management                      spatial analysis software for assessing and responding to          Imagery, Spatial Analysis
+                                                        natural disasters, aiding in disaster management and recovery      Software
+                                                        efforts.
+                 9      Environmental                   Monitoring and analysing environmental changes using tools         RS, GIS Software,            (Tsatsaris et al., 2021)
+                        Monitoring                      such as RS, GIS and environmental sensors to assess the impact     Environmental Sensors
+                                                        of human activities on ecosystems.
+Thakuri et al.
+
+
+
+
+                                                                                                                                                           Continued on next page
+https://doi.org/10.30852/sb.2025.2977
+
+
+
+
+                                        TABLE 4. Continued.
+
+
+                                        SN    Use                      Description                                                        Type                        Reference
+
+                                        10    Soil Health Assessment   Applying geospatial tools such as soil sensors and GIS to assess   Soil Sensors, GIS           (Roberts et al., 2021)
+                                                                       soil health parameters. This includes mapping soil properties,     Software
+                                                                       moisture levels and nutrient distribution for precision soil
+                                                                       management.
+                                        11    Smart Farming            Integrating Internet of Things (IoT) devices with GIS for smart    IoT Devices, GIS Software   (Miloudi et al., 2020)
+                                                                       farming applications. This involves real-time monitoring of
+                                                                       farm equipment, weather conditions and crop status to enhance
+                                                                       overall farm efficiency.
+                                        12    Crop Yield Prediction    Utilising ML algorithms integrated with GIS and RS data for        ML, RS, GIS Software        (Abbas et al., 2020)
+                                                                       accurate crop yield prediction. Geospatial technologies enable
+                                                                       the analysis of multiple factors inﬂuencing crop productivity.
+
+
+
+
+                                                                                                                                                                                                   APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+                                        13    Pest and Disease         Employing geospatial tools such as satellite imagery and GIS for   Satellite Imagery, GIS      (Balasundram et al., 2020)
+                                              Monitoring               monitoring and predicting pest and disease outbreaks. This aids    Software
+                                                                       in timely interventions and targeted application of pesticides.
+                                        14    Water Management         Utilising geospatial technologies for efficient water              GIS Software, RS            (Kafy et al., 2021)
+                                                                       management in agriculture. This involves mapping water
+                                                                       resources, monitoring irrigation efficiency and implementing
+                                                                       precision irrigation practices.
+113
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+     support climate adaptation and aid mitigation ef-               Agarwal, S., & Rajan, K. S. (2016). Performance analysis
+     forts. They enable detailed analysis of climate, soil,             of MongoDB versus PostGIS/PostGreSQL databases
+     land use, agricultural facilities and vulnerability                for line intersection and point containment spatial
+                                                                        queries. Spatial Information Research, 24(6), 671–677.
+     patterns, supporting region-speciﬁc CSA strategies.
+                                                                        https://doi.org/10.1007/s41324-016-0059-1
+           The integration of RS and GIS allows tailored
+                                                                     Agbehadji, I. E., Schütte, S., Masinde, M., Botai, J., & Mab-
+     vulnerability assessments, as shown in Nepal, Pak-                 haudhi, T. (2023). Climate risks resilience development:
+     istan, Bhutan and other regional contexts, im-                     A bibliometric analysis of climate-related early warn-
+     proving precision farming, agro-advisory services                  ing systems in Southern Africa. Climate, 12(1), Article 3.
+     and climate-informed land-use planning. Adaptive                Ahamed, T. (Ed.). (2022). Remote sensing application: Re-
+     applications remain valuable across diverse areas.                 gional perspectives in agriculture and forestry (Vol. 59).
+                                                                        Springer Nature.
+     With growing connectivity, GIS software, satellite
+                                                                     Ahansal, Y., Bouziani, M., Yaagoubi, R., Sebari, I., Sebari,
+     imagery and GPS-based tools are increasingly ac-
+                                                                        K., & Kenny, L. (2022). Towards smart irrigation: A
+     cessible, while AI-driven approaches like machine                  literature review on the use of geospatial technologies
+     learning and deep learning are expanding the ana-                  and machine learning in the management of water
+     lytical potential.                                                 resources in arboriculture. Agronomy, 12(2), 297.
+           Advocating for SDIs for agriculture, supported            Ahmed, S., Adams, A. M., Islam, R., Hasan, S. M., & Panciera,
+     by institutional stewardship and frequent data shar-               R. (2019). Impact of traffic variability on geographic ac-
+                                                                        cessibility to 24/7 emergency healthcare for the urban
+     ing, is vital. Political collaboration and cross-sector
+                                                                        poor: A GIS study in Dhaka, Bangladesh. PloS One, 14(9),
+     partnerships further enhance decision-making.
+                                                                        Article 0222488.
+     Strengthening institutional capacity, enhancing                 Airlangga, P., & Rachman, A. A. (2022). Deployment of Lo-
+     digital literacy of farmers, fostering cross-sector                cation Mapping results based on Application Program-
+     collaboration and ensuring inclusive access to geo-                ming Interface. NEWTON: Networking and Information
+     spatial innovations will be essential for scaling                  Technology, 1(3), 111–118. Article e0222488.
+
+     CSA solutions. Integrating these technologies into              Akram, W., Ahmad, A., Javed, M. A., & Raoof, A. (n.d.).
+                                                                        Exploring existing spatial patterns of diarrhea and propos-
+     agricultural planning and management can build
+                                                                        ing new health unit using GIS in district Vehari, Punjab
+     more resilient, productive and sustainable farming
+                                                                        Pakistan. Retrieved January 30, 2024, from https://
+     systems.                                                           www.academia.edu/download/54737024/Diarrhea_
+                                                                        GIS.pdf
+     5. ACKNOWLEDGEMENTS                                             Aksha, S. K. (2018). Assessing vulnerability and multi-hazard
+                                                                        risk in the Nepal Himalaya [PhD Thesis]. Virginia Tech.
+           We are grateful to the Asia-Paciﬁc Network for
+                                                                        https://vtechworks.lib.vt.edu/handle/10919/85864
+     Global Change Research for providing the ﬁnancial               Al-Awadhi, T. (2010). The Use of RS and GIS to evaluate the
+     support under Grant No. CBA2020-13MY-Thakuri.                      effects of tropical cyclones: A case study from A’Seeb,
+     We also acknowledge the support received from the                  Muscat after GONU cyclone. In 1st WMO International
+     ICIMOD FA2 Action Research under the GRAPE and                     Conference on Indian Ocean Tropical Cyclones and Climate
+     to Mid-West University for their support in imple-                 Change, Muscat, Sultanate of Oman, 8–11 March 2009
+                                                                        (p. 95).
+     menting this project.
+                                                                     Altieri, M. A., & Nicholls, C. I. (2017). The adaptation
+                                                                        and mitigation potential of traditional agriculture in
+     REFERENCES                                                         a changing climate. Climatic Change, 140(1), 33–45.
+     Abbas, F., Afzaal, H., Farooque, A. A., & Tang, S. (2020).         https://doi.org/10.1007/s10584-013-0909-y
+        Crop yield prediction through proximal sensing and           Alvarez Leon, L. F., & Quinn, S. (2019). The value of crowd-
+        machine learning algorithms. Agronomy, 10(7), Arti-             sourced street-level imagery: Examining the shifting
+        cle 1046.                                                       property regimes of OpenStreetCam and Mapillary.
+     Adhikari, S., Baral, H., & Nitschke, C. R. (2018). Identiﬁca-      GeoJournal, 84(2), 395–414. https://doi.org/10.1007/
+        tion, prioritization and mapping of ecosystem services          s10708-018-9865-4
+        in the Panchase Mountain Ecological Region of Western        Andrieu, N., Dumas, P., Hemmerlé, E., Caforio, F., Falcon-
+        Nepal. Forests, 9(9), Article 554.                              nier, G. N., Blanchard, M., & Vayssières, J. (2021). Ex
+     Aduvukha, G. R., Abdel-Rahman, E. M., Sichangi, A. W.,             ante mapping of favorable zones for uptake of climate-
+        Makokha, G. O., Landmann, T., Mudereri, B. T., Ton-             smart agricultural practices: A case study in West Africa.
+        nang, H. E., & Dubois, T. (2021). Cropping pattern              Environmental Development, 37, Article 100566.
+        mapping in an agro-natural heterogeneous landscape           Anselin, L., Li, X., & Koschinsky, J. (2022). GeoDa, from the
+        using sentinel-2 and sentinel-1 satellite datasets.             desktop to an ecosystem for exploring spatial data. Ge-
+        Agriculture, 11(6), Article 530. https://doi.org/10.3390/       ographical Analysis, 54(3), 439–466. https://doi.org/10
+        agriculture11060530                                             .1111/gean.12311
+
+
+     114                                                                                                               Thakuri et al.
+                                                                          APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+Aslam, A. Q., Ahmad, I., Ahmad, S. R., Hussain, Y., Hussain,         Development and Sustainability, 19(2), 497–525. https://
+   M. S., Shamshad, J., & Zaidi, S. J. A. (2018). Integrated         doi.org/10.1007/s10668-015-9743-x
+   climate change risk assessment and evaluation of adap-         Bhattarai, K., & Conway, D. (2010). Urban vulnerabili-
+   tation perspective in southern Punjab, Pakistan. Science          ties in the Kathmandu Valley, Nepal: Visualizations
+   of the Total Environment, 628, 1422–1436.                         of human/hazard interactions. Journal of Geographic
+Atzberger, C. (2013). Advances in remote sensing of agri-            Information System, 2(02), Article 63.
+   culture: Context description, existing operational mon-        Bhunia, G. S., & Shit, P. K. (2019). Geospatial analysis of public
+   itoring systems and major information needs. Remote               health. Springer International Publishing. https://doi.or
+   Sensing, 5(2), 949–981.                                           g/10.1007/978-3-030-01680-7
+Ayaz, M., Ammad-Uddin, M., Sharif, Z., Mansour, A., &             Bhusal, J. K., Chapagain, P. S., Regmi, S., Gurung, P.,
+   Aggoune, E.-H. M. (2019). Internet-of-Things (IoT)-               Zulkaﬂi, Z., Karpouzoglou, T., Pandeya, B., Buytaert,
+   based smart agriculture: Toward making the ﬁelds talk.            W., & Clark, J. (2016). Mountains under pressure:
+   IEEE Access, 7, 129551–129583.                                    Evaluating ecosystem services and livelihoods in the
+Baffaut, C., Dabney, S. M., Smolen, M. D., Youssef, M. A.,           Upper Himalayan region of Nepal. International Journal
+   Bonta, J. V., Chu, M. L., Guzman, J. A., Shedekar, V. S.,         of Ecology and Environmental Sciences, 42(3), 217–226.
+   Jha, M. K., & Arnold, J. G. (2015). Hydrologic and water       Brovelli, M. A., Minghini, M., Moreno-Sanchez, R., &
+   quality modeling: Spatial and temporal considerations.            Oliveira, R. (2017). Free and open source software for
+   Transactions of the ASABE, 58(6), 1661–1680.                      geospatial applications (FOSS4G) to support Future
+Bajjali, W. (2017). ArcGIS for environmental and water issues.       Earth. International Journal of Digital Earth, 10(4), 386–
+   Springer.                                                         404. https://doi.org/10.1080/17538947.2016.1196505
+Balaska, V., Adamidou, Z., Vryzas, Z., & Gasteratos, A.           Butt, A., Shabbir, R., Ahmad, S. S., & Aziz, N. (2015). Land
+   (2023). Sustainable crop protection via robotics and              use change mapping and analysis using Remote Sens-
+   artiﬁcial intelligence solutions. Machines, 11(8), Arti-          ing and GIS: A case study of Simly watershed, Islam-
+   cle 774.                                                          abad, Pakistan. The Egyptian Journal of Remote Sensing
+Balasundram, S. K., Golhani, K., Shamshiri, R. R., & Vadamalai,      and Space Science, 18(2), 251–259.
+   G. (2020). Precision agriculture technologies for man-         Castella, J. -C., Kam, S. P., Quang, D. D., Verburg, P.
+   agement of plant diseases. In I. Ul. Haq & S. Ijaz (Eds.),        H., & Hoanh, C. T. (2007). Combining top-down and
+   Plant disease management strategies for sustainable               bottom-up modelling approaches of land use/cover
+   agriculture through traditional and modern approaches             change to support public policies: Application to sus-
+   (Vol. 13, pp. 259–278). Springer International Publish-           tainable management of natural resources in northern
+   ing. https://doi.org/10.1007/978-3-030-35955-3_13                 Vietnam. Land Use Policy, 24(3), 531–545.
+Barasa, P. M., Botai, C. M., Botai, J. O., & Mabhaudhi, T.        Cechini, M., Boller, R., Baynes, K., Schmaltz, J., Thomp-
+   (2021). A review of climate-smart agriculture research            son, C., Roberts, J., Rodriguez, J., King, B., Wong, M.,
+   and applications in Africa. Agronomy, 11(6), Article 1255.        & Rice, Z. (2018). NASA GIBS and worldview: Visualiz-
+Basharat, M. (2019). Water management in the Indus Basin             ing NASA’s earth science data for all to explore. Ameri-
+   in Pakistan: Challenges and opportunities. Indus River            can Geophysical Union (AGU) Fall Meeting, GSFC-E-DAA-
+   Basin, 375–388.                                                   TN63571. https://ntrs.nasa.gov/citations/20180008507
+Bauer, K., Hinz, O., Van Der Aalst, W., & Weinhardt,              Challinor, A. J., Müller, C., Asseng, S., Deva, C., Nicklin, K.
+   C. (2021). Expl(AI)n It to Me – Explainable AI and                J., Wallach, D., Vanuytrecht, E., Whitﬁeld, S., Ramirez-
+   Information Systems Research. Business & Information              Villegas, J., & Koehler, A. -K. (2018). Improving the use
+   Systems Engineering, 63(2), 79–82. https://doi.org/10             of crop models for risk assessment and climate change
+   .1007/s12599-021-00683-2                                          adaptation. Agricultural Systems, 159, 296–306.
+Becker, L. T., & Gould, E. M. (2019). Microsoft Power BI:         Chandra, A., McNamara, K. E., & Dargusch, P. (2018).
+   Extending excel to manipulate, analyze, and visualize             Climate-smart agriculture: Perspectives and framings.
+   diverse data. Serials Review, 45(3), 184–188. https://doi         Climate Policy, 18(4), 526–541. https://doi.org/10.1080/
+   .org/10.1080/00987913.2019.1644891                                14693062.2017.1316968
+Benos, L., Tagarakis, A. C., Dolias, G., Berruto, R., Kateris,    Chapagain, T. R., Karki, T. B., Shah, P., Acharya, G. D.,
+   D., & Bochtis, D. (2021). Machine learning in agricul-            Gyeltshen, K., Islam, M. R., & Hossain, M. B. (2023).
+   ture: a comprehensive updated review. Sensors, 21(11),            Climate-smart agriculture technologies and practices
+   Article 3758. https://doi.org/10.3390/s21113758                   in Nepal. In SAARC Agriculture Centre, SAARC, Dhaka,
+Bhandari, K. P., Aryal, J., & Darnsawasdi, R. (2015). A              Bangladesh (p. 82). SAARC Agriculture Centre (SAC).
+   geospatial approach to assessing soil erosion in a wa-         Chettri, N., Uddin, K., Chaudhary, S., & Sharma, E. (2013).
+   tershed by integrating socio-economic determinants                Linking spatio-temporal land cover change to biodi-
+   and the RUSLE model. Natural Hazards, 75(1), 321–342.             versity conservation in the Koshi Tappu Wildlife Re-
+   https://doi.org/10.1007/s11069-014-1321-2                         serve, Nepal. Diversity, 5(2), 335–351.
+Bhatta, G. D., Ojha, H. R., Aggarwal, P. K., Sulaiman, V. R.,     Chhogyel, N., Kumar, L., & Bajgai, Y. (2020). Spatio-
+   Sultana, P., Thapa, D., Mittal, N., Dahal, K., Thomson,           temporal landscape changes and the impacts of climate
+   P., & Ghimire, L. (2017). Agricultural innovation and             change in mountainous Bhutan: A case of Punatsang
+   adaptation to climate change: Empirical evidence from             Chhu Basin. Remote Sensing Applications: Society and
+   diverse agro-ecologies in South Asia. Environment,                Environment, 18, Article 100307.
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                                           115
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+     Chu, D. (2020). Remote sensing of land use and land cover             (2022). Evaluation of land use/cover change and urban
+        in mountain region: A comprehensive study at the central           sprawling pattern using remote sensing and GIS: A case
+        Tibetan Plateau. Springer Singapore. https://doi.org/10            study in Thimphu, Bhutan. Civil Engineering and Archi-
+        .1007/978-981-13-7580-4                                            tecture, 10(6), 2572–2579.
+     Colomina, I., & Molina, P. (2014). Unmanned aerial systems         Drogkoula, M., Kokkinos, K., & Samaras, N. (2023). A com-
+        for photogrammetry and remote sensing: A review. IS-               prehensive survey of machine learning methodologies
+        PRS Journal of Photogrammetry and Remote Sensing, 92,              with emphasis in water resources management. Applied
+        79–97.                                                             Sciences, 13(22), Article 12147.
+     Colucci, E., Ruvo, V., Lingua, A., Matrone, F., & Rizzo, G.        Dulin, M. F., Ludden, T. M., Tapp, H., Blackwell, J., de Her-
+        (2020). HBIM-GIS integration: From IFC to cityGML                  nandez, B. U., Smith, H. A., & Furuseth, O. J. (2010). Us-
+        standard for damaged cultural heritage in a multiscale             ing Geographic Information Systems (GIS) to under-
+        3D GIS. Applied Sciences, 10(4), Article 1356.                     stand a community’s primary care needs. The Journal of
+     Condon, L. E., & Maxwell, R. M. (2015). Evaluating the                the American Board of Family Medicine, 23(1), 13–21.
+        relationship between topography and groundwater                 Ebener, S., Roth, S., & Khetrapal, S. (2018). Building capacity
+        using outputs from a continental-scale integrated                  for geo-enabling health information systems: Supporting
+        hydrology model. Water Resources Research, 51(8),                  equitable health services and well-being for all. https://
+        6602–6621. https://doi.org/10.1002/2014WR016774                    pdfs.semanticscholar.org/2af2/4f0b58801385058cb0
+     Corbett, J. (2013). “I Don’t Come from Anywhere”: Explor-             a6b300641fffbe6f03.pdf
+        ing the role of the geoweb and volunteered geographic           Edler, D., & Vetter, M. (2019). The simplicity of modern
+        information in rediscovering a sense of place in a dis-            audiovisual web cartography: An example with the
+        persed aboriginal community. In D. Sui, S. Elwood, &               open-source JavaScript library leaﬂet.js. KN - Journal of
+        M. Goodchild (Eds.), Crowdsourcing geographic knowl-               Cartography and Geographic Information, 69(1), 51–62.
+        edge (pp. 223–241). Springer Netherlands. https://doi              https://doi.org/10.1007/s42489-019-00006-2
+        .org/10.1007/978-94-007-4587-2_13                               Embarak, O. (2018). Data analysis and visualization using
+     Das, S. (2022). Challenges in predicting extreme weather              Python: Analyze data to create visualizations for BI systems.
+        events over the South Asian region. In Extreme natu-               Apress. https://doi.org/10.1007/978-1-4842-4109-7
+        ral events: Sustainable solutions for developing countries      Erskine, M. A., Gregg, D. G., Karimi, J., & Scott, J. E. (2013).
+        (pp. 51–106). Springer Nature Singapore.                           Business decision-making using geospatial data: A re-
+     Deibe, D., Amor, M., & Doallo, R. (2020). Big data geospatial         search framework and literature review. Axioms, 3(1),
+        processing for massive aerial LiDAR datasets. Remote               10–30.
+        Sensing, 12(4), Article 719.                                    Farkas, G. (2017). Applicability of open-source web map-
+     Devia, G. K., Ganasri, B. P., & Dwarakish, G. S. (2015). A re-        ping libraries for building massive Web GIS clients.
+        view on hydrological models. Aquatic Procedia, 4, 1001–            Journal of Geographical Systems, 19(3), 273–295. https://
+        1007.                                                              doi.org/10.1007/s10109-017-0248-z
+     Dewey, A., & Drahota, A. (2016). Introduction to systematic        Fathololoumi, S., Vaezi, A. R., Alavipanah, S. K., Ghor-
+        reviews: Online learning module Cochrane Training.                 bani, A., Saurette, D., & Biswas, A. (2021). Effect of
+        Retrieved December 26, 2023, from https://traini                   multi-temporal satellite images on soil moisture pre-
+        ng.cochrane.org/interactivelearning/module-1-intr                  diction using a digital soil mapping approach. Geo-
+        oduction-conducting-systematic-reviews.                            derma, 385, Article 114901.
+     Dhimal, M., Ahrens, B., & Kuch, U. (2015). Climate change          Feidas, H., Karagiannidis, A., Keppas, S., Vaitis, M., Kontos,
+        and spatiotemporal distributions of vector-borne dis-              T., Zanis, P., Melas, D., & Anadranistakis, E. (2014).
+        eases in Nepal–a systematic synthesis of literature. PloS          Modeling and mapping temperature and precipi-
+        One, 10(6), e0129869.                                              tation climate data in Greece using topographical
+     Dickin, S. K., Schuster-Wallace, C. J., & Elliott, S. J. (2013).      and geographical parameters. Theoretical and Applied
+        Developing a vulnerability mapping methodology: Ap-                Climatology, 118(1–2), 133–146. https://doi.org/10.100
+        plying the water-associated disease index to dengue in             7/s00704-013-1052-4
+        Malaysia. PLoS One, 8(5), e63584.                               Feizizadeh, B., Blaschke, T., Nazmfar, H., Akbari, E., & Ko-
+     Disney, M., Burt, A., Calders, K., Schaaf, C., & Stovall,             hbanani, H. R. (2013). Monitoring land surface temper-
+        A. (2019). Innovations in ground and airborne tech-                ature relationship to land use/land cover from satel-
+        nologies as reference and for training and validation:             lite imagery in Maraqeh County, Iran. Journal of Envi-
+        Terrestrial Laser Scanning (TLS). Surveys in Geophysics,           ronmental Planning and Management, 56(9), 1290–1315.
+        40(4), 937–958. https://doi.org/10.1007/s10712-019-0               https://doi.org/10.1080/09640568.2012.717888
+        9527-x                                                          Ferehan, N., Haqiq, A., & Ahmad, M. W. (2022). Smart farm-
+     Dolan, M. E., Holden, C. C., Beard, M. K., & Bult, C. J. (2006).      ing system based on intelligent internet of things and
+        Genomes as geography: Using GIS technology to build                predictive analytics. Journal of Food Quality, 2022, Arti-
+        interactive genome feature maps. BMC Bioinformatics,               cle 7484088.
+        7(1), Article 416. https://doi.org/10.1186/1471-2105-7-         Ferrán, Á., Bernabé, S., Rodriquez, P. G., & Piaza, A. (2012).
+        416                                                                A web-based system for classiﬁcation of remote sens-
+     Dorji, L., Shukla, S. K., Wangchuk, D., Dorji, K. T., Gyelt-          ing data. IEEE Journal of Selected Topics in Applied Earth
+        shen, K., Chettri, N., Aryal, K. R., & Abdouli, K. M. A.           Observations and Remote Sensing, 6(4), 1934–1948.
+
+
+     116                                                                                                                   Thakuri et al.
+                                                                               APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+Flenniken, J. M., Stuglik, S., & Iannone, B. V. (2020). Quan-           nication technologies for supporting smallholder agri-
+   tum GIS (QGIS): An introduction to a free alternative                culture and climate resilience. Climate, 6(4), Article 97.
+   to more costly GIS platforms: FOR359/FR428, 2/2020.               Hazzard, E. (2011). OpenLayers 2.10 (pp. 372–1). Packt Pub-
+   EDIS, 2020(2), 7.                                                    lishing.
+Foster, T., Mieno, T., & Brozović, N. (2020). Satellite-based        Hegarty, C. J. (2017). The global positioning system (GPS).
+   monitoring of irrigation water use: Assessing mea-                   In Springer handbook of global navigation satellite systems
+   surement errors and their implications for agricultural              (pp. 197–218). Cham: Springer International Publish-
+   water management policy. Water Resources Research,                   ing.
+   56(11), e2020WR028378. https://doi.org/10.1029/2020               Herold, S., & Sawada, M. C. (2012). A review of geospatial
+   WR028378                                                             information technology for natural disaster manage-
+Funk, C., Michaelsen, J., & Marshall, M. T. (2012). Mapping             ment in developing countries. International Journal of
+   recent decadal climate variations in precipitation and               Applied Geospatial Research (IJAGR), 3(2), 24–62.
+   temperature across eastern Africa. Remote Sensing                 Hidayatulloh, R., & Airlangga, P. (2022). Integration of
+   of Drought: Innovative Monitoring Approaches, 331(7),                mapbox and google maps to support additional features
+   331–355.                                                             in geographic information systems. SAINTEKBU, 14(02),
+Ghosh, S., Kumar, D., & Kumari, R. (2022). Cloud-based                  16–22.
+   large-scale data retrieval, mapping, and analysis for             Hina, S. M., Szmerekovsky, J., Lee, E., Amin, M., & Arooj,
+   land monitoring applications with google earth engine                S. (2020). Effective municipal solid waste collection us-
+   (GEE). Environmental Challenges, 9, 100605.                          ing geospatial information systems for transportation:
+Gilani, H., Shrestha, H. L., Murthy, M. S. R., Phuntso, P.,             A case study of two metropolitan cities in Pakistan. Re-
+   Pradhan, S., Bajracharya, B., & Shrestha, B. (2015).
+                                                                        search in Transportation Economics, 84, Article 100950.
+   Decadal land cover change dynamics in Bhutan. Journal
+                                                                     Hinz, R., Sulser, T. B., Huefner, R., Mason-D’Croz, D.,
+   of Environmental Management, 148, 91–100.
+                                                                        Dunston, S., Nautiyal, S., Ringler, C., Schuengel, J.,
+Girotto, C. D., Piadeh, F., Bkhtiari, V., Behzadian, K., Chen,
+                                                                        Tikhile, P., Wimmer, F., & Schaldach, R. (2020). Agri-
+   A. S., Campos, L. C., & Zolgharni, M. (2023). A critical re-
+                                                                        cultural development and land use change in India: A
+   view of digital technology innovations for early warning
+                                                                        scenario analysis of trade-offs between UN Sustain-
+   of water-related disease outbreaks associated with cli-
+                                                                        able Development Goals (SDGs). Earth’s Future, 8(2),
+   matic hazards. International Journal of Disaster Risk Re-
+                                                                        e2019EF001287.         https://doi.org/10.1029/2019EF00
+   duction, 100, Article 104151.
+                                                                        1287
+Gomes, V. C., Queiroz, G. R., & Ferreira, K. R. (2020).
+                                                                     Hofmann-Wellenhof, B., Lichtenegger, H., & Collins, J.
+   An overview of platforms for big earth observation
+                                                                        (2012). Global positioning system: Theory and practice.
+   data management and analysis. Remote Sensing, 12(8),
+                                                                        Springer Science & Business Media. https://books.
+   Article 1253.
+                                                                        google.com/books?hl=en&lr=&id=F7jrCAAAQBAJ&oi
+Gurung, D. R., Shrestha, M., Shrestha, N., Debnath, B., Jishi,
+                                                                        =fnd&pg=PR19&dq=GPS+(Global+Positioning+Syste
+   G., Bajracharya, R., Dhonju, H. K., & Pradhan, S. (2014).
+                                                                        m)&ots=zYkavXsLnz&sig=Rrkuv2wF8jmJMQnTb9i
+   Multi scale Disaster Risk Reduction Systems Space and
+                                                                        vHcgFhyY
+   Community based Experiences over HKH Region. The
+                                                                     Horvat, Z. (2013). Using landsat satellite imagery to de-
+   International Archives of the Photogrammetry, Remote
+                                                                        termine land use/land cover changes in Međjimurje
+   Sensing and Spatial Information Sciences, 40, 1301–1307.
+                                                                        County, Croatia. Hrvatski Geografski Glasnik, 75(2), 5–28.
+Gutiérrez, J., Condeço-Melhorado, A., & Martín, J. C. (2010).
+   Using accessibility indicators and GIS to assess spatial          Hu, Y., Janowicz, K., Prasad, S., & Gao, S. (2015). Metadata
+   spillovers of transport infrastructure investment. Jour-             topic harmonization and semantic search for linked-
+   nal of Transport Geography, 18(1), 141–152.                          data-driven geoportals: A case study using ArcGIS on-
+Hassan, S. I., Alam, M. M., Zia, M. Y. I., Rashid, M., Illahi, U.,      line. Transactions in GIS, 19(3), 398–416. https://doi.or
+   & Su’ud, M. M. (2022). Rice crop counting using aerial               g/10.1111/tgis.12151
+   imagery and GIS for the assessment of soil health to              Huang, Z., Bai, Y., Alatalo, J. M., & Yang, Z. (2020). Mapping
+   increase crop yield. Sensors, 22(21), Article 8567.                  biodiversity conservation priorities for protected areas:
+Hassan, S. S., & Goheer, M. A. (2021). Modeling and mon-                A case study in Xishuangbanna Tropical Area, China.
+   itoring wheat crop yield using geospatial techniques:                Biological Conservation, 249, Article 108741.
+   A case study of Potohar Region, Pakistan. Journal of              Hussain, M., Arsalan, M. H., & Mehdi, M. R. (2008). Role
+   the Indian Society of Remote Sensing, 49(6), 1331–1342.              of GIS in public health management in Pakistan. IEEE
+   https://doi.org/10.1007/s12524-020-01290-6                           Aerospace and Electronic Systems Magazine, 23(7), 39–
+Haworth, B. T. (2018). Implications of volunteered ge-                  45.
+   ographic information for disaster management and                  Iamtrakul, P., Padon, A., & Klaylee, J. (2022). Analysis of
+   GIScience: A more complex world of volunteered geog-                 urban sprawl and growth pattern using geospatial tech-
+   raphy. Annals of the American Association of Geographers,            nologies in megacity, Bangkok, Thailand. In S. Bouren-
+   108(1), 226–240. https://doi.org/10.1080/24694452.20                 nane & P. Kubicek (Eds.), Geoinformatics and data analy-
+   17.1321979                                                           sis (Vol. 143, pp. 109–123). Springer International Pub-
+Haworth, B. T., Biggs, E., Duncan, J., Wales, N., Boruff, B., &         lishing. https://doi.org/10.1007/978-3-031-08017-3_
+   Bruce, E. (2018). Geographic information and commu-                  10
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                                          117
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+     Isioye, A. O., & Jobin, P. (2012). An assessment of digital            veloping geoinformation competence with future geogra-
+        elevation models (DEMs) from different spatial data                 phy teachers. Preprint. http://arxiv.org/abs/1909.04388
+        sources. Asian Journal of Engineering, Sciences & Technol-       Kilsedar, C. E., & Brovelli, M. A. (2020). Multidimensional
+        ogy, 2(1). https://www.academia.edu/download/3780                   visualization and processing of big open urban geospa-
+        3261/ajest_id1_2.pdf                                                tial data on the web. ISPRS International Journal of Geo-
+     Jamtsho, S., Corner, R., & Dewan, A. (2015). Spatio-temporal           Information, 9(7), Article 434.
+        analysis of spatial accessibility to primary health care in      Krenn, P. J., Titze, S., Oja, P., Jones, A., & Ogilvie, D. (2011).
+        Bhutan. ISPRS International Journal of Geo-Information,             Use of global positioning systems to study physical ac-
+        4(3), 1584–1604.                                                    tivity and the environment: A systematic review. Amer-
+     Janoth, J., Gantert, S., Koppe, W., Kaptein, A., & Fischer, C.         ican Journal of Preventive Medicine, 41(5), 508–515.
+        (2012). TerraSAR-X2-mission overview. In 2012 IEEE               Kulawiak, M., Dawidowicz, A., & Pacholczyk, M. E. (2019).
+        International Geoscience and Remote Sensing Symposium               Analysis of server-side and client-side Web-GIS data
+        (pp. 217–220). IEEE. https://ieeexplore.ieee.org/abstr              processing methods on the example of JTS and JSTS
+        act/document/6351599/                                               using open data from OSM and geoportal. Computers &
+     Jansen, M., & Seraj, F. (2020). e-Sight: Real-time cloud               Geosciences, 129, 26–37.
+        platform for visualizing edge transport infrastructure           Kulkarni, S. S., Wardlow, B. D., Bayissa, Y. A., Tadesse,
+        information. In 2020 IEEE International Conference on               T., Svoboda, M. D., & Gedam, S. S. (2020). Developing
+        Pervasive Computing and Communications Workshops                    a remote sensing-based combined drought indicator
+        (PerCom Workshops) (pp. 1–6). IEEE. https://ieeexplore              approach for agricultural drought monitoring over
+        .ieee.org/abstract/document/9156181/                                Marathwada, India. Remote Sensing, 12(13), Article 2091.
+                                                                         Lal, M. (2011). Implications of climate change in sustained
+     Javaid, M., Haleem, A., Khan, I. H., & Suman, R. (2023).
+                                                                            agricultural productivity in South Asia. Regional Envi-
+        Understanding the potential applications of Artiﬁcial
+                                                                            ronmental Change, 11(S1), 79–94. https://doi.org/10.100
+        Intelligence in Agriculture Sector. Advanced Agrochem,
+                                                                            7/s10113-010-0166-9
+        2(1), 15–30.
+                                                                         Ledur, C., Griebler, D., Manssour, I., & Fernandes, L.
+     Jusuf, S. K., Mousseau, B., Godfroid, G., & Hui, V. S. J. (2017).
+                                                                            G. (2015). Towards a domain-speciﬁc language for
+        Integrated modeling of CityGML and IFC for city/neigh-
+                                                                            geospatial data visualization maps with big data sets.
+        borhood development for urban microclimates analy-
+                                                                            In 2015 IEEE/ACS 12th International Conference of Com-
+        sis. Energy Procedia, 122, 145–150.
+                                                                            puter Systems and Applications (AICCSA) (pp. 1–8). IEEE.
+     Kafy, A. -A., Raikwar, V., Al Rakib, A., Kona, M. A., &
+                                                                            https://ieeexplore.ieee.org/abstract/document/750
+        Ferdousi, J. (2021). Geospatial approach for developing
+                                                                            7178/
+        an integrated water resource management plan in
+                                                                         Lei, T. L., & Church, R. L. (2010). Mapping transit-based
+        Rajshahi, Bangladesh. Environmental Challenges, 4,
+                                                                            access: Integrating GIS, routes and schedules. Interna-
+        Article 100139.
+                                                                            tional Journal of Geographical Information Science, 24(2),
+     Kamal, A., Dhakal, P., Javaid, A. Y., Devabhaktuni, V. K.,
+                                                                            283–304. https://doi.org/10.1080/13658810902835404
+        Kaur, D., Zaientz, J., & Marinier, R. (2021). Recent
+                                                                         Lelovics, E., Unger, J., Gál, T., & Gál, C. V. (2014). Design of
+        advances and challenges in uncertainty visualization:
+                                                                            an urban monitoring network based on Local Climate
+        A survey. Journal of Visualization, 24(5), 861–890.
+                                                                            Zone mapping and temperature pattern modelling. Cli-
+        https://doi.org/10.1007/s12650-021-00755-1
+                                                                            mate Research, 60(1), 51–62.
+     Kazmi, J. H., & Zubair, S. (2014). Estimation of vehicle dam-
+                                                                         Li, M., Yang, C., & Zhang, Q. (Eds.). (2022). Soil and crop
+        age cost involved in road traffic accidents in Karachi,             sensing for precision crop production. Springer Nature.
+        Pakistan: A geospatial perspective. Procedia Engineer-           Li, Y., Lu, H., Entekhabi, D., Gianotti, D. J. S., Yang, K.,
+        ing, 77, 70–78.                                                     Luo, C., Feldman, A. F., Wang, W., & Jiang, R. (2022a).
+     Kemper, H., & Kemper, G. (2020). Sensor fusion, GIS                    Satellite-based assessment of meteorological and
+        and AI technologies for disaster management. The                    agricultural drought in Mainland Southeast Asia. IEEE
+        International Archives of the Photogrammetry, Remote                Journal of Selected Topics in Applied Earth Observations
+        Sensing and Spatial Information Sciences, 43, 1677–1683.            and Remote Sensing, 15, 6180–6189.
+     Kerry, R., & Escolà, A. (2021). Sensing approaches for preci-       Li, Z. -L., Tang, B. -H., Wu, H., Ren, H., Yan, G., Wan, Z.,
+        sion agriculture. Springer International Publishing.                Trigo, I. F., & Sobrino, J. A. (2013). Satellite-derived land
+     Khan, M. J., Khan, H. S., Yousaf, A., Khurshid, K., & Abbas, A.        surface temperature: Current status and perspectives.
+        (2018). Modern trends in hyperspectral image analysis:              Remote Sensing of Environment, 131, 14–37.
+        A review. Ieee Access, 6, 14118–14129.                           Liu, B., Chen, X., Meng, Q., Yang, H., & van Wart, J. (2017).
+     Khan, T. U., Mannan, A., Hacker, C. E., Ahmad, S., Amir Sid-           Estimating maize yield potential and yield gap with
+        dique, M., Khan, B. U., Din, E. U., Chen, M., Zhang, C., &          agro-climatic zones in China—Distinguish irrigated
+        Nizami, M. (2021). Use of GIS and remote sensing data to            and rainfed conditions. Agricultural and Forest Meteo-
+        understand the impacts of land use/land cover changes               rology, 239, 108–117.
+        (LULCC) on snow leopard (Panthera uncia) habitat in              Liu, Y., & Jiao, W. (2016). Application of remote sensing
+        pakistan. Sustainability, 13(7), Article 3590.                      technology in agriculture of the USA. In Computer and
+     Kholoshyn, I., Bondarenko, O., Hanchuk, O., & Shmeltser,               Computing Technologies in Agriculture IX: 9th IFIP WG
+        E. (2019). Cloud ArcGIS Online as an innovative tool for de-        5.14 International Conference, CCTA 2015, Beijing, China,
+
+
+     118                                                                                                                     Thakuri et al.
+                                                                           APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+   September 27-30, 2015, Revised Selected Papers, Part I           Miyan, M. A. (2015). Droughts in Asian least developed
+   (Vol. 9, pp. 107–114). Springer International Publishing.           countries: Vulnerability and sustainability. Weather and
+Lizardo, L. E. O., & Davis, C. A. (2017). A PostGIS extension          Climate Extremes, 7, 8–23.
+   to support advanced spatial data types and integrity             Moghadas, M., Rajabifard, A., Fekete, A., & Kötter, T.
+   constraints. In Proceedings of the 25th ACM SIGSPATIAL              (2022). A framework for scaling urban transforma-
+   International Conference on Advances in Geographic                  tive resilience through utilizing volunteered geo-
+   Information Systems (pp. 1–10). ACM. https://doi.org/               graphic information. ISPRS International Journal of
+   10.1145/3139958.3140020                                             Geo-Information, 11(2), Article 114.
+Makris, A., Tserpes, K., Spiliopoulos, G., Zissis, D., &            Molden, D. J., Shrestha, A. B., Immerzeel, W. W., Maharjan,
+   Anagnostopoulos, D. (2021). MongoDB Vs PostgreSQL:                  A., Rasul, G., Wester, P., Wagle, N., Pradhananga, S., &
+   A comparative study on performance aspects. GeoInfor-               Nepal, S. (2022). The great glacier and snow-dependent
+   matica, 25(2), 243–268. https://doi.org/10.1007/s1070               rivers of Asia and climate change: Heading for troubled
+   7-020-00407-w                                                       waters. In A. K. Biswas & C. Tortajada (Eds.), Water secu-
+Malinas, C. D., Matei, F., Pop, I. D., Salagean, T., & Malina, A.      rity under climate change (pp. 223–250). Springer Singa-
+   (2025). Individual and synergistic contributions of GIS,            pore. https://doi.org/10.1007/978-981-16-5493-0_12
+   remote sensing, and AI in advancing climate-resilient            Moussa Kourouma, J., Eze, E., Negash, E., Phiri, D., Vinya,
+   agriculture. AgriEngineering, 7(7), Article 230.                    R., Girma, A., & Zenebe, A. (2021). Assessing the spatio-
+Mananze, S., Pôças, I., & Cunha, M. (2020). Mapping and                temporal variability of NDVI and VCI as indices of crops
+   assessing the dynamics of shifting agricultural land-               productivity in Ethiopia: A remote sensing approach.
+   scapes using google earth engine cloud computing, a                 Geomatics, Natural Hazards and Risk, 12(1), 2880–2903.
+                                                                       https://doi.org/10.1080/19475705.2021.1976849
+   case study in Mozambique. Remote Sensing, 12(8), Ar-
+                                                                    Moyroud, N., & Portet, F. (2018). Introduction to QGIS. In N.
+   ticle 1279.
+                                                                       Baghdadi, C. Mallet, & M. Zribi (Eds.), QGIS and generic
+Mariani, S., & Fauzi, F. (2017). The arcview and GeoDa ap-
+                                                                       tools (1st ed., pp. 1–17). Wiley. https://doi.org/10.1002/
+   plication in optimization of spatial regression estimate.
+                                                                       9781119457091.ch1
+   Journal of Theoretical and Applied Information Technol-
+                                                                    Mugandani, R., Wuta, M., Makarau, A., & Chipindu, B.
+   ogy, 95(5), Article 1102.
+                                                                       (2012). Re-classiﬁcation of agro-ecological regions of
+Maxwell, R. M., Condon, L. E., & Kollet, S. J. (2015). A high-
+                                                                       Zimbabwe in conformity with climate variability and
+   resolution simulation of groundwater and surface wa-
+                                                                       change. African Crop Science Journal, 20, 361–369.
+   ter over most of the continental US with the integrated
+                                                                    Murthy, M. S. R., Bajracharya, B., Pradhan, S., Shestra, B.,
+   hydrologic model ParFlow v3. Geoscientiﬁc Model Devel-
+                                                                       Bajracharya, R., Shakya, K., Wesselmann, S., Ali, M., &
+   opment, 8(3), 923–937.
+                                                                       Bajracharya, S. (2014). Adoption of geospatial systems
+Mayer, T., Bhandari, B., Martínez, F. G., Walker, K., Jiménez,
+                                                                       towards evolving sustainable himalayan mountain de-
+   S. A., Kruskopf, M., Maganini, M., Phalke, A., Wangchen,
+                                                                       velopment. The International Archives of the Photogram-
+   T., & Phuntsho, L. (2023). Employing the agricultural
+                                                                       metry, Remote Sensing and Spatial Information Sciences,
+   classiﬁcation and estimation service (ACES) for map-
+                                                                       40, 1319–1324.
+   ping smallholder rice farms in Bhutan. Frontiers in
+                                                                    Nadeem, M. U., Anjum, M. N., Afzal, A., Azam, M., Hussain,
+   Environmental Science, 11, Article 1137835.
+                                                                       F., Usman, M., Javaid, M. M., Mukhtar, M. A., & Majeed,
+McBratney, A. B., Santos, M. M., & Minasny, B. (2003). On
+                                                                       F. (2022). Assessment of multi-Satellite precipitation
+   digital soil mapping. Geoderma, 117(1–2), 3–52.
+                                                                       products over the Himalayan mountains of Pakistan,
+Mete, M. O., Guler, D., & Yomralioglu, T. (2018). Develop-             South Asia. Sustainability, 14(14), Article 8490.
+   ment of 3D web GIS application with open source li-              Netek, R., Pohankova, T., Bittner, O., & Urban, D. (2023).
+   brary. Selçuk Üniversitesi Mühendislik, Bilim Ve Teknoloji          Geospatial analysis in web browsers—Comparison
+   Dergisi, 6, 818–824.                                                study on WebGIS process-based applications. ISPRS
+Miloudi, L., Rezeg, K., Kazar, O., & Miloudi, M. K. (2020).            International Journal of Geo-Information, 12(9), Arti-
+   Smart sustainable farming management using in-                      cle 374.
+   tegrated approach of IoT, blockchain & geospatial                Neteler, M., Bowman, M. H., Landa, M., & Metz, M. (2012).
+   technologies. In M. Ezziyyani (Ed.), Advanced Intelli-              GRASS GIS: A multi-purpose open source GIS. Environ-
+   gent Systems for Sustainable Development (AI2SD’2019)               mental Modelling & Software, 31, 124–130.
+   (Vol. 1103, pp. 340–347). Springer International Pub-            Nex, F., & Remondino, F. (2014). UAV for 3D mapping appli-
+   lishing.      https://doi.org/10.1007/978-3-030-36664-              cations: A review. Applied Geomatics, 6(1), 1–15. https://
+   3_38                                                                doi.org/10.1007/s12518-013-0120-x
+Misra, A. K. (2014). Climate change and challenges of wa-           Nguyen, H. T., & Pearce, J. M. (2010). Estimating poten-
+   ter and food security. International Journal of Sustainable         tial photovoltaic yield with r. Sun and the open source
+   Built Environment, 3(1), 153–165.                                   Geographical Resources Analysis Support System. Solar
+Mitsova, D. (2019). Supporting natural hazards manage-                 Energy, 84(5), 831–843.
+   ment with geospatial technologies. In Oxford Research            Ormsby, T., Napoleon, E., Burke, R., Groessl, C., & Bowden,
+   Encyclopedia of Natural Hazard Science. Oxford Uni-                 L. (2010). Getting to know ArcGIS desktop. Esri Press
+   versity Press. https://doi.org/10.1093/acrefore/9780                Redlands.     https://scholar.lib.vt.edu/ejournals/JSTE/
+   199389407.013.283                                                   v48n3/pdf/lisichenko.pdf
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                                        119
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+     Page, M. J., McKenzie, J. E., Bossuyt, P. M., Boutron, I.,         Puente, I., González-Jorge, H., Martínez-Sánchez, J., &
+        Hoffmann, T. C., Mulrow, C. D., Shamseer, L., Tetzlaff,            Arias, P. (2013). Review of mobile mapping and survey-
+        J. M., Aki, E. A., Brennan, S. E., Chou, R., Glanville,            ing technologies. Measurement, 46(7), 2127–2145.
+        J., Grimshaw, J. M., Hróbjartsson, A., Lalu, M. M., Li,         Qin, C., Zhan, L., & Zhu, A. (2014). How to apply the geospa-
+        T., Loder, E. W., Mayo-Wilson, E., McDonald, S., …                 tial data abstraction library (GDAL) properly to parallel
+        Moher, D. (2021). The PRISMA 2020 statement: An                    geospatial raster I/O ? Transactions in GIS, 18(6), 950–
+        updated guideline for reporting systematic reviews.                957. https://doi.org/10.1111/tgis.12068
+        British Medical Journal, 372, Article 71. https://dx.doi.or     Radmehr, R., Henneberry, S. R., & Shayanmehr, S. (2021).
+        g/10.1136/bmj.n71                                                  Renewable energy consumption, CO2 emissions, and
+     Panda, S. S., Ames, D. P., & Panigrahi, S. (2010). Application        economic growth nexus: A simultaneity spatial mod-
+        of vegetation indices for agricultural crop yield predic-          eling analysis of EU countries. Structural Change and
+        tion using neural network techniques. Remote Sensing,              Economic Dynamics, 57, 13–27.
+        2(3), 673–696.                                                  Rahman, M. M., & Szabó, G. (2020). National spatial data
+     Pandey, P. C., & Pandey, M. (2023). Highlighting the role of          infrastructure (NSDI) of Bangladesh–development,
+        agriculture and geospatial technology in food security             progress and way forward. ISPRS Annals of the Pho-
+        and sustainable development goals. Sustainable Devel-              togrammetry, Remote Sensing and Spatial Information
+        opment, 31(5), 3175–3195.                                          Sciences, 4, 131–138.
+     Parker, L., Guerten, N., Nguyen, T. T., Rinzin, C., Tashi,         Rajamani, S. K., & Iyer, R. S. (2023). Use of python modules
+        D., Wangchuk, D., Bajgai, Y., Subedi, K., Phuntsho, L.,            in ecological research. In Perspectives on the transition
+        Thinley, N., & Chhogyel, N. (2017). Climate change                 toward green and climate neutral economies in Asia
+        impacts in Bhutan: Challenges and opportunities for                (pp. 182–206). IGI Global. https://www.igi-global.com/
+        the agricultural sector (CCAFS Working paper).                     chapter/use-of-python-modules-in-ecological-rese
+     Peng, B., Guan, K., Tang, J., Ainsworth, E. A., Asseng, S.,           arch/327260
+        Bernacchi, C. J., Cooper, M., Delucia, E. H., Elliott, J. W.,   Razaﬁnimaro, A., Hajalalaina, A. R., Reziky, Z. T., Delaitre,
+        & Ewert, F. (2020). Towards a multiscale crop modelling            E., & Andrianarivo, A. (2021). Landsat8 satellite image
+        framework for climate change adaptation assessment.                classiﬁcation with ERDAS for mapping the Kalambatri-
+        Nature Plants, 6(4), 338–348.                                      tra Special Reserve. American Journal of Remote Sensing,
+     Penjor, U., Kaszta, Ż., Macdonald, D. W., & Cushman, S. A.            9(1), 16–22.
+        (2021). Prioritizing areas for conservation outside the         Řezník, T., Lukas, V., Charvát, K., Jr., Charvat, K., Křivánek,
+        existing protected area network in Bhutan: The use of              Z., Kepka, M., Herman, L., & Řezníková, H. (2017). Dis-
+        multi-species, multi-scale habitat suitability models.             aster risk reduction in agriculture through geospatial
+        Landscape Ecology, 36(5), 1281–1309. https://doi.org/10            (Big) data processing. ISPRS International Journal of Geo-
+        .1007/s10980-021-01225-7                                           Information, 6(8), Article 238.
+     Petersen, L. K. (2018). Real-time prediction of crop yields        Roberts, D. P., Short, N. M., Sill, J., Lakshman, D. K., Hu, X.,
+        from MODIS relative vegetation health: A continent-                & Buser, M. (2021). Precision agriculture and geospa-
+        wide analysis of Africa. Remote Sensing, 10(11), Arti-             tial techniques for sustainable disease control. Indian
+        cle 1726.                                                          Phytopathology, 74(2), 287–305. https://doi.org/10.100
+     Pisinaras, V., Petalas, C., Gikas, G. D., Gemitzi, A., &              7/s42360-021-00334-2
+        Tsihrintzis, V. A. (2010). Hydrological and water quality       Ruane, A. C., Goldberg, R., & Chryssanthacopoulos, J.
+        modeling in a medium-sized basin using the Soil and                (2015). Climate forcing datasets for agricultural mod-
+        Water Assessment Tool (SWAT). Desalination, 250(1),                eling: Merged products for gap-ﬁlling and historical
+        274–286.                                                           climate series estimation. Agricultural and Forest Mete-
+     Pitz, W., & Miller, D. (2010). The terrasar-x satellite. IEEE         orology, 200, 233–248.
+        Transactions on Geoscience and Remote Sensing, 48(2),           Rzeszewski, M. (2023). Mapbox. In C. M. Burnett (Ed.),
+        615–622.                                                           Evaluating participatory mapping software (pp. 21–40).
+     Plato, E. A. (2019). Highlighting recent uses of the NASA             Springer International Publishing. https://doi.org/10
+        worldview mapping application. In AGU Fall Meeting,                .1007/978-3-031-19594-5_2
+        GSFC-E-DAA-TN76137-1.         https://ntrs.nasa.gov/citati      Saadat, H., Bonnell, R., Shariﬁ, F., Mehuys, G., Namdar, M.,
+        ons/20200000554                                                    & Ale-Ebrahim, S. (2008). Landform classiﬁcation from
+     Potin, P., Rosich, B., Miranda, N., Grimont, P., Shurmer,             a digital elevation model and satellite imagery. Geomor-
+        I., O’Connell, A., Krassenburg, M., & Gratadour, J. -B.            phology, 100(3–4), 453–464.
+        (2018). Sentinel-1 constellation mission operations             Scherr, S. J., Shames, S., & Friedman, R. (2012). From
+        status. In IGARSS 2018-2018 IEEE International Geo-                climate-smart agriculture to climate-smart land-
+        science and Remote Sensing Symposium (pp. 1547–1550).              scapes. Agriculture & Food Security, 1(1), Article 12.
+        IEEE.   https://ieeexplore.ieee.org/abstract/document/             https://doi.org/10.1186/2048-7010-1-12
+        8517743/                                                        Senanayake, S., Pradhan, B., Huete, A., & Brennan, J.
+     Prandi, F., Devigili, F., Soave, M., Di Staso, U., & De Amicis,       (2020). A review on assessing and mapping soil erosion
+        R. (2015). 3D web visualization of huge CityGML models.            hazard using geo-informatics technology for farming
+        The International Archives of the Photogrammetry, Remote           system management. Remote Sensing, 12(24), Arti-
+        Sensing and Spatial Information Sciences, 40, 601–605.             cle 4063.
+
+
+     120                                                                                                                   Thakuri et al.
+                                                                            APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+Shaﬁ, U., Mumtaz, R., García-Nieto, J., Hassan, S. A., Zaidi,         directions. Environmental Research Letters, 14(7), Arti-
+   S. A. R., & Iqbal, N. (2019). Precision agriculture tech-          cle 073001.
+   niques and practices: From considerations to applica-           Suzuki, A. (2023). Uncertainty in grid data: A theory and
+   tions. Sensors, 19(17), Article 3796.                              comprehensive robustness test. Quality & Quantity,
+Shaﬁ, U., Mumtaz, R., Iqbal, N., Zaidi, S. M. H., Zaidi, S. A.        57(5),   4477–4491.      https://doi.org/10.1007/s11135-0
+   R., Hussain, I., & Mahmood, Z. (2020). A multi-modal               22-01555-x
+   approach for crop health mapping using low altitude             Tamiminia, H., Salehi, B., Mahdianpari, M., Quackenbush,
+   remote sensing, internet of things (IoT) and machine               L., Adeli, S., & Brisco, B. (2020). Google Earth Engine
+   learning. IEEE Access, 8, 112708–112724.                           for geo-big data applications: A meta-analysis and sys-
+Shaikh, T. A., Rasool, T., & Lone, F. R. (2022). Towards              tematic review. ISPRS Journal of Photogrammetry and Re-
+   leveraging the role of machine learning and artiﬁ-                 mote Sensing, 164, 152–170.
+   cial intelligence in precision agriculture and smart            Tan, S., Wu, B., Yan, N., & Zeng, H. (2018). Satellite-based
+   farming. Computers and Electronics in Agriculture, 198,            water consumption dynamics monitoring in an ex-
+   Article 107119.                                                    tremely arid area. Remote Sensing, 10(9), Article 1399.
+Sharma, B., Aggarwal, U., Kaur, K., Saini, H., Rani, S.,           Tariq, M.A.U. R., Wangchuk, K., & Muttil, N. (2021). A criti-
+   Kumar, P., Verma, K., & Shacham, Y. (2023). Role of                cal review of water resources and their management in
+   remote sensing in precision agriculture. In V. K. Gunjan           Bhutan. Hydrology, 8(1), Article 31.
+   & J. M. Zurada (Eds.), Proceedings of 3rd International         Tashi, D. (2018). Mapping change in rice cultivation us-
+   Conference on Recent Trends in Machine Learning, IoT,              ing geospatial science in the Paro valley, Bhutan from
+   Smart Cities and Applications (Vol. 540, pp. 619–630).             1995-2011 [PhD Thesis]. Flinders University, College
+   Springer Nature Singapore. https://doi.org/10.1007/                of Science and Engineering. https://flex.flinders.edu
+   978-981-19-6088-8_57                                               .au/file/e2ac91ac-9562-4ab3-90ae-84a1c0013995/1/
+Sharma, P., Bhardwaj, D. R., Singh, M. K., Nigam, R., Pala,           Thesis_Dorji%20-%20Ammended-Finial_281118.pdf
+   N. A., Kumar, A., Verma, K., Kumar, D., & Thakur, P.            Thakur, J. K., Singh, S. K., & Ekanthalu, V. S. (2017).
+   (2022). Geospatial technology in agroforestry: Status,             Integrating remote sensing, geographic information
+   prospects, and constraints. Environmental Science and              systems and global positioning system techniques
+   Pollution Research, 30(55), 116459–116487. https://doi             with hydrological modeling. Applied Water Science,
+   .org/10.1007/s11356-022-20305-y                                    7(4),    1595–1608.     https://doi.org/10.1007/s13201-0
+Shiferaw, B., Smale, M., Braun, H. -J., Duveiller, E., Reynolds,      16-0384-5
+   M., & Muricho, G. (2013). Crops that feed the world 10.         Thakuri, S., Parajuli, B. P., Shakya, P., Baskota, P., Pradhan,
+   Past successes and future challenges to the role played            D., & Chauhan, R. (2022). Open-source data alternatives
+   by wheat in global food security. Food Security, 5(3),             and models for ﬂood risk management in Nepal. Remote
+   291–317. https://doi.org/10.1007/s12571-013-0263-y                 Sensing, 14(22), Article 5660.
+Shrestha, M., & Khanal, S. (2020). Future prospects of pre-        Thapa, P. (2021). Using geospatial technologies for disaster
+   cision agriculture in Nepal. Archives of Agriculture and           management in developing countries. Journal of Remote
+   Environmental Science, 5(3), 397–405.                              Sensing & GIS, 9(4), 1–5.
+Shukla, D., Shivnani, C., & Shah, D. (2016). Comparing ora-        Thapa, P. S., Adhikari, B. R., Shaw, R., Bhattarai, D., & Yanai,
+   cle spatial and postgres PostGIS. International Journal of         S. (2023). Geomorphological analysis and early warning
+   Computer Science & Communication, 7, 95–100.                       systems for landslide risk mitigation in Nepalese mid-
+Signorello, G., Prato, C., Marzo, A., Ientile, R., Cucuzza, G.,       hills. Natural Hazards, 117(2), 1793–1812. https://doi.or
+   Sciandrello, S., Martínez-López, J., Balbi, S., & Villa, F.        g/10.1007/s11069-023-05929-8
+   (2018). Are protected areas covering important biodi-           Thapa, R. B., Matin, M. A., & Bajracharya, B. (2019). Capacity
+   versity sites? An assessment of the nature protection              building approach and application: Utilization of earth
+   network in Sicily (Italy). Land Use Policy, 78, 593–602.           observation data and geospatial information technol-
+Singh, M., Vermaa, A., & Kumar, V. (2023). Geospatial                 ogy in the Hindu Kush Himalaya. Frontiers in Environ-
+   technologies for the management of pest and disease                mental Science, 7, Article 165.
+   in crops. In Precision agriculture (pp. 37–54). Elsevier.       Thiede, R., Sutton, T., Düster, H., & Sutton, M. (2014).
+   https://www.sciencedirect.com/science/article/pii/                 Quantum GIS training manual. Quantum Organisation.
+   B9780443189531000027                                               https://wiki.isikhnas.com/images/archive/f/fc/20140
+Stevens, F. R., Gaughan, A. E., Linard, C., & Tatem, A.               709044739!Introduction_QGISTrainingManual-id.
+   J. (2015). Disaggregating census data for population               pdf
+   mapping using random forests with remotely-sensed               Thorp, K. R., & Tian, L. F. (2004). A review on remote sens-
+   and ancillary data. PloS One, 10(2), e0107042.                     ing of weeds in agriculture. Precision Agriculture, 5(5),
+Sugandi, D., & Somantri, L. (2018). Improving geography               477–508. https://doi.org/10.1007/s11119-004-5321-1
+   pre-service teachers’ understanding of satellite im-            Tollefsen, A. F., Strand, H., & Buhaug, H. (2012). PRIO-
+   agery analysis using ER mapper software with a module.             GRID: A uniﬁed spatial data structure. Journal of Peace
+   International Journal of Education, 11(1), 59–67.                  Research, 49(2), 363–374. https://doi.org/10.1177/00
+Sun, A. Y., & Scanlon, B. R. (2019). How can Big Data and             22343311431287
+   machine learning beneﬁt environment and water man-              Tomaszewski, B., Judex, M., Szarzynski, J., Radestock, C., &
+   agement: A survey of methods, applications, and future             Wirkus, L. (2015). Geographic information systems for
+
+
+https://doi.org/10.30852/sb.2025.2977                                                                                          121
+APN Science Bulletin, Volume 15, Issue 1 (2025): 98–122
+
+
+
+        disaster response: A review. Journal of Homeland Secu-          Wang, S. W., Munkhnasan, L., & Lee, W. -K. (2021). Land
+        rity and Emergency Management, 12(3). https://doi.org/             use and land cover change detection and prediction in
+        10.1515/jhsem-2014-0082                                            Bhutan’s high altitude city of Thimphu, using cellular
+     Tooth, S. (2015). Google Earth as a resource. Geography,              automata and Markov chain. Environmental Challenges,
+        100(1),   51–56.    https://doi.org/10.1080/00167487.20            2, Article 100017.
+        15.12093954                                                     Wang, Y., Huynh, G., & Williamson, C. (2013). Integration of
+     Tsatsaris, A., Kalogeropoulos, K., Stathopoulos, N., Louka,          Google Maps/Earth with microscale meteorology mod-
+        P., Tsanakas, K., Tsesmelis, D. E., Krassanakis, V.,               els and data visualization. Computers & Geosciences, 61,
+        Petropoulos, G. P., Pappas, V., & Chalkias, C. (2021).             23–31.
+        Geoinformation technologies in support of environ-              Weiss, M., Jacob, F., & Duveiller, G. (2020). Remote sensing
+        mental hazards monitoring under climate change:                   for agricultural applications: A meta-review. Remote
+        An extensive review. ISPRS International Journal of               Sensing of Environment, 236, Article 111402.
+        Geo-Information, 10(2), Article 94.                             Westra, E. (2015). Python geospatial analysis essentials. Packt
+     Tsheten, T., Clements, A. C., Gray, D. J., & Wangdi, K. (2021).       Publishing Ltd. https://books.google.com/books?hl=e
+        Dengue risk assessment using multicriteria decision                n&lr=&id=bJ_5CQAAQBAJ&oi=fnd&pg=PP1&dq=Ge
+        analysis: A case study of Bhutan. PLoS Neglected Tropical          ospatial+Python+Libraries&ots=Y8qLbBSK_a&sig=
+        Diseases, 15(2), Article e0009021.                                 H3b-kcUjIkT8I8JVPWfmc85i5hY
+                                                                        Wondrade, N., Dick, Ø. B., & Tveite, H. (2014). GIS based
+     Tshewang, U., Tobias, M. C., & Morrison, J. G. (2021).
+                                                                          mapping of land cover changes utilizing multi-temporal
+        Bhutan: Conservation and environmental protection in the
+                                                                           remotely sensed image data in Lake Hawassa Water-
+        Himalayas. Springer International Publishing. https://
+                                                                           shed, Ethiopia. Environmental Monitoring and Assess-
+        doi.org/10.1007/978-3-030-57824-4
+                                                                           ment, 186(3), 1765–1780. https://doi.org/10.1007/s10
+     Uddin, K., Shrestha, H. L., Murthy, M. S. R., Bajracharya, B.,
+                                                                           661-013-3491-x
+        Shrestha, B., Gilani, H., Pradhan, S., & Dangol, B. (2015).
+                                                                        Yang, X., & Liu, Z. (2005). Using satellite imagery and GIS
+        Development of 2010 national land cover database for
+                                                                           for land-use and land-cover change mapping in an
+        the Nepal. Journal of Environmental Management, 148,
+                                                                           estuarine watershed. International Journal of Remote
+        82–90.
+                                                                           Sensing, 26(23), 5275–5296. https://doi.org/10.1080/0
+     Upton, S. M. (2017). Data and Geometry; Model Building at
+                                                                           1431160500219224
+        Calthorpe Analytics. https://commons.clarku.edu/idce
+                                                                        Yu, L., & Gong, P. (2012). Google Earth as a virtual globe
+        _masters_papers/152/
+                                                                           tool for Earth science applications at the global scale:
+     Vadrevu, K. P., Le Toan, T., Ray, S. S., & Justice, C. O.
+                                                                           Progress and perspectives. International Journal of Re-
+        (Eds.). (2022). Remote sensing of agriculture and land
+                                                                           mote Sensing, 33(12), 3966–3986. https://doi.org/10.10
+        cover/land use changes in South and Southeast Asian
+                                                                           80/01431161.2011.636081
+        countries. Springer.
+                                                                        Yu, M., Yang, C., & Li, Y. (2018). Big data in natural disaster
+     Van Ginkel, M., & Biradar, C. (2021). Drought early warning
+                                                                           management: A review. Geosciences, 8(5), Article 165.
+        in agri-food systems. Climate, 9(9), Article 134.               Zahra, S. M., Shahid, M. A., Maqbool, Z., Sabir, R. M., Safdar,
+     Van Wart, J., van Bussel, L. G., Wolf, J., Licker, R., Grassini,      M., Majeed, M. D., & Sarwar, A. (2023). Application of
+        P., Nelson, A., Boogaard, H., Gerber, J., Mueller, N. D.,          geospatial techniques in agricultural resource manage-
+        & Claessens, L. (2013). Use of agro-climatic zones to              ment. IntechOpen. https://www.intechopen.com/onli
+        upscale simulated crop yield potential. Field Crops Re-            ne-first/87629
+        search, 143, 44–55.                                             Zambelli, P., Gebbert, S., & Ciolli, M. (2013). Pygrass: An
+     Van Westen, C. J. (2013). Remote sensing and GIS for natu-           object oriented python application programming in-
+        ral hazards assessment and disaster risk management.               terface (API) for geographic resources analysis support
+        Treatise on Geomorphology, 3(15), 259–298.                         system (GRASS) geographic information system (GIS).
+     Vancauwenberghe, G., Dessers, E., Crompvoets, J., & Van-              ISPRS International Journal of Geo-Information, 2(1),
+        denbroucke, D. (2014). Realizing data sharing: The role            201–219.
+        of spatial data infrastructures. In M. Gascó-Hernández          Zhan, L. -J., & Qin, C. -Z. (2012). Parallel geospatial raster
+        (Ed.), Open Government (Vol. 4, pp. 155–169). Springer             processing by Geospatial Data Abstraction Library
+        New York. https://doi.org/10.1007/978-1-4614-9563-                 (GDAL)—Applicability and defects. In Transactions in
+        5_10                                                               GIS. https://www.geog.leeds.ac.uk/groups/geocomp/
+     Varol, M. B., & Şanlioğlu, İ. (2017). Open geospatial con-            2013/papers/30.pdf
+        sortium web map and feature services and free/open              Zheng, X., & Amemiya, M. (2023). Method for applying
+        source server/client softwares. International Journal of           crowdsourced street-level imagery data to evaluate
+        Engineering and Geosciences, 2(1), 17–26.                          street-level greenness. ISPRS International Journal of
+     Vulevic, A., Macura, D., Djordjevic, D., & Castanho, R. A.            Geo-Information, 12(3), Article 108.
+        (2018). Assessing accessibility and transport infras-           Zysk, E., Dawidowicz, A., Źróbek, S., & Źróbek, R. (2020).
+        tructure inequities in administrative units in Serbia’s            The concept of a geographic information system for the
+        Danube Corridor based on multi-criteria analysis and               identiﬁcation of degraded urban areas as a part of the
+        GIS mapping tools. Transylvanian Review of Administra-             land administration system-A Polish case study. Cities,
+        tive Sciences, 14(53), 123–143.                                    96, Article 102423.
+
+
+     122                                                                                                                  Thakuri et al.
+

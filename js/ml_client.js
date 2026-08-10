@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Client-Side ML Stress Classifier (browser port)
+   Crafty GIS — Client-Side ML Stress Classifier (browser port)
    ═══════════════════════════════════════════════════════════
    A zero-dependency port of server/ml_model.js so the ML stress
    decision ("Moderate Stress", confidence, merged advisory) is

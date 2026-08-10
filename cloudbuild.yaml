@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════
-#  FarmHealth — Google Cloud Build pipeline
+#  Crafty GIS — Google Cloud Build pipeline
 #  Builds the Docker image and pushes it to Artifact Registry,
 #  ready for Cloud Run / App Engine Flexible deployment.
 #
@@ -12,22 +12,22 @@ steps:
     args:
       - 'build'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/crafty_gis:${SHORT_SHA}'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:latest'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/crafty_gis:latest'
       - '.'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/crafty_gis:${SHORT_SHA}'
 
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'farmhealth'
-      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+      - 'crafty_gis'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/crafty_gis:${SHORT_SHA}'
       - '--region=${_REGION}'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -40,7 +40,7 @@ steps:
 
 substitutions:
   _REGION: us-central1
-  _REPO: farmhealth
+  _REPO: crafty_gis
 
 images:
-  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/farmhealth:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/crafty_gis:${SHORT_SHA}'

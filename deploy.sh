@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # ============================================
-# FarmHealth Deployment Script
+# Crafty GIS Deployment Script
 # Pushes to Git → Triggers Render + Netlify
 # ============================================
 
 set -e  # Exit on error
 
-echo "🚀 Deploying FarmHealth..."
+echo "🚀 Deploying Crafty GIS..."
 
 echo "\n📝 Step 1: Checking Git status..."
 git status --short

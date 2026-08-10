@@ -1,4 +1,4 @@
-# FarmHealth — What To Do Next (Playbook)
+# Crafty GIS — What To Do Next (Playbook)
 
 > Last updated: 2026-08-09 · This is the **action checklist**, not the deep roadmap
 > (see `SELFHOST_MIGRATION.md` for the full phased plan and `SELFHOST_SETUP.md` for install details).
@@ -16,7 +16,7 @@
 | **Click-to-scan “What's at this location”** — auto pincode (India Post API) + nearby power/water/canal infrastructure (OpenStreetMap) with distances, when a field is selected | ✅ auto-runs on field select |
 | **Import my own records (CSV)** — upload `lat,lng,survey,khata,owner,motor,pipeline,electricity,...` → clicking a field auto-matches the nearest record within 500 m | ✅ built into Land Info card |
 | **Correct Ollama model tags** everywhere (`deepseek-r1:7b`, `llava-phi3`) | ✅ fixed in compose files, `.env.example`, all docs |
-| **Self-host stack** — `docker-compose.selfhost.yml` (farmhealth + ollama + postgis + uptime-kuma) | ✅ validated |
+| **Self-host stack** — `docker-compose.selfhost.yml` (crafty_gis + ollama + postgis + uptime-kuma) | ✅ validated |
 
 ---
 
@@ -33,7 +33,7 @@ git push origin main
 Render auto-deploys the backend; Netlify auto-deploys the frontend.
 
 ### 2. Add the GEE env vars to Render (ONLY in the dashboard — never in the repo)
-1. Render dashboard → your **farmhealth1-backend** service → **Environment** tab.
+1. Render dashboard → your **crafty-gis backend (legacy farmhealth1-backend)** service → **Environment** tab.
 2. Add these (mark as **Secret**):
    - `GEE_SERVICE_ACCOUNT` = `gee-backend-account@braided-analyst-500314-c5.iam.gserviceaccount.com`
    - `GEE_PRIVATE_KEY` = the **single-line** value from your local `.env` (everything between the quotes — it already has `\n` escapes, paste as-is)
@@ -42,11 +42,11 @@ Render auto-deploys the backend; Netlify auto-deploys the frontend.
 4. Wait ~2-4 min (free tier cold start).
 
 ### 3. Verify the backend is live (open these URLs)
-- `https://farmhealth1-backend.onrender.com/api/health` → `"gee":"connected"`
-- `https://farmhealth1-backend.onrender.com/api/gee/health` → `{"status":"connected","initialized":true}`
+- `https://crafty-gis backend (legacy farmhealth1-backend).onrender.com/api/health` → `"gee":"connected"`
+- `https://crafty-gis backend (legacy farmhealth1-backend).onrender.com/api/gee/health` → `{"status":"connected","initialized":true}`
 - **NEW** — the infrastructure endpoint (returns real OpenStreetMap data):
   ```bash
-  curl -X POST https://farmhealth1-backend.onrender.com/api/infrastructure \
+  curl -X POST https://crafty-gis backend (legacy farmhealth1-backend).onrender.com/api/infrastructure \
     -H "Content-Type: application/json" \
     -d '{"lat":25.4358,"lng":81.8463,"radius":2000}'
   ```
@@ -99,7 +99,7 @@ Then bring up the stack:
 docker compose -f docker-compose.selfhost.yml up -d
 docker compose -f docker-compose.selfhost.yml logs -f ollama   # watch it pull deepseek-r1:7b (~4.7 GB)
 ```
-The stack auto-pulls `deepseek-r1:7b` and serves Ollama on `:11434`, FarmHealth on `:8080`, Uptime Kuma on `:3001`.
+The stack auto-pulls `deepseek-r1:7b` and serves Ollama on `:11434`, Crafty GIS on `:8080`, Uptime Kuma on `:3001`.
 
 **Tip:** `POST /api/ai/health` is the Uptime Kuma probe; add it as an HTTP monitor once Kuma is up.
 

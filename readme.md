@@ -2,7 +2,7 @@
 
 <div align="center">
   
-  # 🌾 FarmHealth — Satellite Crop Monitor
+  # 🌾 Crafty GIS — Satellite Crop Monitor
   
   ### *Advanced Satellite Vision for Precision Agriculture*
   
@@ -63,7 +63,7 @@
 
 ## ✨ Features
 
-FarmHealth brings the power of multi-spectral satellites directly to farmers and researchers.
+Crafty GIS brings the power of multi-spectral satellites directly to farmers and researchers.
 
 <div align="center">
 
@@ -93,7 +93,7 @@ graph LR
     A[📍 Draw/Select Field] --> B[🛰️ Fetch Satellites]
     B --> C[📊 Compute Evalscripts]
     C --> D[🧠 AI Generates Advice]
-    D --> E[📱 FarmHealth Dashboard]
+    D --> E[📱 Crafty GIS Dashboard]
     
     B --> F[Sentinel-2 <br/> Multispectral]
     B --> G[Landsat-8 <br/> Thermal]
@@ -115,7 +115,7 @@ graph LR
 
 ## 🔐 Authentication Roles
 
-FarmHealth includes a dual-role mock authentication system for demonstration and security:
+Crafty GIS includes a dual-role mock authentication system for demonstration and security:
 
 | Role | Username | Password | Privileges |
 |------|----------|----------|------------|

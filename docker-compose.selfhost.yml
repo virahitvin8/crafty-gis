@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — SELF-HOSTED stack (for the always-on laptop)
+# Crafty GIS — SELF-HOSTED stack (for the always-on laptop)
 #
 #   Deploy:
 #     set -a; source .env; set +a
@@ -10,7 +10,7 @@
 #   can copy these services into Coolify later (or run as-is).
 #
 #   Ports:
-#     8080  → FarmHealth app + backend
+#     8080  → Crafty GIS app + backend
 #     3001  → Uptime Kuma dashboard
 #     11434 → Ollama (LAN only — do NOT expose publicly, it has no auth)
 #     5432  → PostgreSQL + PostGIS (LAN only)
@@ -32,8 +32,8 @@
 # ═══════════════════════════════════════════════════════════
 
 services:
-  # ─── FarmHealth app + backend ───
-  farmhealth:
+  # ─── Crafty GIS app + backend ───
+  crafty_gis:
     build: .
     ports:
       - "8080:8080"
@@ -98,15 +98,15 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-farmhealth}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-farmhealth}
-      - POSTGRES_DB=${POSTGRES_DB:-farmhealth}
+      - POSTGRES_USER=${POSTGRES_USER:-crafty_gis}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-crafty_gis}
+      - POSTGRES_DB=${POSTGRES_DB:-crafty_gis}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgis_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-farmhealth} -d ${POSTGRES_DB:-farmhealth}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-crafty_gis} -d ${POSTGRES_DB:-crafty_gis}"]
       interval: 30s
       timeout: 5s
       retries: 3

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Crop Stress Decision Model (pure JS, zero deps)
+   Crafty GIS — Crop Stress Decision Model (pure JS, zero deps)
    ═══════════════════════════════════════════════════════════
    A real Random Forest classifier implemented from scratch in
    Node.js (no scikit-learn needed). Trained on "bootstrap labels"

@@ -40,7 +40,7 @@ def strip_comments_and_strings(code: str) -> str:
 
 
 def main() -> int:
-    with open('vba/farmhealth_report.bas', encoding='utf-8') as fh:
+    with open('vba/crafty_gis_report.bas', encoding='utf-8') as fh:
         src = fh.read()
     clean = strip_comments_and_strings(src)
     lines = clean.split('\n')

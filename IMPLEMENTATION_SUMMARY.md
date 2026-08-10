@@ -1,4 +1,4 @@
-# FarmHealth Open-Source Stack — Implementation Summary
+# Crafty GIS Open-Source Stack — Implementation Summary
 
 ## ✅ What Was Implemented
 
@@ -64,7 +64,7 @@
   - Volume for model persistence
   - Health check included
   - GPU support (optional, commented)
-- ✅ Updated `farmhealth` service
+- ✅ Updated `crafty_gis` service
   - Added `depends_on: ollama`
   - Environment variables for Ollama connection
   - Points to `http://ollama:11434` (Docker network DNS)
@@ -275,4 +275,4 @@ sudo swapon /swapfile
 - ✅ Monitoring — Uptime Kuma
 - ✅ Complete docs — DEPLOYMENT.md + updated README
 
-**Result:** FarmHealth now runs completely free, forever, with no external API dependencies.
+**Result:** Crafty GIS now runs completely free, forever, with no external API dependencies.

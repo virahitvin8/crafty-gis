@@ -1,4 +1,4 @@
-# 🚀 Quick Start — 100% Open-Source FarmHealth
+# 🚀 Quick Start — 100% Open-Source Crafty GIS
 
 ## 5-Minute Setup
 

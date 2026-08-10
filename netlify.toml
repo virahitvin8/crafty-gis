@@ -1,4 +1,4 @@
-# ─── Netlify Configuration – FarmHealth Satellite Crop Monitor ───
+# ─── Netlify Configuration – Crafty GIS Satellite Crop Monitor ───
 
 [build]
   publish = "."
@@ -6,7 +6,7 @@
 [dev]
   framework = "#static"
 
-# SPA redirects: redirect API calls to farmhealth1 backend
+# SPA redirects: redirect API calls to crafty-gis backend (legacy name farmhealth1-backend)
 [[redirects]]
   from = "/api/*"
   to = "https://farmhealth1-backend.onrender.com/api/:splat"

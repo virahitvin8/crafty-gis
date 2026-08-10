@@ -1,15 +1,15 @@
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — Dokploy stack
+# Crafty GIS — Dokploy stack
 #
 #   In Dokploy:
-#     Projects → farmhealth → Add Resource → Docker Compose
+#     Projects → crafty_gis → Add Resource → Docker Compose
 #     → point at this file in the repo (or paste its contents).
 #
-#   This stack builds FarmHealth from THIS repo's Dockerfile
+#   This stack builds Crafty GIS from THIS repo's Dockerfile
 #   (no external registry image required), then adds the
 #   self-hosted companions:
 #
-#     farmhealth    :8080   app + backend (public entrypoint)
+#     crafty_gis    :8080   app + backend (public entrypoint)
 #     ollama        :11434  self-hosted LLM + vision (internal)
 #     postgis       :5432   saved farms / land records / STAC index
 #     uptime-kuma   :3002   monitoring + alerts (optional)
@@ -24,8 +24,8 @@
 # ═══════════════════════════════════════════════════════════
 
 services:
-  # ─── FarmHealth app + backend (public entrypoint on 8080) ───
-  farmhealth:
+  # ─── Crafty GIS app + backend (public entrypoint on 8080) ───
+  crafty_gis:
     build:
       context: .
     ports:
@@ -81,15 +81,15 @@ services:
   postgis:
     image: postgis/postgis:16-3.4
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-farmhealth}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-farmhealth}
-      - POSTGRES_DB=${POSTGRES_DB:-farmhealth}
+      - POSTGRES_USER=${POSTGRES_USER:-crafty_gis}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-crafty_gis}
+      - POSTGRES_DB=${POSTGRES_DB:-crafty_gis}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgis_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-farmhealth} -d ${POSTGRES_DB:-farmhealth}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-crafty_gis} -d ${POSTGRES_DB:-crafty_gis}"]
       interval: 30s
       timeout: 5s
       retries: 3

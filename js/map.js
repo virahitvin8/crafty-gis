@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Map Module
+   Crafty GIS — Map Module
    ═══════════════════════════════════════════════════════════ */
 
 const FH_MAP = (function() {
@@ -956,6 +956,38 @@ const FH_MAP = (function() {
     if (_zoneLayer) { _zoneLayer.clearLayers(); }
   }
 
+  // ═══════════ DISEASE OUTBREAK LAYER (research s44163) ═══════════
+  // Heat circles geotagging disease detections on the map.
+  let _outbreakLayer = null;
+
+  function getOutbreakLayer() {
+    if (!_state.map) return null;
+    if (!_outbreakLayer) {
+      _outbreakLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _outbreakLayer;
+  }
+
+  function clearOutbreakLayer() {
+    if (_outbreakLayer) { _outbreakLayer.clearLayers(); }
+  }
+
+  // ═══════════ MANAGEMENT ZONES LAYER (research Geo-Intelligent) ═══════════
+  // Colored per-zone patches for the site-specific management zones.
+  let _mgmtLayer = null;
+
+  function getMgmtLayer() {
+    if (!_state.map) return null;
+    if (!_mgmtLayer) {
+      _mgmtLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _mgmtLayer;
+  }
+
+  function clearMgmtOverlay() {
+    if (_mgmtLayer) { _mgmtLayer.clearLayers(); }
+  }
+
   return {
     setStateRef,
     findSavedField,
@@ -994,6 +1026,12 @@ const FH_MAP = (function() {
     mergeFromFirestore,
     // ML zone overlay
     getZoneLayer,
-    clearZoneOverlay
+    clearZoneOverlay,
+    // Disease outbreak layer
+    getOutbreakLayer,
+    clearOutbreakLayer,
+    // Management zones layer
+    getMgmtLayer,
+    clearMgmtOverlay
   };
 })();

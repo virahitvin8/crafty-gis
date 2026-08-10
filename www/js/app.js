@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Main Application Module
+   Crafty GIS — Main Application Module
    ═══════════════════════════════════════════════════════════
    Orchestrates all modules and exposes the public FH API.
    ═══════════════════════════════════════════════════════════ */
@@ -15,6 +15,7 @@ const FH = (function() {
   if (FH_API.setStateRef) FH_API.setStateRef(state);
   if (FH_UI.setStateRef) FH_UI.setStateRef(state);
   if (FH_ANALYSIS.setStateRef) FH_ANALYSIS.setStateRef(state);
+  if (FH_INTEL.setStateRef) FH_INTEL.setStateRef(state);
 
   // ═══════════ INITIALIZATION ═══════════
   function init() {
@@ -125,14 +126,41 @@ const FH = (function() {
     getAIAdvice: FH_API.getAIAdvice,
     analyzeCropPhoto: FH_API.analyzeCropPhoto,
 
+    // GIS Utilities (Senior GIS Analyst grade)
+    validateField: FH_GIS.validateCoordinates,
+    calculateFieldArea: FH_GIS.polygonArea,
+    calculateFieldPerimeter: FH_GIS.polygonPerimeter,
+    getFieldCentroid: FH_GIS.polygonCentroid,
+    formatCoordinates: FH_GIS.formatCoord,
+    detectUTMZone: FH_GIS.detectUTMZone,
+    haversineDistance: FH_GIS.haversineDistance,
+
     // Professional Analysis (GEE continuous + clipped terrain + ML)
     runProfessionalAnalysis: FH_ANALYSIS.runProfessionalAnalysis,
     exportProZoneCSV: FH_ANALYSIS.exportProZoneCSV,
     exportProReportCSV: FH_ANALYSIS.exportProReportCSV,
     retrainProModel: FH_ANALYSIS.retrainProModel,
+
+    // G5/G8: Ground-truth labels + PDF reports
     submitGroundTruth: FH_ANALYSIS.submitGroundTruth,
     refreshGroundTruthCount: FH_ANALYSIS.refreshGroundTruthCount,
     exportPDFReport: FH_ANALYSIS.exportPDFReport,
+
+    // Research Intelligence (FH_INTEL — from the 12 PDFs)
+    renderResearchKB: FH_INTEL.renderResearchKB,
+    toggleResearchCard: FH_INTEL.toggleResearchCard,
+    recordDiseaseOutbreak: FH_INTEL.recordDiseaseOutbreak,
+    renderOutbreakLayer: FH_INTEL.renderOutbreakLayer,
+    renderDiseaseTimeline: FH_INTEL.renderDiseaseTimeline,
+    computeSpreadRisk: FH_INTEL.computeSpreadRisk,
+    clearOutbreaks: FH_INTEL.clearOutbreaks,
+    addDetectionFromVision: FH_INTEL.addDetectionFromVision,
+    saveSensorReading: FH_INTEL.saveSensorReading,
+    renderSensorFusion: FH_INTEL.renderSensorFusion,
+    computeDiseaseEWS: FH_INTEL.computeDiseaseEWS,
+    runManagementZones: FH_INTEL.runManagementZones,
+    renderManagementZones: FH_INTEL.renderManagementZones,
+    exportMgmtZonesCSV: FH_INTEL.exportMgmtZonesCSV,
 
     // UI
     setMode: FH_UI.setMode,

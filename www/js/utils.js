@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Utilities Module
+   Crafty GIS — Utilities Module
    ═══════════════════════════════════════════════════════════ */
 
 const FH_UTILS = (function() {

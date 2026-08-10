@@ -1,0 +1,892 @@
+Received May 26, 2020, accepted June 8, 2020, date of publication June 16, 2020, date of current version June 29, 2020.
+Digital Object Identifier 10.1109/ACCESS.2020.3002948
+
+
+
+
+A Multi-Modal Approach for Crop Health
+Mapping Using Low Altitude Remote
+Sensing, Internet of Things (IoT)
+and Machine Learning
+UFERAH SHAFI1 , RAFIA MUMTAZ 1 , (Senior Member, IEEE), NAVEED IQBAL1 ,
+SYED MOHAMMAD HASSAN ZAIDI1 , (Senior Member, IEEE),
+SYED ALI RAZA ZAIDI 2 , (Member, IEEE), IMTIAZ HUSSAIN3 , AND ZAHID MAHMOOD3
+1 School of Electrical Engineering and Computer Science (SEECS), National University of Sciences and Technology (NUST), Islamabad 44000, Pakistan
+2 School of Electronic and Electrical Engineering, University of Leeds, Leeds LS2 9JT, U.K.
+3 Crop Sciences Institute, National Agriculture Research Center (NARC), Islamabad 45500, Pakistan
+
+Corresponding author: Rafia Mumtaz (rafia.mumtaz@seecs.edu.pk)
+This work was supported in part by the Higher Education Commission (HEC), National Research Programme for Universities (NRPU)
+Program, Pakistan, and in part by the Global Challenge Research Fund (GCRF), U.K.
+
+
+
+
+  ABSTRACT The agriculture sector holds paramount importance in Pakistan due to the intrinsic agrarian
+  nature of the economy. Pakistan has its GDP based on agriculture, however it relies on manual monitoring of
+  crops, which is a labour intensive and ineffective method. In contrast to this, several cutting edge technology-
+  based solutions are being employed in the developed countries to enhance the crop yield with the optimal
+  use of resources. To this end, we have proposed an integrated approach for monitoring crop health using IoT,
+  machine learning and drone technology. The integration of these sensing modalities generate heterogeneous
+  data which not only varies in nature (i.e. observed parameter) but also has different temporal fidelity. The
+  spatial resolution of these methods is also different, hence, the optimal integration of these sensing modalities
+  and their implementation in practice are addressed in the proposed system. In our proposed solution, the IoT
+  sensors provide the real-time status of environmental parameters impacting the crop, and the drone platform
+  provide the multispectral data used for generating Vegetation Indices (VIs) such as Normalized Difference
+  vegetation Index (NDVI) for analyzing the crop health. The NDVI provides information about the crop
+  based on the chlorophyll content, which offers limited information regarding the crop health. In order
+  to obtain a rich and detailed knowledge about crop health, the variable length time series data of IoT
+  sensors and multispectral images were converted to a fixed-sized representation to generate crop health
+  maps. A number of machine and deep learning algorithms were applied on the collected data wherein deep
+  neural network with two hidden layers was found to be the most optimal model among all the selected
+  models, providing an accuracy of (98.4%). Further, the health maps were validated through ground surveys
+  and by agriculture experts due to the absence of reference data. The proposed research is basically an
+  indigenous, technology based agriculture solution capable of providing important insights into the crop
+  health by extracting complementary features from multi-modal data set, and minimizing the crop ground
+  survey effort, particularly useful when the agriculture land is large in size.
+
+
+  INDEX TERMS Internet of Things (IoT), precision agriculture, NDVI, crop health.
+
+I. INTRODUCTION                                                                                conditions and the largest irrigation system in the world [1].
+Pakistan is an agricultural country owing to its natural                                       The agriculture sector accounts for 18.5% of Pakistan
+resources including fertile arable land, favorable climate                                     GDP [2] and has a significant impact on the economy of
+                                                                                               the country. Despite of all suitable conditions for crops cul-
+   The associate editor coordinating the review of this manuscript and                         tivation, Pakistan is still unable to produce surplus yield for
+approving it for publication was Peng-Yong Kong               .                                national and international market needs. Every year, Pakistan
+
+                     This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+112708                                                                                                                                                                VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+faces a huge loss in the agriculture sector due to several                         Typically, the multispectral data collected using drone is
+factors such as extreme climatic variations, lack of technol-                   used to compute the VIs of the crop for determining its
+ogy adoption, improper use of major resources like water,                       health status. Generally, NDVI is used as a strong indicator
+fertilizer, and pesticides [3]. The inappropriate utilization of                of crop health. However, if the crop health conditions are
+these resources leads to loss of organic content & nutrients                    only determined from the NDVI values, then the inferred
+in the crop and a significant reduction in its yield. In order to               crop health status would be misleading due to the varying
+address these problems, technology-based solutions should                       level of chlorophyll content at different stages of the crop.
+be employed to overcome the manual farming practices                            Every development stage of crop has some predefined range
+which are inherently time consuming and laborious.                              of NDVI values, which can help to assess the health of the
+   In Pakistan, major crops wheat, rice, maize, sugarcane and                   crop. The low NDVI value does not always refer to the
+cotton are planted on 8.74, 2.80, 1.30, 1.30 and 2.47 million                   stressed or unhealthy crop, we have to integrate the temporal
+per ha in 2018 to 2019. Among these, wheat is the staple crop                   information of the crop development stage as well to deter-
+of the country and typically sown from October to Decem-                        mine the crop health status.
+ber and harvested from March to May [4]. The wheat plant                           In view of the above, we have proposed a multi modal
+undergoes several development stages such as seeding, tiller-                   data driven approach for agricultural monitoring based on
+ing, booting, heading and ripening. In each stage, the wheat                    IoT, drone based remote sensing and machine learning. The
+plant has specific requirements of water, temperature, solar                    proposed work is based on testing the hypothesis that the inte-
+radiations and nutrients / fertilizer for optimal growth. These                 gration of multi modal data can enhance the representation
+requirements are directly correlated with climate change, for                   of crop health information as compared to the crop health
+instance, the frequency of rainfall and temperature variations.                 status depicted only by NDVI. For this purpose, the collected
+For the ideal development of the wheat plant, the primary                       data from IoT nodes and drone were analyzed at different
+resources should be applied in a controlled fashion in a                        growth stages of the crop and its health maps were generated
+site-specific manner as the deficiency of any resource can                      to localize the area under stress.
+adversely affect the crop growth where as, the excessive use                       The major contributions of the paper are highlighted
+of these resources can damage the crop [5]. To precisely esti-                  below:
+mate the resource requirements, Precision Agriculture (PA)                         • Integration of IoT and drone multispectral data for crop
+is widely practiced across the world and it basically enhances                       health monitoring. Both these sensing modalities gener-
+the food production with optimal use of resources [6].                               ate heterogeneous data which not only varies in nature
+   As of today, the smart agriculture systems based on IoT                           (i.e. observed parameter) but also has different temporal
+are rapidly gaining popularity as they provide real time sta-                        fidelity. The spatial resolution of these methods is also
+tus of the environmental variables pertaining to the crop                            different, hence, the optimal integration of these sens-
+using low cost sensors [7]. Such systems not only advance                            ing modalities and their implementation in practice are
+the PA practices but also play a key role in making the                              addressed in this paper.
+crop monitoring system more efficient and effective. On the                        • Development of crop health maps for enhanced
+other hand, the IoT based systems are generally suitable for                         visualization of the stressed areas and their subsequent
+small to medium scale farming due to their sensitivity to the                        validation through ground survey.
+high maintenance & deployment cost and power constraints.                          • Development of IoT sensors data maps which provided
+In contrast to IoT, remote sensing is widely used for large                          insights for identifying the factors affecting the crop
+scale farming which is based on a reflective analysis of satel-                      health.
+lite images [8]. Conventionally, satellite images have been                     This multi modal integration of data for crop health mapping
+used as the key source of information for analyzing crop                        differentiates the proposed work from the existing work.
+status in precision agriculture. But, obtaining most recent                     Most of the existing technology based solutions in agricul-
+aerial/satellite imagery is very expensive, and data process-                   ture domain are either based on IoT data or remote sensing
+ing is also intensive and complicated. In addition to this,                     data, but the proposed system exploits the benefits of both
+the images obtained from satellites are of low resolution and                   technologies to provide a better solution.
+are only suitable for large scale studies. This limit their appli-                 The rest of the paper is organized as follows, the related
+cability in studies based on precision agriculture. On the other                work is described in section-2, the proposed system is dis-
+hand, the satellites (such as Quick Bird, ASTER) providing                      cussed in section-3, the methodology is detailed in Section-4;
+higher resolution images have long revisit time which makes                     results are discussed in Section-5, and conclusion and future
+them unsuitable for applications (such as pest monitoring,                      work is discussed in section-6
+nutrient stress monitoring etc.) that require images on fre-
+quent basis [9]. To overcome these limitations, low altitude                     II. RELATED WORK
+platforms such as drone with on-board imaging sensors are                       Agriculture sector has evolved with the emergence of the
+used, where these platforms provide high-resolution images                      information and communication technology. Several attempts
+and flexible data acquisition [6].                                              have been made to improve the crop productivity and
+
+
+VOLUME 8, 2020                                                                                                                          112709
+                             U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+minimize the loss by using the modern technology [7], [10].                This platform consisted of a large durable fixed wing air
+There are several agricultural applications based on Remote                frame mounted with a Canon camera and the FLIR thermal
+sensing in which reflective analysis of spectral bands [8]                 camera for the computation of the indices such as Normal-
+is performed using multiple VIs which provide useful                       ized Difference Vegetation Index (NDVI) and Water Stress
+insights about the health of the crops. The most com-                      Index (WSI). There were a number of flight missions that
+mon VIs are NDVI, Soil Adjusted Vegetation Index                           were run to scan the study area during various development
+(SAVI), Enhanced Vegetation Index (EVI), and many others.                  stages of the crop. The collected images were used to generate
+Typically, the satellites used for agriculture monitoring are              the NDVI and NGB (Near infrared Green Blue) images,
+Landsat, QuickBird, Envisat, SPOT 6 & 7, Sentinel 1 & 2,                   which helped to delineate the regions with low yield potential,
+and MODIS [11].                                                            areas with variable plant counts, and identify uneven distribu-
+   In [12], an automated system for monitoring the cotton                  tion of nitrogen and water management related problems.
+crop based on IoT has been proposed to acquire the data                       Similarly, in another study [20], a crop health monitoring
+in real time. The proposed automated system comprised the                  system was developed by using WSN and drone technology.
+deployment of wireless sensor network (WSN) in the cotton                  The key contribution of this paper is the construction of run
+fields for the monitoring and recording the health status of the           time clusters of sensors by taking into account the factors such
+crop. For this purpose, the Waspmote agriculture sensor board              as run time data acquisition, the area of interest to be scanned,
+has been used which consisted of temperature and humidity                  absence of adequate number of nodes, and dynamic flight
+sensors, soil moisture sensors and leaf wetness sensors. The               path of drone. In addition to this, Bayesian classifier was used
+main aim of the proposed system was to take proactive and                  to identify the most appropriate node as a cluster head. The
+preventive actions to reduce the losses due to diseases and                proposed system was validated by simulating results through
+insects/pests attack.                                                      various software tools, and conducting experiments in labs
+   Crop irrigation is the primary building block of any agricul-           and in agriculture field using concept devices. The results
+ture system. therefore, there is a need of a proper water man-             produced were supportive in terms of installation time, energy
+agement system for irrigation purposes to minimize water                   ingestion, response time and its usability.
+loss. For this purpose, this paper [13] recommends the use                    Remote sensing systems based on satellite are suitable for
+of Wireless Sensor and Actuator Network (WSAN) for the                     large arable land because of their wide area coverage, how-
+crop irrigation and control by developing an in-house design               ever, their long revisit time and coarse resolution make them
+and development of WSAN and its communication protocol.                    unsuitable for certain agricultural application where rapid
+   In [14], a framework for modern farming using various                   response is required such as disease mapping, pest detection
+techniques such as IoT, big data and mobile computing,                     etc. To overcome these limitations, drone platforms were
+has been discussed. Through this model, the farmer can be                  used which provided high resolution imagery on frequent
+enabled to obtain information related to the needed fertilizers            basis but their power limitations do not allow them to cover
+from the soil samples. The farmers are then informed about                 large fields in a single flight mission. In addition to this, IoT
+the total fertilizer requirement through a mobile app.                     based systems provide real-time statistics about crop health
+   In [15], [16], the soil moisture sensing is discussed which             such as climate variables which have a significant impact
+is one of the frequently used methods by farmers to schedule               on the crop health but owing to their high deployment and
+irrigation. The purpose of this study was to make a low-cost               maintenance cost, these systems are preferably suitable for
+and low power IoT system based on Arduino, where soil                      small and medium sized agriculture lands.
+moisture sensors (Watermark 200SS sensors) were placed                        There are various smart agriculture systems which are
+in the field to send data wirelessly using LoRa technology.                based on hybrid approach and incorporate IoT, remote sens-
+These type of IoT based systems are known as Internet of                   ing, machine and deep learning as discussed in [21]–[23].
+under ground Things (IOUT). The system was effectively val-                Nexus to this, a smart irrigation system using deep learning
+idated on the study site by deploying the sensors at 4 different           is presented in [24] where the research work is based on
+depths in a wheat field. The advantage of the proposed system              developing WSN comprising of several sensors. The data
+was that it provided the proof of concept of an affordable                 collected from these sensors is sent to the cloud where a
+real time data gathering and analysis system for soil moisture             deep learning architecture ‘Long and Short Term Memory
+monitoring and showed a great potential for a system that can              (LSTM)’ is applied to predict different features such as soil
+be widely used by farmers. An IoT based system for insects                 temperature, humidity and air temperature. The projected
+detection in plants was discussed in [17]. Similarly, another              values of these vital parameters helped to determine the crop
+IoT based system was presented in [18] in which images                     best suited to be grown for subsequent season.
+were processed for disease detection; while soil moisture                     In addition to the application of deep learning in IoT based
+sensor and humidity sensors were used to monitor water                     smart systems, deep learning is widely used in very complex
+requirements.                                                              agricultural activities such as weed detection, crop disease
+   The research work presented in [19] describes the use                   mapping, identification of pest attack, plant phenology anal-
+of an inexpensive low altitude remote sensing platform,                    ysis, crop yield prediction, crop classification and many more
+GreenDrone, developed for monitoring the Maize crop.                       as discussed in [25]–[29]. In order to perform the above
+
+112710                                                                                                                                 VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+TABLE 1. Comparison of proposed system with existing systems.
+
+
+
+
+activities, the most common deep learning techniques are                        study area are generated. Although, the data is collected from
+Convolution Neural Network (CNN), LSTM, Recurrent Neu-                          multiple sources; but it is not combined together to produce a
+ral Network (RNN) and Region based CNN (R-CNN) [22].                            unified output. In [34], several applications of drone based
+Similarly, another application of CNN is presented in [30],                     agricultural systems are proposed where multiple sensors
+in which wheat yield is estimated by detecting and counting                     are mounted on the drone to collect multi source payload
+wheat spikes. An important area of precision agriculture is                     including real time data of different crop related parameters
+to accurately estimate the area under pest or disease attack.                   and spectral data. This research work is only focused on
+Therefore, R-CNN is used to accurately localize the area                        proposing the architectures of agriculture applications and
+under disease attack as presented in [31]. In addition to this.                 does not provide any implementation detail of the proposed
+LSTM is also used for disease detection in potato plants as                     architecture and data processing.
+discussed in [32].                                                                 A comparison of the existing and proposed work based on
+   There are several studies in which WSN or IoT is used                        the important parameters such as ‘Drone data’, ‘IoT data’,
+along with drone technology. Toward such end, an intelligent                    ‘Multi-source Data integration’, ‘VI maps’, ‘Health maps’
+crop health monitoring system is presented in [33], in which                    and ‘IoT data maps’ is given in the Table 1. The compara-
+a collaborative approach of UAV and WSN is used. The                            tive analysis of the previous research work has revealed that
+drone and WSN were used to collect images and real time                         the IoT and drone data have been used separately to infer
+data respectively. This paper was mainly focused on drone                       crop health status but the integration of these two modalities
+trajectory planning to collect WSN data. The collected data                     have not been highlighted in the recent research. However,
+from WSN is transmitted to the cloud and processed by                           to provide rich representation of crop health, the integra-
+the end user. Subsequently, soil & temperature maps of the                      tion of these two modalities to generate crop health maps
+
+VOLUME 8, 2020                                                                                                                         112711
+                                U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+would be very useful. In this regard, we propose a multi-                     in 28 passes of 100 meters length. Each pass had 6 rows with
+source data integration approach that combines IoT and drone                  inter row distance of 0.25m.
+technology to provide an improved crop monitoring system.
+Both these sensing modalities generate heterogeneous data                     III. PROPOSED SYSTEM
+which not only varies in nature (i.e. observed parameter) but                 We proposed an integrated system for wheat crop health mon-
+also has different temporal fidelity. The spatial resolution of               itoring. The main building blocks of the system are IoT agri
+these methods is also different, hence, the optimal integra-                  nodes, communication channel for transmitting data, drone
+tion of these sensing modalities and their implementation in                  with a multispectral camera, local server for archiving data,
+practice are addressed in the proposed system. Additionally,                  and a web portal for data visualization. The high level system
+machine learning approaches and deep learning architec-                       architecture is shown in Figure 3.
+tures [6] are applied on the combined data to generate crop                      The detail of the above mentioned building blocks are
+health maps which provide more detailed and clear visual-                     described in the following sections:
+ization of stressed areas as compared to traditional NDVI
+maps. Moreover, IoT sensors maps are generated which help                     A. DEVELOPMENT OF IoT AGRI NODES
+to correlate the factors affecting the health of the crop. The                The development of a typical IoT node primarily involves
+proposed system has provided a technology based solution in                   the careful selection of sensors, communication module and
+comparison to the traditional practices in vogue and would be                 the power source. The details of these components for the
+useful for the agricultural and research community.                           purpose of the current research work are described below.
+
+A. STUDY AREA                                                                 1) IoT SENSORS
+The study area selected is National Agriculture Research                      For the proposed system, three sensors were used including
+Center (NARC) which is located at 33.67◦ N, and 73.13◦ E                      air temperature & humidity sensor, soil temperature sensor,
+in Islamabad, Pakistan. Figure 1 shows the study area map                     and soil moisture sensor. For recording the air temperature
+of NARC. This map is generated using ‘ArcGIS’ software                        and humidity, ‘DHT11’ digital sensor was used, for sensing
+and the shape file is retrieved from the open source platform                 Soil temperature, ‘DS18B20’ digital sensor was selected, and
+‘Diva-GIS’. The average temperature of this area is 21.74◦ C                  for monitoring the soil moisture level, the ‘Capacitive Soil
+and average annual rainfall recorded is 1142 mm. The                          Moisture’ sensor was used. There are two major categories of
+major crops harvested in this region are wheat, maize, and                    soil moisture sensors including volumetric and tensiometric.
+mustard etc.                                                                  The volumetric sensors measure the water level in the soil;
+                                                                              whereas the tensiometric sensors measure the water potential
+                                                                              in the soil [35]. The selected capacitive soil moisture sensors
+                                                                              used for this research work are Grove - Capacitive Soil Mois-
+                                                                              ture Sensor (Corrosion Resistant), which are volumetric in
+                                                                              nature. They are not factory calibrated, therefore, the opti-
+                                                                              mal calibration of these sensors is a challenge. This issue is
+                                                                              addressed by manually configuring the sensors in the lab and
+                                                                              field using multi-point calibration technique [36].
+                                                                                 On the other hand, volumetric soil moisture sensors which
+                                                                              are factory calibrated are more accurate but at the same time
+                                                                              they are expensive as well [37] and deploying such sensors
+                                                                              in numbers are beyond the budgetary provisions of the pilot
+                                                                              studies.
+                                                                                 The capacitive soil moisture sensor outputs an analog volt-
+                                                                              age level which is inversely proportional to the moisture
+                                                                              content. This sensor is sensitive to the variation in temper-
+                                                                              ature, salinity and pH content of the soil. The calibrated
+                                                                              IoT sensors’ measurements were fairly accurate and this was
+FIGURE 1. Study area map (NARC, Pakistan).
+                                                                              validated by comparing the readings with the commercial
+                                                                              sensors provided by NARC.
+   The crop selected for this research work is wheat. It is a
+Rabi crop which is generally sown in October-November and                     2) COMMUNICATION MODULE
+harvested in April-May depending on the temperature and the                   The purpose of the communication module is to reliably
+soil type. The life cycle of the wheat crop spans over different              transmit the data from one end to the other, and plays a key
+stages of development as shown in Figure 2. The wheat field                   role in characterizing the performance of the system. For
+was selected at NARC for this research work. In the trial area                our research work, the ‘LoRA’ (Long Range) communication
+of 4200m2 , the wheat variety, ‘BORLUAG-16’, was planted                      module was found more suitable owing to its long range
+
+112712                                                                                                                                    VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+FIGURE 2. Wheat growth stages.
+
+
+
+
+of transmission. Moreover, in an agriculture land, there is                     time monitoring. The most rich source of energy for powering
+a clear line of sight which makes LoRa technology to be                         the proposed agriculture system is the solar energy. For this
+more effective for such a set up. The LoRa modules operate                      purpose, the slave nodes are powered by a 10W solar Panel
+on two types of frequencies i.e. 433MHz and 868MHz. For                         and 4Ah Battery to provide long battery backups in case of
+our application, the 433MHz frequency module was used                           rain fall and cloudy weather. The master node is equipped
+as this frequency band is license free, however, the 868mhz                     with 40W solar panel with a 5Ah battery to provide adequate
+ISM band is not free in Pakistan. The LoRa modules use                          power to it. The Figure 4 shows an IoT Agri node with LoRA
+their proprietary modulation techniques in which data is sent                   and power module.
+using Chirps and they can also be interfaced with the micro-
+controller over the serial-parallel interface (SPI) protocol.
+                                                                                 B. SYSTEM DEPLOYMENT
+   For the transmission of data, the IoT agri nodes were
+                                                                                The IoT agri nodes are deployed across the wheat field in a
+configured using star topology, which has 8× slave nodes and
+                                                                                star topology as shown in Figure 5.
+1× master node. The slave nodes sent data to the master node
+                                                                                   The field is divided into a 3 × 3 matrix comprising of
+using LoRa technology whereas, the data from the master
+                                                                                9 cells where the area covered by each cell is 0.15 acres.
+node to the web portal was sent using GSM technology. The
+                                                                                We have deployed one IoT node in each cell to collect IoT
+advantage of star topology is its cost effectiveness, however
+                                                                                sensors data. Each IoT node consists of sensors along with
+at the same time, it has a single point of failure as well. This is
+                                                                                other components as shown in Figure 4. These IoT nodes
+because a single master node is responsible for sending data
+                                                                                cannot be deployed in bulk due to budget constraints of this
+that is collected from all nodes to the local server. In order to
+                                                                                research work. So, we have chosen a small experimental plot
+overcome this limitation to a certain extent, the SD card was
+                                                                                and made deployment topology accordingly. In each cell,
+placed on the master node for storing the data for 24 hours in
+                                                                                we have recorded multiple readings by placing IoT node
+case of any communication failure at the master node end.
+                                                                                at different locations. On average, the readings of tempera-
+                                                                                ture and soil moisture did not vary significantly. Although,
+3) POWER MODULE                                                                 the information regarding the soil moisture for the given
+In the IoT based systems, the continuous provision of power                     crop field can be increased by deploying more IoT nodes in
+is the primary concern to keep the system operational for real                  each cell, but for the preliminary study, we have deployed
+
+VOLUME 8, 2020                                                                                                                        112713
+                                U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+FIGURE 3. Proposed system architecture.
+
+
+
+
+FIGURE 4. IoT Agri Node with its components.
+
+
+
+
+9 nodes to cover the subject area. In future, we may add more                 order to get a detailed picture of the crop health. The data
+sensors and adopt the robot technology for data capturing.                    from two different modalities was generated at a variable
+The agriculture robot will be like a moving trolley which will                temporal resolution, which was further mapped to a fixed
+move across the field and collect sensors data.                               sized representation for data processing and analysis.
+                                                                                 The optical and multispectral images were collected by DJI
+IV. METHODOLOGY                                                               Phantom 4 advance drone with Sentera multispectral imager
+In order to develop our proposed system, the multi modal data                 mounted on it. The specification of drone and the on-board
+obtained from IoT nodes and drone imagery was integrated in                   imager are given in the Table 2 and Table 3 respectively.
+
+112714                                                                                                                                    VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+FIGURE 5. IoT Agri Nodes deployed across the wheat field.
+
+
+TABLE 2. Drone specifications.
+
+
+
+
+   Subsequently, various machine learning and deep learning                     whereas the details of each processing step is described in
+algorithms were applied on the fused data for crop health                       the following sub sections.
+classification and generating health maps. Later on, the health
+maps were compared with the NDVI maps and IoT sensors                            A. DATA PRE-PROCESSING
+data maps for validation purposes. The block diagram rep-                       The data was collected from two heterogeneous sources
+resenting various modules of the proposed system and the                        including IoT agri nodes and drone, where the data from IoT
+sequence of data flow among them is shown in Figure 7,                          nodes was sent to the local server with an interval of 5 minutes
+
+
+VOLUME 8, 2020                                                                                                                           112715
+                                 U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+TABLE 3. Drone imager and image specifications.
+
+
+
+
+                                                                               black circles show the outliers, which were removed later
+                                                                               from the data set. A distinct variation over the period of three
+                                                                               months has been observed for humidity, which was mainly
+                                                                               attributed to the weather fluctuations in the year 2019-20.
+                                                                               Similarly, in the box plot of soil moisture, it has been observed
+                                                                               that its values were increased gradually ranging from 10%
+                                                                               to 90%. This observed behavior of soil moisture is due to
+                                                                               the fact that during the initial crop growing stage, the soil
+                                                                               moisture was less, however, as the crop grew in size, the soil
+                                                                               moisture increased incrementally. It was observed from the
+                                                                               air temperature box plot that the behaviour of the tempera-
+                                                                               ture profile is negatively correlated with the humidity data.
+                                                                               The variation in the air temperature was also credited to
+                                                                               the changes in the weather conditions. During the month of
+                                                                               December and January, the crop was typically covered by
+                                                                               frost and dew drops in early morning. Due to these factors,
+                                                                               the soil temperature rapidly dropped ranging from 5◦ C-15◦ C
+                                                                               which eventually increased in the soil moisture.
+                                                                                  In addition to the IoT nodes data, the multispectral data was
+                                                                               also pre-processed. For capturing the multispectral images,
+                                                                               the drone was flown at the recommended height of 120 feet
+                                                                               with speed of 6 miles per hour. These recommendations
+                                                                               were provided by the multispectral imager vendor, i.e Sen-
+                                                                               tera. With these configurations, the ground sampling distance
+FIGURE 6. Layout of Wheat Field in the form of 3 × 3 matrix.                   (GSD) was 1.2 inches per pixel. GSD can be computed by
+                                                                               using the Eq 7 [38].
+and drone imagery was collected on weekly basis. The IoT
+nodes were powered by solar panels, however in an event                                                              α×h
+                                                                                                          GSD =                                       (1)
+of cloudy or rainy weather conditions, the batteries were not                                                         f
+sufficiently charged. As a result of this, the data was not sent
+to the web portal leading to missing values, which were then                   where ‘h’ is the altitude of the platform; ‘f’ indicates the focal
+interpolated by using bi-linear interpolation. When the batter-                length of the image sensor and α refers to the size of the
+ies restored their charge, the data transmission was resumed.                  charged coupled device (CCD) cell of the imager.
+During the first few minutes of the resumption of the power                       There was no cloud cover in the recorded imagery as the
+supply, the sensors were reconfigured and consumed some                        drone is typically flown below the cloud height. On average,
+time to stabilize. During this interval, the transmitted data was              25 to 30 images were captured in a single flight mission with
+considered as an outlier because the values did not correspond                 an overlap of 70% in the image content. This overlap was
+to the true values of the environmental parameters, therefore,                 then used to stitch the images seamlessly in order to obtain
+the outliers were removed from the data set. In order to picto-                the complete scene representation.
+rially represent the statistical summary of all IoT agri nodes
+data in terms of monthly mean, variation, min-max values and                   B. NDVI MAPS
+outliers, the box plot was used as shown in Figure 8.                          It is mentioned earlier that we have 9 × IoT agri nodes
+   The two whiskers in Figure 8 show the minimum and                           deployed in the field (see Figure 6), therefore, the stitched
+maximum values of a particular variable whereas the line in                    image obtained during the pre-processing stage was mapped
+the box shows the mean of the particular variable; and the                     onto these 9 cells as shown in Figure 10.
+
+112716                                                                                                                                     VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+FIGURE 7. Block diagrams of the data processing.
+
+
+
+
+FIGURE 8. Statistical summary of IoT agri nodes data.
+
+
+   The NDVI values of the stitched images were computed to                      the early stages of crop development, the NDVI value is low
+find the chlorophyll content of the crop. which is an indicator                 as compared to the matured stage of stem elongation phase,
+of the crop health status. The NDVI of the stitched images                      and again a decline in NDVI values is observed during the
+was computed using Eq 2 [39].                                                   grain ripening stage, when crop turns golden and loses the
+                                                                                chlorophyll content.
+                                    NIR − R
+                        NDVI =                                         (2)         The spatial NDVI maps generated for the period of
+                                    NIR + R                                     three months starting from November to January are shown
+where, ‘NIR’ is the Near Infra Red band and ‘R’ is the Red                      in Figure 12. The NDVI map for the month of November did
+band.                                                                           not cover the entire field due to an unstable drone flight.
+  Typically, the NDVI profile for the entire wheat growth                       However, NDVI maps for the other months include the com-
+cycle represents a parabola as shown in Figure 11.                              plete region of the study area (Figure 12).
+  The dotted bounding box in Figure 11 is representing the                         The area covered by the cells in Figure 12 showed the
+months for which we have collected the data and generated                       variations of NDVI at different development stages of wheat.
+the NDVI maps. It can been seen in Figure 11 that during                        In the Figure 12-A, the yellow color is representing sparse
+
+VOLUME 8, 2020                                                                                                                       112717
+                                 U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+                                                                               FIGURE 11. NDVI profile of entire growth cycle of Wheat crop.
+FIGURE 9. Ground sampling distance at a specific height.
+
+                                                                               in others. The crop is in the stem elongation stage which
+                                                                               starts after 5 leafs stage (Figure 2) and lasts until the end of
+                                                                               February. The height of the crop in this stage is not uniform
+                                                                               across the field i.e. low in some regions and high is other
+                                                                               regions. The green color in the NDVI image represents the
+                                                                               region where the crop is more dense and taller. The variation
+                                                                               in the crop height and its thickness over our the study area
+                                                                               is mainly attributed to several factors such as the sunlight
+                                                                               reaching to that plant, fertilizer distribution in that area, and
+                                                                               the terrain slope to hold the water in that region.
+                                                                                  The advantage of NDVI maps is that they provide an over-
+                                                                               all picture of crop health and help to identify the crop under
+                                                                               stress. However, they provide limited information regarding
+                                                                               the stressed area. These maps do not identify the sources of
+                                                                               stress, for instance, rust disease, lack of soil moisture, extreme
+                                                                               weather conditions, evapotranspiration, insufficient fertilizer
+                                                                               etc. Therefore, a ground survey was performed to validate the
+                                                                               results of NDVI maps and the visual inspection has shown
+                                                                               that the stressed areas indicated by NDVI maps were present
+                                                                               in the crop field.
+                                                                                  NDVI is not the sole criteria to determine the crop health
+                                                                               because it only indicates the presence of chlorophyll content
+                                                                               in the plants. However, additional information and knowl-
+                                                                               edge regarding the crop growth is required to determine its
+                                                                               health status. This includes information about meteorological
+                                                                               parameters such as air temperature, humidity, soil parameters
+FIGURE 10. Stitched NIR image.                                                 such as soil temperature and soil moisture information, and
+                                                                               knowledge about the crop development stage. For this pur-
+vegetation, while, the Figure 12-B shows the dense vegetation                  pose, the maps of the data obtained from IoT sensors were
+of crop because the plants canopy and height was relatively                    also plotted to relate them to the NDVI maps and to draw
+matured during the month of December. The yellow color                         some useful inferences as discussed in the following section.
+in Figure 12 -A is attributed to early stages of crop devel-
+opment when the vegetation is low and sparse. It does not                      C. IoT SENSORS DATA MAPS
+indicate the Unhealthy status of the crop at this stage. The                   To analyze the variations in the crop health illustrated by crop
+red color shows the presence of the bare soil. In comparison                   NDVI maps, the IoT sensors data was utilized to highlight
+to Figure 12-B, the Figure 12-C represents more yellowish                      the environmental events impacting the crop health. For this
+content which indicates that the crop was under stress. This                   purpose, the atmospheric and soil parameters maps were
+comparison is marked by ellipses, drawn on the Figure 12-B                     generated as shown in Figure 13.
+and Figure 12-C. Generally, in all three images, the spread of                   These maps showed cell wise variation in the atmospheric
+the wheat plant canopy is thin in some regions, while thick                    parameters (air temperature and humidity); and variation in
+
+112718                                                                                                                                     VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+FIGURE 12. Spatial NDVI maps.
+
+
+
+
+FIGURE 13. Soil moisture map, soil temperature map, humidity and air temperature map (January 2020).
+
+
+
+
+the soil parameters (soil moisture and soil temperature). The                   (cell wise) as shown in Figure 13-A. It is observed in cell-5
+variation in the NDVI maps directly corresponded to the                         of Figure 13-B that the terrain was uneven and the dip in
+changes reflected in the IoT data. For instance, the area                       the ground caused the runoff water to be accumulated for a
+covered by the cell-8 in Figure 12-C corresponded to the                        longer period of time. This has increased the soil moisture
+area under stress which was due to high humidity and soil                       more than the crop required at this stage which caused the
+moisture as shown in Figure 13. Consequently, the wheat                         crop to go under stress. It is clear from the above discussion
+growth was effected and the leaves of the crops turned yellow                   that the IoT sensors data provided added information to better
+due to excessive moisture and low temperature. The ideal                        comprehend the NDVI maps and helped in assimilating the
+temperature requirement is 22◦ C at this stage (as mentioned                    reasons for the stressed crop.
+by NARC agriculture experts), however, the recorded average                        In the view of above, this multi source data (IoT sen-
+temperature was 16◦ C, which has consequently suppressed                        sors, NDVI, and crop development stage) was subsequently
+the crop growth across the study area.                                          integrated to generate more detailed crop health maps as
+   There were several other factors that effected the crop                      discussed in the following sections.
+growth such as terrain slope, fertilizer distribution across the
+field, type of the soil, and the seed quality. The terrain surface               D. MULTI-MODAL DATA INTEGRATION
+of the study area was not uniform & smooth and varied                           In multi modal data acquisition, the data is generally pro-
+across each cell. This is noticeable in the soil moisture map                   duced from heterogeneous sources at variable intervals and
+
+VOLUME 8, 2020                                                                                                                         112719
+                                 U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+of variable length. This multi source data is mapped to a                      2/3 data set was used for training and 1/3 data set was used for
+common temporal resolution for integration and further pro-                    testing purposes. As a result, the training data set comprised
+cessing. In our focused research, the IoT data was logged at an                382173 records and test data set contained 188235 records.
+interval of 5 minutes owing to the infrequent environmental                    The distribution of the records for three classes in the train-
+changes. Likewise, in order to discern the incremental growth                  ing data set i.e. ‘Unhealthy’, ‘Stressed’ and ‘Healthy’ was
+of the crop, the drone imagery was recorded after every week.                  36,904, 137,887, 207,282 respectively. Similarly, for the
+In order to combine the data of these different modalities,                    test data set, the distribution of ‘Unhealthy’, ‘Stressed’ and
+the IoT nodes data was averaged over 7 days and mapped to                      ‘Healthy’ classes was 18379, 68336 and 101520 records
+the temporal resolution of the multispectral imager data.                      respectively.
+   After equalizing the temporal resolution, the next step was                    In order to perform crop health classification, several clas-
+to map the two different data set on the same the spatial                      sification models were tested including Naive Bayes (NB),
+resolution. The NDVI values obtained at a given crop devel-                    Support Vector Machine (SVM) and Neural Network
+opment stage of each cell of the 3 × 3 matrix layout (see                      (NN) [22], [41], which were found suitable for the nature
+Figure 12) were flattened into a vector, where, the index of                   of the collected data. The NB is a supervised classification
+the vector represented the NDVI value of each pixel. This                      algorithm which uses Bayes theorem based on probabilities
+was further mapped to the corresponding IoT agri node data,                    to classify the distinct objects. Whereas, SVM is a classi-
+where each record of IoT data consisted of air temperature,                    fier which uses kernel function to generate highly discrim-
+humidity, soil temperature, soil moisture and the temporal                     inant classes with significant margin [42]. For this research
+information of crop development stage as shown in Figure 14.                   work, SVM was trained using ‘Radial Basis’ as a kernel
+The same process was repeated for each cell of the                             function.
+3 × 3 matrix layout of the field. The final data set comprised                    The NN was trained using different shallow and deep learn-
+a matrix [X]i,j , where i represented the no. of records and j                 ing models with different hyper-parameter settings includ-
+denoted the no. of features, which include IoT sensors data,                   ing the (i) selection of hidden layers,(ii) hidden nodes in
+NDVI values, and information related to the crop develop-                      each layer, (iii) activation function, and (iv) loss function.
+ment stage. Once the data has been integrated and prepared                     Table 4 shows the design and hyper-parameter configuration
+for the entire crop field, it was labeled record wise to perform               of different NN models. The Figure 15 shows the architecture
+crop health classification.                                                    of NN.
+
+
+
+
+                                                                               FIGURE 15. Neural Network architecture.
+
+
+FIGURE 14. Format of multi modal data set in the context of the                  For this research work, cross entropy is used as a loss
+proposed system.                                                               function in NN because it minimizes the difference between
+                                                                               predicted and actual values in classification problems. This
+E. CROP HEALTH CLASSIFICATION                                                  function is computed by using Eq 3 [43].
+For crop health classification, the data was categorized into                                                              n
+three classes i.e. ‘Unhealthy’, ‘Stressed’ and ‘Healthy’. The                                                  1 X
+                                                                                             Cross Entropy = −     yi log(ȳi )                       (3)
+labeled vector was transformed into one-hot encoding since                                                     N
+                                                                                                                         i=1
+we were dealing with a multi-class problem [40]. Thus,
+a separate label matrix [Y]i,k was generated where i = no                      where N is the total number of records, yi is the actual label
+of records and k = no of classes. The final classification                     (ground truth) of ith record, and ȳi is the predicted value of ith
+data set [X]i,j included i = 570408 and j = 6, where i                         record computed by a classifier.
+was total number of records and j indicated the total features                    The above mentioned classification models were applied
+including NDVI values, crop development stage and data                         on our multi modal data set and the obtained results are
+of IoT sensors. Subsequently, the data set was split, where                    discussed in the following section.
+
+112720                                                                                                                                     VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+TABLE 4. Hyper-parameter configuration of different NN models.
+
+
+
+
+TABLE 5. Performance of all classification models.
+
+
+
+
+V. RESULTS AND DISCUSSIONS                                                      of the accuracy. F1 score is a function of precision and recall
+In this section, before discussing the classification results,                  and is calculated using the Eq 7. It ranges between 0 and 1.
+the various metrics used to evaluate the performance of                         The higher the score, the better the accuracy [44]–[46].
+the applied machine and deep learning algorithms will be
+described.                                                                                                    2 ∗ Precision ∗ Recall
+                                                                                               F1Score =                                    (7)
+   (1) Accuracy                                                                                                Precision + Recall
+   Accuracy defines the capability of the model to generate
+the correct number of predictions for the observed values.                       A. CLASSIFICATION RESULTS
+it defines how close a measurement is to a true or accepted                     The classification algorithms (mentioned in sub section IV-E)
+value. Accuracy is measured by Eq 4, where TP denotes to                        were applied on the multi modal data set encompassing
+true positive, TN denotes to true negative, FP denotes to false                 input data from drone imagery, IoT sensor data, and tempo-
+positive and FN denotes to false negative [44], [45].                           ral information of the crop development stage. The perfor-
+                                                                                mance evaluation of these classification algorithms is listed
+                                   TP + TN
+                 Accuracy =                                            (4)      in Table 5.
+                              TP + TN + FP + FN                                    It was observed that model M1 exhibited the lowest per-
+   (2) Precision                                                                formance as compared to others because it has no hidden
+   Precision refers to the closeness or reproducible correctly                  layer, which made it unsuitable to learn complex structures
+classified instances of a given positive class out of the total                 for the subject data. The models M2 and M3 had one hidden
+classified instances of that class. It is calculated with the                   layer with 64 and 128 nodes respectively, which also led to
+formula shown in Eq 5, where TP denotes to true positive                        under fitting i.e. the model was too simple to learn complex
+and FP denotes to false positive [44]–[46].                                     relationships in the data.
+                                        TP                                         The model M4 outperformed all other classification mod-
+                      Precision =                                      (5)      els and showed the highest accuracy, precision, recall and
+                                      TP + FP
+                                                                                F1 Score. The models M5 to M7 were less accurate relative
+   (3) Recall
+                                                                                to M4 due to their highly complex structure which resulted
+   Recall refers to the proportion of the total instances of a
+                                                                                in over fitting. This was owing to a large number of hidden
+particular positive class that were correctly classified. It is
+                                                                                layers with excessive number of nodes. This configuration
+calculated with the formula shown in Eq 6, where TP refers
+                                                                                of the model decreased the performance of the classifier on
+to true positive and FN refers to false negative [44]–[46].
+                                                                                the test data set as it memorized the structures in the data set
+                                       TP                                       instead of generalizing it.
+                       Recall =                                        (6)
+                                    TP + FN                                        The performance of NB and SVM models was found to
+  (4) F1 Score                                                                  be between the highest and the lowest performing models
+  F1 score is calculated to find a balance between precision                    i.e.M4 and M1. Typically, SVM classifier performs better on
+and recall, because individually, they do not cover all aspects                 the large data set with multiple dimensions (features), while
+
+VOLUME 8, 2020                                                                                                                           112721
+                                U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+FIGURE 16. Spatial crop health maps.
+
+
+
+
+NB provides probabilistic predictions on muti-class prob-                     health maps, therefore, ground survey was performed and
+lems. Hence, these characteristics have made these models                     agriculture specialist were consulted for this. The validation
+suitable for our current data set.                                            of the above results have supported the hypothesis formed
+   We can conclude from the above discussion that the crop                    earlier in section I, which stated that the integration of multi
+health can be classified using multi modal data by applying                   modal data can enhance the representation of crop health
+machine and deep learning models. The comparative analysis                    information as compared to the crop health status depicted
+of all classification models has revealed that M4 is the most                 only by NDVI.
+optimal model among all the selected models. This model was
+then used to generate the crop health maps as discussed in the
+following section.                                                            VI. CONCLUSION & FUTURE WORK
+                                                                              A system for crop health monitoring has been proposed which
+B. CROP HEALTH MAPS                                                           is based on integration of the latest technologies such as drone
+To overcome the limitation of the NDVI maps for crop health                   based remote sensing, IoT and machine learning. The integra-
+assessment, the spatial crop health maps were generated at                    tion of these sensing modalities generate heterogeneous data
+different crop development stages. These health maps rep-                     which not only varies in nature (i.e. observed parameter) but
+resented the crop health status into three main categories                    also has different temporal fidelity. The spatial resolution of
+including ‘Unhealthy’, ‘Stressed’ and ‘Healthy’ as shown                      these methods is also different, hence, the optimal integra-
+in Figure 16. For generating these maps, pixel wise crop                      tion of these sensing modalities and their implementation in
+health classification was performed using the model M4.                       practice are addressed in the proposed system.
+Each pixel was classified into three classes and was numer-                      The multi-modal data was collected from different sources
+ically labeled, where 1 referred to ‘Unhealthy’, 2 referred                   including IoT sensors and drone with a multispectral cam-
+‘Stressed’ and 3 referred the ‘Healthy’ pixels. This classifi-                era mounted on it. This multi source data was generated at
+cation was mainly based on NDVI and IoT nodes data along                      variable intervals and of variable length. This data was then
+with the temporal information of the crop. The tagging of this                mapped to a common temporal resolution for integration and
+multi source data set into three classes was performed with                   labeled to perform supervised classification. The machine
+the help of NARC agriculture domain experts. Subsequently,                    learning techniques such as SVM and NB along with several
+the health maps were generated (as shown in Figure 16) after                  deep learning models were applied to classify each pixel as
+applying the M4 model of NN on this multi modal data set.                     healthy, Unhealthy or stressed. Among these selected models,
+The gradient in the blue color of Figure 16 represents the three              M4 model of NN was found to be the most suitable model
+classes of crop health as shown in the color legend.                          for our multi-modal data set and provided the classification
+   It is clear that the health maps in Figure 16 provided a                   accuracy of 98.4%.
+distinctive and improved visualization of crop health status                     Conventionally, NDVI is used for monitoring crop health
+as compared to the health information shown in the NDVI                       but it only provides the health information based on chloro-
+maps in Figure 12. The stressed and Unhealthy areas shown                     phyll value, whereas, for a detailed crop health represen-
+in Figure 12-C can be seen in more detail in Figure 16-C.                     tation, the data from multiple sources is required such as
+There was no reference data available to validate the crop                    soil moisture, soil temperature, humidity and air temperature.
+
+112722                                                                                                                                    VOLUME 8, 2020
+U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+For this purpose, the data from two different modalities were                      [11] J. D. Rudd, G. T. Roberson, and J. J. Classen, ‘‘Application of satellite,
+combined and crop health maps were generated to provide                                 unmanned aircraft system, and ground-based sensor data for precision
+                                                                                        agriculture: A review,’’ in Proc. ASABE Annu. Int. Meeting. St. Joseph, MI,
+a clear picture of the crop health relative to the information                          USA: American Society Agricultural Biological Engineers, 2017, p. 1.
+provided by NDVI maps. In addition to this, IoT sensors data                       [12] R. Shahzadi, J. Ferzund, M. Tausif, and M. Asif, ‘‘Internet of Things based
+maps were generated to correlate the behaviour of environ-                              expert system for smart agriculture,’’ Int. J. Adv. Comput. Sci. Appl., vol. 7,
+                                                                                        no. 9, pp. 341–350, 2016.
+mental variation with the crop status delineated in the crop                       [13] E. A. Aqeel-ur-Rehman, Z. A. Shaikh, H. Yousuf, F. Nawaz, M. Kirmani,
+NDVI maps, where these maps provided useful insights about                              and S. Kiran, ‘‘Crop irrigation control using wireless sensor and actuator
+the factors influencing the crop health. The IoT sensor data                            network (WSAN),’’ in Proc. Int. Conf. Inf. Emerg. Technol., Jun. 2010,
+                                                                                        pp. 263–268.
+maps were validated by comparing IoT sensors reading with
+                                                                                   [14] J. O. Payero, A. Mirzakhani-Nafchi, A. Khalilian, X. Qiao, and R. Davis,
+the commercial senors provided by NARC and they were                                    ‘‘Development of a low-cost Internet-of-Things (IoT) system for monitor-
+found to provide a competitive accuracy. The crop health                                ing soil water potential using watermark 200SS sensors,’’ Adv. Internet
+maps were validated through the ground surveys and agri-                                Things, vol. 18, no. 3, pp. 71–86, 2017.
+                                                                                   [15] M. C. Vuran, A. Salam, R. Wong, and S. Irmak, ‘‘Internet of underground
+culture experts due to the absence of reference data (such as                           things in precision agriculture: Architecture and technology aspects,’’ Ad
+drone imagery database of the subject area, satellite images                            Hoc Netw., vol. 81, pp. 160–173, Dec. 2018.
+with a compatible image resolution, and real time data gener-                      [16] C. N. G. Babu, K. T. C. Shekhara, S. A. Kavitha, and D. N. Chethan,
+                                                                                        ‘‘Advanced farming using smart technology,’’ Int. J. Comput. Sci. Eng.,
+ated by IoT sensors). The validated maps revealed that crop                             vol. 4, pp. 154–158, May 2016.
+health maps based on multi-modal data provided rich insights                       [17] A. Sabo and S. M. Qaisar, ‘‘The event-driven power efficient wireless
+into crop health status relative to the crop health knowledge                           sensor nodes for monitoring of insects and health of plants,’’ in Proc. IEEE
+provided by individual NDVI maps.                                                       3rd Int. Conf. Signal Image Process. (ICSIP), Jul. 2018, pp. 478–483.
+                                                                                   [18] L. Gupta, K. Intwala, K. Khetwani, T. Hanamshet, and R. Somkunwar,
+   For the future work, the role of other parameters related                            ‘‘Smart irrigation system and plant disease detection,’’ Int. Res. J. Eng.
+to crop health will be investigated, which may enhance the                              Technol., vol. 4, no. 3, pp. 2356–2395, 2017.
+performance of the proposed work. Additionally, the soil                           [19] A. K. Nasir and M. Tharani, ‘‘Use of greendrone uas system for maize crop
+                                                                                        monitoring,’’ in Proc. Int. Conf. Unmanned Aerial Vehicles Geomatics, Int.
+properties using multispectral data and their effect on crop                            Arch. Photogramm., Remote Sens. Spatial Inf. Sci., vol. XLII-2/W6, Bonn,
+health will be analyzed. Further, the fertilizer maps such                              Germany, Sep. 2017, pp. 263–268.
+as nitrogen maps will be generated to determine it’s spread                        [20] M. A. Udin, A. Mansour, D. Le Jeune, M. Ayaz, E.-H. M. Aggoune, ‘‘UAV-
+across the field and impact on crop health.                                             assisted dynamic clustering of wireless sensor networks for crop health
+                                                                                        monitoring,’’ Sensors, vol. 18, no. 2, pp. 1–24, 2018.
+                                                                                   [21] Y.-Y. Zheng, J.-L. Kong, X.-B. Jin, X.-Y. Wang, and M. Zuo, ‘‘CropDeep:
+ACKNOWLEDGMENT                                                                          The crop vision dataset for deep-learning-based classification and detec-
+The research work has been conducted in NUST-SEECS, IoT                                 tion in precision agriculture,’’ Sensors, vol. 19, no. 5, p. 1058, Mar. 2019.
+Lab in collaboration with NARC, Islamabad.                                         [22] A. Kamilaris and F. X. Prenafeta-Boldú, ‘‘Deep learning in agriculture:
+                                                                                        A survey,’’ Comput. Electron. Agricult., vol. 147, pp. 70–90, Apr. 2018.
+REFERENCES                                                                         [23] M. Roopaei, P. Rad, and K.-K.-R. Choo, ‘‘Cloud of things in smart agri-
+                                                                                        culture: Intelligent irrigation monitoring by thermal imaging,’’ IEEE Cloud
+ [1] M. A. Bhatti and J. W. Kijne, Irrigation Allocation Problems at Tertiary           Comput., vol. 4, no. 1, pp. 10–15, Jan. 2017.
+     Level in Pakistan. London, U.K.: Overseas Development Institute, 1990.
+                                                                                   [24] S. A. M. Varman, A. R. Baskaran, S. Aravindh, and E. Prabhu, ‘‘Deep
+ [2] M. Anwer, S. Farooqi, and Y. Qureshi, ‘‘Agriculture sector perfor-
+                                                                                        learning and IoT for smart agriculture using WSN,’’ in Proc. IEEE Int.
+     mance: An analysis through the role of agriculture sector share in GDP,’’
+                                                                                        Conf. Comput. Intell. Comput. Res. (ICCIC), Dec. 2017, pp. 1–6.
+     J. Agricult. Econ., Extension Rural Develop., vol. 3, no. 3, pp. 270–275,
+                                                                                   [25] L. Santos, F. N. Santos, P. M. Oliveira, and P. Shinde, ‘‘Deep learning
+     2015.
+                                                                                        applications in agriculture: A short review,’’ in Proc. Iberian Robot. Conf.
+ [3] M. Aslam, ‘‘Agricultural productivity current scenario, constraints and
+                                                                                        Cham, Switzerland: Springer, 2019, pp. 139–151.
+     future prospects in Pakistan,’’ Sarhad J. Agricult., vol. 32, no. 4,
+     pp. 289–303, Oct. 2016.                                                       [26] A.-K. Mahlein, ‘‘Plant disease detection by imaging sensors–parallels and
+                                                                                        specific demands for precision agriculture and plant phenotyping,’’ Plant
+ [4] U. Saeed, J. Dempewolf, I. Becker-Reshef, A. Khan, A. Ahmad, and
+                                                                                        Disease, vol. 100, no. 2, pp. 241–251, Feb. 2016.
+     S. A. Wajid, ‘‘Forecasting wheat yield from weather data and MODIS
+     NDVI using random forests for Punjab province, Pakistan,’’ Int. J. Remote     [27] A. Chlingaryan, S. Sukkarieh, and B. Whelan, ‘‘Machine learning
+     Sens., vol. 38, no. 17, pp. 4831–4854, Sep. 2017.                                  approaches for crop yield prediction and nitrogen status estimation in
+ [5] M. H. Abdullah, A. Saboor, I. A. Baig, and M. Arshad, ‘‘Climate change,            precision agriculture: A review,’’ Comput. Electron. Agricult., vol. 151,
+     risk and food security: An analysis of wheat crop in Pakistan,’’ in Cli-           pp. 61–69, Aug. 2018.
+     mate Change Challenge (3C) and Social-Economic-Ecological Interface-          [28] A. A. Alfarisy, Q. Chen, and M. Guo, ‘‘Deep learning based classification
+     Building. Cham, Switzerland: Springer, 2016, pp. 41–63.                            for paddy pests & diseases recognition,’’ in Proc. Int. Conf. Math. Artif.
+ [6] M. A. Latif, ‘‘An agricultural perspective on flying sensors: State of the         Intell. (ICMAI), 2018, pp. 21–25.
+     art, challenges, and future directions,’’ IEEE Geosci. Remote Sens. Mag.,     [29] M. D. Bah, E. Dericquebourg, A. Hafiane, and R. Canals, ‘‘Deep learning
+     vol. 6, no. 4, pp. 10–22, Dec. 2018.                                               based classification system for identifying weeds using high-resolution
+ [7] U. Shafi, R. Mumtaz, J. García-Nieto, S. A. Hassan, S. A. R. Zaidi, and            UAV imagery,’’ in Proc. Sci. Inf. Conf. Cham, Switzerland: Springer,
+     N. Iqbal, ‘‘Precision agriculture techniques and practices: From consider-         Jul. 2018, pp. 176–187.
+     ations to applications,’’ Sensors, vol. 19, no. 17, p. 3796, Sep. 2019.       [30] M. M. Hasan, J. P. Chopin, H. Laga, and S. J. Miklavcic, ‘‘Detection
+ [8] R. B. Macdonald, ‘‘A summary of the history of the development of auto-            and analysis of wheat spikes using convolutional neural networks,’’ Plant
+     mated remote sensing for agricultural applications,’’ IEEE Trans. Geosci.          Methods, vol. 14, no. 1, p. 100, Dec. 2018.
+     Remote Sens., vol. GE-22, no. 6, pp. 473–482, Nov. 1984.                      [31] S. T. Cynthia, K. M. Shahrukh Hossain, M. N. Hasan, M. Asaduzzaman,
+ [9] J. V. Stafford, ‘‘Implementing precision agriculture in the 21st century,’’        and A. K. Das, ‘‘Automated detection of plant diseases using image pro-
+     J. Agricult. Eng. Res., vol. 76, pp. 267–275, Jul. 2000.                           cessing and faster R-CNN algorithm,’’ in Proc. Int. Conf. Sustain. Technol.
+[10] M. P. Wachowiak, D. F. Walters, J. M. Kovacs, R. Wachowiak-Smolíková,              Ind. 4.0 (STI), Dec. 2019, pp. 1–5.
+     and A. L. James, ‘‘Visual analytics and remote sensing imagery to support     [32] X. Hang, H. Gao, and S. Jia, ‘‘Identification of tomato diseases using skip-
+     community-based research for precision agriculture in emerging areas,’’            gram and LSTM based on QA (question-answer) system,’’ J. Phys., Conf.
+     Comput. Electron. Agricult., vol. 143, pp. 149–164, Dec. 2017.                     Ser., vol. 1437, no. 1, 2020, Art. no. 012048.
+
+VOLUME 8, 2020                                                                                                                                                112723
+                                     U. Shafi et al.: Multi-Modal Approach for Crop Health Mapping Using Low Altitude Remote Sensing, IoT and Machine Learning
+
+
+
+
+[33] D. Popescu, F. Stoican, G. Stamatescu, L. Ichim, and C. Dragana,                                        NAVEED IQBAL received the B.S. degree in infor-
+     ‘‘Advanced UAV–WSN system for intelligent monitoring in precision                                       mation technology from the National University
+     agriculture,’’ Sensors, vol. 20, no. 3, p. 817, Feb. 2020.                                              of Sciences and Technology (NUST), Pakistan,
+[34] A. K. Saha, J. Saha, R. Ray, S. Sircar, S. Dutta, S. P. Chattopadhyay,                                  in 2011, where he is currently pursuing the
+     and H. N. Saha, ‘‘IOT-based drone for improvement of crop quality in                                    master’s degree in image processing and remote
+     agricultural field,’’ in Proc. IEEE 8th Annu. Comput. Commun. Workshop                                  sensing domain. He has previously worked in
+     Conf. (CCWC), Jan. 2018, pp. 612–615.                                                                   industry as a Senior Software Developer, and led
+[35] Soil Sensor Type. Accessed: May 11, 2020. [Online]. Available:
+                                                                                                             the team for Android and iPhone application devel-
+     https://soilsensor.com/sensors/sensor-types/
+                                                                                                             opment. His research interests include deep learn-
+[36] Grove—Capacitive Moisture Sensor (Corrosion-Resistant). Accessed:
+     May 11, 2020. [Online]. Available: https://wiki.seeedstudio.com/Grove-                                  ing, remote sensing, and image processing for crop
+     Capacitive_Moisture_Sensor-Corrosion-Resistant                                                          classification/health monitoring.
+[37] Vernier Soil Moisture Sensor. Accessed: May 11, 2020. [Online]. Avail-
+     able: https://www.vernier.com/product/soil-moisture-sensor/                                              SYED MOHAMMAD HASSAN ZAIDI (Senior
+[38] Y. Chen, W. S. Lee, H. Gan, N. Peres, C. Fraisse, Y. Zhang, and Y. He,                                   Member, IEEE) received the Ph.D. degree from
+     ‘‘Strawberry yield prediction based on a deep neural network using high-                                 the University of South Florida, USA, in 1992.
+     resolution aerial orthoimages,’’ Remote Sens., vol. 11, no. 13, p. 1584,                                 He is currently the former Principal and the Dean
+     Jul. 2019.                                                                                               of the NUST School of Electrical Engineering
+[39] Z. Jiang, A. R. Huete, J. Chen, Y. Chen, J. Li, G. Yan, and X. Zhang,                                    and Computer Science (SEECS). He also serves
+     ‘‘Analysis of NDVI and scaled difference vegetation index retrievals of                                  as a Senior Research Faculty at NUST-SEECS.
+     vegetation fraction,’’ Remote Sens. Environ., vol. 101, no. 3, pp. 366–378,
+                                                                                                              His key research interests include wireless and
+     Apr. 2006.
+                                                                                                              photonics networks, ultra high speed communi-
+[40] I. Goodfellow, Y. Bengio, and A. Courville, Deep Learning. Cambridge,
+     MA, USA: MIT Press, 2016.                                                                                cation systems, network security, and the Internet
+[41] K. Liakos, P. Busato, D. Moshou, S. Pearson, and D. Bochtis, ‘‘Machine        of Things (IoT). He was a recipient of several coveted awards including,
+     learning in agriculture: A review,’’ Sensors, vol. 18, no. 8, p. 2674,        the Best University Researcher and Teacher and the Presidents’ Pride of
+     Aug. 2018.                                                                    Performance for his national level meritorious service in IT education and
+[42] Y. Ma and G. Guo, Support Vector Machines Applications. New York,             research. Furthermore, he has won international research grants and has more
+     NY, USA: Springer, 2014.                                                      than 100 research publications in reputed journals and conferences. He has
+[43] P.-T. de Boer, D. P. Kroese, S. Mannor, and R. Y. Rubinstein, ‘‘A tutorial    also been the pioneer steering committee International Co-Chair of the IEEE
+     on the cross-entropy method,’’ Ann. Oper. Res., vol. 134, no. 1, pp. 19–67,   sponsored International Conference HONET-ICT, since past 16 years.
+     Feb. 2005.
+[44] U. Shafi, R. Mumtaz, H. Anwar, A. M. Qamar, and H. Khurshid, ‘‘Surface                                  SYED ALI RAZA ZAIDI (Member, IEEE) is
+     water pollution detection using Internet of Things,’’ in Proc. 15th Int.
+                                                                                                             currently an Assistant Professor of Communi-
+     Conf. Smart Cities, Improving Qual. Life Using ICT IoT (HONET-ICT),
+                                                                                                             cation and Sensing for RAS. He was awarded
+     Islamabad, Pakistan, Oct. 2018, pp. 92–96.
+[45] N. S. S. Sokolova and M. Japkowicz, ‘‘Beyond accuracy, F-score and                                      J. W. and F. W. Carter Prize. He also received
+     ROC: A family of discriminant measures for performance evaluation,’’ in                                 the COST IC0902, EPSRC, DAAD, and Royal
+     Proc. Australas. Joint Conf. Artif. Intell., Hobart, TAS, Australia, 2016,                              Academy of Engineering grants. He has published
+     pp. 1015–1021.                                                                                          more than 100 technical papers in various top-
+[46] E. Goutte and C. Gaussier, ‘‘A probabilistic interpretation of precision,                               tier IEEE journals and conferences. His research
+     recall and F-score, with implication for evaluation,’’ in Proc. Eur. Conf.                              interest includes design and implementation of
+     Inf. Retr., Santiago de Compostela, Spain: Springer, 2005, pp. 345–359.                                 communication protocols for wireless networking
+                                                                                                             specifically in the area of M2M.
+
+                                                                                                             IMTIAZ HUSSAIN received the bachelor’s and
+                                                                                                             master’s degree from the University of Agricul-
+                           UFERAH SHAFI received the B.Sc. degree in                                         ture, Faisalabad, and the Ph.D. degree from the
+                           mathematics from Bahauddin Zakariya University,                                   University of Illinois at Urbana-Champaign, USA.
+                           Multan, Pakistan, the M.Sc. degree in information                                 He currently performs his duties as the Director of
+                           technology from Quaid-i-Azam University, Islam-                                   the PARC Crop Sciences Institute (CSI), National
+                           abad, Pakistan, and the M.S. degree in computer                                   Agricultural Research Center (NARC). He has
+                           science from the COMSATS Institute of Infor-                                      published several research papers in reputed jour-
+                           mation Technology, Islamabad. She is currently                                    nals and conferences in the agriculture domain.
+                           pursuing the Ph.D. degree with the School of Elec-
+                           trical Engineering and Computer Science, NUST,
+                           Pakistan. Her key research interests include deep                                 ZAHID MAHMOOD received the MSc. degree
+learning, remote sensing, image processing, and the Internet of Things (IoT).                                (Hons.) in plant breeding and genetics from PMAS
+                                                                                                             Arid Agriculture University, Rawalpindi, Pakistan,
+                                                                                                             in 2002. He is currently a Senior Scientific Offi-
+                                                                                                             cer at Crop Sciences Institute, National Agricul-
+                                                                                                             tural Research Centre, Islamabad, Pakistan. He has
+                           RAFIA MUMTAZ (Senior Member, IEEE)                                                more than 17 years of professional experience in
+                           received the Ph.D. degree in remote sensing and                                   crop improvement and plant breeding and genet-
+                           satellite image processing from the University of                                 ics. He has published more than 40 research arti-
+                           Surrey, U.K., in 2010. She is currently working                                   cles in international journals and conferences. His
+                           as the Head of Information Technology and the           current research interests include the areas of high-throughput genotyp-
+                           Director of the Internet of Things (IoT) Lab,           ing and high-throughput phenotyping using UAV-based sensors for crop
+                           NUST-SEECS. She was a recipient of several              evaluation and development. He also received several international fel-
+                           national and international research grants worth        lowships/trainings in leading institutes and universities of USA, Australia,
+                           PKR 22.6 million. She received the NUST-SEECS           China, Mexico, Kenya, and India.
+                           Best Researcher Award, in 2019.
+
+112724                                                                                                                                           VOLUME 8, 2020
+

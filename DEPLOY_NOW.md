@@ -1,4 +1,4 @@
-# ⚡ Deploy FarmHealth NOW
+# ⚡ Deploy Crafty GIS NOW
 
 > **Your stack (chosen):** 🥇 **Netlify (frontend) + Render (backend)** — primary,
 > live today. 🛟 **Docker (self-hosted)** — backup/offline/advanced path.
@@ -52,8 +52,8 @@ ever have an outage or free-tier limits bite.
 curl -fsSL https://get.docker.com | sh
 
 # 2. Clone + configure
-git clone https://github.com/virahitvin8/crafty-gis.git farmhealth
-cd farmhealth
+git clone https://github.com/virahitvin8/crafty-gis.git crafty_gis
+cd crafty_gis
 # export secrets into the shell (see docker-compose.selfhost.yml header —
 # no .env mounts, they break the GEE key):
 set -a; source .env; set +a

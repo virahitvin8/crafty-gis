@@ -1,6 +1,6 @@
 ╔══════════════════════════════════════════════════════════════════╗
 ║                                                                  ║
-║   🛰️  FarmHealth — Precision Satellite Crop Monitor              ║
+║   🛰️  Crafty GIS — Precision Satellite Crop Monitor              ║
 ║                                                                  ║
 ║   Status: ✅ CODE COMPLETE — READY TO DEPLOY                     ║
 ║                                                                  ║
@@ -125,5 +125,5 @@ Branch: main
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Built with ❤️ — FarmHealth v2.0 — 100% Open Source
+Built with ❤️ — Crafty GIS v2.0 — 100% Open Source
 

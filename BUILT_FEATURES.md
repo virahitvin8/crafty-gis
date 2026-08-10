@@ -1,4 +1,4 @@
-# ✅ FarmHealth — Complete Feature Build
+# ✅ Crafty GIS — Complete Feature Build
 
 > **All features built legally**: user-entered data, public OSM data, official APIs.
 > **No government scraping. No data bypassing. No legal risk.**
@@ -152,4 +152,4 @@ The P0–P2 gaps from the roadmap were built end-to-end (backend + frontend):
 
 ---
 
-**Built**: 2026-08-09 | **Stack**: FarmHealth v2.0 | **License**: MIT
+**Built**: 2026-08-09 | **Stack**: Crafty GIS v2.0 | **License**: MIT

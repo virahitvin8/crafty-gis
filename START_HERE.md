@@ -1,8 +1,8 @@
-# 🚀 START HERE — FarmHealth Open-Source Stack
+# 🚀 START HERE — Crafty GIS Open-Source Stack
 
 ## ✅ What Was Built
 
-Your FarmHealth app now has a **complete open-source stack** with **Primary → Secondary** architecture:
+Your Crafty GIS app now has a **complete open-source stack** with **Primary → Secondary** architecture:
 
 ### 🔄 Primary (✅) vs Secondary (⚠️) Services
 

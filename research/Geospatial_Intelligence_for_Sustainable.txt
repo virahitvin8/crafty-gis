@@ -1,0 +1,1213 @@
+                              Journal of Scientific Research and Reports
+
+                              Volume 31, Issue 12, Page 441-460, 2025; Article no.JSRR.149063
+                              ISSN: 2320-0227
+
+
+
+
+  Geospatial Intelligence for Sustainable
+             Agriculture: Integrating GIS
+                   and Image Processing
+                                    Sanjeet Kumar Borah a*, Kandarpa Kalita b,
+                                        Priti Bandana Konwar a, Munmi Bora a
+                                                   and Laxmi Narayan Sethi c
+    a Faculty of Agricultural Sciences and Technology, Assam Down Town University, Guwahati, India.
+                       b Faculty of Computer Technology, Assam Down Town University, Guwahati, India.
+                                   c Department of Agricultural Engineering, Assam University, Silchar, India.
+
+
+
+                                                                                                 Authors’ contributions
+
+  This work was carried out in collaboration among all authors. All authors read and approved the final
+                                                                                           manuscript.
+
+                                                                                                      Article Information
+                                                                              DOI: https://doi.org/10.9734/jsrr/2025/v31i123788
+
+                                                                                                     Open Peer Review History:
+     This journal follows the Advanced Open Peer Review policy. Identity of the Reviewers, Editor(s) and additional Reviewers,
+                    peer review comments, different versions of the manuscript, comments of the editors, etc are available here:
+                                                                                https://pr.sdiarticle5.com/review-history/149063
+
+
+
+                                                                                                   Received: 06/10/2025
+  Review Article
+                                                                                                  Published: 08/12/2025
+
+
+ABSTRACT
+
+ The rapid growth of digitalization upon agriculture has established today Geographic Information
+ Systems (GIS) and image processing as key technologies allowing to reinforce spatial intelligence,
+ increase the precision of decision-making processes and optimize natural resource utilization. The
+ present review is intended to provide an overview of the fundamentals, methodological
+ developments, and recent applications related to GIS and image processing technologies focusing
+ on their fusion for precision and smart farming. GIS provides an effective platform to manage,
+ analyse and visualise geospatial data whilst image processing is used to quantitative extract crop,
+ soil and environmental information from satellite, UAV and proximal sensing imagery. Altogether,
+_____________________________________________________________________________________________________
+
+*Corresponding author: E-mail: sanjeetkumarborah27@gmail.com;
+
+Cite as: Sanjeet Kumar Borah, Kandarpa Kalita, Priti Bandana Konwar, Munmi Bora, and Laxmi Narayan Sethi. 2025.
+“Geospatial Intelligence for Sustainable Agriculture: Integrating GIS and Image Processing”. Journal of Scientific Research and
+Reports 31 (12):441–460. https://doi.org/10.9734/jsrr/2025/v31i123788.
+                               Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+ these technologies are used for crop monitoring, vegetation index mapping, soil variability analysis,
+ early disease and pest detection, stress diagnostics and data-driven site-specific management.
+ The paper also discusses the increasing role of artificial intelligence and machine learning to
+ automate feature extraction, classification and prediction modelling in complex geospatial datasets.
+ However, challenges still exist in data interoperation, real-time analytics, algorithm scaling and
+ integration of multi-source imagery. Filling these gaps is necessary to maximize the potential of GIS
+ image processing approaches for developing climate-resilient, sustainable and high-efficiency
+ agricultural systems. The study emphasizes that the merging geospatial technologies are provoking
+ future of smart farming and enabling science-based agricultural revolutions worldwide.
+
+
+Keywords: GIS, image processing; precision agriculture; vegetation indices; crop monitoring; Spatial
+          analysis; smart agriculture.
+
+1. INTRODUCTION                                            further improve the precision of crop monitoring
+                                                           and facilitate real-time decision-making for robust
+Agriculture is experiencing a revolution sparked           agricultural management that is adaptive under
+by unprecedented developments in digital, data             varying environmental conditions.
+and sensing technologies. With increasing global
+demand for food, agricultural production systems           However, challenges remain in terms of data
+are under increasing pressure due to climate               quality, interoperability, scalability and access to
+variability, soil degradation, erratic pest dynamics       digital tools in developing agricultural economies.
+and requirement of sustainable resource use                Due to the rapid uptake of geospatial tools and
+(Balyan et al., 2024). Such complexities demand            techniques in agricultural systems, a review
+a more accurate, data-based and spatially                  article is required to collate existing knowledge,
+conscious decision support system. The Role of             applications while emphasizing their potential
+Geographic Information Systems and Image                   utility, enable the assessment of recent
+Processing in Agriculture Nowhere has the                  developments as well as discuss challenges still
+emphasis on technology transfer been more                  exist. The objective of this review is to provide an
+evident than with respect to agriculture. Among            overview of the progress in GIS and image-
+the technologies that have influenced this                 processing techniques in the field of agriculture,
+change, GIS and image processing have                      evaluate their roles in precision and sustainable
+become essential tools for today's agricultural            agriculture and identify future directions for
+research, planning, and management (Raihan,                research and technology integration.
+2024). GIS has been employed to facilitate the
+collection, storage, analysis and display of               1.1 Background and Global Context of
+georeferenced data; this is used by farmers,                   Agricultural Transformation
+planners and scientists to account for spatial
+variation in soils, crops water resources and              The     future    of   agriculture  is   one of
+climate. This spatial capacity is useful for               unprecedented change with demographic shifts,
+selective interventions, better land use planning          environmental concerns and technological
+and the rational management of inputs.                     advances that demand sustainability. With the
+Concomitantly, the development in image                    world’s population expected to exceed 9.7 billion
+processing based on satellite imaging, UAV-                by 2050, it is the challenge of agricultural
+based imaging, and ground-based sensors has                systems to produce far more food using far fewer
+transformed the crop health monitoring/disease             natural resources (Mohamed, 2023). This
+outbreaks/pest       infestation/phenological/growth       increase in food demand is exacerbated by
+stages/yield attributes estimation (Abrahams et            falling arable land, soil fertility degradation,
+al., 2023). The combination of webcams,                    water stress, events of extreme climate due to
+machine learning and spectral analysis allows              climate change. While traditional agricultural
+the real-time surveillance as well as on-the-fly           practices have difficulty addressing these
+interpretation of complex field situations. The            multifaceted challenges, the world’s farming
+integration      of   GIS and      image-processing        sector is soon to be dominated by modern, data-
+technology has established new precedents in               empowered and tech-enabled models. This
+precision agriculture where spatially referenced           transformation has largely been driven by
+data can be directly linked to image-derived               technology, specifically in sensing systems,
+information (V & T, 2025). Such integration will           automation, artificial intelligence (AI), and
+
+
+                                                       442
+                              Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+geospatial analytics (Kumari et al., 2025). The           production is increasingly more dependent on
+modern era of remote sensing, UAVs, GIS-based             digital and data-driven technologies to support
+platforms and high resolution imaging tools allow         productivity,    sustainability,  and    resilience
+for the accurate and continuous monitoring of the         (Khanna et al., 2022). Digital innovations support
+crop environment, soil status, and climate                the systematic aggregation, integration and
+variability. With these devices, farmers can shift        analysis of diverse datasets from soil
+from general and homogenous field practices to            characteristics, crop health indicators and
+spot specific and demand-oriented actions                 weather data to market price-points. High-
+leading to significant increase in resource               resolution spatial imagery from satellites, UAV
+utilization      efficiency    notching     down          and ground sensors provides real-time
+environmental footprints (Getahun et al., 2024).          information on field conditions and early warning
+Digital agriculture projects are being supported          signs of stressors so that proactive intervention
+by governments and international organisations,           can be taken. Machine learning and data
+who view them as an opportunity to enhance                analytics have augmented predictive abilities
+food security, resilience and to speed up the             such that farmers and policy makers can predict
+attainment of sustainable development goals               yield    variability,  adjust input    applications
+(SDGs). Beyond this, the international trend              accordingly, as well as offset the risk of pest
+toward and climate-smart and precision farming            infestations or adverse weather events (Ghosh et
+signals a wider commitment to sustainable                 al., 2025).
+intensification making more from the same
+farmland while minimizing ecological harm (Ali &          Furthermore, precision farming is an example of
+Dahlhaus, 2022). The uptake in digital                    data-driven agriculture in which water, fertilizers
+technology is different across countries, for             and pesticides among others are applied at
+example many advanced geospatial technologies             variable rates depending on the specific
+are being offshore to developed countries and             demands of a location. This enhances but also
+used at breakneck speed in farms, while many              the resource utilization efficiency of a process,
+developing farms are working on a transition              as well as reduced production costs and
+from analog surveillance systems under the                environmental impact thereof (Maurya et al.,
+guide of policy, capacity building and research           2024). Digital tools are also essential to enhance
+cooperation.                                              traceability, supply chain transparency and
+                                                          market linkages, empowering farmers with
+In this changing environment, GIS and image               access to better decision-making and income
+processing have become two cornerstones of the            generating opportunities. On the larger scales,
+future in agriculture decision support. Taken             digital agriculture also enriches national and
+together, the two technologies deliver a powerful         regional food-security systems by supporting
+instrument for spatially explicit mapping and early       extended monitoring, forecasting, decision
+detection of crop anomalies to ensure traditional         making at policy level. For developing countries,
+agricultural systems are converted into                   data-driven approaches can provide a way to
+intelligent, adaptive and sustainable production          overcome       yield    gaps,    enhance      farm
+systems.                                                  management capacity and strengthen climate
+                                                          adaptation. As a result, the introduction of such
+1.2 Need for Digital and Data-driven                      digital technologies (including GIS and image
+    Approaches in Agriculture                             processing), is no longer an option but a strategic
+                                                          requirement for energizing agriculture into the
+The intensification of agriculture in the 21st            21st century (Dooyum Uyeh et al., 2023).
+century has led to agriculture becoming ever
+more complex, and decision-support systems                1.3 Importance of GIS and Image
+that provide accurate, timely decisions on                    Processing for Precision Agriculture
+numerical evidence have been difficult to
+implement (Yi et al., 2024). Agriculture systems          Precision farming depends on the understanding
+dominated by traditional practices, which depend          and managing of spatial and temporal variability
+on experience-based knowledge and manual                  in farms. In this framework of aid, GIS and image
+field observations, are insufficient to meet the          processing technologies are the mainstays that
+challenges of climate variability, pest dynamics,         allow farmers and researchers to rely on data-
+soil nutrient loading exhaustion and variable             supported decisions for their farming sites,
+market conditions. In the face of environmental           improving productivity, use efficiency and
+and     socio-economic     uncertainties,    farm         sustainability (Toromade & Chiekezie, 2024).
+
+
+                                                      443
+                                 Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+The significance of these tractor systems is the             there exist some gaps that prevent GIS and
+ability to transform raw spatial and visual data             image processing from being widely and
+into actionable information, changing the way in             efficiently used in the agriculture. Included
+which agricultural resources are monitored,                  among these challenges is a deficiency in
+dissected and managed.                                       unified approaches that enable the integration of
+                                                             high-resolution spatial data with advanced image
+GIS is a valuable tool to combine various geo-               analytics for real-time decisions. In most of the
+spatial data including soil maps, topography,                studies, only one application is explored in
+climate information, and crop yield records into             isolation e.g., crop monitoring, soil mapping or
+an integrated decision-support system. Spatially,            disease detection. No integrated work has been
+GIS supports a fine-scale definition of                      found so far on how these tools can take a joined
+management zones, location of yield limiting                 effort to contribute to holistic precision agriculture
+factors and mapping soil fertility gradients. This           systems.
+knowledge enables targeted interventions
+such as crop-specific variable-rate fertilizer               Second, the difference in the quality of input
+application, optimized irrigation scheduling and             data, sensor attributes, spatial resolutions and
+adapted weed or pest management measures (D                  methods used for the processing introduce
+& A, 2024). GIS also facilitates long-term                   discrepancies that influence accuracy and
+planning of farming activities by identifying land-          comparability with regard to agricultural
+use capabilities, risks of erosion and availability          monitoring. There is evidence further that work
+of water resources; it contributes to sustainable            on developing standard protocols for image
+agricultural development. Image processing                   acquisition,     pre-processing and      geospatial
+provides GIS with realistic, high-resolution visual          analysis has been scarce or poor, especially in
+observations of crops using satellite, UAV and               heterogeneous agricultural landscapes like the
+proximal sensing images. Disease, nutritional                hill regions and smallholder dominated farming
+deficiency, water stress and pest infestations can           systems. Also, while machine learning and deep
+be early diagnosed by means of image                         leaning      techniques     have     demonstrated
+processing (spectral analysis, vegetation indices,           enormous potential, employing them for
+texture-based features and machine-learning-                 agriculture has been limited by the lack of
+based inferences (Evsahi̇ bi̇ oglu & Ozdi̇ ki̇ li̇ ler,      annotated data sets that are applicable to
+2015). It also allows highly accurate automated              multidisciplinary problems within these areas as
+crop monitoring, yield estimation, canopy                    well as computational complexity and model
+analysis and growth-stage definition. The high               transferability across different domains. Another
+temporal resolution of imaging instruments                   important challenge is the relatively scarce
+enables constant monitoring of the field                     availability of advanced geospatial related tools
+condition, eliminating the need for labour                   to farmers in developing countries, where many
+intensive manual scouting.                                   obviously face limitations resulting from
+                                                             infrastructural shortfall, cost constraint and
+Combined, GIS and image analysis provides a                  technical know-how that hamper their full
+comprehensive precision agriculture system that              adoption. There is also literature that manifests a
+supports spatial explicit decision-making at the             requirement for more agro-climatic, cropping
+same time as it can improve crop monitoring.                 system and socio-economic context specific
+This beneficial effect not only leads to better              models. Also, the incorporation of GIS and image
+input-use efficiency and lower production cost               processing      in    combination     with    novel
+but also plays a key role in sustainable                     technologies (e.g., sensing based on IoT;
+environment through the reduction of waste and               automation in UAVs; clouded analytics) as well
+overly use of chemical. With the growing role of             as real time decision-support systems is
+digitization in agriculture, GIS and image-                  underdeveloped and fragmented across studies.
+processing are ever more essential technologies,             According to the above-mentioned gaps, in this
+turning them into key tools for the smart,                   review we will make an attempt to summarize the
+intelligent and resource-efficient farm systems of           state     of   art,   to   assess     technological
+today.                                                       improvements and critically analyze good
+                                                             practice (i.e., strengths and weaknesses) on
+1.4 Research Gaps and Motivation for the                     application of GIS and image-processing
+    Present Review                                           technologies in agriculture.
+Although great progress can be seen in                       We hope that this review will serve as a useful
+geospatial technologies and digital imagery,                 reference for researchers, policy makers and
+
+                                                         444
+                                Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+practicians in the progress of synergistically              The synergy between GIS and image
+combining these technologies for better precision           processing provides a powerful analysis
+farming, resource use efficiency and sustainable            environment where spatial information and
+agriculture development. This review attempts to            indicators derived from images can be fused to
+contribute toward further integration, accessibility        supply an overall knowledge. This synergy allows
+and data-driven operation of the agricultural               the real-time tracking of spatial variability, which
+system by synthesizing available literature and             can help farmers in data-driven decision-
+indicating areas for future research.                       making and enhance overall precision agriculture
+                                                            plans. With the ongoing development of digital
+2. FUNDAMENTALS OF GIS AND IMAGE                            agriculture, it is important to have a well-
+    PROCESSING                                              founded knowledge about these technologies in
+                                                            order to implement them efficiently and at
+The advancement of digital technologies for                 their    highest    potential    with regard      to
+agriculture is dependent on the utilization of              productivity, sustainability as well resource
+Geographic Information Systems (GIS) and                    efficiency.
+image processing, which are important tools for
+spatial    analysis   techniques    and   visual            2.1 Geographic Information System (GIS):
+interpretation of agricultural scenes. Together,                Concepts and Components
+these capabilities are used for the systematic
+acquisition, processing and visualization of                A GIS is a computer-based tool for mapping and
+geospatial information needed in precision                  analysing of features and events on the Earth's
+decision-making (Karada et al., 2023).                      surface. It allows us to grasp spatial
+                                                            relationships, patterns, and trends toward
+GIS is a computer-based system for capturing,               geographical landscapes which is essential for
+storing, managing, analyzing and displaying data            precision agriculture.   GIS     functions   by
+which are spatially referenced. It combines                 associating attribute data (information about a
+several layers of information including soil                feature/area) to spatial data (location-based
+conditions, topography, climate predictors and              information), accordingly enabling users to
+land use systems that fit together into a single            conduct sophisticated spatial analyses required
+platform for users to see how spatial patterns              for farming planning, monitoring and resource
+and variability manifest on the landscape due to            management (Singh et al., 2024).
+agricultural activities. Key GIS capabilities for this
+site are georeferencing, map projection, spatial            GIS works by integrating the concepts and
+query, terrain modelling, and overlay operations            methods from both conceptual and technical
+above and beyond location-based farm                        approaches. Its theoretical basis centers on the
+management. By using these functions, the GIS               cartographic representation of nature (fields,
+can help to identify management zones,                      soils, water bodies and crop zones) as vector or
+resource distribution trends and land capability            raster data model. These models allow for spatial
+for different kinds of agricultural production.             analysis such as proximity analysis, overlay
+                                                            operations, terrain modelling, buffer creation and
+On the other hand, image proc easing requires               land suitability analysis. The technology
+acquiring, enhancing, and interpreting digital              components of GIS are hardware, software, data
+images acquired by satellites, UAVs, or ground-             organizations and individuals to deploy the
+based sensors. The process includes in general              technology.
+pre-processing    procedures      as the    noise
+removal, radiometric and geometric calibration              2.2 Basics of Image Processing
+and also analytical tasks such as image’s
+segmentation,     features      extraction,   the           Image processing is a collection of computational
+computation of spectral bands indexes and                   techniques that are used to obtain, manipulate,
+classification. Such techniques can provide                 understand and interpret digital images for
+detailed analysis of crop vigour, disease                   meaningful information. In the case of
+incidence, canopy structure, weed location, soil            agriculture, these methods allow fine-grained
+status and water stress. With the development of            monitoring of crop health, soil properties, plant
+machine learning and deep learning, image                   growth status and local variations in fields based
+processing has become a promising tool in                   on satellite data, unmanned aerial vehicle
+automatic crop monitoring and smart agricultural            (UAV) imaging data and field-based sensor
+diagnosis (Farhood et al., 2022).                           inputs.
+
+
+                                                        445
+                            Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+
+
+                                 Fig. 1. Key Components of GIS
+
+The process generally involves three core               monitoring and precision decision-making. Its
+stages:                                                 combination with GIS enhances the spatial
+                                                        accuracy and contextual relevance of agricultural
+ 1. Image Acquisition                                   assessments, forming a core foundation of smart
+                                                        and data-driven farming systems.
+ •   Obtaining      images    from     optical,
+     multispectral, hyperspectral, thermal or           2.2.1 Image acquisition and pre-processing
+     LiDAR sensors.
+ •   Data can be collected through satellite            Image capture and pre-processing are the most
+     platforms,    UAVs    (unmanned     aerial         important first steps in an image analysis
+     vehicles),      handheld     devices and           workflow as they directly impact the accuracy,
+     automated field sensors.                           interpretability and reproducibility of downstream
+                                                        analyses. In tasks such as agriculture, where
+ 2. Image Pre-processing                                decision making is based on mild variations
+                                                        between crops reflectance, and canopy texture
+ •   Enhances image quality and reduces                 and soil type, the accuracy of these early steps
+     distortion.                                        becomes more crucial than ever. Good imaging
+ •   Comprises radiometric, geometric, noise,           quality allows growth stages and stress to be
+     atmospheric       correction   and   image         monitored, with predictive models running to
+     registration.                                      estimate yield and disease.
+ •   Provides      that images    are   a   true
+     representation of ground condition and fit            A. Image Acquisition
+     for analysis.
+                                                        Image     Retrieval    Image      acquisition:  is
+ 3. Image Analysis and Interpretation                   defined as receiving raw digital imagery from the
+                                                        various remote and proximal sensors. The
+ •   Usefulness of data is further enhanced             choice of a particular platform and sensor type is
+     through operations like or maintenance             based on the scale of observation, desired
+     image classification, vegetation, edge             spatial detail, and nature of agricultural
+     detection, feature      extraction   and           application.
+     segmentation ((e.g. NDVI).
+ •   Automation for disease diagnosis, weed             Affordable UAVs and improvements in sensor
+     detection, yield monitoring and stress             miniaturization technologies have transformed
+     assessment is       implemented     using          agricultural imaging through flexible, on-demand
+     machine learning, deep learning methods.           and high-resolution data collection. Satellite
+                                                        platforms provide uniform temporal coverage for
+Image processing transforms raw image data              long-term monitoring and large-scale agricultural
+into interpretable insights, enabling real-time         predictions, on the other hand.
+
+
+
+                                                    446
+                              Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+                     Table 1. Major Image Acquisition Sources in Agriculture
+
+ Source                Sensor Type                        Agricultural Applications                 Reference
+ Satellite             Multispectral,                     Regional crop monitoring,                 (Omia et al.,
+                       Hyperspectral, Thermal             drought assessment, LULC                  2023)
+                                                          change detection
+ UAV / Drone           RGB, Multispectral,                Plant stress detection, weed              (Alsadik et al.,
+                       Hyperspectral, Thermal,            mapping, disease surveillance,            2024)
+                       LiDAR                              canopy structure analysis
+ Ground-Based          RGB cameras, proximal              Crop phenotyping, soil                    (Jin et al.,
+ Sensors               multispectral sensors,             moisture estimation, leaf-level           2020)
+                       thermal scanners                   disease analysis
+ Handheld Devices      RGB                                Quick field scouting, farmer-led          (Won et al.,
+ / Mobile Phones                                          crop diagnosis                            2025)
+
+  B. Image Pre-processing                                 indices extraction (e.g., NDVI, SAVI, EVI, NDRE
+                                                          and GNDVI).
+Pre-processing raw imagery directly provided by
+sensors in geometry and spectral leads to                 Texture: statistical descriptions of surface
+correct representation of field conditions. Without       patterns, roughness and uniformity can be
+this, it is possible that errors in atmospheric           useful in distinguishing healthy from diseased
+disturbance, sensor limitations or geometric              plant tissues and crop types.
+distortion may lead to unreliable analysis.               Form and geometry: Outline, leaf area,
+Corrections are important because they allow for          perimeter   and    structural   characteristics
+the interpretation of accurate vegetation indices,        measured from high-resolution UAV images.
+and early plant stress detection, as well as
+comparability of image-derived metrics across             Temporal components: developments over
+time, instruments or platforms.                           time represented in multi-temporal images that
+                                                          reflect  crop   developmental    stages   and
+2.2.2 Feature extraction, segmentation, and               phenological phases.
+      classification                                      Feature extraction seeks to reduce the
+                                                          complexity of image data, while retaining the
+Feature       extraction, segmentation       and          important characteristics needed for meaningful
+classification are the analytical foundations of          analysis.
+image processing that convert pre-processed
+imagery into useful agricultural information.                B. Segmentation
+These methods make pattern recognition,
+anomaly detection, and discrimination of                  Segmentation is the partitioning of an image into
+different plant and soil conditions possible,             meaningful regions or objects which are
+making them the basis of precision farming                homogenous in spectral or spatial properties. In
+applications.                                             Agricultural environments, images need to be
+                                                          segmented in order to separate different objects
+  A. Feature Extraction                                   of interest like crop canopy, soil patches, weeds
+                                                          or diseased part of the field. Segmentation
+Feature Description: Feature extraction is the            methods might be based on thresholding
+process of extracting descriptive attributes from         methods (using spectral indices), region-based
+images that capture crucial information about             algorithms (pixels with similar characteristics are
+crops, soil and vegetation. These features                grouped) or machine learning (e.g., k means
+capture the spectral and spatial structure, thus          clustering) (Lei et al., 2024). State-of-the-art
+enabling subtle variations in plant health,               deep-learning methods such as U-Net or Mask
+canopy structure and field variability to be              R-CNN offer the capability of highly accurate
+analysed.                                                 pixel-level segmentation, which can be valuable
+                                                          for disease diagnosis and plant phenotyping.
+Key extracted features include:                              C. Classification
+
+Spectral: reflectance associated with several             Classification determines a category that each
+spectral bands that are used for vegetation               pixel or object in the image belongs to by
+
+                                                      447
+                              Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+comparing their characteristics. It is required for       At the bottom of the pyramid, remote sensing
+preparing thematic maps like crop type maps,              offers a synoptic, repetitive and multi-spectral
+land-use maps, disease distribution of crops and          observation of agricultural landscapes throughout
+nutrient deficiency mapping.                              satellite data (Landsat, Sentinel or MODIS). Such
+                                                          datasets provide large-scale data on crop
+Common classification approaches include:                 phenology, vegetation vigor, soil moisture,
+                                                          thermal profiles and land-use dynamics. The GIS
+ i.    Supervised- the model is trained on                enables the organization of, management of,
+       labelled samples. e.g. Support vector              overlay of, and analysis of these datasets in a
+       machines, Random forests and Artificial            georeferenced space that facilitates the
+       neural networks).                                  conversion of raw layers into actionable spatial
+ii.    Unsupervised classification: clustering of         knowledge. The interaction of GIS and RS
+       pixels without known information (e.g., k-         strengthens its capabilities in spatial modelling,
+       means, ISODATA).                                   suitability analysis, space-time change detection
+iii.   Object-based image analysis (OBIA) that            and the predictive mapping of crop condition.
+       classifies groups of pixels (objects), not
+       single bits, increasing the accuracy in            The integration is reinforced by UAV-based
+       high-resolution UAV imagery.                       image acquisition; ultra high-resolution images at
+iv.    Deep learning, using a CNN for advanced            any temporal and spatial scales can be acquired.
+       pattern recognition and feature extraction.        With RGB, multispectral, hyperspectral, thermal
+                                                          and Lidar sensors, the unmanned aerial vehicles
+The use of classification results provides to             (UAVs) allow field-level monitoring with
+researchers and farmers the possibility to                centimetre-scale accuracy. GIS is the hub of
+visualize the spatial distribution in field,              processing and assimilating UAV products, which
+as well as to monitor crop performance, and               makes it capable of aligning detailed field data at
+then     make  decisions    about    precision            high-resolution to more coarse grained satellite
+interventions.                                            information. Such multiscale data fusion enables
+                                                          fine-scale agricultural applications such as crop
+The process of feature extraction, segmentation           health monitoring, water stress identification,
+and classification facilitate translation from raw        nutrient deficiency and weed detection and
+imagery to actionable knowledge. These                    micro-topographic       analysis for      precision
+methods facilitate disease diagnosis, crop type           irrigation.
+mapping, stress detection and yield estimation
+by identifying informative features, separating           Major benefits of GIS-RS-UAV integration are
+important regions and classifying field conditions        the augmented spatial accuracy, better crop
+(Nethala et al., 2024). Their interoperability with       status     monitoring,      effective      resource
+GIS also enhances and facilitates analysis of the         management and detecting fine scale variations
+agricultural systems through the incorporation of         in fields which are not visible using traditional
+spatial context to support precision agriculture;         techniques. It also allows integration for machine
+farmland management optimization in landscape             learning or deep learning pipelines, where rich
+pattern; risk assessment; and monitoring, among           spatial datasets can be used to train predictive
+others.                                                   models for yield estimation, disease detection
+                                                          and anomaly identification.
+2.3 Integration of GIS with Remote
+    Sensing and UAV-Based Imaging                         In general, the blending of GIS with remote
+                                                          sensing and UAV imaging creates a full
+The fusion of Geographic Information Systems              potentials      spatial-information ecosystem
+(GIS) with remote sensing (RS) and Unmanned               necessary to develop precision agriculture and
+Aerial Vehicle (UAV)-borne imaging has made               boost farm productivity and enable data
+the joint framework for spatially informed                supported decision support system in today's
+agricultural monitoring one of the most exciting          agricultural landscapes.
+developments. Such integration allows for multi-
+scale data collection, accurate spatial referencing       2.4 Advances in AI and Machine Learning
+and powerful analysis that can be used to                     for Geospatial Data Analysis
+optimize     site-specific   crop    management
+and in-season decision-making (Chen et al.,               The recent development of AI and ML has
+2025).                                                    revolutionized geospatial data analysis in
+
+
+                                                      448
+                               Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+agricultural environments. Early GIS and imagery           well as predicting yields and environmental
+based methods which required intensive manual              variables at field as scale (Attri et al., 2023).
+interpretation, have been established by the               These models are time-dependent and they can
+empirical rule-based classification and the step           be used for more accurate prediction of crop
+forward in scaling accuracy or ability to                  performance under different climatic and
+generalize for agronomic field rules has become            management situations. In addition, AI geospatial
+increasingly refined. Contemporary AI-based                fusion approaches         fuse        multi-sensor
+techniques, in      particular  deep      learning,        (multispectral, hyperspectral, LiDAR SAR,
+ensemble      learning,     and   spatial-temporal         thermal and others) data within GISs in a
+modelling have turned geospatial analytics to a            knowledge-based manner to generate all-
+more automation-friendly and accurate context-             inclusive decision-support layers. These fusion
+aware decision support system (Dritsas & Trigka,           models are capable of preserving not only the
+2025).                                                     spectral but also structural information of crop
+                                                           fields, which could enhance tasks such as
+Using machine learning, such as SVM (Support               precision irrigation strategy estimation, soil
+Vector Machines), RF (Random Forests), GB                  nutrient monitoring, canopy structure detecting
+(Gradient Boosting) and kNN (k-Nearest                     and micro-zones dividing. Advanced ML
+Neighbour) based classification algorithms the             pipelines can also be used to achieve real-time
+accuracy of LULC mapping has been increased                agriculture monitoring with edge AI and cloud-
+along with crop discrimination and vegetation              orchestration, such as automated UAV image
+monitoring. These methods effectively deal with            processing and streamed scenarios' detection in
+large multi-source remote sensing datasets over            the field, on-the-fly management maps
+satellites, UAV platforms, and proximal sensing            generation as well. The inclusion of interpretable
+systems (Srivastava et al., 2022). Deep learning           AI (XAI) methods additionally supports
+networks such as Convolutional Neural Networks             transparency, helping agriculture stakeholders to
+(CNN),      U-Net,    ResNet,    attention-based           understand model decisions and increase
+architectures have recently become a state-of-             confidence in autonomous systems.
+the-art for harvesting high level features from
+complicated     imagery,     enabling    superior          In general, AI and ML IN Ali et al have lifted
+segmentation of crop varieties, cueing in on               geospatial    agriculture from      descriptive
+anomalies and stress symptoms such as disease              mapping to predictive, prescriptive and even
+or malnutrition. Spatial-temporal models using             autonomous analytics indicating smarter data
+RNNs, LSTM, and Transformer architectures                  driven, resource efficient agricultural farm
+provide a flexible way to model crop growth as             management.
+
+                           Table 2. Various AI models used in Agriculture
+
+                                              Primary
+ Algorithm/Model        Type                  Applications in              Strengths               Reference
+                                              Agriculture
+                                              Crop type                    High accuracy           (Dapke et al.,
+ Support Vector
+                        Supervised ML         classification, LULC         with limited            2025)
+ Machine (SVM)
+                                              mapping                      training data
+                                              Disease detection,           Handles high-           (Carranza et al.,
+ Random Forest                                soil mapping,                dimensional             2021)
+                        Ensemble ML
+ (RF)                                         vegetation                   data; robust to
+                                              classification               noise
+                                                                                                   (Elvanidi &
+ Gradient Boosting                            Yield prediction,            High predictive
+                        Ensemble ML                                                                Katsoulas,
+ (GB)                                         stress detection             power
+                                                                                                   2023)
+ k-Nearest                                    Crop discrimination,         Simple and              (Dasari et al.,
+                        Supervised ML
+ Neighbour (kNN)                              pattern recognition          interpretable           2025)
+                                              Image classification,        Excellent               (Mary et al.,
+ CNN                    Deep Learning         canopy feature               feature learning;       2022)
+                                              extraction                   high accuracy
+
+
+
+
+                                                       449
+                                Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+
+
+Fig. 2. GIS and image processing enabled UAVs for crop spraying and monitoring (Borah et al.,
+                                           2025)
+
+3. APPLICATIONS               OF        GIS          IN           manage water resources at the watershed
+   AGRICULTURE                                                    scale.
+                                                               5. Yield     Estimation     and    Forecasting:
+Agricultural Production has become highly                         Prediction of crop yield is sensitive to the
+dependent on the use of Geographic Information                    availability of accurate climate information.
+Systems (GIS) that allows for acquisition,                        Crop performance assessment can be
+integration, analysis, and visualization of spatially             done at a range of scales using climatic
+related data in a single system. As such, it has                  data from remote sensing images that are
+an instrumental role to play in providing tools for               combined with ground environmental
+decision making and insights into spatial                         monitoring. This helps in early warning
+variability, resource distribution and field level                and planning of agricultural activities.
+heterogeneity that empower sustainable and                     6. Climate and Pest Risk Mapping: GIS
+precision agriculture.                                            analyses of localised trends including
+                                                                  temperature, humidity, precipitation rates
+  1. Land Use and Land Cover (LULC)                               and reported incidence of pests across
+     Mapping: GIS enables precise mapping of                      spatial areas where pest outbreaks are
+     agricultural landscapes consisting of                        known to occur help in determining high-
+     cultivated areas, fallows, tree crops and                    risk areas for disease transmission as well
+     natural vegetation. These maps are                           as management practices for proactive
+     valuable for land-use planning, monitoring                   control against frequent pest invasion.
+     of agricultural encroachment and study of                 7. Disaster assessment & recovery planning
+     land degradation.                                            for floods, droughts, cyclones or hailstorm
+  2. Soil Mapping and Site-Specific Soil                          for quick       impact    assessment      on
+     Management: The ability to map soil                          agriculture and for expediting relief to the
+     fertility in detail is made possible partly by               affected farmers.
+     the incorporation of textural, pH, nutrient
+     content, and topographical attributes                  GIS has the effect of increasing agricultural
+     through GIS. This promotes variable rate               productivity through spatialized, data-informed
+     nutrient application, problematic soil                 process of decision making. In such applications
+     mapping and input resource utilization.                as precision agriculture, climate-resilient farming,
+  3. Crop Monitoring and Health Assessment:                 and sustainable land management, the proposed
+     GIS use satellite and UAV-derived indices              model is essential in integrating multi-source
+     (NDVI, NDRE, SAVI) to evaluate                         datasets and visualizing spatial patterns.
+     vegetation greenness as well as stress
+     detection and locate spatial patterns of               3.1 Precision Agriculture                    and        Site-
+     disease or nutrient deficiency within a                    Specific Management
+     field.
+  4. Spatially Enabled Irrigation and Water                 Precision agriculture relies heavily on GIS to
+     Management: Using evapo-transpiration,                 capture and analyze the spatial variability that
+     soil moisture, topographic, and hydrology              exists within agricultural fields. Farmers now use
+     layers combined through spatial analysis,              GIS to integrate yield monitor data, remote-
+     GIS is used to design effective irrigation             sensing outputs, soil sample analyses and GPS-
+     systems, timetable irrigation events and               based observations to understand how crop
+
+
+                                                        450
+                                Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+performance varies from one location to another             management, enabling farmers to apply
+within the same farm. This spatial understanding            fertilizers in balanced quantities rather than
+allows the application of fertilizers, pesticides and       adopting uniform doses across an entire field.
+irrigation water only where they are needed,                (Singh et al., 2015) used GIS to create nutrient
+thereby reducing excessive input use and                    distribution maps for agricultural soils in India
+improving efficiency. (Zhang and Kovacs, 2012)              and demonstrated how these maps could guide
+emphasized that GIS, when combined with                     precision fertilizer recommendations, reducing
+satellite imagery and proximal sensing,                     both      nutrient  wastage    and     production
+significantly enhances the identification of                costs.
+nutrient deficiencies and crop stress, enabling
+farmers to make timely decisions about                      3.3 Water Resource Management and
+field operations. Their study also showed how                   Irrigation Planning
+GIS-based nutrient maps contribute to more
+accurate variable rate fertilization, ultimately            Water resource management is a critical
+supporting healthier crops and improved                     component        of    agricultural    sustainability,
+yields.                                                     particularly in regions facing increasing water
+                                                            scarcity. GIS supports irrigation planning by
+3.2 Soil Resource Mapping and Fertility                     helping      delineate      watersheds,      assess
+    Assessment                                              groundwater potential, map surface water bodies
+                                                            and     model      hydrological     processes.    By
+Soil characteristics vary significantly across              integrating spatial layers such as rainfall
+agricultural landscapes, and GIS provides a                 distribution, soil permeability, slope and geology,
+robust framework for visualizing and analysing              GIS can identify potential zones for groundwater
+this variability. By integrating field-sampled soil         exploration and guide the placement of irrigation
+data with geostatistical interpolation techniques           structures. (Jha et al., 2010) used GIS
+such as kriging and inverse distance weighting,             techniques to identify groundwater potential
+GIS allows researchers to develop detailed maps             zones in India and demonstrated that the
+of soil pH, texture, organic matter content,                integration of hydrological and geological
+micronutrient distribution and erosion potential.           parameters significantly improves irrigation
+These maps support site-specific nutrient                   planning.
+
+
+
+
+                               Fig. 3. Applications of GIS in Agriculture
+
+
+
+
+                                                        451
+                               Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+3.4 GIS-Based         Climate        and        Risk       4.2 Weed Identification and Classification
+    modelling
+                                                           Accurate detection and classification of weeds is
+In the face of accelerating climate change,                essential for precise weed management and
+agriculture is increasingly exposed to a spectrum          reducing competition for nutrients, light and water
+of hazards including droughts, floods, heatwaves           in crop systems. A recent study by (Guzel et al.,
+and erratic rainfall. The integration of Geographic        2024) presents an image-processing approach
+Information Systems (GIS) into climate-risk                using deep learning for weed detection in
+modelling has therefore become indispensable               agricultural fields: multispectral and RGB images
+for identifying vulnerability, assessing exposure          are processed to segment weed regions, classify
+and supporting adaptation in farming systems.              weed species and map weed infestation levels.
+Recent work by (Mălinaș et al., 2025) illustrates          The workflow includes image acquisition via
+this shift by presenting a framework in which GIS          drones,     preprocessing       (noise      reduction,
+is combined with remote sensing and climate                normalization), segmentation (U-Net/SegNet
+data to map farmland vulnerability and guide               architectures)     and     classification    (ResNet,
+adaptive farming strategies. Their analysis                DenseNet). The study shows high accuracy even
+emphasises that by overlaying spatial layers of            in “green-on-green” scenarios where weeds and
+hazard (such as temperature extremes),                     crops share similar foliage colour. This enables
+exposure (cropped area, irrigation dependence)             variable-rate      herbicide      application     and
+and adaptive capacity (soil resilience, farm               autonomous weeding systems, advancing
+diversity), GIS-driven maps become powerful                precision agriculture techniques.
+tools for proactively targeting climate-smart
+interventions.                                             4.3 Pest Monitoring and Early-Warning
+4. APPLICATIONS     OF     IMAGE                               Systems
+   PROCESSING IN AGRICULTURE
+                                                           Pest outbreaks pose a major threat to yield
+Image processing has emerged as one of the                 stability, and image-processing combined with
+most transformative technologies in modern                 remote sensing and AI is increasingly being
+agriculture, enabling rapid, non-destructive, and          deployed for early detection and warning. (Duan
+highly precise observation of plants, soil and field       et. al., 2023) introduces a multimodal deep-
+conditions. By converting raw visual data from             learning architecture that integrates visual data
+RGB, multispectral, hyperspectral, thermal and             from leaf- and canopy-level images with textual
+depth sensors into meaningful agronomic                    metadata (weather, pest alerts) to detect pest
+information, image-processing techniques allow             presence, classify pest species and estimate
+farmers and researchers to monitor crop health,            infestation severity. The system uses object-
+detect diseases, identify weeds, track pests,              detection frameworks (e.g., Faster R-CNN) for
+assess plant growth, estimate yield and evaluate           image data and natural-language processing
+soil properties with unprecedented accuracy.               (NLP) for textual context, thereby improving
+                                                           prediction accuracy and providing proactive
+4.1 Crop Health and Disease Detection                      alerts. Farmers using such systems can
+    Using Digital Imaging                                  implement targeted interventions, reduce pest
+                                                           spread and avoid blanket pesticide applications.
+Image-processing technologies have become
+vital for assessing crop health and detecting              4.4 Yield Prediction Using Spectral and
+diseases at early stages, enabling non-                        Structural features
+destructive, rapid monitoring across vast fields. A
+recent review by (Li et al. 2024) highlights how           Predicting crop yield prior to harvest is a key
+digital imaging combined with deep-learning                objective in agricultural monitoring, and image-
+algorithms can accurately identify disease                 processing plays a central role by deriving
+symptoms such as leaf spots or chlorosis from              structural (canopy cover, height) and spectral
+RGB and multispectral images, even before they             (NDVI, red-edge) features. Recent research has
+are visible to the human eye. The study                    shown that integrating time-series imagery from
+demonstrates how convolutional neural networks             drones or satellites with machine-learning
+(CNNs) and vision-transformer models trained on            models (e.g., random forests, XGBoost)
+image datasets like PlantVillage can classify              significantly improves yield estimation accuracy.
+disease types, estimate severity and spatially             For instance, by analyzing image-derived
+map infected zones.                                        vegetation indices and canopy height models
+
+                                                       452
+                               Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+mid-season, analysts can forecast final yield with         by creating more efficient and responsive data
+high confidence, allowing supply-chain planning            led farm management systems.
+and input-adjustment. Though a specific paper is
+not cited here, the trend reflects solid progress in       5.1 GIS-Based Analysis of Image-Derived
+this field.                                                    Vegetation Indices
+
+4.5 Image-Based     Soil         Texture         and       With GIS, information on the pixel-by-pixel
+    Moisture Analysis                                      spectral characteristics of vegetation can be
+                                                           converted into spatially explicit decision relevant
+While less common than canopy applications,                maps and statistics. By employing image-based
+image-processing is increasingly being used for            indices (e.g., NDVI, EVI, NDRE) in a geospatial
+soil characterization. Recent work explores how            environment, scientists and decision-makers are
+UAV-mounted multispectral or thermal sensors               able to measure spatial variation, track temporal
+capture soil surface reflectance and temperature           change detection, map management zones and
+patterns which, when processed by machine-                 connect vegetation signals with other data
+learning models, correlate with soil texture               sources including soil properties, topography and
+classes (sand, silt, clay) and soil moisture               climate.
+content. These image-derived soil maps help                Major stages            involved       in a     GIS-based
+guide irrigation scheduling, tillage decisions and         process:
+soil amendment placement in precision
+agriculture frameworks.                                    Import and Geo-reference: Ingest pre-
+                                                           processed    index    raster’s  (cloud   free,
+5. INTEGRATED  GIS  AND                     IMAGE          atmospherically corrected and ortho-corrected)
+   PROCESSING     FOR                       SMART          into the GIS environment and ensure that
+   AGRICULTURE                                             uniform coordinate systems are maintained and
+                                                           resolutions.
+The integration of GIS and image processing is a
+central pillar of smart agriculture which links            Resampling and harmonization: Equalize
+spatial data management with sophisticated                 spatial resolution and grid position when adding
+image-based analytics. While GIS serves as the             up indices with different sensor and/or date
+georeferenced repository for various agricultural          information, to allow for pixel-wise comparison
+layers and enables overlay and analysis of these,          and multi-temporal analysis
+image processing is responsible for Retrieval of           .
+critical information from satellite, UAV or sensor-        Masking and quality filtering: From the
+based imageries. Integrated, these technologies            resulting maps, masks for non-vegetation (i.e.,
+provide the ability to precisely map crop                  built-up areas, water bodies), clouds and low-
+conditions, soil variability, plant health and             quality pixels are generated. Spurious values are
+resource distribution. Vegetation indices, disease         eliminated by means of quality assurance bands
+detection results and stress maps derived from             or automated thresholding.
+image processing are better used in GIS for
+mapping management zones, precision input                  Zonal and descriptive statistics: Calculate
+application maps and smart irrigation scheduling.          zonal statistics (mean, median, standard
+The integration of imagery with soil, climate, and         deviation) for administrative villages / fields /
+topography data improves the predictive                    management zones to summarize vegetation
+modelling for yield forecasting, pest risk analysis,       status per unit. Apply information in the form of
+and       climate resilient    decision     making.        objects (field polygons) to farm-level decisions.
+Furthermore, mapping crop at the plant level will
+                                                           Time-series and phenology analysis: Stack
+provide real-time field monitoring; since the map
+                                                           multi-temporal index raster’s and calculate
+is a representation (e.g. of lot) it supports
+                                                           temporal smoothing, anomaly detection and
+the use of GIS applications while scouting or
+                                                           phenological metrics (green-up date, peak
+performing      in-field    operations    can    be
+                                                           greenness, senescence). Batch processing is
+automated.
+                                                           also possible using GIS temporal tools or
+                                                           scripting (Python/R).
+On the whole, GIS and image processing
+technology offer an important tool in modern
+                                                           Trend detection and change mapping: Use
+agriculture that can be used to improve
+                                                           pixel-by-pixel trend analysis (e.g. by linear
+productivity, sustainability, and decision making
+
+                                                       453
+                              Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+regression, Mann–Kendall test) and change-                5.2 UAV-Based Crop Monitoring Systems
+detection algorithms to separate in the image
+areas of long-term productivity shift, degradation        Unmanned Aerial Vehicles (UAVs) have recently
+or recovery.                                              gained increasing attention by providing a
+                                                          revolutionary solution for on-demand, high
+Spatial interpolation and surface modelling:              resolution     crop    monitoring in     precision
+Interpolate index values as derived raster’s              agriculture. Their capacity for acquiring data at
+where field measurements are sparse, or model             spatial, temporal and spectral scales is high and
+continuous surfaces using soil/weather layers in          allows for continuous monitoring of crop
+proximity to indices.                                     development, the dynamics of stress and field
+                                                          variability.   With     onboard     multispectral,
+Classification       and      management-zone             hyperspectral, thermal, RGB and lidar sensors
+delineation: Clustering (k-means, ISODATA) or             UAVs       enable   real-time   assessment       of
+supervised classification of index layers and             biophysical and biochemical crop parameters
+ancillary variables to define management zones            such as canopy vigor, chlorophyll content, leaf
+for VR applications.                                      area index (LAI), water stress and nutrient status.
+
+Integration with ancillary datasets: Map your             These systems typically share the following
+overlay index results to soil maps, DEM-based             steps: mission planning, autonomous flight
+drainage patterns, irrigation infrastructure and          operation, image capture process, georeferenced
+weather layers to identify the causes of                  images generation, pre-processing of images
+observed variability and inform prescriptive              and analytical model. Automatically holds stable
+measures.                                                 flight lines and overlap for precise mosaics, using
+                                                          high-quality autopilot and GNSS navigation
+Validation and accuracy assessment: Verify                systems. The high (1-10 cm) spatial resolution of
+index inferences based on ground truth (biomass           data obtainable by UAVs enables fine-detailed
+samples, LAI, crop yield) through spatial                 observation of intra-field variability which cannot
+correspondence of observations and calculate              be seen in satellite images. Combined with
+accuracy or correlation indices.                          machine       learning,   UAV imagery       enables
+                                                          automated pest infestation, disease symptom,
+Vegetation indices computed from spectral                 weed patch and lodging pattern detections.
+measurements are turned into actionable                   Thermal sensors have been increasingly used for
+spatial intelligence by GIS. With strict                  irrigation      scheduling      through     canopy
+processing, validation and fusion with existing           temperature        anomaly       mapping      while
+contextual datasets, GIS-based monitoring                 multispectral VIs including the NDVI, SAVI,
+application using these vegetation indices is a           NDRE and GNDVI support crop health
+key technology for accurate diagnosis,                    diagnostics. Additionally, UAV time-series
+monitoring and intervention in contemporary               monitoring also allows crop growth modelling,
+farming.                                                  yield prediction, and stress warning system.
+
+         Table 3. Common Vegetation Indices Used in GIS-Based Agricultural Analysis
+
+ Vegetation Index       Formula                         Application                            Reference
+ NDVI (Normalized       (NIR – Red) / (NIR +            Crop vigor, biomass, drought           (Gaikwad et al.,
+ Difference             Red)                            monitoring                             2025)
+ Vegetation Index)
+ EVI (Enhanced          2.5 × (NIR – Red) /             Stress detection, high                 (Berger et al.,
+ Vegetation Index)      (NIR + 6×Red –                  biomass mapping                        2022)
+                        7.5×Blue + 1)
+ NDRE (Normalized       (NIR – Red Edge) /              Early stress detection,                (B et al., 2025)
+ Difference Red-        (NIR + Red Edge)                nutrient assessment
+ Edge)
+ SAVI (Soil-Adjusted    (1 + L)(NIR – Red) /            Sparse vegetation and semi-            (Nanasaheb et al.,
+ Vegetation Index)      (NIR + Red + L)                 arid regions                           2020)
+ GNDVI (Green           (NIR – Green) / (NIR +          Nitrogen status, chlorophyll           (Peter et al.,
+ NDVI)                  Green)                          content                                2021)
+
+
+
+                                                      454
+                                Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+                Table 4. Types of UAV used in Agriculture (Delavarpour et al., 2021)
+
+ UAV Type                        Advantages
+ Fixed-Wing UAV                  Ideal for large farms; efficient coverage; stable in wind
+ Rotary-Wing (Multirotor)        Ideal for small to medium farms; excellent for detailed imaging
+ Hybrid VTOL                     Suitable for both small and large farms; efficient and precise
+ Single-Rotor Helicopter         Can carry heavy sensors and sprayers
+
+In general, a UAV-based crop monitoring system              sophisticated algorithms and trained personnel to
+offers fast and flexible method, easy access, low           handle the large geospatial datasets processing.
+cost-effective sensing for agricultural monitoring          Smallholder farmers and other facilities with
+that enhances the decision-making steps of                  limited resources do not have the hardware
+precision input management, site-specific                   capability nor the expertise for deploying
+treatment implementation and sustainable farm               advanced spatial analyses.
+practices.
+                                                               3. Limited       Interoperability                     and
+6. LIMITATIONS AND CHALLENGES                                     Standardization
+
+Despite the significant progress made in the                There are not widely acceptable standards of
+integration of GIS and image-processing                     geospatial agricultural data that can be used for
+technologies in agriculture, several limitations            data formats, metadata information, coordinate
+and challenges still constrain their widespread             systems and sensor specifications which
+adoption, especially in resource-limited regions.           facilitates failure of integration of multi-source
+These challenges arise from technical, financial,           dataset.     This     limitation     hampers      the
+infrastructural, and institutional factors that             interoperability     among         the     platforms
+collectively influence the precision, reliability, and      development        and     frustrates   efforts    of
+operational efficiency of smart agriculture                 collaborative research and multi-agency data
+systems. While advanced geospatial and                      sharing.
+imaging      tools    can     revolutionize       farm
+management, their effectiveness depends                        4. Complexity of Agricultural Landscapes
+heavily on data quality, computational capacity,
+skilled personnel, and supportive policy                    The      agricultural  landscape      is   naturally
+ecosystems. The following subsections elaborate             heterogeneous with respect to soil type, crop
+on the major challenges that continue to shape              types' scale and form, topography management
+the practical implementation and sustainability of          activities, as well as climate. Static classification
+these technologies in diverse agricultural                  algorithms and generalized platforms lack the
+contexts.                                                   ability to model very dynamic field situations,
+                                                            giving rise to misclassifications and lower
+  1. Data     Availability         and        Quality       prediction accuracies.
+     Constraints
+                                                               5. Price   of   Novel                 Sensors         and
+In agricultural geo-spatial applications regular,
+                                                                  Technologies
+high resolution multi-temporal imaging is
+particularly important.     Nonetheless,   large
+                                                            UAVs, hyperspectral sensors and LiDAR provide
+portions of geographic areas especially in Less
+                                                            a better spatial and spectral resolution but are
+Developed Countries (LDCs) suffer from poor
+                                                            still cost-prohibitive for several institutions and
+access to high-quality satellite imagery, non-
+                                                            producers. The purchasing, maintenance,
+uniform coverage by UAV and an inadequate
+                                                            information storage and processing costs are
+amount ground truth data. Meanwhile, cloud
+                                                            impeding the usage especially by small range
+interference, atmospheric turbulences and short-
+                                                            and middle range farmers.
+daylight make optical remote sensing less
+feasible.
+                                                               6. Deficiencies   in              skills and        weak
+  2. High Computational            and     Technical              technical capacity
+     Requirements
+                                                            GIS and image processing tools can only be put
+Usage of hyperspectral (HS), LiDAR and )UAV                 to good use if they are combined with knowledge
+imagery)   requires    powerful   computers,                from several domains such as remote sensing,
+
+
+                                                        455
+                                Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+machine learning, agronomy or spatial modelling.            CNN-LSTM           networks      for      improved
+Most of the farming communities do not have                 representation       of    dynamic    crop-climate
+access to required technical knowledge which                interactions. Real-time analytics can be
+has limited the use of geospatial technology in             enhanced with an edge-AI system enabling on-
+regular farm management.                                    the-fly processing of UAV and field-sensor
+                                                            imagery to quickly identify diseases, weeds, and
+  7. Challenges in Real-Time Monitoring                     irrigation requirements. We propose that the
+                                                            research should further develop automation to
+Even though advancements in technology now                  incorporate not only GIS but also swarm of
+allow for near-real-time analytics, such real-time          autonomous UAV with depositing/release units,
+monitoring is still particularly challenging due to         smart sprayers and ground robots and
+bandwidth constraints in rural sites and data               specifically focus on path-planning, coordinated
+transmission delays, while maintaining onboard              navigation and dynamic georeferencing. For high
+the UAV computing capabilities might be                     resolution 3D and hyperspectral analysis more
+complex. These limitations influence the ability to         sophisticated algorithms for high dimensional
+take timely decisions during moments critical for           data such as canopy modelling, biomass
+the crops.                                                  estimation or the early detection of stress are
+                                                            needed. GIS digital twin simulations of crop and
+  8. Challenges in Data Privacy, Security                   soil processes are a major next step, requiring
+     and Ethics                                             real-time sensor integrations and AI decision
+                                                            layers. Cloud-based scalable GIS platforms and
+With the development of geospatial technologies             distributed processing framework should be
+and increasingly nuanced farm-level information             deployed to cope with increasing agricultural big
+is available, concerns are raised about data                data. Standardization initiatives must also
+ownership and privacy, as well as potential                 support interoperable data formats and common
+misuse. Transparent rules for data governance,              protocols to facilitate cross-agency collaboration.
+access and ethical use are crucial, yet simple in           Researching on adoption barriers, farmer
+many places.                                                readiness and cost benefit dynamics are also
+                                                            necessary from agricultural sociology and policy
+  9. Environmental           and        Operational         research point of view. Finally, ethical issues in
+     Limitations                                            respect to data ownership, privacy and fairness
+                                                            as well as responsive AI exploitation should be
+UAVs imagery has its limitations, due to weather            integrated ensuring transparent and fair
+conditions, authorization to fly and compliance             application of geospatial technologies in
+with regulations or by the autonomy of batteries.           agriculture.
+Alternatively, coverage in satellite-based imaging
+is limited by cloud cover, revisit time and spatial         8. CONCLUSION
+resolution.
+                                                            GIS and remote sensing play a crucial role in
+7. FUTURE RESEARCH DIRECTIONS                               modern agriculture. Together, these tools
+                                                            provide the spatial intelligence and analysis
+The convergence between GIS, image                          capabilities needed to practice precision farming
+processing and advanced sensing technologies                and develop sustainable food production system
+is still advancing, providing new avenues for               capable of dealing with resiliency challenges as
+enhancement of precision agriculture; but there             well. They are connected to satellite remote
+remain multiple scientific and technological                sensing, UAV-based imaging and ground-sensor
+limitations to fully exploit the potential of spatial       networks, turning traditional farming into data-
+data analytics in agri-food systems. Future                 driven and responsive operations. Farmers and
+research     should      focus    on    multi-source        decision-makers can use these tools to manage
+geospatial data fusion by integration of satellite,         resources more efficiently, reduce uncertainty,
+UAV, IoT, LiDAR and ground-based datasets                   and develop better climate adaptation strategies,
+using     sophisticated      models      that    can        among others including soil and crop mapping;
+accommodate         multi-resolution   and     multi-       stress detection; yield estimation; disease
+temporal variances. AI powered spatial-temporal             monitoring; farm-level decision support. Recent
+block modelling needs to further advance using              developments of artificial intelligence, machine
+explainable and scalable deep learning                      learning and big-data analytics have provided
+architecture like transformers, GNNs and hybrid             geospatial technologies with new possibilities for
+
+
+                                                        456
+                                Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+automated interpretation, multi-source data                         monitoring: A review centered on date
+fusion and predictive modelling on a large scale.                   palm trees. Remote Sensing, 16(23),
+Nonetheless, there are still several challenges                     4371. https://doi.org/10.3390/rs16234371
+including data interoperability, computational              Attri, I., Awasthi, L. K., Sharma, T. P., & Rathee,
+requirements, poor standardization and the skills                   P. (2023). A review of deep learning
+to develop context-specific models for various                      techniques used in agriculture. Ecological
+agro-ecological regions.                                            Informatics,            77,          102217.
+                                                                    https://doi.org/10.1016/j.ecoinf.2023.10221
+The next step of GIS and image processing in                        7
+the agriculture will be the real-time, autonomous,          B, H. H., A, S., Chitra, R., & M, V. (2025).
+and intelligent systems that can combine multi-                     Advanced NDRE techniques for precision
+modal data to give actionable information. For                      crop monitoring and analysis. 2025 IEEE
+broad-scale adoption, support will be needed for                    International Students’ Conference on
+interdisciplinary research on open-source                           Electrical, Electronics and Computer
+platform development and broader digital                            Science             (SCEECS),            1–4.
+infrastructure. Finally, as demonstrated in this                    https://doi.org/10.1109/SCEECS64059.202
+study shows that these technologies have                            5.10941496
+tremendous potential to improve productivity,               Balyan, S., Jangir, H., Tripathi, S. N., Tripathi, A.,
+sustainability and decision making that contribute                  Jhang, T., & Pandey, P. (2024). Seeding a
+significantly to global food security and intelligent               sustainable future: Navigating the digital
+agricultural revolution.                                            horizon        of      smart      agriculture.
+                                                                    Sustainability,           16(2),         475.
+DISCLAIMER (ARTIFICIAL INTELLIGENCE)                                https://doi.org/10.3390/su16020475
+                                                            Berger, K., Machwitz, M., Kycko, M., Kefauver,
+Author(s) hereby declares that NO generative AI                     S. C., Van Wittenberghe, S., Gerhards, M.,
+technologies such as Large Language Models                          Verrelst, J., Atzberger, C., van der Tol, C.,
+(ChatGPT, COPILOT, etc.) and text-to-image                          Damm, A., Rascher, U., Herrmann, I., Paz,
+generators have been used during the writing or                     V. S., Fahrner, S., Pieruschka, R.,
+editing of this manuscript.                                         Prikaziuk, E., Buchaillot, M. L., Halabuk,
+                                                                    A., Celesti, M., & Schlerf, M. (2022). Multi-
+COMPETING INTERESTS                                                 sensor spectral synergies for crop stress
+                                                                    detection and monitoring in the optical
+Authors have declared that they have no known                       domain: A review. Remote Sensing of
+competing financial interests or non-financial                      Environment,            280,         113198.
+interests or personal relationships that could                      https://doi.org/10.1016/j.rse.2022.113198
+have appeared to influence the work reported in             Borah, S., Padhiary, M., Sethi, L., Kumar, A., &
+this paper.                                                         Saikia, P. (2025). Precision farming with
+                                                                    drone sprayers: A review of auto
+REFERENCES                                                          navigation and vision-based optimization.
+                                                                    Journal of Biosystems Engineering, 50.
+Abrahams, M., Sibanda, M., Dube, T., Chimonyo,                      https://doi.org/10.1007/s42853-025-00263-
+       V. G. P., & Mabhaudhi, T. (2023). A                          2
+       systematic review of UAV applications for            Carranza, C., Nolet, C., Pezij, M., & van der
+       mapping neglected and underutilised crop                     Ploeg, M. (2021). Root zone soil moisture
+       species’ spatial distribution and health.                    estimation with Random Forest. Journal of
+       Remote        Sensing,      15(19),     4672.                Hydrology,             593,          125840.
+       https://doi.org/10.3390/rs15194672                           https://doi.org/10.1016/j.jhydrol.2020.1258
+Ali, B., & Dahlhaus, P. (2022). Roles of selective                  40
+       agriculture     practices    in   sustainable        Chen, X., Zhang, H., & Wong, C. U. I. (2025).
+       agricultural performance: A systematic                       Dynamic        monitoring    and    precision
+       review.     Sustainability,    14(6),   3185.                fertilization decision system for agricultural
+       https://doi.org/10.3390/su14063185                           soil nutrients using UAV remote sensing
+Alsadik, B., Ellsäßer, F. J., Awawdeh, M., Al-                      and GIS. Agriculture, 15(15), 1627.
+       Rawabdeh, A., Almahasneh, L., Oude                           https://doi.org/10.3390/agriculture1515162
+       Elberink, S., Abuhamoor, D., & Al Asmar,                     7
+       Y. (2024). Remote sensing technologies               D, L. A., & A, O. C. (2024). Geographic
+       using UAVs for pest and disease                              information system (GIS) application in soil
+
+
+                                                        457
+                              Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+      fertility management: A review. Journal of                 Conference on Agro-Geoinformatics (Agro-
+      Global Agriculture and Ecology, 16(2), 29–                 Geoinformatics), 143–148.
+      40.                                                 Farhood, H., Bakhshayeshi, I., Pooshideh, M.,
+      https://doi.org/10.56557/jogae/2024/v16i28                 Rezvani, N., & Beheshti, A. (2022). Recent
+      592                                                        advances of image processing techniques
+Dapke, P., Quadri, S. A., Nagare, S. M., Bandal,                 in       agriculture         (pp.      129–153).
+      S. B., & Baheti, M. R. (2025). A                           https://doi.org/10.1016/B978-0-323-90508-
+      comparative analysis machine learning                      4.00007-1
+      techniques for LULC classification using            Gaikwad, N. B., Maheshmalkar, P. R., & Sayyad,
+      Landsat-8 satellite imagery. International                 S. B. (2025). Vegetation indices for
+      Journal of Engineering and Geosciences,                    optimizing crop management. IJFMR –
+      10(1),                                84–92.               International Journal for Multidisciplinary
+      https://doi.org/10.26833/ijeg.1503104                      Research,                                   7(3).
+Dasari, K., Kharde, M. R., Maddileti, K.,                        https://doi.org/10.36948/ijfmr.2025.v07i03.
+      Pasupuleti, V. R., Ram, M. K., Sujana, C.,                 44081
+      Komali, G., & Fariddin, S. B. (2025).               Getahun, S., Kefale, H., & Gelaye, Y. (2024).
+      Internet of things based smart agriculture                 Application       of     precision    agriculture
+      using K-nearest neighbor for enhancing                     technologies         for     sustainable    crop
+      the crop yield. Indonesian Journal of                      production            and          environmental
+      Electrical Engineering and Computer                        sustainability: A systematic review. The
+      Science,            39(1),         436–445.                Scientific      World       Journal,     2024(1),
+      https://doi.org/10.11591/ijeecs.v39.i1.pp43                2126734.
+      6-445                                                      https://doi.org/10.1155/2024/2126734
+Delavarpour, N., Koparan, C., Nowatzki, J.,               Ghosh, A., Rai, S., Ashoka, P., Kotyal, K., B, S.,
+      Bajwa, S., & Sun, X. (2021). A technical                   Saran, S., Anjali K. P. Sivakumar, Panotra,
+      study on UAV characteristics for precision                 N., & Pandey, S. K. (2025). Data-driven
+      agriculture applications and associated                    decision making in agriculture with
+      practical challenges. Remote Sensing,                      sensors, satellite imagery and AI analytics
+      13(6),                                 1204.               by digital farming. Archives of Current
+      https://doi.org/10.3390/rs13061204                         Research International, 25(5), 37–52.
+Dooyum Uyeh, D., Gebremedhin, K. G., &                           https://doi.org/10.9734/acri/2025/v25i5118
+      Hiablie, S. (2023). Perspectives on the                    6
+      strategic importance of digitalization for          Guzel, M., Turan, B., Kadioglu, I., Basturk, A.,
+      modernizing         African      agriculture.              Sin, B., & Sadeghpour, A. (2024). Deep
+      Computers and Electronics in Agriculture,                  learning for image-based detection of
+      211,                                107972.                weeds from emergence to maturity in
+      https://doi.org/10.1016/j.compag.2023.107                  wheat        fields.      Smart      Agricultural
+      972                                                        Technology,                 9,           100552.
+Dritsas, E., & Trigka, M. (2025). Remote sensing                 https://doi.org/10.1016/j.atech.2024.10055
+      and geospatial analysis in the big data era:               2
+      A survey. Remote Sensing, 17(3), 550.                      https://doi.org/10.1109/Agro-
+      https://doi.org/10.3390/rs17030550                         Geoinformatics.2015.7248127
+Duan, J., Ding, H., & Kim, S. (2023). A                   Jha, M. K., Chowdary, V. M., & Chowdhury, A.
+      multimodal approach for advanced pest                      (2010). Groundwater assessment in
+      detection and classification. arXiv preprint               Salboni Block, West Bengal (India) using
+      arXiv:2312.10948.                                          remote sensing, geographical information
+      https://doi.org/10.48550/arXiv.2312.10948                  system and multi-criteria decision analysis
+Elvanidi, A., & Katsoulas, N. (2023). Machine                    techniques. Hydrogeology Journal, 18(7),
+      learning-based crop stress detection in                    1713–1728.
+      greenhouses.        Plants,    12(1),     52.              https://doi.org/10.1007/s10040-010-0631-z
+      https://doi.org/10.3390/plants12010052              Jin, X., Li, Z., & Atzberger, C. (2020). Editorial for
+Evsahiboğlu, A. N., & Özdikililer, E. (2015).                    the special issue “Estimation of crop
+      Integration      of      remote      sensing               phenotyping traits using unmanned ground
+      technology to geographic information                       vehicle and unmanned aerial vehicle
+      system for sustainable planning of water                   imagery.” Remote Sensing, 12(6), 940.
+      resources. 2015 Fourth International                       https://doi.org/10.3390/rs12060940
+
+
+
+                                                      458
+                                 Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+Karada, M. S., Bajpai, R., Singh, M., Singh, A.                    4(2),120.https://doi.org/10.61185/SMIJ.202
+       K., Agnihotri, D., & Singh, B. K. (2023). A                 3.44102.
+       review on advances in agriculture and                 Nanasaheb, A. A., V, P. H., & Paswan, P. K.
+       agroforestry      with     GPS      and     GIS.            (2020). Soil adjusted vegetation index
+       International Journal of Plant and Soil                     (SAVI), in the Uben river basin of Gujarat.
+       Science,       35(6),       150–160.        DOI:            International Journal of Chemical Studies,
+       10.9734/IJPSS/2023/v35i62849.                               8(5),                               693–698.
+Khanna, M., Atallah, S. S., Kar, S., Sharma, B.,                   https://doi.org/10.22271/chemi.2020.v8.i5j.
+       Wu, L., Yu, C., Chowdhary, G., Soman, C.,                   10381
+       & Guan, K. (2022). Digital transformation             Nethala, P., Um, D., Vemula, N., Montero, O. F.,
+       for a sustainable agriculture in the United                 Lee, K., & Bhandari, M. (2024).
+       States: Opportunities and challenges.                       Techniques for canopy to organ level plant
+       Agricultural Economics, 53(6), 924–937.                     feature extraction via remote and proximal
+       https://doi.org/10.1111/agec.12733                          sensing: A survey and experiments.
+Kumari, K., Mirzakhani Nafchi, A., Mirzaee,                        Remote        Sensing,     16(23),     4370.
+       S., & Abdalla, A. (2025). AI-driven future                  https://doi.org/10.3390/rs16234370
+       farming:        Achieving        climate-smart         Omia, E., Bae, H., Park, E., Kim, M. S., Baek, I.,
+       and           sustainable            agriculture.           Kabenge, I., & Cho, B.-K. (2023). Remote
+       AgriEngineering,              7(3),           89.           Sensing in Field Crop Monitoring: A
+       https://doi.org/10.3390/agriengineering703                  Comprehensive        Review     of    Sensor
+       0089                                                        Systems, Data Analyses and Recent
+Lei, L., Yang, Q., Yang, L., Shen, T., Wang, R., &                 Advances.           Remote          Sensing,
+       Fu,      C.     (2024).       Deep      learning            15(2),354.https://doi.org/10.3390/rs150203
+       implementation of image segmentation in                     54.
+       agricultural applications: A comprehensive            Peter, B. G., Messina, J. P., Carroll, J. W., &
+       review. Artificial Intelligence Review, 57(6),              Chikowo, R. (2021). A case for green-
+       149. https://doi.org/10.1007/s10462-024-                    based vegetation indices: Plot-scale sUAS
+       10775-6                                                     imagery related to crop chlorophyll content
+Mălinaș, C. D., Matei, F., Pop, I. D., Sălăgean,                   on smallholder maize farms in Malawi.
+       T., & Mălinaș, A. (2025). Individual and                    Remote Sensing Letters, 12(8), 778–787.
+       synergistic contributions of GIS, remote                    https://doi.org/10.1080/2150704X.2021.19
+       sensing, and AI in advancing climate-                       38733
+       resilient agriculture. AgriEngineering, 7(7),         Raihan, A. (2024). A systematic review of
+       230.                                                        geographic information systems (GIS) in
+       https://doi.org/10.3390/agriengineering707                  agriculture for evidence-based decision
+       0230                                                        making       and    sustainability.   Global
+Mary, S. R., Pachar, S., Srivastava, P. K., Malik,                 Sustainability Research, 3(1), 1–24.
+       M., Sharma, A., G. Almutiri, T., & Atal, Z.                 https://doi.org/10.56556/gssr.v3i1.636
+       (2022). Deep learning model for the image             Singh, S., Sethi, S., Sharma, R., Vaibhavi, D., &
+       fusion and accurate classification of                       Tiwari, U. (2024). Precision agriculture
+       remote sensing images. Computational                        using Web-GIS. 2024 IEEE International
+       Intelligence and Neuroscience, 2022(1),                     Conference on Big Data & Machine
+       2668567.                                                    Learning         (ICBDML),          221–226.
+       https://doi.org/10.1155/2022/2668567                        https://doi.org/10.1109/ICBDML60909.202
+Maurya, D. K., Maurya, S. K., Kumar, M.,                           4.10577371
+       Chaubey, C., Gupta, D., Patel, K. K.,                 Srivastava, A., Bharadwaj, S., Dubey, R.,
+       Mehta, A. K., & Yadav, R. (2024). A review                  Sharma, V. B., & Biswas, S. (2022).
+       on precision agriculture: An evolution and                  Mapping vegetation and measuring the
+       prospect for the future. International                      performance of machine learning algorithm
+       Journal of Plant & Soil Science, 36(5),                     in LULC classification in the large area
+       363–374.                                                    using Sentinel-2 and Landsat-8 datasets of
+       https://doi.org/10.9734/ijpss/2024/v36i5453                 Dehradun as a test case. The International
+       4                                                           Archives of the Photogrammetry, Remote
+Mohamed, M. (2023). Agricultural sustainability                    Sensing and Spatial Information Sciences,
+       in the age of deep learning: Current trends,                XLIII-B3-2022,                      529–535.
+       challenges,      and      future    trajectories.           https://doi.org/10.5194/isprs-archives-
+       Sustainable Machine Intelligence Journal,                   XLIII-B3-2022-529-2022
+
+
+                                                         459
+                                        Borah et al.; J. Sci. Res. Rep., vol. 31, no. 12, pp. 441-460, 2025; Article no.JSRR.149063
+
+
+Toromade, A. S., & Chiekezie, N. R. (2024). GIS-                             https://doi.org/10.9734/ijecc/2025/v15i8496
+     driven agriculture: Pioneering precision                                2
+     farming      and    promoting     sustainable                     Won, H. S., Lee, E., Lee, S., Nam, J.-H., Jung,
+     agricultural practices. World Journal of                                J., Cho, Y., Evert, T., Kan, N., Kim, S., &
+     Advanced Science and Technology, 6(1),                                  Kim, D. S. (2025). Image analysis using
+     057–072.                                                                smartphones: Relationship between leaf
+     https://doi.org/10.53346/wjast.2024.6.1.00                              color and fresh weight of lettuce under
+     47                                                                      different nutritional treatments. Frontiers in
+Upadhyay, A., Chandel, N. S., Singh, K. P.,                                  Plant               Science,               16.
+     Chakraborty, S. K., Nandede, B. M.,                                     https://doi.org/10.3389/fpls.2025.1589825
+     Kumar, M., ... & Elbeltagi, A. (2025). Deep                       Yi, D., Jun, L., Haodic, G., Xing, Z., Lie, Y.,
+     learning and computer vision in plant                                   Maidin, S. S., Ishak, W. H. W., & Wider, W.
+     disease detection: A comprehensive                                      (2024). Transforming agriculture: An
+     review of techniques, models, and trends                                insight into decision support systems in
+     in      precision    agriculture.     Artificial                        precision farming. Journal of Applied Data
+     Intelligence      Review,      58(3),       92.                         Sciences,           5(4),        1614–1624.
+     DOI:10.1007/s10462-024-11100-x.                                         https://doi.org/10.47738/jads.v5i4.274
+V, J. R., & T, T. K. (2025). Application of                            Zhang, C., & Kovacs, J. M. (2012). The
+     remote sensing and GIS for real-                                        application of small unmanned aerial
+     time crop monitoring and extension                                      systems for precision agriculture: A review.
+     support services. International Journal of                              Precision Agriculture, 13(6), 693–712.
+     Environment and Climate Change, 15(8),                                  https://doi.org/10.1007/s11119-012-9274
+     144–150.                                                                -5
+
+Disclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual
+author(s) and contributor(s) and not of the publisher and/or the editor(s). This publisher and/or the editor(s) disclaim responsibility for
+any injury to people or property resulting from any ideas, methods, instructions or products referred to in the content.
+_______________________________________________________________________________
+© Copyright (2025): Author(s). The licensee is the journal publisher. This is an Open Access article distributed under the terms
+of the Creative Commons Attribution License (http://creativecommons.org/licenses/by/4.0), which permits unrestricted use,
+distribution, and reproduction in any medium, provided the original work is properly cited.
+
+
+
+                                                 Peer-review history:
+                            The peer review history for this paper can be accessed here:
+                                  https://pr.sdiarticle5.com/review-history/149063
+
+
+
+
+                                                                  460
+

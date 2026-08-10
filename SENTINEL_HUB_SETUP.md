@@ -2,7 +2,7 @@
 
 ## ✅ Successfully Configured
 
-Your Sentinel Hub credentials have been successfully integrated into FarmHealth!
+Your Sentinel Hub credentials have been successfully integrated into Crafty GIS!
 
 ### Credentials Status: ✅ ACTIVE
 

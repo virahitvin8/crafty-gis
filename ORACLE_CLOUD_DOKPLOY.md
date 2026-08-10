@@ -1,4 +1,4 @@
-# 🚀 FarmHealth on Oracle Cloud Free Tier + Dokploy
+# 🚀 Crafty GIS on Oracle Cloud Free Tier + Dokploy
 
 **Cost**: $0/month (Oracle Cloud Free Tier)  
 **Uptime**: 24/7 always-on  
@@ -9,7 +9,7 @@
 
 ## 📋 What You'll Get
 
-- ✅ **Always-on** FarmHealth instance (no sleeping)
+- ✅ **Always-on** Crafty GIS instance (no sleeping)
 - ✅ **Auto HTTPS** with LetsEncrypt
 - ✅ **One-click deploys** from GitHub
 - ✅ **Backend** (Node.js + GEE + Gemini AI)
@@ -22,7 +22,7 @@
 
 ## 🏗️ Oracle Cloud Free Tier Specs
 
-| Resource | Free Tier Limit | For FarmHealth |
+| Resource | Free Tier Limit | For Crafty GIS |
 |----------|----------------|----------------|
 | VM (ARM Ampere) | 4 OCPUs, **24GB RAM** (Always Free) | ✅ use all 4 OCPUs / 24GB |
 | VM (AMD E2.1.Micro) | 1/8 OCPU, **1GB RAM** (Always Free) | ❌ too small for this stack |
@@ -62,7 +62,7 @@ The AMD free shape (1GB RAM) will OOM — don't use it for this stack.
 
 #### **Configuration**:
 
-**Name**: `farmhealth-dokploy`  
+**Name**: `crafty_gis-dokploy`  
 **Compartment**: Select your compartment (usually `root`)
 
 **Image**:
@@ -109,7 +109,7 @@ allow traffic. If the Dokploy dashboard or the app "doesn't load" while
 | HTTP | 0.0.0.0/0 | TCP | 80 |
 | HTTPS | 0.0.0.0/0 | TCP | 443 |
 | Dokploy UI | 0.0.0.0/0 | TCP | 3000 |
-| FarmHealth app | 0.0.0.0/0 | TCP | 8080 |
+| Crafty GIS app | 0.0.0.0/0 | TCP | 8080 |
 | Monitoring | 0.0.0.0/0 | TCP | 3002 |
 
 **Save** all rules.
@@ -144,7 +144,7 @@ df -h    # Should show ~100GB disk
 ### **Phase 5: Install Dokploy — ONE script** (5 min)
 
 The repo ships a one-command installer that provisions the box, installs
-Dokploy, waits for the UI, and pre-creates the `farmhealth` project:
+Dokploy, waits for the UI, and pre-creates the `crafty_gis` project:
 
 ```bash
 # From your laptop — copy the script up, then run it on the VM:
@@ -159,7 +159,7 @@ The script (runs on the VM) does:
 - Adds 8 GB swap if the box reports < 8 GB RAM
 - Runs the official Dokploy installer (Docker, Nginx, LetsEncrypt)
 - Waits until the UI answers on `:3000`
-- Creates the `farmhealth` project via API when you pass `--api-token`
+- Creates the `crafty_gis` project via API when you pass `--api-token`
 
 Equivalent manual install, if you prefer:
 ```bash
@@ -183,17 +183,17 @@ curl -sSL https://dokploy.com/install.sh | sh
 ### **Phase 7: Deploy the whole stack — one Docker Compose resource** (5 min)
 
 The repo's `docker-compose.dokploy.yml` is the **entire stack in one file** —
-no separate frontend/backend split needed. It builds FarmHealth from the
+no separate frontend/backend split needed. It builds Crafty GIS from the
 repo's Dockerfile and adds Ollama, PostGIS, and Uptime Kuma:
 
 | Service | Port | Role |
 |---|---|---|
-| farmhealth | 8080 | App + backend (built from repo) |
+| crafty_gis | 8080 | App + backend (built from repo) |
 | ollama | 11434 | Self-hosted AI (internal) |
 | postgis | 5432 | Saved farms / land records |
 | uptime-kuma | 3002 | Monitoring (optional) |
 
-1. **Projects → `farmhealth`** (pre-created by the script, or create it)
+1. **Projects → `crafty_gis`** (pre-created by the script, or create it)
 2. **Add Resource → Docker Compose**
 3. Connect GitHub → select `virahitvin8/crafty-gis` (branch `main`)
    **Compose path**: `docker-compose.dokploy.yml`
@@ -308,17 +308,17 @@ sudo systemctl restart sshd
 ssh ubuntu@YOUR_VM_IP
 
 # Check stack (Dokploy's compose resource creates its own project containers):
-docker ps | grep -E 'dokploy|farmhealth|ollama|uptime'
+docker ps | grep -E 'dokploy|crafty_gis|ollama|uptime'
 
-# Check the farmhealth service logs:
-docker ps --format '{{.Names}}' | grep -i farmhealth | xargs -I{} docker logs {} -f
+# Check the crafty_gis service logs:
+docker ps --format '{{.Names}}' | grep -i crafty_gis | xargs -I{} docker logs {} -f
 ```
 
-### **Update FarmHealth**
+### **Update Crafty GIS**
 
 Push to `main` → GitHub Actions (`.github/workflows/deploy-dokploy.yml`)
 auto-triggers Dokploy. Manual trigger:
-1. Dokploy Dashboard → `farmhealth` project → the compose service
+1. Dokploy Dashboard → `crafty_gis` project → the compose service
 2. Click **"Redeploy"**
 
 ### **Backup**
@@ -404,7 +404,7 @@ docker logs nginx-proxy -f
    - A record: `@` → `YOUR_VM_IP`
    - CNAME: `www` → `@`
 3. **In Dokploy**:
-   - Go to `farmhealth` → **Domains**
+   - Go to `crafty_gis` → **Domains**
    - Add: `yourdomain.com`
    - Dokploy auto-generates SSL certificate
 4. **Done**: `https://yourdomain.com` now live
@@ -431,7 +431,7 @@ docker logs nginx-proxy -f
 
 ## 🎯 You're Done!
 
-Your FarmHealth instance is now:
+Your Crafty GIS instance is now:
 - ✅ **24/7 online** (Oracle Free Tier)
 - ✅ **Auto-deploying** from GitHub (via Dokploy)
 - ✅ **HTTPS enabled** (LetsEncrypt)
@@ -449,7 +449,7 @@ Your FarmHealth instance is now:
 - **Oracle Cloud Docs**: https://docs.oracle.com/en-us/iaas/Content/home.htm
 - **Oracle Always Free FAQ**: https://www.oracle.com/cloud/free/faq.html
 - **Dokploy Docs**: https://dokploy.com/docs
-- **FarmHealth GitHub**: https://github.com/virahitvin8/crafty-gis
+- **Crafty GIS GitHub**: https://github.com/virahitvin8/crafty-gis
 - Sibling guides: `DOKPLOY_DEPLOY.md` (general), `SELFHOST_MIGRATION.md` (laptop)
 
 ---

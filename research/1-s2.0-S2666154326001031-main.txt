@@ -1,0 +1,812 @@
+                                                          Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+                                                                   Contents lists available at ScienceDirect
+
+
+                                              Journal of Agriculture and Food Research
+                               journal homepage: www.sciencedirect.com/journal/journal-of-agriculture-and-food-research
+
+
+
+
+Crop disease surveillance through integration of machine and deep learning
+in the face of climate change
+Avneet Kaur a , Gurjit S. Randhawa b,* , Aitazaz A. Farooque a,c , Mumtaz Ali d,h ,
+Harmanpreet Singh c , Khalil Al-Mughrabi e, Dave Bell f, Rajandeep Singh g
+a
+  Faculty of Sustainable Design Engineering, University of Prince Edward Island, Charlottetown, PE, Canada
+b
+  School of Computer Science, University of Guelph, Guelph, ON, Canada
+c
+  Canadian Centre for Climate Change and Adaptation, University of Prince Edward Island, St Peters Bay, PE, Canada
+d
+  School of Business, Law, Humanities, and Pathways, University of Southern Queensland, QLD 4305, Australia
+e
+  New Brunswick Department of Agriculture, Aquaculture and Fisheries, Wicklow, NB, Canada
+f
+  Bell Crop Services, Harvey, NB, Canada
+g
+  Department of Electronics Technology, Guru Nanak Dev University, Amritsar, PB, India
+h
+  Scientific Research Centre, Al-Ayen Iraqi University, Thi-Qar, 64001, Iraq
+
+
+
+
+A R T I C L E I N F O                                     A B S T R A C T
+
+Keywords:                                                 Early detection of potato plant diseases is vital for agricultural productivity, plants, economy, and human health.
+Artificial neural network                                 Preventing disease spread minimizes agricultural losses and safeguard food production. Potatoes are a major food
+Deep learning                                             source worldwide, and reduced production could contribute to food insecurity. Precise and automatic plant
+Machine learning
+                                                          disease detection represents a fundamental research topic. This study focuses on detecting potato disease risk
+Potato disease detection
+Random forest
+                                                          associated with Early Blight (EB) and Gray Mold (GM) spores under the influence of dynamic climate. The aim of
+                                                          this study is to utilize Deep Learning (DL) and Machine Learning (ML) technologies for the disease detection of
+                                                          infected and healthy potato plants in Atlantic Canada, for Prince Edward Island (PEI) and New Brunswick (NB);
+                                                          and United States (U.S.), for Maine, to mitigate agricultural losses. The novel potato dataset used in the study
+                                                          comprised 5630 instances, with 1482 instances from PEI, 3032 from NB, and 1116 from Maine. A hybrid
+                                                          Artificial Neural Network - Random Forest (ANN-RF) is implemented model for binary disease classification,
+                                                          where the presence of EB or GM spores is considered as a single ‘diseased’ class. The hybrid ANN-RF model yields
+                                                          testing accuracy of 91 % for PEI, 86.5 % for NB, 88.4 % for Atlantic Canada, 84 % for Maine, and 87.5 % for
+                                                          combined data, with training accuracy of 97 %, 94.7 %, 91 %, 94.5 %, and 91 %, respectively, and log loss values
+                                                          under 0.4. These results highlight the potential of the developed model for disease detection in potato crops
+                                                          based on historical spore and weather data. The research findings examine potato diseases across multiple re­
+                                                          gions, uncovering geographical dissimilarities that shape disease prevalence, patterns, and management effec­
+                                                          tiveness. The study emphasizes the effectiveness of the hybrid model for predicting the likelihood of potato
+                                                          disease based on pathogenic spores, demonstrating the importance of AI in enhancing agricultural productivity,
+                                                          pesticide inventory control, and promoting sustainable farming practices.
+
+
+
+
+1. Introduction                                                                                approximately $1.7 billion to farm cash receipts in 2022 [2]. Potato
+                                                                                               production in Canada with special reference to the Atlantic provinces,
+    Potatoes are among the most extensively consumed and valued crops                          particularly Prince Edward Island (PEI) and New Brunswick (NB) ac­
+in the world and occupy the fourth place among leading crops by con­                           counts for approximately 35.7 %. In fact, PEI covers 21.6 % and NB
+sumption with rice, wheat, and maize taking the top three places [1].                          covers 13.8 %, with both provinces recognized as leading producers of
+Potatoes are massively produced in countries including China, India,                           potatoes in the country. Although potatoes remain an important staple
+Europe, Canada, etc., serving as a staple food and a vital source of in­                       food crop [3], the crop remains vulnerable to crop diseases that are
+come to developing countries. In Canada, potatoes contributed                                  exacerbated by climatic changes [4]. Maine ranks under top 10 potato
+
+
+    * Corresponding author.
+      E-mail address: randhawg@uoguelph.ca (G.S. Randhawa).
+
+https://doi.org/10.1016/j.jafr.2026.102733
+Received 22 May 2025; Received in revised form 26 January 2026; Accepted 29 January 2026
+Available online 30 January 2026
+2666-1543/© 2026 The Authors. Published by Elsevier B.V. This is an open access article under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-
+nc-nd/4.0/).
+A. Kaur et al.                                                                                                 Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+producing states in the U.S. and sustainability of potato industry for               powdery mildew, and anthracnose. Using a K-Nearest Neighbor algo­
+Maine has been a major concern over years [5].                                       rithm for weather parameter estimation and a Feed Forward Neural
+    Potato plant diseases are a growing challenge in the global potato               Network for disease forecasting, the model produced accurate forecast
+industry, causing significant economic challenges and crop losses [6].               based on the history of 10 years of weather information including
+Plant health monitoring [7] and disease diagnosis [8] are applied in an              temperature, humidity, rainfall and wind speeds. In 2021, researchers
+effort of controlling the further spread of diseases and implementing                [25] developed a weather-based prediction model of potato LB using
+suitable management measures. Early disease diagnosis of crops can                   stepwise regression analysis. A field study was conducted in Northern
+facilitate the treatment of diseased plants and increase productivity and            Himalayas of India during two cropping seasons, 2017–2018, and the
+yield [9]. This further helps to reduce the damage caused by diseases in             prime meteorological characters influencing the disease development
+the agricultural sector and to increase quality as well as quantity. From a          included maximum and minimum temperature, relative humidity,
+study [10], it is found that about 20–40 % of yield loss in horticulture is          rainfall, and wind speed. The model achieved a coefficient of determi­
+caused by plant diseases. Early Blight (EB) [11,12], is uniformly                    nation (R2) of 0.80, indicating that the implementation of the model in
+distributed across fields, with higher incidence in areas where plants are           predicting LB is effective under changing environmental conditions.
+under stress, such as low spots with excessive moisture. Gray Mold (GM)              Another study in disease detection [26], evaluated various CNN struc­
+[13,14] is favored by humid weather and dense canopies, leading to                   tures such as LeNet, VGG16, ResNet50, and Xception are compared in
+lesions on leaves and potential yield losses. These diseases not only                detecting diseases in tomato leaves.
+affect yield but also pose a threat to food security, which underlines the               Even though the advancements in AI, DL, and ML have made a
+importance of early diagnostics and proper interventions.                            considerable impact in plant disease identification, challenges persist.
+    While traditional approaches for diseases diagnosis involve physical             Most of the existing literature has focused on image-based disease
+assessment or sample collections from the fields, these are however                  detection, often neglecting the critical role of environmental factors.
+tedious, costly and prone to errors [15]. In addition, these methods do              Additionally, prior research work typically targets identifying single
+not sufficiently address the impact of environmental factors like tem­               disease, lacking integrated frameworks for the integration of most
+perature, rain, and wind speed which are important in disease incidence.             common diseases such as EB and GM. Most of the research rely on
+Therefore, there is a growing need to develop models that can make                   datasets under controlled environment settings which limits their
+predictions and diagnose diseases with ease and more precisely and at a              applicability to real-world scenarios. Furthermore, only few researchers
+lost cost. The adoption of advanced technologies like Artificial Intelli­            have analyzed and detected the diseases using weather and disease data.
+gence (AI), including Deep Learning (DL) and Machine Learning (ML),                  Moreover, while DL and ML models have laid strong foundation and
+has revolutionized the agricultural sector, enabling more efficient and              shown promising results in disease diagnosis, there is a scope of doing
+precise approaches to crop management. These advanced technologies                   the identification of diseases utilizing the hybrid approaches that in­
+have been widely deployed to monitor plant health, early warning on                  corporates DL for the extraction of features and ML for binary classifi­
+disease and pests, and crop management which are challenges intensi­                 cation as they are underexplored in existing disease detection strategies.
+fied by climate change [16,17].                                                          The proposed research bridges these gaps by presenting an advanced
+    A vast number of studies have been carried out to understand the use             hybrid Artificial Neural Network- Random forest (ANN-RF) model for
+of AI, DL, and ML in agriculture especially in the monitoring of plant               spore-based disease detection of two potato diseases by integrating
+health and disease detection [18]. This has been underscored by several              meteorological data, addressing climate-driven challenges in agricul­
+studies that pointed out their ability to cope with issues of variabilities in       ture. This hybrid approach capitalizes on the strengths of both DL and
+the environment and diseases prone crops. In 2025, a study [19] pro­                 ML, offering a robust solution for disease detection. This paper evaluates
+posed a multimodal AI model for diagnosing potato leaf diseases which                the performance of the proposed hybrid model on potato disease data­
+include EB and Late Blight (LB) using the Potato Leaf Disease Dataset.               sets from Atlantic Canada, PEI and NB regions, and U.S., Maine, known
+The visual features were extracted using MSC-ResViT, text descriptions               for their significant contributions to potato production as depicted in
+using MSC-TextCNN, while image statistical features were extracted by                Fig. 1.
+CT-CNN, with a high-test accuracy of 98.43 %. A study [20], published                    Thus, Fig. 1 illustrates the pipeline used for potato disease prediction
+in 2022, provided a comprehensive overview of DL and image analysis                  across Canada (PEI and NB) and U.S (Maine). Different environmental
+for the detection of potato diseases. This work presented the use of                 variables from weather stations and spore count concentrations from
+several DL models, including VGG19, GoogleNet, AlexNet CNN, and                      respective fields, collected by Airspore are compiled into a fully numeric
+focused on the detection of diseases like LB, EB, black scurf and common             dataset. An ANN is used for generating synthetic parameters to enhance
+scab.                                                                                feature representation, and these ate used to train and test a RF classifier
+    An AI framework is described in a study [21] in 2024, to detect                  for predicting the disease presence or absence/spore. The model
+diseases in potato plants where Convolutional Neural Network (CNN)                   identifies EB, GM, and healthy conditions for potato plant. The leaf
+has been used for classification. Potato diseases, including EB and LB,              images are included only for conceptual visualization. Thus, Fig. 1
+are accurately predicted from the plant village dataset containing over              summarizes the complete process from field data acquisition to model-
+20,000 photos with an accuracy of 98.03 %. A recent study [22] in 2025,              based disease classification.
+explored the implementation of CNN for early-stage disease detection in                  The main contribution of this study is its comprehensive approach to
+potato leaves, achieving high classification accuracies of 98 % for EB, LB           potato disease prediction, focusing on the leading potato-producing
+respectively and 99 % for healthy leaves. The proposed model was                     provinces in Atlantic Canada, NB and PEI, and Maine, U.S. The study
+experimented on Potato Leaf Dataset (PLD) that includes 4072 images                  demonstrates a combined model for both countries, regions, as well as
+that have passed through the preprocessing steps such as resizing,                   individual models for PEI, NB, and Maine, allowing for a comparative
+normalization, and data augmentation.                                                analysis of how varying geographical and climatic factors influence
+    Another study in 2022 [23] proposed a weather-based disease fore­                disease occurrence and progression. By employing advanced AI tech­
+cast model for rice blast disease using an ensemble feature ranking                  nologies, including ML and DL, the study introduces a hybrid model that
+approach. It identified vital weather characteristics, including visibility,         is both innovative and unique in its application for disease detection.
+rainfall, number of hours of sunshine, maximum wind speed, and                       Furthermore, this research examines two major diseases affecting potato
+number of rainy days for disease prediction from Chiang Rai in Thailand              crops, marking the first time these diseases have been collectively
+for rice blast disease outbreak. The study, conducted in 2013 [24],                  studied in a unified framework. A new and novel dataset was specifically
+presented a fusion of weather forecasting and disease prediction models              prepared for this study, incorporating spore trap data and climate fac­
+as a novel strategy for predicting grape diseases such as downy mildew,              tors, enabling precise predictions of disease occurrence and offering
+
+                                                                                 2
+A. Kaur et al.                                                                                                Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+                          Fig. 1. Overview of the hybrid AI-based methodology for potato crop disease detection in Atlantic Canada.
+
+
+valuable insights for proactive disease management. This study aims to             airborne pathogens. For the spore analysis process, (a) illustrates a
+advance the field of potato disease detection and provide actionable               damaged spore on the right, likely about to collapse, and (b) shows
+insights for farmers and policymakers. By facilitating early disease               distinct spore morphology for pathogen identification.
+detection, this research not only enhances crop management but also
+supports sustainable agriculture in the face of climate change.                    2.3. Dataset description
+
+2. Materials and methods                                                               Reliable and valid data form the foundation of this study. The dataset
+                                                                                   incorporates both primary and secondary data sources in numerical and
+2.1. Study area                                                                    categorical format. The primary data includes the spore trap counts
+                                                                                   which are collected by the PEI Potato Board and Airspore that gives
+    The research was carried out in the Atlantic Canada region, in the             information about the potential for potato disease occurrence. The
+provinces of Prince Edward Island (PEI) and New Brunswick (NB), and                secondary data consists of meteorological data obtained from different
+in Maine, a state in the U.S., which are leading producers of potatoes.            weather stations. The combination of both data sources in terms of data
+Field data for PEI were collected from 19 potato farms, for NB, data were          samples is shown in Table 1. Spore trap data for PEI was obtained from
+collected from 25 distinct locations, and for Maine were collected from            19 farm locations, including Albany, Alberton, Charlottetown, Elmira,
+18 fields, from 2019 to 2023, comprising a total of 62 potato farm lo­             Kensington, Kinkora, Meadowbank, Morell, New Glasgow, O'Leary,
+cations. These two Atlantic provinces and Maine collectively contribute            Oyster Bed, Pownal, Rustico, Souris, St. Peters Bay, Summerside, Tyne
+significantly to Canada's and U.S. potato industry, both in terms of               Valley, Wellington, and York. Corresponding for PEI, weather data were
+quantity and quality, making them an ideal focus for research. Global              gathered from seven stations, East Point, Harrington, Charlottetown,
+potato farming faces numerous challenges, with crop diseases being the             Maple Plains, North Cape, St. Peters, and Summerside. For NB, Airspore
+most critical. Crop diseases not only affect the yield and production of           provided spore trap data from 25 farms including Bedell, Bloomfield,
+crops but also have broader implications on the environment, food se­              Carleton West, Centreville, Charleston, Comeau, DSL De Drummond,
+curity, human health, market stability, and increasing reliance on ag­             DSL Drummond, Drummond, Florenceville, Four Falls, Glassville, Grand
+rochemicals. The selection of this study area was purposive. Despite the           Falls, Jacksonville, McCluskey, Monquart, New Denmark, North View,
+agricultural importance of NB, PEI, and Maine, no comprehensive                    Plaster Rock, Rosedale, Saint Andre, Saint Leonard, Saint Quentin,
+studies have yet been conducted for theses regions focusing on the                 Simonds, Wilmot, and Woodstock. Weather data for NB were obtained
+detection of potato diseases, particularly in classifying potatoes as either       from five stations, Aroostook, Edmundston, Fredericton, Sussex Four
+healthy or diseased. Furthermore, the problem of potato diseases, such             Corners, and Woodstock. For Maine, the field dataset was obtained
+as Early Blight (EB) and Gray Mold (GM), has been a persistent issue that          through Airspore from 18 locations, including Acadia, Blaine, Caribou,
+threatens the sustainability of potato farming in these provinces. The             Easton, Fort Fairfield, Fort Kent, Hamlin, Houlton, Limestone, Linneus,
+prevalence of this problem, coupled with the lack of previous research,            Littleton, Mapleton, Mars Hill, Masardis, Presque Isle, South Aroostook,
+shows that more attention should be paid to this issue and highlights the          St. Agatha, and Washburn. The weather dataset was acquired from
+necessity of further investigation in the development of disease detec­            Houlton and Aroostook weather stations. The dataset was accumulated
+tion. This study intends to fill the existing research gap by concentrating        on weekly basis from May to October over the period of 2019–2023. The
+on regional variations for NB, PEI, and Maine and help the local agri­             climatic variables which were used in the relationship with spore trap
+cultural community meet these gaps by identifying best disease detec­              counts were temperature (◦ C), dew point temperature (◦ C), relative
+tion practices.                                                                    humidity (%), precipitation (mm), wind speed (km/h), and wind direc­
+                                                                                   tion (s degrees). Other temporal variables utilized are date, month, year
+2.2. Airspore spore analysis process                                               and week number.
+                                                                                       The initial raw dataset used in this study contains a comprehensive
+   The Airspore system for spore detection and analysis is depicted in             set of variables spanning four key dimensions: temporal, spatial, mete­
+Fig. 2, which shows the weather station and spore trap aid in detecting            orological, and disease-specific attributes. Table 2 summarizes the
+
+                                                                               3
+A. Kaur et al.                                                                Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+                 Fig. 2. Airspore system for spore collection and analysis.
+
+
+
+
+                                             4
+A. Kaur et al.                                                                                                          Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+Table 1
+Distribution of total, positive, and negative spore trap samples from potato farms in PEI, NB, and combined region.
+  Province                                                Total Spore Trap Samples     Negative      Positive    Early Blight (Absent/Present)     Gray Mold (Absent/Present)
+                                                                                                                 (2019–2023)                       (2019–2023)
+
+  Prince Edward Island                                    1482                          275          1207        229/519                           53/688
+  New Brunswick                                           3032                         1480          1552        761/755                           719/797
+  Prince Edward Island and New Brunswick                  4514                         1755          2759        983/1274                          772/1485
+  Maine                                                   1116                          692           424        207/351                           485/73
+  Prince Edward Island, New Brunswick, and Maine          5630                         2447          3183        1190/1625                         1257/1558
+
+
+
+                                                                                              predicting potato disease occurrence in accordance with pathogen
+Table 2                                                                                       spores, serves as the foundation of proposed study's methodology. ML is
+Key components of the raw dataset prior to processing, organized by temporal,
+                                                                                              a subset of AI that involves the use of algorithms to model complex data
+spatial, weather, and disease-related attributes.
+                                                                                              and make predictions while DL is a more sophisticated form of ML that
+  Sample         Temporal        Spatial           Weather           Disease                  employs neural networks. ANN [27,28] is a DL model designed and
+                 Information     Information       Information       Information
+                                                                                              developed as a closer resemblance to a human brain. It is made up of an
+  1              • Date          • Province        • Temperature     • Disease type:          input layer, one or more than one hidden layer and an output layer. In
+                 • Week            (PEI, NB,       • Dew Point         Early Blight
+                                                                                              this study, the ANN was used as feature extraction model in which high
+                   Number          and               Temperature       or Gray Mold
+                 • Month           Maine)          • Precipitation   • Spore Counts           dimensional environmental data like temperature, precipitation, wind
+                 • Year          • Location        • Humidity        • Disease                speed and dew point temperature were taken in. Based on literature
+                   (2019–2023)   • Co-             • Wind Speed        Occurrence             review [18], RF, DT, and SVM are among the most widely used classi­
+                                   Ordinates       • Wind              (or Spore              fiers for similar tasks. Initial evaluations demonstrated that RF out­
+                                                     Direction         Presence)
+                                                                                              performed other classifiers (including DT, SVM, k-NN, and Logistic
+                                                                                              Regression) on our dataset in terms of accuracy and robustness. Thus, for
+structure and components of this unprocessed dataset. In the study, the                       the binary classification (for spores' presence/absence for EB and GM), a
+target variable is potato disease incidence (or spore presence) and can be                    powerful and reliable classifier, known as the RF classifier, was
+categorized as either present or absent. Fig. 3 provides the sample of                        employed. RF [29,30] is a type of group method of learning with a
+tabular data used in the proposed study. It illustrates the structure and                     family of decision trees that is generated during the training phase. In
+characteristics of the dataset used for the prediction of disease likelihood                  this research, the RF classifier relied on the features that were recog­
+and represents the features selected for model training and testing.                          nized by the ANN as distributing the data into positive and negative
+                                                                                              classes.
+2.4. Data processing
+                                                                                              2.5.1. Model development
+    In this study, the dataset contained both numerical and categorical                           In this study, the identification of the spore presence for two potato
+attributes. Thus, in the data processing phase, the data was cleaned to fit                   diseases, namely EB and GM, was examined in two countries, Atlantic
+the hybrid Artificial neural Network -Random forest (ANN-RF) model.                           Canada (PEI and NB) and U.S. (Maine). The method of analysis is to
+Initially, all records were first inspected to remove incomplete rows,                        conduct the examination of spores’ detection on data obtained from the
+duplicated entries, or variables not relevant for model training. Since the                   regions individually, and collectively. This approach offers a broad and
+attribute values of location, province, crop diseases and disease presence                    diverse perspective on diseases in geographical disparities and envi­
+are categorical, they were coded into numeric features using technique                        ronmental contexts. The dataset comprises of 11 input features such as
+such as label encoding to aid model training. Moreover, the process of                        location, week number, year, month, crop disease, temperature, dew
+data pre-processing was used in the current research to eliminate all                         point temperature, relative humidity, precipitation, wind speed, and
+unnecessary data or incomplete information. Numerical features (tem­                          wind direction which states the crucial factors impacting potato health,
+perature, dew point temperature, humidity, precipitation, wind speed,                         and one dependent variable, spores presence which points out to the
+and wind direction) were scaled and checked to ensure consistent value                        potential for disease occurrence if the potato crop is not protected with
+ranges across provinces. These preprocessing steps produced a clean and                       the appropriate fungicides.
+uniform tabular dataset, further providing a stable input space for the                           An ANN model was employed for the identification of potato dis­
+ANN feature extractior and classification platform. These steps were                          eases. The proposed model was built with a sequential architecture using
+important in normalizing the data and achieving the maximum model fit                         Keras library. The input layer has 11 input features introduced, followed
+for disease diagnosis when environmental conditions prevailed.                                by three dense layers for the subsequent processing. The first dense layer
+                                                                                              consists of 512 neurons, followed by a second dense layer with 256
+                                                                                              neurons and ReLU activation for both. The third dense layer has 128
+2.5. Methodology
+                                                                                              neurons and ReLU activation function, serve as a feature extraction layer
+                                                                                              to generate synthetic features for further analysis with ML classifier for
+   The development of an advanced hybrid model using Deep Learning
+                                                                                              efficient disease detection. The last layer contains single neuron with
+(DL) and Machine Learning (ML) to analyze a novel dataset for
+
+
+
+
+                                               Fig. 3. Sample of tabular data utilized for predicting disease risk in potato crop.
+
+                                                                                        5
+A. Kaur et al.                                                                                                       Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+sigmoid activation function which classifies the potatoes as healthy or                  addition to this, recall, precision, and F1-score were also evaluated.
+infected. The developed ANN model is trained utilizing the Stochastic
+Gradient Descent (SGD) optimizer with learning rate being set to 0.001                   2.5.2.1. Accuracy. Accuracy is a measure of the relative performance of
+and momentum to 0.9, for 200 epoch with 32 samples per batch. Pre­                       the classifier by comparing the total number of true positive plus true
+liminary experiments were conducted using multiple data splits (90–10,                   negative values divided by the total number of items the classifier pre­
+85–15, and 80–20), and the 75–25 split provided the best model per­                      dicted on [31].
+formance and stratified sampling was used for data splitting to avoid
+                                                                                                        Total Number of Correct Predictions        TP + TN
+data misrepresentation for training and testing. Thus, the data is split                 Accuracy =                                         =
+into a ratio of 75:25 for training and testing as demonstrated in Table 3.                                  Total Number of Predictions       TP + TN + FP + FN
+The working flow of model is represented by Fig. 4 in which the ANN                                                                                            [1]
+functions as a deep feature generator and the RF acts as the final                          In above equation, true positives (TP), true negatives (TN), false
+decision-making classifier.                                                              positives (FP), false negatives (FN) are defined.
+    After training the ANN, the output of the final hidden layer (the 128-
+neuron dense layer highlighted in Fig. 4) was extracted. This layer acts                 2.5.2.2. Log loss. Log loss measures how well the estimated probabili­
+as a feature extractor, generating a synthetic feature vector for each                   ties correspond to the actual categories [32]. It gives more penalty to the
+sample. These feature vectors represent the learned high-level abstrac­                  wrong classifications that are made with high ‘confidence level’ thus
+tions generated by the ANN and were obtained by forwarding the input                     making it more sensitive than accuracy.
+data through the network and capturing the activations of this specific
+                                                                                                           N
+layer before the final sigmoid classification node. The extracted features                              1 ∑
+                                                                                         Log Loss = −         [yi log(pi ) + (1 − yi ) log(1 − pi ) ]                    [2]
+by the 128-neuron feature extraction layer were then used as input                                      N i=1
+dataset for training the RF classifier. Additionally, the ANN's sigmoid
+output was not used for RF training; instead, the RF model learned                       Where, N represents total number of samples, yi denotes true label for
+directly from the synthetic features and the true labels. Integration of an              the ith sample (1 for positive, 0 for negative), pi symbolizes predicted
+RF classifier improves the classification performance by utilizing these                 probability of the positive class for the ith sample (value between 0 and
+high-quality synthetic features. The RF classifier was implemented with                  1), and log represents natural logarithm.
+varying numbers of estimators, ranging from 25 to 300 in increments of                       Feature extraction was accomplished using an ANN which can cap­
+25, to identify the optimal model configuration. For the evaluation of                   ture intricate patterns from the data. These extracted features were then
+the RF classifier performance, accuracy and log loss were used, and the                  used to feed an RF classifier, which classified between negative and
+output included the index of two classes (healthy: spores absence and                    positive spore samples from potato fields. The use of feature extraction
+infected: spores presence) and the corresponding probabilities.                          via ANN and using RF for classification has proved to be effective in
+    This hybrid approach of using DL for feature extraction with RF                      detecting disease spore samples and has a robust evaluation method as
+classifier presents a robust and scalable framework for the detection of                 displayed in both, accuracy and log loss results.
+pathogen spores that can cause potato diseases. The ANN efficiently
+learns the complex structure within the data, and the RF model enhances                  3. Results and analysis
+interpretability and classification precision. Performing the analysis for
+PEI, NB, Maine, and their combination, the study addresses both                              The understanding of environmental factors which affect potato
+regional, locational, and collective trends, filling a critical research gap             diseases in Prince Edward Island (PEI), New Brunswick (NB), and Maine
+in disease forecasting for potato crops in these provinces. This dual-                   show the interconnection between the factors like temperature, wind
+layered analysis also supports the assertion that disease detection stra­                speed, precipitation, dew point temperature, relative humidity, and
+tegies must be adapted to the geographical and climatic conditions                       wind direction. The heatmaps illustrated in Fig. 5 for PEI, Fig. 6 for NB
+within the region.                                                                       and Fig. 7 for Maine, are critical in highlighting the region-specific re­
+                                                                                         lationships between environmental factors and crop disease dynamics.
+2.5.2. Model evaluation                                                                  They reveal how variables like temperature and dew point temperature
+   The evaluation of model's performance in detecting potato crop                        consistently show strong positive correlations (e.g., PEI: 0.85, NB: 0.86,
+disease spores focused on two major diseases, namely, EB and GM. The                     and Maine: 0.86), signifying their influence on the potential of disease
+dataset was analyzed using two key metrics: accuracy and log loss. In                    occurrence. These heatmaps provide a visual foundation for under­
+                                                                                         standing and comparing how environmental factors shape crop health
+                                                                                         by highlighting the need of region-specific disease management strate­
+Table 3                                                                                  gies. The heatmaps show generally weak to moderate correlations be­
+Dataset details for PEI, NB, Maine, and combined regions: Train-test splits before
+                                                                                         tween environmental factors and disease occurrence in PEI, NB, and
+and after ANN feature Extraction.
+                                                                                         Maine, implying that no single variable strongly influences disease dy­
+  Dataset Splitting: (75:25)                                                             namics in these regions. his could be due to complex interactions among
+  Province       Samples                        Split      Split After    Target         multiple environmental and biological factors not captured here, such as
+                                                before     ANN:                          soil characteristics, crop management, and pathogen variability. Future
+                                                ANN:       Synthetic
+                                                                                         work involving more extensive and higher-resolution data collection, as
+                                                Features   Features
+                                                                                         well as incorporation of additional relevant variables, will be critical to
+                 Total     Training   Testing   Layers     Layers         Layers         better understand the multifactorial influences on disease development
+  PEI            1482      1111        371      11         128            1              and to improve region-specific management strategies.
+  NB             3032      2274        758      11         128            1                  Fig. 8 illustrate the prevalence of spores of two potato diseases,
+  Atlantic       4514      3385       1129      11         128            1
+                                                                                         namely, Early Blight (EB), and Gray mold (GM), across NB, PEI, and
+    Canada
+  Maine          1116       837        279      11         128            1              Maine from 2019 to 2023. Fig. 8 consists of (i) a heatmap showing
+  Atlantic       5630      4222       1408      11         128            1              counts when the pathogen spores were not present, (ii) a heatmap dis­
+    Canada                                                                               playing counts with pathogen spores' presence, and (iii) a line plot
+    and                                                                                  tracking overall spores’ prevalence for all provinces over time. The
+    United
+                                                                                         heatmaps highlight regional variations, with some provinces
+    States
+
+
+                                                                                     6
+A. Kaur et al.                                                                                             Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+                         Fig. 4. Architecture of hybrid ANN-Random Forest model designed for predicting potato disease occurrence.
+
+
+experiencing higher pathogen load than others, while the line plots                classified into four levels according to spore counts: 0 when no spores
+reveal temporal trends, indicating whether the number of spores is                 were found, 1 for 1–50 spores, 2 for 51–100 spores, and 3 for counts
+increasing or decreasing. These visualizations provide insights into               exceeding 100, (ranging 0 to 3) was analyzed against weather parameter
+regional pathogen spore patterns for strategical disease management.               zones divided into low, moderate, and high using percentile-based
+                                                                                   thresholds. ANOVA was performed individually for EB and GM. The
+                                                                                   values where ANOVA was significant (p < 0.05), Turkey HSD post-hoc
+3.1. ANOVA analysis                                                                test identified which zones differed. Table 4 provides summaries for
+                                                                                   the ANOVA analysis for EB and GM.
+    ANOVA (Analysis of Variance) tests whether the mean spore preva­                   From Tables 4 and it has been observed that GM, spore counts in the
+lence index differs significantly across distinct weather zones (low,              Moderate temperature zone were significantly higher than in the High
+moderate, and high). The F-value measures how much group means                     zone (p = 0.0006). For EB, spore counts in the Moderate precipitation
+differ relative to variation within groups: a higher F indicates greater           zone were significantly higher than both Low and High precipitation
+separation. The p-value defines if this difference is statistically signifi­       zones (p < 0.001). No significant differences were found for relative
+cant or not. For instance, p < 0.05 means we reject the null hypothesis            humidity or wind speed. Wind direction showed significant differences
+and conclude there is a significant difference. The spore prevalence was
+
+                                                                               7
+A. Kaur et al.                                                                                               Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+       Fig. 5. Correlation heatmap illustrating the relationships between environmental factors and crop disease dynamics in Prince Edward Island, Canada.
+
+
+
+
+          Fig. 6. Correlation heatmap illustrating the relationships between environmental factors and crop disease dynamics in New Brunswick, Canada.
+
+
+for both pathogens. Dew point temperature showed no significant                     temperature, wind speed, precipitation, dew point temperature, relative
+differences.                                                                        humidity, and wind direction. This analytical step complements the
+                                                                                    statistical results by identifying specific weather conditions associated
+3.2. Regional analysis of spore prevalence and environmental factors                with higher spore detection. In PEI, as shown in Fig. 9(a), it can be
+                                                                                    observed that EB and GM spores occur more frequently and at a wider
+   In addition to the ANOVA and post-hoc statistical tests, a detailed              range of wind speeds up to 35 km/h with moderate temperature average
+descriptive analysis was also performed to explore how spore prevalence             of 16 ◦ C–22 ◦ C in relation to temperature and wind speed with precip­
+patterns vary under different environmental conditions across the                   itation. High rainfall, indicated by red hues, corresponds to moderate
+studied regions (PEI, NB, and Maine). Figs. 9–11 summarize these pat­               wind speeds of 15–20 km/h and average temperatures of 18 ◦ C to, 20 ◦ C
+terns, highlighting how spore counts, and prevalence relate to                      affecting mainly EB disease spores.
+
+
+                                                                                8
+A. Kaur et al.                                                                                                Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+            Fig. 7. Correlation heatmap illustrating the relationships between environmental factors and crop disease dynamics in Maine, United States.
+
+
+    Investigation of the relationship between dew point temperature and              disease zones are observed in temperature ranges of 16–20 ◦ C, wind
+wind direction in PEI as shown in Fig. 9(b) reveals that EB is most likely           speeds of 12–25 km/h, and relative humidity of 65–80 %.
+to manifest when the wind direction falls between 20 and 25 s degrees,                   The trends for Maine are shown in Fig. 11(a), where EB and GM
+combined with moderate dew point temperatures in the range of                        spores were detected more frequently at moderate temperature ranging
+12–18 ◦ C and relative humidity higher than 80 %. GM, on the other                   between 16 and 22 ◦ C and wind speeds up to 35 km/h. High pre­
+hand, shows a wider range of directions of the wind and is favorable at              cipitations, depicted by red hues, aligns with moderate wind speeds of
+high humidity levels of 85–90 % with dew points of 14–18 ◦ C. Such                   15–20 km/h and temperature around 18–20 ◦ C, primarily affecting EB.
+trends indicate that disease spores presence in PEI is highly dependent                  Fig. 11(b) illustrates the relationship between dew point temperature
+on wind conditions, humidity, and temperature.                                       and wind direction, revealing that EB is most prevalent when wind di­
+    In PEI, as demonstrated in Fig. 9, low disease zones for EB and GM               rections range between 20 and 25◦ , with moderate dew point temper­
+are characterized by temperature ranges of 19-16 ◦ C, wind speeds below              atures of 12–18 ◦ C and relative humidity exceeding 80 %. GM occurs
+15 km/h, dew point temperature in the range of 6–11 ◦ C, and relative                over a broader range of wind directions and is most favorable at high
+humidity below 70 %. Moderate spore disease zones are observed at                    humidity levels of 85–90 % with dew points of 14–18 ◦ C.
+temperature above 20 ◦ C, dew point temperature above 17 ◦ C, wind                       In Maine, as shown in Fig. 11, low spore disease zones for EB and GM
+speeds exceeding 25 km/h, and relative humidity above 85 %. High                     are characterized by temperatures of 10–15 ◦ C, wind speeds below 15
+spore disease zones are seen in the ranges of 15–20 ◦ C for temperature,             km/h, dew point temperatures between 6 and 11 ◦ C, and relative hu­
+11–17 ◦ C for dew point temperature, wind speeds of 15–25 km/h, and                  midity below 70 %. Moderate spore disease zones emerge at tempera­
+relative humidity of 70–85 %.                                                        tures above 20 ◦ C, dew point temperatures above 17 ◦ C, wind speeds
+    Similar trends as illustrated in Fig. 10(a) are observed in NB, but the          exceeding 25 km/h, and relative humidity above 85 %. High disease
+environmental parameters appear to fluctuate slightly less than in PEI.              zones for spores are found at temperature ranges of 15–20 ◦ C, dew point
+When comparing temperature and wind speed with precipitation, the                    temperatures of 11–17 ◦ C, wind speeds between 15 and 25 km/h, and
+result shows that EB and GM spores have the highest frequency in the                 relative humidity levels of 70–85 %.
+dataset, specifically in the temperature range of 27–30 ◦ C, wind speeds                 Overall, the consideration of the environmental attributes like tem­
+of up to 14 km/h and moderate precipitation. In general, NB has lower                perature, wind speed, precipitation, dew point temperature, relative
+values of wind speeds, and precipitation, which can be the reason why                humidity, and wind direction can be concluded that it is useful for
+the performance of the model is slightly lower than that of PEI.                     determining the conditions that enable spore detection for predicting
+    Fig. 10(b) demonstrates the findings of the correlation between dew              disease occurrence of potato crops in PEI, NB, and Maine. This is sup­
+point temperature and wind direction in NB demonstrate specific envi­                ported by how PEI, NB, and Maine, exhibits greater environmental
+ronmental characteristics of each disease. EB spores were detected at a              variability for the variables examined in the current study, which are
+higher incidence at wind directions 15–20 s degrees and relative hu­                 indicative of better generalization for models. These enhancements
+midity higher than 75 %, while GM spores were detected at all wind                   contribute to the accuracy and loss trends of the Random forest (RF)
+directions, but at higher dew point temperature 16–20 ◦ C and relative               model, offering an integrated understanding of the relationships be­
+humidity higher than 85 %. These findings suggest that environmental                 tween environmental factors and disease rates in the area.
+stability plays a significant part in NB rather than the environmental
+volatility seen in PEI.                                                              3.3. Model performance
+    In NB, as illustrated in Fig. 10, low spore disease zones for EB and GM
+correspond to temperature ranges of 10–15 ◦ C, dew point temperature                 3.3.1. Model performance for Prince Edward Island
+below 11 ◦ C, and relative humidity below 65 %. Moderate spore disease                   Based on the accuracy and loss curves of the PEI as shown in Fig. 12
+zones are seen at temperatures exceeding 22 ◦ C, dew point temperature               and Table 5, the RF model obtains a test accuracy as high as 91 % and
+more than 17 ◦ C, and relative humidity higher than 80 %. High spore                 train accuracy of up to 97 %. Consistent with the accuracy gained during
+
+                                                                                 9
+A. Kaur et al.                                                                                                   Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+Fig. 8. Early Blight (a) and Gray Mold (b) spores' prevalence from 2019 to 2023 across NB, PEI, and Maine: (i) spores absence, (ii) spores presence, and (iii) overall
+spores prevalence trends.
+
+
+the training and testing phases, they plateau after elevating with the                3.3.2. Model performance for New Brunswick
+added trees, as illustrated in the accuracy curve, where the testing ac­                  For NB, as depicted in Fig. 13 and Table 5, the test accuracy is 86.5
+curacy is designed to be lower, because of the model's ability to gener­              %, and is slightly lower when compared to PEI, and for train accuracy, it
+alize. The loss curve also shows that the values for the train loss are               is 94.7 %. The graphs depicting the accuracy rate reflects a similar trend
+constant and low (0.09) throughout all iterations which proves that the               as PEI with training accuracy followed by testing accuracy, albeit at a
+model fits very well the train data. In contrast to the cross-validation              slight time lag. Similarly, the loss curve, train loss is statically low at
+error, the test loss begins greater (0.24) but decreases progressively as             0.12 while the test loss is initially higher at 0.39 but reduces as the
+more trees are added, thereby illustrating better generalization of pre­              number of trees increase in the model. The slightly higher test loss than
+diction confidence over unseen data for the detection of likelihood of                PEI implies that NB might have tested the model with the harder pat­
+potato diseases.                                                                      terns or noise in the NB dataset.
+
+
+
+
+                                                                                 10
+A. Kaur et al.                                                                                                      Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+Table 4
+Summary of ANOVA and Tukey HSD results for spore prevalence across weather parameter zones (Early Blight and Gray Mold).
+  Parameter                           Pathogen                     ANOVA p-value                     Significant?                     Post-hoc results
+
+  Temperature                         Gray Mold                    0.00097                           Yes                              Moderate > High
+  Temperature                         Early Blight                 0.426                             No                               –
+  Relative Humidity                   Gray Mold                    0.62                              No                               –
+  Relative Humidity                   Early Blight                 0.13                              No                               –
+  Precipitation                       Gray Mold                    0.073                             No                               –
+  Precipitation                       Early Blight                 0.000011                          Yes                              Moderate > High and Low
+  Wind Speed                          Gray Mold                    0.247                             No                               –
+  Wind Speed                          Early Blight                 0.987                             No                               –
+  Dew Point Temp                      Gray Mold                    0.12                              No                               –
+  Dew Point Temp                      Early Blight                 0.56                              No                               –
+  Wind Direction                      Gray Mold                    ≈0                                Yes                              Several directions differ significantly
+  Wind Direction                      Early Blight                 0.0118                            Yes                              Several directions differ significantly
+
+
+
+
+     Fig. 9. Scatter plots visualizing weather parameter relationships for predicting potato diseases in PEI, Canada, highlighting variations across spore types.
+
+
+
+
+    Fig. 10. Scatter plots visualizing weather parameter relationships for predicting potato diseases in NB, Canada, highlighting variations across spore types.
+
+
+
+3.3.3. Model performance for Atlantic Canada                                            increased difficulty of the data merged. The test loss begins at 0.30 and
+    As for the test results for the combined dataset as illustrated in Fig. 14          keeps dropping, indicating that an increased number of samples is
+and Table 5, the test accuracy is 88.4 %, which is between the individual               helpful for the model, but more iterations is needed to achieve the best
+results of PEI and NB and if further expressed in terms of train accuracy,              level of generalization.
+it is slightly lower and is 91 % which indicates that compared to the
+single dataset, it has slightly reduced the model overfitting with the                  3.3.4. Model performance for Maine
+increase of data. The loss curves also show that the train loss is still                   For Maine, Fig. 15 shows accuracy curves with consistent test ac­
+relatively low (at 0.19), however, it has increased slightly compared to                curacy of 84 % and training accuracy of 94.5 %, indicating stable model
+the loss specific to each of the individual datasets because of the                     performance. The loss graph reveals that the training loss remains low
+
+
+                                                                                   11
+A. Kaur et al.                                                                                                   Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+Fig. 11. Scatter plots visualizing weather parameter relationships for predicting potato diseases in Maine, United States, highlighting variations across spore types.
+
+
+
+
+                         Fig. 12. Performance evaluation of PEI, Canada: Accuracy and Log Loss trends across varying numbers of trees.
+
+
+and constant at 0.14, while testing loss decreases initially and then                 model. To account class imbalance, precision, recall, and F1-Score are
+stabilizes at 0.36, demonstrating improved generalization with more                   reported alongside accuracy. While accuracy and log loss show overall
+trees.                                                                                performance, the other metrics indicate how well the model identifies
+                                                                                      both majority and minority classes. As shown in Table 6, the model
+3.3.5. Model performance for Atlantic Canada and United States                        performs well across all regions. In PEI, it achieved 91 % Accuracy, 90.5
+    The accuracy and loss curves for Atlantic Canada and U.S., as shown               % Precision, 92.8 % Recall, and 91.4 % F1-Score. Similar results were
+in Fig. 16, represent high and stable training accuracy of 91 % and                   observed for NB, Atlantic Canada, Maine, and the combined Atlantic
+testing accuracy of 87.5 % across different number of trees, indicating               Canada and United States dataset, demonstrating reliable performance
+model flexibility and ability to perform across diverse regions. The loss             across regions.
+curve highlights a sharp in testing loss initially, followed by stabilization
+at 0.37 and training loss remaining consistently low at 0.19.                         3.3.7. Proposed model comparison with other models across regions
+                                                                                          To justify model selection, a comparative evaluation was conducted
+3.3.6. Performance evaluation across different metrics                                between ANN-RF and ANN-DT hybrid configurations. Table 7 presents
+   Table 6 provides a comprehensive evaluation of the hybrid ANN-RF                   the performance comparison of the proposed model (ANN-RF) with an
+                                                                                      alternative hybrid configuration (ANN-DT). The ANN-RF classifier out­
+Table 5                                                                               performs ANN-DT across all regions. Although, different classifiers (e.g.,
+Performance comparison of ANN → RF hybrid model in terms of accuracy and              RF, DT, LR, KNN, and SVM) were tested during experimentation.
+loss for PEI, NB, and combined data.                                                  However, the DT classifier demonstrated the highest overall accuracy
+  Hybrid Model         Province                 Accuracy (%)     Log Loss
+                                                                                      followed by RF and therefore was selected for comparison in this study.
+   (ANN → RF)                                   Train   Test     Train    Test        The result in table highlights higher accuracy and support the selection
+                                                                                      of RF as the most effective classifier in the hybrid framework for
+                       PEI                      97       91      0.09     0.24
+                       NB                       94.7     86.5    0.12     0.39        detecting crop diseases in this study.
+                       Atlantic Canada (PEI     91       88.4    0.19     0.30
+                       and NB)                                                        3.3.8. Proposed model comparison with existing studies
+                       Maine                    94.5     84      0.14     0.36           The performance of the proposed hybrid models (ANN-RF and ANN-
+                       Atlantic Canada and      91       87.5    0.19     0.37
+                       United States
+                                                                                      DT) was compared with previous studies on potato disease prediction (as
+
+
+                                                                                 12
+A. Kaur et al.                                                                                               Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+                         Fig. 13. Performance evaluation of NB, Canada: Accuracy and Log Loss trends across varying numbers of trees.
+
+
+
+
+                 Fig. 14. Performance evaluation of Atlantic Canada (PEI and NB): Accuracy and Log Loss trends across varying numbers of trees.
+
+
+
+
+                     Fig. 15. Performance evaluation of Maine, United States: Accuracy and Log Loss trends across varying numbers of trees.
+
+
+shown in Table 8). Prior works mainly focus on image-based datasets                 warning using weather and spore data, and is designed for practical
+using CNNs or on weather-based regression for a single disease. In                  application in agricultural advisory systems.
+contrast, our models combine weather and spore data for predicting EB
+and GM across multiple regions, including three individual regions (PEI,            4. Discussion
+NB, and Maine), combinations of two provinces (PEI + NB), and the
+entire dataset (PEI + NB + Maine). The ANN-RF model outperforms                        The research on the identification of potato disease spores in Atlantic
+ANN-DT, showing the benefit of ANN-based feature extraction for                     Canada (Prince Edward Island; PEI and New Brunswick; NB) and United
+Random Forest classification. Compared with previous methods, our                   States (Maine) underlines the relevance of the environmental influences
+approach provides comprehensive evaluation metrics, supports early                  and the sophisticated Machine Learning (ML) frameworks to enhance
+
+                                                                               13
+A. Kaur et al.                                                                                                    Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+
+
+   Fig. 16. Performance evaluation of Atlantic Canada (PEI and NB) and United States (Maine): Accuracy and Log Loss trends across varying numbers of trees.
+
+
+Table 6                                                                                 Table 8
+Performance metrics evaluation of the hybrid ANN→RF model across different              Comparison of the proposed model with previous studies on potato disease
+metrics.                                                                                prediction.
+  Hybrid           Province           Accuracy   Precision   Recall        F1-           Reference and    Disease         Dataset         Model            Performance
+   Model                                                                   Score         Year             Diagnosed
+   (ANN → RF
+                   PEI                91         90.5        92.8          91.4          [19], 2025       Potato leaf     Potato leaf     MSC-ResViT,      Accuracy:
+                   NB                 86.5       87.4        84.7          86                             disease: EB     dataset         MSC-             98.43 %
+                   Atlantic Canada    88.4       88.5        88.7          88.6                           and LB          (Imagery)       TextCNN,
+                   (PEI and NB)                                                                                                           and CT-CNN
+                   Maine              84         85.8        83.3          84.6          [25], 2021       Potato LB       Weather         Stepwise         R2: 0.80
+                   Atlantic Canada    87.5       86.2        86.5          86.3                                           data            regression
+                   and United                                                            [22], 2025       Potato leaf     Potato leaf     CNN              Accuracy: 99
+                   States                                                                                 disease: EB,    dataset                          %
+                                                                                                          LB, and         (Imagery)
+                                                                                                          healthy
+Table 7                                                                                  Proposed (for    Potato EB       Weather         ANN-DT           Accuracy: 91
+Comparison of hybrid ANN→RF and ANN→DT models across regions.                              PEI, NB,       and GM          and Spore                        %
+                                                                                           Maine, PEI +                   data
+  Province                               Accuracy (%)                                      NB, PEI + NB   Potato EB       Weather         ANN-RF           Accuracy: 91
+                                         Proposed                   (ANN → DT)             + Maine)       and GM          and Spore                        %
+                                         Model (ANN → RF)                                                                 data
+
+  PEI                                    91                         87.3
+  NB                                     86.5                       85.1                of 91 % for PEI, 86.5 % for NB, and 84 % for Maine demonstrate that the
+  Atlantic Canada (PEI and NB)           88.4                       85
+                                                                                        model captures patterns unique to the regions. The slightly lower per­
+  Maine                                  84                         81.2
+  Atlantic Canada and United States      87.5                       85.4                formance in NB compared to PEI may be due to smaller environmental
+                                                                                        variability or availability of complex patterns in the NB dataset.
+                                                                                        Whereas, for Maine, the performance difference is due to locational
+the consequences in the sphere of agriculture. Thus, this study identifies              distinctions. The merged dataset for Atlantic Canada demonstrates the
+spores of two principal potato diseases, Early Blight (EB) [11,12] and                  model's ability to generalize well, achieving a test accuracy of 88.4 %,
+Gray Mold (GM) [13], [14], [33], [34], [35] to help predict disease                     whereas for Atlantic Canada and U.S., an impressive accuracy of 87.5 %,
+occurrence likelihood under different environmental conditions. The                     strengthening the best of all regions. The gradual reduction of the test
+integrated methodology of Artificial Neural Network (ANN) for the                       loss as more trees are included in the RF classifier reflects the model's
+feature extraction process and Random Forest (RF) classification has                    ability to predict the outcomes on unseen data. In addition, some
+proven to be a highly effective methodologies to distinguish between                    important factors, such as soil conditions, farming practices, and the
+positive and negative spore classes.                                                    types of crops grown in previous years are not included in the current
+    The proposed hybrid model ANN-RF is an application-driven                           dataset. These missing factors can create variation that the model is
+advanced contribution for detecting spores that cause potato diseases.                  unable to capture. Increasing the dataset with more samples, additional
+The ANN component performs a unique function of extracting the                          years, and relevant agronomic information should help reduce the issue
+relevant format out of high dimensions environmental streams such as                    of class imbalance and improve the model's overall performance in
+temperature, precipitation, dew point temperature, etc. These features                  different provinces.
+which may be non-linear, and complex is important in understanding                          For performance evaluation in this study, accuracy and log loss
+the nature of the dependence of disease existence on the environmental                  curves are useful to give a detailed evaluation of the models. Addi­
+conditions. The extracted features are then used as an input in the RF                  tionally, other performance metrics included precision, recall, and F1-
+classifier, which is especially efficient in binary classification problems             Score are also included, which represents the model stability for the
+due to its ensemble learning features. This enables the model to gener­                 utilized data. The high train accuracy and low train loss indicate that the
+alize well, minimize the instance of overfitting, and offers robust                     model performs very well in fitting training data. However, the gradual
+performance.                                                                            reducing of test loss, and the stabilization of the test accuracy demon­
+    The efficiency of this approach is demonstrated by the accuracy and                 strate better generalization capabilities of the model in terms of unseen
+log loss curves of PEI, NB, Maine, and their combination. Test accuracy
+
+                                                                                   14
+A. Kaur et al.                                                                                                 Journal of Agriculture and Food Research 26 (2026) 102733
+
+
+data. These curves validate the robustness of the ANN-RF hybrid model             for sustainable farming. Further work might extend physical validation,
+and underscore its potential for real-world applications. Furthermore,            environmental variables, combine more regions and implement online
+the proposed model is also compared with other hybrid-classifiers and             surveillance systems to improve disease prediction and intervention
+ANN-DT shows best results followed by the proposed ANN-RF model.                  more.
+    This study is unique in its comprehensive analysis of spores of two
+potato diseases (EB and GM) and their classification into negative or             CRediT authorship contribution statement
+positive categories. Most of the of research performed within the domain
+cover only one disease, different diseases dataset, or there is no inte­              Avneet Kaur: Writing – review & editing, Writing – original draft,
+gration of hybrid DL and ML techniques. Through managing this                     Visualization, Software, Methodology, Formal analysis, Data curation,
+research gap, the study provides a foundation on which spore detection            Conceptualization. Gurjit S. Randhawa: Writing – review & editing,
+disease models can be built for other crops or diverse areas. In addition,        Validation, Supervision, Investigation, Funding acquisition, Formal
+this study emphasizes that importance of incorporating environmental              analysis. Aitazaz A. Farooque: Writing – review & editing, Validation,
+data, which are often overlooked in traditional approaches.                       Project administration, Investigation, Funding acquisition, Conceptual­
+    The relevance of this research extends beyond academic contribu­              ization. Mumtaz Ali: Writing – review & editing, Validation, Method­
+tions. By enabling early and accurate detection of spores of potato dis­          ology, Formal analysis. Harmanpreet Singh: Writing – review &
+eases, farmers can adopt timely interventions, reduce crop loss and               editing, Visualization, Software, Formal analysis. Khalil Al-Mughrabi:
+ensure sustainable food production. Considering that the potato crop              Writing – review & editing, Validation, Resources, Data curation. Dave
+plays a vital role in the economies worldwide as well as for Atlantic             Bell: Writing – review & editing, Validation, Resources, Data curation.
+Canada and U.S., this research has substantial implications for local             Rajandeep Singh: Writing – review & editing, Visualization, Investi­
+agricultural development and decision-making. This research makes a               gation, Formal analysis.
+significant contribution to the agricultural world by advancing the spore
+detection of potato diseases influenced by dynamic weather parameters.            Declaration of competing interest
+The study conducted in Atlantic Canada and U.S. not only underscores
+the region's unique climatic challenges but also provides actionable in­              The authors declare that they have no known competing financial
+sights that can help farmers effectively mitigate the risks of disease            interests or personal relationships that could have appeared to influence
+outbreaks. The predictions from the developed model can help farmers              the work reported in this paper.
+in making specific management decisions, including fungicide applica­
+tion timing or increasing scouting and monitoring frequency. The pro­             Acknowledgement
+posed model is designed to prioritize disease warnings and enabling
+growers to act before the disease spreads. Furthermore, the hybrid                    The authors would like to acknowledge Airspore (https://airspore.
+model can be integrated to decision-support tools for informed disease            com) for providing the essential data necessary for conducting this
+management decisions. The implementation of the hybrid model em­                  research study. Authors would like to extend sincere gratitude to the
+phasizes the transformative power of advanced technologies such as                Natural Science and Egnineering Research Council of Canada - Alliance
+Deep Learning (DL) and ML in revolutionizing agricultural practices. By           Sustainable Agriculture Research Initive (NSERC Alliance SARI) grant
+promoting more sustainable farming practices, it helps to safeguard both          for supporting this research. Additionally, the authors also appreciate
+the environment and public health. The findings of this study lay the             the invaluable support offered by the Sustainable Agriculture Research
+foundation for a smarter, more resilient approach to agriculture, where           Group at the Canadian Centre for Climate Change and Adaptation,
+the integration of advanced technologies ensures not only effective               University of Prince Edward Island.
+disease management to a single country but also across diverse
+geographical landscapes and long-term food security.                              Data availability
+
+5. Conclusion                                                                        Data will be made available on request.
+
+    In conclusion, potential of two most common potato diseases                   References
+including Early Blight (EB) and Gray Mold (GM) have been accurately
+                                                                                  [1] A. Hussen, Intra-row spacing on the growth, yield and yield component of potato
+identified in this study based on the spore data and environmental
+                                                                                      (Solanium tuberosum L.): a review, Int. J. Curr. Res. Acad. Rev. 9 (6) (May 2021)
+conditions of temperature, rainfall, wind speed, wind direction, relative             11–16, https://doi.org/10.20546/ijcrar.2021.906.003.
+humidity as well as the dew point temperature for Atlantic Canada and             [2] Potato market information review 2022-2023, Crops and Horticulture Division,
+United States. It is observed that the proposed hybrid Artificial Neural              Agriculture and Agri-Food Canada, Dec. 2023, pp. 1–45 [Accessed Online on Dec
+                                                                                      2024]. Available: Potato Market Information Review 2024-2025 - agriculture.
+Network – Random Forest (ANN-RF) model that utilized Deep Learning                    canada.ca.
+(DL) for the feature extraction and Machine Learning (ML) for the                 [3] G. Burgos, T. Zum Felde, C. Andre, S. Kubow, The potato and its contribution to the
+classification providing robust and accurate predictions, with test ac­               human diet and health, in: H. Campos, O. Ortiz (Eds.), The Potato Crop, Springer,
+                                                                                      Cham, 2019, pp. 37–74, https://doi.org/10.1007/978-3-030-28683-5_2.
+curacies of 91 % for Prince Edward Island (PEI), 86.5 % for New                   [4] T. Handayani, S.A. Gilani, K.N. Watanabe, Climatic changes and potatoes: how can
+Brunswick (NB(, 88.4 % for the Atlantic Canada (PEI and NB), 84 % for                 we cope with the abiotic stresses? Breed. Sci. 69 (4) (Sep. 2019) 545–563, https://
+Maine, and 87 % for combined dataset (PEI, NB, and Maine). Higher                     doi.org/10.1270/jsbbs.19070.
+                                                                                  [5] S.L. DeFauw, R.P. Larkin, P.J. English, J.M. Halloran, A.K. Hoshide, Geospatial
+performance of the model indicates how presented approach is effective                evaluations of potato production systems in Maine, Am. J. Potato Res. 89 (6) (Dec.
+when environment variance or volatility is greater, NB, although slightly             2012) 471–488, https://doi.org/10.1007/s12230-012-9271-2.
+lower accuracy, may represent more stable but possibly more intricate             [6] E. Vilvert, L. Stridh, B. Andersson, Å. Olson, L. Aldén, A. Berlin, Evidence based
+                                                                                      disease control methods in potato production: a systematic map protocol, Environ.
+graphic patterns. The integrated dataset shows the ability of the model
+                                                                                      Evid. 11 (6) (Dec. 2022) 1–8, https://doi.org/10.1186/s13750-022-00259-x.
+to reproduce and generalize region-wise results efficiently. This research        [7] J.M. Roper, J.F. Garcia, H. Tsutsui, Emerging technologies for monitoring plant
+therefore emphasizes the need to add environmental information to the                 health in vivo, ACS Omega 6 (8) (Mar. 2021) 5101–5107, https://doi.org/
+                                                                                      10.1021/acsomega.0c05850.
+development of spore-based disease identification models to have a
+                                                                                  [8] J. Rashid, I. Khan, G. Ali, S.H. Almotiri, M.A. Alghamdi, K. Masood, Multi-level
+unified view of the factors that may lead to diseases and effective pest              deep learning model for potato leaf disease recognition, Electronics (Switzerland)
+inventory control. As the study presents a new concept of combining                   10 (17) (Sep. 2021), https://doi.org/10.3390/electronics10172064.
+both DL and ML and fills the several gaps that exists in multi-disease
+diagnosis and locational distinctions, this therefore provides a premise
+
+                                                                             15
+A. Kaur et al.                                                                                                                   Journal of Agriculture and Food Research 26 (2026) 102733
+
+ [9] M. Jung, J.S. Song, A.Y. Shin, B. Choi, S. Go, S.Y. Kwon, J. Park, S.G. Park, Y.             [20] K. Hamza, S. Un Nisa, G. Irshad, A review on potato disease detection and
+     M. Kim, Construction of deep learning-based disease detection model in plants, Sci.               classification by exploiting deep learning techniques, J. Agri. Vet. Sci 1 (2) (2022)
+     Rep. 13 (1) (Dec. 2023) 7331, https://doi.org/10.1038/s41598-023-34549-2.                         2022–2079, https://doi.org/10.55627/Javs.01.2.0251.
+[10] B. Richard, A. Qi, B.D.L. Fitt, Control of crop diseases through integrated crop             [21] A. Abbas, U. Maqsood, S. Ur Rehman, K. Mahmood, T. Alsaedi, M. Kundi, An
+     Management to deliver climate-smart farming systems for low- and high-input crop                  artificial intelligence framework for disease detection in potato plants, Eng.
+     production, Plant Pathol. 71 (1) (Jan. 2022) 187–206, https://doi.org/10.1111/                    Technol. Appl. Sci. Res. 14 (1) (2024) 12628–12635, https://doi.org/10.48084/
+     ppa.13493.                                                                                        etasr.6456.
+[11] H. Afzaal, A.A. Farooque, A.W. Schumann, N. Hussain, A. McKenzie-Gopsill,                    [22] J. Sarada, J. Ramachandraiah, V. Neerugatti, C.R. Raman, A. Taranum, A.K. Sinha,
+     T. Esau, F. Abbas, B. Acharya, Detection of a potato disease (early blight) using                 Early stage disease classification in potato leaves using convolutional neural
+     artificial intelligence, Remote Sens (Basel) 13 (3) (Jan. 2021) 411, https://doi.org/             network (CNN), in: Challenges in Information, Communication and Computing
+     10.3390/rs13030411.                                                                               Technology, CRC Press, London, 2024, pp. 707–712, https://doi.org/10.1201/
+[12] I.K. Abuley, B.J. Nielsen, Evaluation of models to control potato early blight                    9781003559092-122.
+     (Alternaria solani) in Denmark, Crop Prot. 102 (Dec. 2017) 118–128, https://doi.             [23] K. Sriwanna, Weather-based rice blast disease forecasting, Computers and
+     org/10.1016/j.cropro.2017.08.012.                                                                 Electronics in Agriculture. 193 (Feb. 2022) 106685, https://doi.org/10.1016/j.
+[13] N. Mamode Ally, H. Neetoo, V.M. Ranghoo-Sanmukhiya, S. Hardowar, V. Vally,                        compag.2022.106685.
+     A. Gungoosingh-Bunwaree, F. Maudarbaccus, T.A. Coutinho, M. Vojvodić,                       [24] S. Sannakki, V.S. Rajpurohit, F. Sumira, H. Venkatesh, A neural network approach
+     A. Bulajić, First report of botrytis cinerea causing gray mold on greenhouse-grown               for disease forecasting in grapes using weather parameters, in: 2013 Fourth
+     tomato plants in Mauritius, Plant Dis. 105 (9) (2021), https://doi.org/10.1094/                   International Conference on Computing, Communications and Networking
+     PDIS-01-21-0219-PDN. American Phytopathological Society, Sep. 01.                                 Technologies (ICCCNT), Tiruchengode, India, IEEE, Tiruchengode, India, Jul.
+[14] B. Williamson, B. Tudzynski, P. Tudzynski, J.A.L. Van Kan, Botrytis cinerea: the                  2013, pp. 1–5, https://doi.org/10.1109/icccnt.2013.6726613.
+     cause of grey mould disease, Mol. Plant Pathol. 8 (5) (Sep. 2007) 561–580, https://          [25] W.A. Dar, F.A. Parry, B.A. Bhat, Potato late blight disease prediction using
+     doi.org/10.1111/j.1364-3703.2007.00417.x.                                                         meteorological parameters in Northern Himalayas of India, J. Agrometeorol. 23 (3)
+[15] J. Kotwal, D.R. Kashyap, D.S. Pathan, Agricultural plant diseases identification:                 (2021) 310–315, https://doi.org/10.54386/jam.v23i3.35.
+     from traditional approach to deep learning, Mater. Today Proc. 80 (1) (Jan. 2023)            [26] A. Kumar, M. V, in: Image based tomato leaf disease detection, IEEE, India, Jul.
+     344–356, https://doi.org/10.1016/j.matpr.2023.02.370.                                             2019, pp. 1–6, https://doi.org/10.1109/icccnt45670.2019.8944692.
+[16] P. Sajitha, A.D. Andrushia, N. Anand, M.Z. Naser, A review on machine learning               [27] S.-H. Han, K.W. Kim, S. Kim, Y.C. Youn, Artificial neural network: understanding
+     and deep learning image-based plant disease classification for industrial farming                 the basic concepts without mathematics, Dement Neurocogn. Disord. 17 (3) (Nov.
+     systems, J. Ind. Inf. Integr. 38 (Mar. 2024) 100572, https://doi.org/10.1016/j.                   2018) 83, https://doi.org/10.12779/dnd.2018.17.3.83.
+     jii.2024.100572.                                                                             [28] S.B. Maind, P. Wankar, Research paper on basic of artificial neural network, Int. J.
+[17] C. Singh, G.S. Randhawa, A.A. Farooque, Y.S. Gill, L. Kumar Km, M. Singh, K. Al-                  Recent and Innov. Trends in Comput. Commun. 2 (1) (Jan. 2014) 96–100, https://
+     Mughrabi, Evaluation of deep learning models for RGB image-based detection of                     doi.org/10.17762/ijritcc.v2i1.2920.
+     potato virus y strain symptoms (O, NO, and NTN) in potato plants, Smart Agric.               [29] G. Biau, G.B. Fr, Analysis of a random forests model, J. Mach. Learn. Res. 13 (Oct.
+     Technol. 10 (Mar. 2025) 100755, https://doi.org/10.1016/j.atech.2024.100755.                      2012) 1063–1095, https://doi.org/10.5555/2188385.2343682.
+[18] A. Kaur, G.S. Randhawa, F. Abbas, M. Ali, T.J. Esau, A.A. Farooque, R. Singh,                [30] K. Fawagreh, M.M. Gaber, E. Elyan, Random forests: from early developments to
+     Artificial intelligence driven smart farming for accurate detection of potato                     recent advancements, Sys. Sci. Contr. Eng. 2 (1) (Oct. 2014) 602–609, https://doi.
+     diseases: a systematic review, IEEE Access 12 (Dec. 2024) 193902–193922,                          org/10.1080/21642583.2014.956265.
+     https://doi.org/10.1109/ACCESS.2024.3510456.                                                 [31] O. Rainio, J. Teuho, R. Klén, Evaluation metrics and statistical tests for machine
+[19] H. Zhu, W. Shi, X. Guo, S. Lyu, R. Yang, Z. Han, Potato disease detection and                     learning, Sci. Rep. 14 (1) (Dec. 2024) 6089, https://doi.org/10.1038/s41598-024-
+     prevention using multimodal AI and large language model, Comput. Electron.                        56706-x.
+     Agric. 229 (Feb) (2025), https://doi.org/10.1016/j.compag.2024.109824.                       [32] Y. Fogel, M. Feder, in: On the problem of on-line learning with log-loss, IEEE,
+                                                                                                       Aachen, Germany, Jun. 2017, pp. 2995–2999, https://doi.org/10.1109/
+                                                                                                       isit.2017.8007079.
+
+
+
+
+                                                                                             16
+

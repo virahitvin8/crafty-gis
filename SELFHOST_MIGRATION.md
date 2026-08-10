@@ -1,6 +1,6 @@
-# 🏠 FarmHealth — Full Self-Hosting Migration Roadmap
+# 🏠 Crafty GIS — Full Self-Hosting Migration Roadmap
 
-> **Goal:** Run the entire FarmHealth stack (satellite, AI, auth, monitoring) on your own hardware — **an 8 GB laptop running 24×7, even with the lid closed** — with zero per-user cloud bills.
+> **Goal:** Run the entire Crafty GIS stack (satellite, AI, auth, monitoring) on your own hardware — **an 8 GB laptop running 24×7, even with the lid closed** — with zero per-user cloud bills.
 >
 > **Status:** 🚧 In progress. Phase 1–2 implemented in this repo. Phases 3+ are step-by-step plans you can execute at your own pace.
 
@@ -17,7 +17,7 @@
         ┌──────────────┬──────────────┼──────────────┬─────────────┐
         │              │              │              │             │
    ┌────┴────┐   ┌─────┴─────┐  ┌─────┴─────┐  ┌─────┴─────┐  ┌────┴─────┐
-   │ FarmHealth│   │  Ollama   │  │ PostgreSQL│  │ Uptime    │  │ Authelia │
+   │ Crafty GIS│   │  Ollama   │  │ PostgreSQL│  │ Uptime    │  │ Authelia │
    │ Backend   │   │ (LLM)     │  │ + PostGIS │  │ Kuma      │  │ (Auth)   │
    │ Node/Expr │   │ DeepSeek  │  │ (land rec,│  │ (monitor) │  │ Phase 4  │
    │ + frontend│   │ R1 7B     │  │  ODC later)│  │           │  │          │
@@ -52,7 +52,7 @@
 | Component | RAM |
 |---|---|
 | Operating system (Linux server, headless) | ~0.8–1.2 GB |
-| FarmHealth backend (Node + Express) | ~0.3 GB |
+| Crafty GIS backend (Node + Express) | ~0.3 GB |
 | PostgreSQL + PostGIS | ~0.4 GB (tune `shared_buffers = 128MB`) |
 | Ollama + `deepseek-r1:7b` (Q4_K_M ≈ 4.7 GB) | ~5.0 GB resident |
 | Uptime Kuma | ~0.2 GB |
@@ -136,7 +136,7 @@ The frontend (`js/api.js` → `getAIAdvice`) was also updated to **prefer the ba
 curl -fsSL https://ollama.com/install.sh | sh
 # 2. Pull the model (≈4.7 GB download)
 ollama pull deepseek-r1:7b
-# 3. Run the FarmHealth server
+# 3. Run the Crafty GIS server
 cd server && npm install && npm start
 # 4. Point the server at Ollama (default already localhost:11434)
 OLLAMA_MODEL=deepseek-r1:7b
@@ -167,7 +167,7 @@ A production-oriented stack is provided in **`docker-compose.selfhost.yml`**:
 
 | Service | Image | Why |
 |---|---|---|
-| `farmhealth` | built from repo `Dockerfile` | The app + backend |
+| `crafty_gis` | built from repo `Dockerfile` | The app + backend |
 | `ollama` | `ollama/ollama:latest` | Local LLM, auto-pulls `deepseek-r1:7b` on start |
 | `postgis` | `postgis/postgis:16-3.4` | Land records, saved farms; the Open Data Cube DB later |
 | `uptime-kuma` | `louislam/uptime-kuma:latest` | Health checks + alerts for all services |
@@ -182,7 +182,7 @@ docker compose -f docker-compose.selfhost.yml ps
 ```
 
 ### Uptime Kuma — wire these monitors
-1. Ports (as set in `docker-compose.selfhost.yml`): **FarmHealth → `http://<laptop-ip>:8080`**, **Uptime Kuma dashboard → `http://<laptop-ip>:3001`**.
+1. Ports (as set in `docker-compose.selfhost.yml`): **Crafty GIS → `http://<laptop-ip>:8080`**, **Uptime Kuma dashboard → `http://<laptop-ip>:3001`**.
 2. In the Kuma dashboard, add monitors:
    - HTTP(S) → `http://<laptop-ip>:8080/api/ai/health` (backend + Ollama in one probe)
    - HTTP(S) → `http://<laptop-ip>:8080/api/gee/health`
@@ -215,7 +215,7 @@ Current state: `js/firebase.js` does Google Sign-In with a mock fallback, and `j
        - TZ=Asia/Kolkata
    ```
 2. Configure `/config/configuration.yml`: users file (bcrypt-hashed passwords) or LDAP, `jwt_secret`, `session` settings. Two-factor via TOTP/WebAuthn.
-3. Put **Caddy or Traefik** (Coolify already manages this) in front of FarmHealth and enable `forward_auth` → Authelia for `/admin` routes while keeping the map public.
+3. Put **Caddy or Traefik** (Coolify already manages this) in front of Crafty GIS and enable `forward_auth` → Authelia for `/admin` routes while keeping the map public.
 4. Replace `js/firebase.js` logic: the app already treats auth as optional (login buttons show/hide via `FH_FIREBASE` checks). Either:
    - **Option A (simplest):** Keep the app's built-in `admin/user` role login for the app UI, and put Authelia only at the *reverse-proxy* layer (protects the whole site). No frontend changes needed.
    - **Option B:** Rewrite `js/firebase.js` as `js/auth.js` calling an `/api/auth/*` session backend backed by Authelia/Postgres. More work; do it only if you need per-user saved farms synced server-side.
@@ -313,7 +313,7 @@ ollama pull deepseek-r1:7b          # or qwen2.5:3b for lighter
 ollama list
 curl http://localhost:11434/api/tags
 
-# FarmHealth server
+# Crafty GIS server
 cd server && npm install && npm start          # → http://localhost:3001
 
 # Self-host stack

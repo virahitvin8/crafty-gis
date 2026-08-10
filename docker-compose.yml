@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — Docker Compose (self-hosted AI included)
+# Crafty GIS — Docker Compose (self-hosted AI included)
 #
 #   App:    http://localhost:3001
 #   Ollama: port 11434 (internal network only — do NOT expose publicly)
@@ -17,7 +17,7 @@
 
 services:
   # ─── Frontend + Backend (Combined) ───
-  farmhealth:
+  crafty_gis:
     build: .
     ports:
       - "3001:8080"
@@ -88,7 +88,7 @@ services:
     #           capabilities: [gpu]
 
   # ─── Python Backend (Alternative) ───
-  farmhealth-python:
+  crafty_gis-python:
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -111,4 +111,4 @@ services:
 # ─── Volumes ───
 volumes:
   ollama-data:      # Persists downloaded models across restarts
-  farmhealth-data:
+  crafty_gis-data:

@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Service Worker (PWA Offline Support)
+   Crafty GIS — Service Worker (PWA Offline Support)
    ═══════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'farmhealth-v1';
+const CACHE_NAME = 'crafty_gis-v1';
 const ASSETS_TO_CACHE = [
   './index.html',
   './css/style.css',

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Configuration Module
+   Crafty GIS — Configuration Module
    ═══════════════════════════════════════════════════════════ */
 
 const FH_CONFIG = (function() {
@@ -133,7 +133,7 @@ const FH_CONFIG = (function() {
     SH_PROCESS: 'https://services.sentinel-hub.com/api/v1/process',
     // Remote backend proxy used when the app is served from a static host
     // (no same-origin /api/sentinel/token). Kept in sync with netlify/render configs.
-    // NOTE: this must match your LIVE Render service URL (farmhealth1-backend).
+    // NOTE: this must match your LIVE Render service URL (crafty-gis backend, legacy name farmhealth1-backend).
     SH_TOKEN_PROXY_FALLBACK: 'https://farmhealth1-backend.onrender.com/api/sentinel/token',
     GEE_PROXY: (typeof window !== 'undefined' && window.location && 
                  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
@@ -145,7 +145,7 @@ const FH_CONFIG = (function() {
   const ONBOARDING_STEPS = [
     {
       icon: '🛰️',
-      title: 'Welcome to FarmHealth',
+      title: 'Welcome to Crafty GIS',
       desc: 'Your complete satellite crop monitoring system. Let us walk you through your first field analysis — step by step.',
       tip: 'This tour takes 2 minutes. You can skip anytime.'
     },
@@ -339,7 +339,9 @@ const FH_CONFIG = (function() {
       timeAnimIdx: 0,
       savedFields: [],
       sceneThumbnails: [],
-      simulatedData: false
+      simulatedData: false,
+      // Research-derived features (FH_INTEL)
+      mgmtZones: null
     };
   }
 

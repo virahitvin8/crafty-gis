@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Firebase Module
+   Crafty GIS — Firebase Module
    ═══════════════════════════════════════════════════════════
    Initializes Firebase, provides Google Sign-In auth, and
    Firestore database operations for saved fields, settings,

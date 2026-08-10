@@ -1,0 +1,986 @@
+Indian Phytopathology (2021) 74:287–305
+https://doi.org/10.1007/s42360-021-00334-2
+
+    REVIEW ARTICLE
+
+
+
+Precision agriculture and geospatial techniques for sustainable
+disease control
+Daniel P. Roberts1        · Nicholas M. Short Jr2 · James Sill3 · Dilip K. Lakshman1 · Xiaojia Hu4 · Michael Buser5
+
+Received: 9 December 2020 / Revised: 23 January 2021 / Accepted: 1 February 2021 / Published online: 20 February 2021
+© This is a U.S. government work and not under copyright protection in the U.S.; foreign copyright protection may apply 2021
+
+
+Abstract
+The agricultural community is confronted with dual challenges; increasing production of nutritionally dense food and decreas-
+ing the impacts of these crop production systems on the land, water, and climate. Control of plant pathogens will figure
+prominently in meeting these challenges as plant diseases cause significant yield and economic losses to crops responsible
+for feeding a large portion of the world population. New approaches and technologies to enhance sustainability of crop
+production systems and, importantly, plant disease control need to be developed and adopted. By leveraging advanced geo-
+informatic techniques, advances in computing and sensing infrastructure (e.g., cloud-based, big data-driven applications)
+will aid in the monitoring and management of pesticides and biologicals, such as cover crops and beneficial microbes, to
+reduce the impact of plant disease control and cropping systems on the environment. This includes geospatial tools being
+developed to aid the farmer in managing cropping system and disease management strategies that are more sustainable but
+increasingly complex. Geoinformatics and cloud-based, big data-driven applications are also being enlisted to speed up crop
+germplasm improvement; crop germplasm that has enhanced tolerance to pathogens and abiotic stress and is in tune with
+different cropping systems and environmental conditions is needed. Finally, advanced geoinformatic techniques and advances
+in computing infrastructure allow a more collaborative framework amongst scientists, policymakers, and the agricultural
+community to speed the development, transfer, and adoption of these sustainable technologies.
+
+Keywords Biological control · Cover crops · Geographic information systems · Precision agriculture · Remote sensing ·
+Sustainable agriculture
+
+
+Introduction                                                                 nutritional needs of a future human population of 9–10
+                                                                             billion (Folely 2011; Martin and Li 2017; Mattoo 2014).
+Estimates indicate that current agricultural production                      It is obvious that increased production of plant-based
+must increase 60–100 percent all else unchanged (food                        foods will play a key role in meeting these challenges. The
+waste levels, current trends in population, diet) to meet                    endosperm of the cereal staples—rice, wheat, and maize
+                                                                             alone provide approximately 23, 17, and 10%, respec-
+                                                                             tively, of total calories for humans globally. In addition
+* Daniel P. Roberts
+  dan.roberts@usda.gov                                                       to macronutrients (fat, protein, carbohydrate) supplying
+                                                                             these calories, plant foods are major sources of micronu-
+1
+     USDA-Agricultural Research Service, Sustainable                         trients (vitamins, essential amino acids, essential lipids)
+     Agricultural Systems Laboratory, BLDG 001, Rm. 245B,                    and mineral elements essential for human nutrition. Plant
+     BARC‑West, Beltsville, MD 20705‑2350, USA
+                                                                             foods also contain a varied range of bioactive compounds
+2
+     Environmental Systems Research Institute, National                      (alkaloids, carotenoids, organosulfur compounds, phenolic
+     Government Unit, Redlands, CA, USA
+                                                                             compounds, phytosterols) that have been associated with
+3
+     Environmental Sciences Research Institute, Solutions                    the prevention of chronic diseases including heart and
+     Engineering Group, Redlands, CA, USA
+                                                                             circulation problems, cancer, diabetes, cataracts, and age-
+4
+     Oil Crops Research Institute of the Chinese Academy                     related functional decline (Martin and Li 2017; Mattoo
+     of Agricultural Sciences, Wuhan, 4300062, China
+                                                                             2014; Roberts and Mattoo 2019).
+5
+     USDA-Agricultural Research Service, Office of National
+     Programs, Beltsville, MD, USA
+
+
+                                                                                                                                    13
+                                                                                                                               Vol.:(0123456789)
+288                                                                                       Indian Phytopathology (2021) 74:287–305
+
+
+    Crop production cannot meet the nutritional needs            Disease control methods to function
+of future populations simply by increasing land acreage          within sustainable, regenerative cropping
+devoted to agriculture. Competition for land use with            systems
+urbanization, and the loss of land to salination and deser-
+tification will reduce suitable land available for agricul-      Going forward, disease control measures need to be com-
+tural production (Federoff et al. 2010; Foley et al. 2005,       patible with sustainable and climate-resilient crop pro-
+2011). It is also unlikely that productivity of current plant    duction systems. These next-generation crop production
+production systems can be increased by using the agricul-        systems will rely in some cases on big data-driven preci-
+tural intensification methods of the past. Food production       sion agriculture to reduce inputs, and biologically based
+doubled worldwide over the past 35 years; largely by lev-        technologies to improve soil health and control soil ero-
+eraging high-yielding plant germplasm with extensive use         sion, as well as control pathogens and pests (Adeyemi
+of synthetic fertilizer, pesticides, and irrigation (Pingali     et al. 2017; Delgado et al. 2019; Pingali 2012; Roberts
+2012; Reganold and Wachter 2016; Roberts and Mattoo              and Mattoo 2018, 2019). New crop germplasm is needed
+2018; Triplett and Dick 2008). Feedstocks for synthetic          that has increased tolerance/resistance for these pathogens
+fertilizer production are dwindling and there are increas-       and pests but also increased tolerance for abiotic stresses
+ing water shortages in many regions of the world (Adey-          due to an erratic climate; that offers higher yields but uses
+emi et al. 2017; Dimpka and Bindraban 2016; Rosegrant            less water, fertilizer, and other inputs; and has higher
+and Cline 2003; Tilman et al. 2002). In addition, agricul-       nutritional quality for the consumer (Fatima et al. 2016;
+tural intensification over the past decades has had nega-        Martin and Li 2017; Mattoo 2014; Mattoo and Teasdale
+tive environmental impacts, such as increased soil erosion       2010; Pingali 2012; Roberts and Mattoo 2018, 2019). In
+and decreased soil fertility, pollution of ground water and      short, these disease control measures need to be developed
+eutrophication of rivers, lakes, and coastal ecosystems,         in such a way that the resulting crop production system can
+and increased greenhouse gases (Foley et al. 2011; Mat-          regenerate soil resources and protect our water and air,
+son et al. 1997; Tilman et al. 2001, 2002). Adding to the        and the new crop germplasm produce more food of high
+challenge is the changing and increasingly erratic global        nutritional quality.
+climate (Ray et al. 2015, 2019). More frequent and more
+severe weather events such as heat waves, drought periods,
+or flooding have been predicted by climate models. Heat
+waves, drought, salinity stress, and higher ozone levels due     Geoinformatic systems and big data
+to global climate change, as well as the associated devel-       analytics for development and use
+opment of new pest and pathogen problems, are predicted          of next‑generation cropping systems
+to be a drag on crop yields (Long et al. 2006; Tester and        and advanced germplasm
+Langridge 2010; Zhao et al. 2017). Of equal concern are
+the negative impacts of elevated temperature and ­CO2 lev-       Managing data spatially coupled with big data analytics
+els on the nutritional quality of many crops (Fedoroff et al.    is inherent to the development and use of next-generation,
+2010; Myers et al. 2014; Schlenker et al. 2009).                 environmentally friendly, climate-resilient crop produc-
+    Clearly, measures that decrease yield losses to plant dis-   tion systems using the precision agriculture approach
+eases will help meet this challenge of increasing the quantity   (Delgado et al. 2019). Agricultural fields are highly het-
+of food available for human consumption. It is estimated         erogeneous spatially, regarding pathogen and pest popu-
+that pathogens and pests cause losses of 10–40% in the sta-      lations and other field properties that impact plant health
+ple crops that provide approximately 50% of global calorie       and growth such as topography, soil type, soil fertility,
+intake. Yield-loss range estimates globally were 10.1–28.1%      and soil moisture (Roberts and Kobayashi 2011). These
+for wheat, 24.6–40.9% for rice, 19.5–41.1% for maize,            field properties interact with climate, greatly influencing
+8.1–21.0% for potato, and 11.0–32.4% for soybean. Disease        drainage, water and nutrient availability, and pathogen and
+control measures that reclaim yield lost to disease would        pest outbreaks and their spatial distribution. Soil sensors
+contribute to increased food availability and improve food       and robots within the field and commercial satellite, aerial,
+security in certain regions of the world as the greatest yield   and drone-based sensing systems have been developed that
+loss estimates were in regions of the world with fast-growing    can monitor some of these factors. Geographic information
+populations and food insecurity (Savary et al. 2019).            systems (GIS) as the organizing principle for spatial data
+                                                                 in combination with big data (defined as a combination
+                                                                 of a variety of data, the velocity of data, and/or volume
+                                                                 of data) management and analytics now allows us to use
+
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                    289
+
+data from these varied sensor systems and link informa-         by improving management of cropping system components
+tion regarding pathogens, pests, crop yield, soil fertility     such as fertilization and irrigation. Unbalanced fertilization
+factors, water, etc. with climate factors to develop cor-       and improper water conditions in field soils have been shown
+relations between disease, crop yield, soil type, and crop      to increase the presence of certain diseases and pests (Cook
+and management (Bestelmeyer et al. 2020; Delgado et al.         and Papendick 1972; Rotem and Palti 1969; Veresoglou
+2019; Janssen et al. 2017). Further, analytics performed on     et al. 2000; Walters and Bingham 2007).
+spatial data from these sensing platforms can potentially          Sensor systems for disease detection and precision agri-
+be used to effectively manage application rates of pesticide    culture-based disease control. Many methods are available
+in addition to other resources such as seed, fertilizer, and    to determine the spatial distribution of pathogens and dis-
+irrigation. As a result, farmers can stop treating crop pro-    ease in grower fields with visual determination by human
+duction fields as a uniform management unit and instead         experts being the most common (Mahlein et al. 2018). How-
+treat the field as a heterogeneous substrate for plant growth   ever, disease monitoring by human experts takes substan-
+(Delgado et al. 2019). In this way, farmers can maximize        tial effort and can be prone to errors and inconsistency. An
+disease control, crop productivity, and profitability and       additional issue is that such visual diagnosis does not scale
+more efficiently use pesticides and other inputs resulting      well. A human expert cannot efficiently evaluate all plants
+in less loss of these resources from agricultural fields and    within a large area (Wu et al. 2019). Surveillance with aerial
+associated harmful environmental impacts (Gebbers and           optical sensor platforms are attractive for this role as they
+Adamchuk 2010; Mahlein 2016).                                   offer the potential to capture and analyze, using the latest
+   It is obvious that continued advances in sensing and big     analytical tools, data from large crop acreage for disease
+data technology will aid in further development of this pre-    diagnosis and determination of disease severity (Mahlein
+cision agriculture approach which is reliant on synthetic       2016; Oerke 2020). However, there are challenges with the
+pesticides and other synthetic inputs. We argue that GIS        remote sensing approach. Variable environmental conditions
+combined with big data analytics will enhance development       impact sensed plant characteristics and there is a need to
+of precision sustainable, regenerative agricultural systems,    differentiate among various abiotic and biotic stresses that
+where the precision agriculture approach is applied to sus-     may share similar spectral signatures. Also, intrinsic plant
+tainable, regenerative cropping systems using biological        properties such as plant architecture and growth phase vari-
+inputs, and advanced germplasm with increased tolerance to      ation, and high sensitivity required for decision-making in
+disease, etc.; as well as the speed of development and adop-    disease control create challenges (Gold et al. 2020; Mahlein
+tion of these new technologies. The following sections are      2016; Mahlein et al. 2018; Oerke 2020; Wu et al. 2019;
+not intended as exhaustive reviews of the literature, rather    Yang 2020).
+we provide literature and case studies, mostly from work           In field crops, diseases that occur in patches, cause
+associated with our units on field crops, to illustrate these   enough morphological and physiological changes in crops,
+points.                                                         are of economic importance, and can be controlled effec-
+                                                                tively (e.g. effective fungicides, mechanical removal) are
+                                                                good candidates for detection using optical sensors fol-
+Disease control tactics with reduced                            lowed by precision agriculture approaches for disease
+environmental impact                                            control (Mahlein 2016; Oerke 2020; Yang 2020). Aerial
+                                                                sensors have been used to detect Cotton Root Rot, damage
+Precision disease control for increased cropping                from root-knot nematodes, Late Blight on tomato, Northern
+system sustainability                                           Leaf Blight on corn, diseases on perennial/orchard crops,
+                                                                and other diseases in fields (Chen et al. 2007; Cook et al.
+As discussed above, due to the patchiness of disease in pro-    2001; Mattupalli et al. 2018; Oerke 2020; Wu et al. 2019;
+duction fields, the precision agriculture approach for dis-     Yang 2020; Zhang et al. 2005). Of these diseases, remote
+ease management can potentially decrease pesticide use by       sensing is effective for precision management optimization
+applying pesticides only as needed in the field and thereby     for soilborne diseases and nematodes because root damage
+decrease environmental impact of the crop production sys-       leads to visible changes in foliage characteristics, infections
+tem (Oerke 2020). Encouragingly, in a French study with         often cluster in the field, pathogen mobility in soil is slow
+946 non-organic farms, high profitability remained with low     impeding spatial disease spread in the field, there is scarce
+pesticide use in 77% of the farms analyzed. The authors         introduction of new disease foci in the field, and disease
+estimated that pesticide use could be reduced 42% without       maps from one season can be applicable in future cropping
+any negative effects on productivity in 59% of the farms        seasons (Oerke 2020). For example, Cotton Root Rot tends
+(Lechenet et al. 2017). Precision agriculture could also        to occur within the same area in a grower’s field from year to
+decrease disease, hence pesticide use, in production fields     year allowing the use of maps of the disease from previous
+
+
+                                                                                                                    13
+290                                                                                          Indian Phytopathology (2021) 74:287–305
+
+years to direct site-specific application of pesticide for con-   hyperspectral imaging to detect and distinguish two impor-
+trol (Yang 2020). However, for wilt diseases caused by soil-      tant pathogens of potato, P. infestans and Alternaria solani,
+borne pathogens, at least two daily measurements are needed       prior to visible symptoms on the potato plant in growth
+to distinguish disease from wilting caused by transient water     chamber experiments (Gold et al. 2020). These are important
+shortage during high irradiation periods.                         first steps, but it needs to be determined if these approaches
+   With high-value perennial crops (citrus, pome fruits,          can be scaled to applications using aerial imaging platforms.
+grapevines, coffee, etc.) remote sensing of disease affect-       Encouragingly, pre-symptomatic detection of X. fastidiosa
+ing roots or those caused by invasive pathogens such as           on olive was possible at the landscape level (Zarco-Tajeda
+Xylella fastidiosa allows removal as early as possible to         et al. 2018).
+prevent further spread of the pathogen (Albetis et al. 2017;          A caveat regarding precision disease control is that in
+Oerke 2020; Zarco-Tejada et al. 2018). For example, spectral      addition to connectivity and other infrastructure needs,
+plant-trait characteristics of disease caused by X. fastidiosa    there is a need to consider the increase in complexity of
+in olive were detected pre-visually, a critical requirement       management of disease and the cropping system with this
+for mechanical eradication of trees in time to contain spread     approach. These precision disease control systems need to
+of the pathogen, in this case via an insect vector (Zarco-        be developed and deployed with the farmer in mind as many
+Tejada et al. 2018). The key here is the time it takes between    technologies are necessary for their implementation. Not all
+detection of a specific disease and application of an effective   farmers have the knowledge and skills required to integrate
+control measure relative to disease progression and spread        all necessary technologies into a disease management sys-
+(Mahlein 2016; Mahlein et al. 2018; Oerke 2020). Remote           tem (Yang 2020).
+sensing is useful in cases other than with active disease con-
+trol efforts. Sensors may be used for estimating the disease      Biologicals for disease control and increased
+loss within large areas and to determine which areas to leave     cropping system sustainability
+out of production next growing season due to the presence
+of soilborne pathogens that cannot be controlled except by        Biological control, the use of biologicals (microbes, cover
+crop rotation (Oerke 2020).                                       crops, etc., and/or their extracts) for disease control, has been
+   Going forward: Precision agriculture approaches for            researched for decades (Fravel 2005; Glare et al. 2012; Köhl
+disease control with synthetic pesticides. In short, variable     et al. 2019). Biological controls are of interest because they
+rate and site-specific pesticide application have potential to    are thought to be more environmentally benign than syn-
+reduce pesticide application and thereby reduce environ-          thetic pesticides for disease control (Glare et al. 2012). They
+mental impacts. However, considerable research is needed          are a particularly important tool for cropping system sustain-
+to make these precision agricultural approaches applicable        ability when plant resistance to pathogens is lacking and
+to all diseases (Mahlein 2016; Mahlein et al. 2018; Oerke         effective cultural controls, such as crop rotation, inadequate.
+2020). In many cases, by the time disease is evident using        Biologicals (cover crops, microbes) also provide benefits
+aerial sensors it is too late to apply control measures to pre-   to crop production systems in addition to disease control;
+vent further damage to the crop (Yang 2020). For example,         with cover crops providing ecosystems services and certain
+even though Late Blight on tomato can be detected remotely,       microbials promoting plant growth and/or increased avail-
+wind and rain-borne dissemination of infective propagules         ability of essential plant nutrients such as phosphate (Berg
+of the causal agent, Phytophthora infestans, can lead to dis-     2009; Compant et al. 2005; Morrissey et al. 2004; Vassilev
+ease in portions of the field, or neighboring fields, far from    et al. 2016). Cover crops will be discussed in another sec-
+where it occurred previously. For this reason, research into      tion below.
+pre-symptomatic detection of disease using different sensor          Many microbial biological control agents are commer-
+systems is ongoing (Mahlein 2016; Mahlein et al. 2019).           cially available for control of a variety of plant diseases
+In these cases, pre-symptomatic detection could be used to        and uses (e.g. https​://www.canr.msu.edu/news/biope​stici​
+trigger management responses before inoculum propagule            des_for_use_in_green​house​s_in_the_us; https​://neveg​etabl​
+production or vector spread to prevent further propagation of     e.org/table​-24-micro​bial-disea​se-contr​ol-produ​cts). How-
+disease (Gold et al. 2020; Zarco-Tejada et al. 2018). Changes     ever, greater grower adoption of biological controls is nec-
+in photosynthetic activity, transpiration, and increased res-     essary. For greater adoption, they must compare favorably in
+piration due to presence of the pathogen can be detected          disease control efficacy and reliability to synthetic pesticide
+prior to generation of visible disease symptoms (Martinelli       compounds over a wide range of environmental conditions
+et al. 2015).                                                     (Fravel 2005; Glare et al. 2012). Biological control efficacy
+   Rumpf et al. (2010) were able to detect Cercospora leaf        is often inconsistent due to the inherent complexity of the
+spot, powdery mildew, and rust on sugar beet before the           interaction between the biological control agent, the patho-
+appearance of visible symptoms. Gold et al. (2020) used           gen, and the soil and plant environments where biological
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                   291
+
+control interactions occur (Compant et al. 2005; Roberts and    at flowering, compared favorably to the chemical control
+Kobayashi 2011). These soil and plant surfaces are highly       carbendazim applied at flowering (Hu et al. 2013, 2014).
+heterogeneous regarding compounds and conditions that           Fungal mycoparasites of sclerotia of S. sclerotiorum were
+impact expression of genes important to biological con-         also developed (Hu et al. 2015, 2016, 2017). Spray appli-
+trol, influencing reliability and efficacy of disease control   cation of one mycoparasite, Aspergillus aculeatus Asp-4,
+(Roberts and Kobayashi 2011). One approach to improv-           to the soil prior to sowing rice in a rice-oilseed rape rota-
+ing reliability and efficacy is to combine biological control   tion resulted in a significant reduction in disease incidence
+microbes in individual formulations or through multiple         and apothecia formation compared with the non-treated
+treatments targeting strategic points in the disease cycle      control; suggesting that colonization and degradation of
+(Ji et al. 2006; Lemanceau and Allabouvette 1991; Pierson       sclerotia by Asp-4 and subsequent reduction in ascospore
+and Weller 1994; Roberts and Mattoo 2018). It is thought        production led to disease control (Hu et al. 2016).
+that a combination of microbes, with different ecological          Although more work needs to be done, the use of multiple
+adaptations and mechanisms of disease control, are more         biological control agents to improve disease control efficacy
+likely to express traits important for disease control over a   and reliability showed promise for control of S. sclerotio-
+wider range of environmental conditions than an individual      rum on oilseed rape, and for increasing oilseed rape seed
+microbe (Compant et al. 2005; Lemanceau and Alabouvette         yield (Hu et al. 2019). Treatments containing all three Bacil-
+1991; Roberts and Kobayashi 2011).                              lus isolates (A6, BY-2, Tu-100) were applied individually
+    Development of a reliable, efficacious biological control   and in combinations as seed treatments and tested in field
+strategy for S. sclerotiorum on oilseed rape in China. Hu       trials conducted at four locations with different soils. The
+et al. (2011, 2013, 2014, 2015, 2016, 2017, 2019) are devel-    treatment containing one isolate, B. subtilis BY-2, resulted
+oping microbial biological control agents to apply at stra-     in significant reductions in disease at all four locations.
+tegic points during the S. sclerotiorum disease cycle since     There was also an incremental, although not statistically
+cultural practices are limited in effectiveness and breeding    significant, reduction in disease with increasing number of
+for resistance to this pathogen challenging. S. sclerotiorum    strains in the treatments (3 strains > 2 strains > 1 strain in
+has a broad host range and long persistence in soil making      terms of disease reduction) at three field trial locations. In
+crop rotation unreliable (Hededus and Rimmer 2005; Mahini       plant growth promotion studies conducted in pots, the seed
+et al. 2020; Nelson 1998) while breeding strategies for plant   treatment containing all three isolates resulted in seed yield
+disease resistance are hampered by limited oilseed rape gene    greater than the non-treated control in four of the five soils
+pools and the need for multigenic resistance (Bardin and        used (an additional soil not used in field trials was added to
+Huang 2001; Wu et al. 2013). Although commercial bio-           this study). A seed treatment containing both isolates A-6
+logical control products for control of Sclerotinia have been   and Tu-100 significantly increased yield in one soil. No
+developed (de Vrije et al. 2001) they are not used in China,    other treatment containing a single isolate, or two isolates,
+possibly due to monetary exchange rates (Hu et al. 2005).       significantly increased yield in these pot studies (Hu et al.
+    S. sclerotiorum overwinters as sclerotia in soil and        2019). Plant growth promotion may be due to production
+produces mycelia or apothecia upon sclerotial germina-          of the plant hormone indole acetic acid (IAA) or increased
+tion. Ascospores produced from apothecia are the primary        phosphate availability as these strains produced IAA and
+inoculum for most diseases of S. sclerotiorum. These            increased soil phosphate levels (Hu et al. 2019).
+ascospores typically germinate on senescing flower pet-            Hu et al. are currently determining if combining different
+als, leading to infection of healthy leaf and stem tissue,      biological agents applied at different points in the disease
+and plant death (Abawi and Grogan 1979; Boland 2004).           cycle improves biological control of S. sclerotiorum on oil-
+Application points for biological control agents in this dis-   seed rape. An experiment is underway at several locations
+ease cycle are as a seed treatment, where the biological        where a seed treatment containing all three Bacillus iso-
+control agent is expected to endophytically or epiphyti-        lates (A6, BY-2, Tu-100) is being combined with a spray
+cally colonize the oilseed rape plant and persist for the       application of the mycoparasite A. aculeatus Asp-4 to soil
+growing season; as a foliar spray at oilseed rape flowering     prior to planting to see if disease control is improved rela-
+to position the biological control agent in the plant canopy    tive to the seed treatment or spray applied alone (Hu et al.
+to prevent infection by germinating ascospores; and as a        unpublished). The hypothesis is that these two application
+spray on the field prior to planting to allow a mycoparasitic   methods will reinforce each other regarding disease con-
+biological control agent to colonize and kill sclerotia prior   trol. The application of mycoparasites prior to planting oil-
+to release of primary inoculum. In field trials conducted       seed rape would reduce initial inoculum of S. sclerotiorum,
+at several locations, seed treatment formulations of three      resulting in less disease to be controlled with the Bacillus
+Bacillus isolates (B. subtilis BY-2 and Tu-100, B. megate-      seed treatment. Likewise, the follow-up use of the Bacillus
+rium A6), and spray applications of two of these isolates
+
+
+                                                                                                                   13
+292                                                                                          Indian Phytopathology (2021) 74:287–305
+
+seed treatments would minimize disease caused by pathogen          associated with chemical pesticides. To encourage grower
+inoculum that escaped the soil spray with the mycoparasite.        adoption, communication with the grower, grower educa-
+   Another approach to increasing sustainability of disease        tion, and management decision support tools (DSTs) to
+control is to combine microbial biological control agents          simplify grower decision making are needed (Barratt et al.
+with reduced rates of synthetic pesticides (Glare et al. 2012).    2018; Chandler et al. 2011; Goldberger and Lehrer 2016;
+For example, a formulation of the mycoparasite, Tricho-            Marrone 2007).
+derma sp. Tri-1, sprayed onto the soil prior to planting was
+tested in combination with reduced application rates of the        Cover crops for sustainable, regenerative cropping
+chemical pesticide carbendazim, applied at oilseed rape            systems and disease control
+flowering, for control of S. sclerotiorum (Hu et al. 2016).
+Encouragingly, treatments containing formulated Tri-1              Cover crops collectively provide a diverse array of ecosys-
+combined with carbendazim applied at 75% the recom-                tem services including control of pathogens, insect pests,
+mended rate reduced incidence of disease to levels obtained        and weeds (Abawi and Widmer 2000; Larkin 2013, 2015;
+with the treatment containing carbendazim applied at the           Mattoo and Teasdale 2010; Teasdale et al. 2004; Vukice-
+recommended rate in field trials. An added benefit of this         vich et al. 2016). Cover crops also fix atmospheric C ­ O2 and
+combined approach is that development of pathogen resist-          build soil organic matter when decomposed, contributing to
+ance to the both the biological control agent and chemical         soil health. Cover crops capture excess nutrients preventing
+pesticide could be slowed. Although both biological control        nutrient loss from soil, prevent soil erosion, and increase
+agents and chemical pesticides are susceptible to develop-         rainfall infiltration and soil water holding capacity. Legu-
+ment of resistance by the target pathogen or pest, the use of      minous cover crops such as vetch, clover, peas, and beans
+two or more unrelated tactics should decrease development          fix atmospheric nitrogen and thereby improve soil fertility
+of resistance to each tactic (Glare et al. 2012; Siegwart et al.   (Mattoo and Teasdale 2010). Mixtures of cover crops are
+2015; Tomasetto et al. 2017). It is also possible that combi-      being developed to increase the number of ecosystem ser-
+nations of biological control agents with synthetic pesticides     vices provided. For example, small grains cover crops, such
+provide additive, if not synergistic effects (Xu et al. 2011).     as cereal rye, produce substantial biomass, build soil organic
+   Going forward: Precision agriculture approach for use of        matter, prevent soil erosion, and provide reliable weed sup-
+biologicals for disease control. Decreasing costs associated       pression as a living cover crop and after termination as a
+with biologicals is another way, in addition to improving          surface mulch (Poffenbarger et al. 2015; Snapp et al. 2005).
+disease control efficacy and reliability, to increase grower       While hairy vetch, a legume, fixes atmospheric nitrogen
+adoption (Glare et al. 2012). Higher costs associated with         and releases nitrogen into the soil during decomposition but
+biologicals due to pricing of the product or the necessity for     grows slowly in the fall and decomposes rapidly making it
+multiple treatment applications (persistence of biological         less effective for weed suppression. Mixtures of hairy vetch
+activity in the environment is typically short; Glare et al.       and cereal rye have been shown to provide greater above
+2012) could be reduced using the precision-agriculture             ground biomass and weed suppression than hairy vetch
+approach. Variable rate and site-specific spray application        monocultures and release greater amounts of nitrogen into
+or seed-treatment delivery of biologicals to only the region       the soil than cereal rye monocultures (Hayden et al. 2012;
+of the field where needed can easily be envisioned as more         2014; Poffenbarger et al. 2015).
+cost-effective than delivery of these biologicals to an entire        Cover-crop-based production system for delivery of eco-
+grower field. As with precision application of chemical pes-       system services and disease control. A sustainable tomato
+ticides, wider use of the precision approach for biological        cropping system developed by Abdul-Baki and Teasdale
+control agents is dependent on detection of disease in time        (1993) is an example of the use of cover crops to decrease
+to restrict widespread dissemination of pathogen inoculum.         cropping system environmental impact while providing a
+   Approaches detailed here for biological control agents          measure of disease and pest control. Conventional, field-
+substantially increase the complexity of cropping system           grown tomato production systems in the mid-Atlantic region
+management and are more knowledge-intensive in relation            of the United States typically consist of tomato transplanted
+to those using synthetic pesticides, creating another impedi-      into raised soil beds. Farmers rely on tillage and black poly-
+ment to grower adoption (Chandler et al. 2011; Glare et al.        ethylene plastic for weed control and synthetic fertilizer to
+2012). Combinations of treatments (e.g. soil spray prior           maintain nitrogen fertility levels (Abdul-Baki et al. 1996).
+to planting, seed treatment, spray at flowering) need to be        Synthetic pesticides are used to control disease and insect
+aligned with crop rotation, crop development, etc., that can       pests. Excess nitrogen in the form of fertilizer is sometimes
+vary with region, weather, and other factors. Handling and         applied to maximize yield, potentially contributing to sur-
+application of microbial biological control agents may dif-        face and groundwater pollution as nitrogen recovery by the
+fer with the microbial used; and clearly differ with those         tomato plant is low (Abdul-Baki et al. 1996). Abdul-Baki
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                         293
+
+and Teasdale integrated the leguminous cover crop hairy                Going forward – Precision approach for delivery of cover
+vetch into the field-grown tomato cropping system to                crops for disease control and other ecosystem services. As
+increase sustainability. In this production system, hairy vetch     can be seen, use of cover crops can add to the resilience of
+is planted into raised soil beds in the fall, in early spring the   the cropping system to disease as well as deliver other eco-
+hairy vetch is killed by spraying with a light herbicide dose,      system services to help restore soil health. However, signifi-
+and subsequently tomato seedlings are no-till planted into          cant challenges remain regarding management of cover crop
+the dead hairy vetch mulch covering the entire production           and cover crop mixtures to optimize ecosystem services pro-
+field. Black plastic was omitted from the sustainable tomato        vided and minimize the cover crop competing for resources
+production system.                                                  with the subsequent cash crop as a weed (Mirsky et al. 2013;
+   Notably, the need for fungicide application was decreased        2017a, b; Wallace et al. 2017). Cover crops, like cash crops,
+with the sustainable tomato production system due to                respond to environmental conditions in fields that impact
+delayed development of tomato early blight disease caused           crop biomass and quality—two performance factors tightly
+by Alternaria solani, a major disease problem with growing          correlated with benefits that cover crops deliver (Finney
+tomatoes in the mid-Atlantic region of the US. The hairy            et al. 2016; Mirsky et al. 2017a, b). Therefore, current efforts
+vetch-mulch inhibited splash dissemination of soil contain-         are directed at integrating cover crop use into a precision
+ing inoculum into the tomato canopy (Mills et al. 2002a,            framework to facilitate cropping system management. New
+b). There was also greater resistance of the crop to inva-          sensing technologies coupled with big data analytics can
+sion and damage by the Colorado Potato Beetle (Teasdale             quantify cover crop performance factors and spatial vari-
+et al. 2004). The sustainable cropping system also had a            ability and impacts on ecosystem service delivery. Remote
+broad impact on tomato plant physiology. In field and green-        sensing offers many tools relevant to cover crops, including
+house experiments, gene transcripts and proteins involved           populating landscape-level models with estimates of per-
+in diverse biological processes were differentially up-reg-         centage of land cover, Normalized Difference Vegetation
+ulated in leaves of hairy vetch-grown tomato plants rela-           Index (NDVI) based on reflectance of cover crops to evalu-
+tive to control plants grown with black plastic (Kumar et al.       ate soil cover and cover-crop biomass, and lidar technol-
+2004, 2005; Mattoo and Abdul-Baki 2006). Up-regulated               ogy to map structure, including vegetation height, density,
+genes included ribulose bisphosphate carboxylase/ oxyge-            and other characteristics across a region (Hively et al. 2009;
+nase (Rubisco), nitrogen-responsive glutamate synthase,             Prabhakara et al. 2015; Saha et al. 2018).
+stress-defense related protein glucose-6-phosphate dehy-
+drogenase, chaperone proteins (HSP70 and ER protein BiP)
+that stabilize native proteins, and the plant defense anti-fun-     Geospatial tools to aid cropping system
+gal proteins chitinase and osmotin. Up-regulation of these          management
+plant defense genes may have increased disease resistance
+of tomato (Kumar et al. 2004; Mills et al. 2002a, b). Current       As illustrated in the sections above, efforts to increase crop-
+work is directed at determining what sustainable cropping           ping system sustainability while providing disease con-
+system components cause this change in tomato physiology            trol can increase management complexity of the farming
+resulting in enhanced resistance to tomato early blight (Mat-       operation. This is particularly true considering that cover
+too et al. unpublished).                                            crops could be combined with biological control agents, or
+   The tomato production system was decreased in environ-           biological control agents combined with other biological
+mental impact in addition to being more robust to patho-            control agents or reduced rates of synthetic pesticides, in
+gens and pests. There was a reduction in synthetic ferti-           an integrated, sustainable disease management approach.
+lizer inputs. Minimum nitrogen fertilizer rates necessary to        Additionally, use of biologicals, such as cover crops and
+achieve maximum tomato yield were reduced to 80 lb/acre             microbial biological control agents, introduces increased
+compared to 170 lb/acre associated with the conventional            environmental influences on their performance that must be
+black plastic system (Abdul-Baki et al. 1997). Soil erosion         managed (Siegwart et al. 2015). Other approaches for more
+and water runoff were also reduced. The hairy vetch-mulch           sustainable disease control such as mixtures and multi-lines
+allowed more water infiltration into soil than the impervi-         of cash crop cultivars for increased genetic heterogeneity
+ous black plastic. Additionally, pesticide loads released from      and reduced use of pesticide may also introduce cropping
+fields were substantially reduced (Rice et al. 2001, 2002).         system management complexity. An important pathogen of
+Importantly, tomato yield, and economic return with this            rice was controlled by alternating rows of two rice varieties
+hairy vetch production system were greater or equivalent            within the field (Zhu et al. 2002). This intermingling of cash
+to that obtained with the conventional tomato production            crop genotypes can alter the disease-resistance profile of the
+system (Abdul-Baki et al. 1996; Kelly et al. 1995).                 grower field and decrease or eliminate the pathogen (Brown-
+                                                                    ing and Frey 1969; Garrett and Mundt 1999; Wolfe 1985).
+
+
+                                                                                                                         13
+294                                                                                          Indian Phytopathology (2021) 74:287–305
+
+    Ultimately the impact of sustainable cropping system           2017; Rose et al. 2016). Many studies blame this lack of use
+approaches on our sustainable future depends on grower             on non-participation of the farmer in tool design (Cerf et al.
+adoption. Geospatial tools are being developed with grower         2012; Ditzler et al. 2018; Lindblom et al. 2017). Existing
+adoption of sustainable cropping system approaches in mind         DSTs are based on information researchers and DST devel-
+(Kanatas et al. 2020; Lindblom et al. 2017; Rose et al. 2016).     opers consider as necessary, but do not actually capture all
+Technologies that are consistent with norms, are not com-          needs of farmers. Other reasons for lack of widespread use
+plex, have observable impacts, and are easy to implement           are a perceived problem of complexity by the user, level of
+tend to be adopted more readily than the opposite (Lindb-          knowledge of the users, poor user interface design, and tedi-
+lom et al. 2017). Sustainable farming approaches are clearly       ous data input requirements, among others (Lindblom et al.
+the opposite, even regarding observable impacts. It can take       2017). Going forward, to increase use of geospatial tools
+years for observable improvements in soil health, etc. For         and DSTs researchers and developers are pivoting to user-
+this reason, geospatial tools are available or being devel-        centered design, which is much more collaborative with the
+oped that decrease the information burden on the farmer,           user (farmer). This design process includes the user in the
+and thus management issues, resulting from complex, more           initial research (analysis) phase as well as the final evalua-
+technology-driven sustainable farming operations.                  tion phase. The purpose of the analysis phase is to under-
+    Use of sensing technologies within a precision frame-          stand the need of the user and the context of use, while the
+work allows designing geospatial tools that provide real-          evaluation phase is for verification and refinement of the
+time, site-specific, decision-making support (O’Grady and          product (Lindblom et al. 2017).
+O’Hare 2017). Examples of currently available geospatial
+tools include autosteering, designed to reduce input (fer-
+tilizer, pesticide, etc.) application overlap and conserve         Development of advanced crop germplasm
+energy as farm machinery moves through the field, and the
+Yara N-sensor, designed to optimize site-specific nitrogen         Disease-resistant crop germplasm represents an efficient
+fertilizer application. The Yara N-sensor couples canopy           and environmentally friendly means of controlling disease
+reflectance in the red and near infrared EM spectrum, to           as pesticide use can be decreased when disease-resistant
+determine crop nitrogen and biomass status, with a fertiliz-       germplasm is used. Use of genetically improved germ-
+ing algorithm to inform variable-rate farm equipment (Lind-        plasm is also a tested method to enhance farmer adoption
+blom et al. 2017). Geospatial decision support tools (DSTs)        of a more sustainable farming approach. Farmers are very
+are interactive and lead users through decision steps with         familiar with working with the new technology (seed); use
+various expected outcomes to aid in effective decision mak-        of new crop germplasm is extremely easy to implement;
+ing (Dicks et al. 2014). In this case, they translate scientific   advanced germplasm that enhances disease resistance pro-
+information into farm management decisions, which neces-           vides an easily observable benefit, increased yield under
+sitates integration of different models, scales, and scientific    disease pressure with less pesticide input expense; and use
+disciplines. Most are based on a subset of research stud-          of disease-resistant crop germplasm decreases the complex-
+ies, data sets, or models designed to represent the system         ity of farming operations, as the need for time-dependent
+in question (Dicks et al. 2014; Parker et al. 2002). Certain       knowledge regarding pesticide application and disease fore-
+software tools can facilitate effective farm management            casting is reduced (Mahlein et al. 2019).
+by recording data efficiently, analyzing it, and generating           The use of GMO-seed is the sometime exception to
+a series of evidence-based recommendations (Rose et al.            grower adoption, as some parts of the world extensively use
+2016; Rossi et al. 2014). Available geospatial tools typically     GMO crops while GMO crops are resisted elsewhere. Thirty
+do not consider the management complexities arising from           countries produce GMO crops with five countries (United
+use of biologicals in precision sustainable cropping systems.      States, Brazil, Argentina, Canada, and India) accounting
+For this reason, Mirsky and Reberg-Horton et al. are devel-        for approximately 90% of total GMO crop production (Van
+oping geospatial DSTs where data important to cover crop           Acker et al. 2017). In the United States herbicide-tolerant
+performance is integrated from field-based, robot-based,           (HT), insect-resistant (Bt), or stacked GMO seed contain-
+and aerial-based sensors; that will provide the farmer with        ing both HT and Bt traits are extensively used (≥ 90% of
+real-time, site-specific information for decisions concerning      acreage planted to GMO) in corn, cotton, and soybean but
+optimization of ecosystem services delivered by the cover          also widely used in alfalfa, canola, and sugar beet produc-
+crops (Melkonian et al. 2017; Roberts et al. 2020).                tion (USDA-ERS 2020). Practical concerns around GMO
+    Geospatial tools and DSTs have not enjoyed widespread          crops decreasing grower interest include insect-pest- and
+use by the farmer despite the perceived benefits of their use      weed-resistance to pesticides that are partnered with the
+by the researchers and others who developed them (Kanatas          GMO-integrated traits. Other concerns include broad seed
+et al. 2020; Lindblom et al. 2017; O’Grady and O’Hare              variety access for farmers, rising seed costs, and dependency
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                       295
+
+on multinational seed companies (Van Acker et al. 2017).         to provide skills in plant breeding, molecular biology, engi-
+Also, citizens in many countries are opposed to GMO crops        neering, and bioinformatics. Also needed are collaborations
+due to perceived negative impacts on human health and the        across regions to test resulting advanced crop germplasm for
+environment (e.g. Jayarman et al. 2012). Consideration of        expression of disease resistance and other traits under vary-
+techniques used for development of crop germplasm (e.g.          ing environmental conditions (Taranto et al. 2018). Research
+crop breeding vs. GMO technologies) is important as adop-        directed at implementing precision approaches in disease
+tion by farmers and consumers could be highly impacted.          control and cover crop management are also heavily reliant
+    GIS combined with big data management and analytics          on cross-disciplinary collaborative efforts spread across large
+will speed the development of advanced crop germplasm by         geographical regions.
+enabling high throughput screening systems, data analysis,
+and collaboration amongst scientists. Development of crop        Agricultural research outcomes system (AgCROS).
+varieties with resistance to biotic (pathogens, pests) and
+abiotic stresses traditionally has been slow and challenging     To enable collaboration and speed development of technology,
+as effects of stresses on crops are variable and complex in      the USDA-Agricultural Research Service (ARS) has devel-
+the case of combinations of stresses (Suzuki et al. 2014;        oped AgCROS. AgCROS is a GIS-based platform designed to
+Taranto et al. 2018). These challenges are compounded by         foster the sharing of research data, the development of DSTs
+the need to develop crop germplasm that more efficiently         for both scientists and producers, and to provide a framework
+uses cropping system inputs and yields edible tissues of         for expediting the development of agricultural models and
+higher nutritional quality. Crop germplasm development will      algorithms. Based on technology from Esri, AgCROS fuses
+require large collections of germplasm as well as large plant    real-time data from IoT sensor networks, field data collected
+populations resulting from breeding or advanced biotechnol-      in situ, and remotely sensed data from UAVs and spaceborne
+ogy techniques, such as gene editing or genetic engineer-        sensors into a single platform that can be used by scientists to
+ing; necessitating the use of high-throughput operations for     rapidly develop and deploy new techniques to producers who
+screening for desired traits (Taranto et al. 2018).              can provide immediate feedback to improve the science.
+    Screening operations are thought to be the rate limiting        Built on Microsoft’s Azure cloud, AgCROS utilizes a suite
+factor in development of advanced crop germplasm (Araus          of core components from Esri, built on a loosely organized
+et al. 2018; Taranto et al. 2018). As with disease assessments   data infrastructure. Unlike traditional data warehouses that
+for precision agriculture, disease assessment phenotyping        require significant upfront design costs, the data manage-
+in germplasm development is typically done manually leav-        ment approach is to start by ensuring data are captured in the
+ing phenotype assessments open to subjectivity, human            cloud in a data pool, organized around a scientific objective
+error, and repeatability issues. High-throughput phenotyp-       or project, and linked or contextualized using GIS at its core.
+ing methods are being developed for disease assessment           Because most of the data in AgCROS are geospatial, the Esri
+in these screening operations based on image processing          components are designed in a multi-tenant architecture to man-
+(inherently a geospatial technique), machine learning, and       age a variety of data types including tabular, vector, and raster
+big data management and analytics to increase speed and          data that is often voluminous (i.e., big data).
+accuracy (Araus et al. 2018). Imaging technology can quan-          Projects act as tenants allowing scientists to control their
+titate percent leaf area diseased and several studies have       environment before releasing or publishing results to the com-
+demonstrated digital phenotyping on crop or canopy scale         munity on the AgCROS platform or exposing data through
+(Mahlein et al. 2019). Big data management and analytics         APIs to other platforms. Because Esri is designed to operate in
+will also support advanced molecular technologies used in        a federation or “system of systems” called WebGIS, data can
+advanced plant germplasm development such as QTL map-            be easily shared as a webservice for use to and from AgCROS,
+ping; genomics, transcriptomics, and proteomics; genome          thereby reducing unnecessary data movement that can be sig-
+editing; and bioinformatic analysis (Taranto et al. 2018).       nificant in the context of the “big data” world. This is also
+                                                                 important when pushing information products in the form of
+                                                                 mobile DSTs to the edge in remote areas where bandwidth is
+Geographic information systems and big                           limited, but decisions must be made quickly.
+data analytics to leverage collaboration
+                                                                 Use of AgCROS to foster collaboration
+Research efforts directed at increasing cropping system sus-     between USDA‑ARS and the agricultural community
+tainability and resilience to disease are heavily reliant on     to control Citrus Greening in the United States
+interdisciplinary collaboration, sharing data, and access to
+the most advanced analytic tools. For example, development       In the disease management arena and as an example of this
+of advanced crop germplasm requires extensive collaboration      new paradigm in use as one of the tenants, AgCROS is being
+
+
+                                                                                                                      13
+296                                                                                              Indian Phytopathology (2021) 74:287–305
+
+used by the CRAFT Foundation, Inc. to bring together con-            support confidence and best practices adoption, monitor-
+stituencies from the over $3 billion Florida citrus industry to      ing tree health and HLB transmission from a regional per-
+combat the spread of Huanglonbing (HLB) or Citrus Green-             spective is key to providing data around Industry economic
+ing, which is transmitted via citrus psyllids. Covering over         health to authorities like the Florida Department of Agricul-
+2000 acres, over 40 growers across 14 Florida counties are           ture Consumer Services (FDACS).
+collaborating with the USDA-ARS, state inspectors, and ­3rd             As with any pathogen, early detection of HLB is key
+party contractors to develop new disease control practices           to preventing long-term loss. Recent research into the use
+while new disease resistant cultivars and other disease con-         of canines for early detection (Gottwald 2020) shows prom-
+trol measures are being developed. Because the threat to the         ise when coupled with the aforementioned field data col-
+business is so imminent, producers uncharacteristically have         lection and GIS techniques as an early detection sys-
+agreed to share their data publicly around their farm manage-        tem. Additionally, combining UAV-based phenotyping
+ment practices to provide immediate feedback to researchers          using imagery with field data collection and novel manage-
+regarding the efficacy of their scientific recommendations.          ment practices gives researchers an overall picture of the
+    The use of AgCROS for HLB disease control develop-               disease. This is also done in AgCROS through the on-farm
+ment provides a spatial perspective of the on-farm net-              network via times-series-data-based NDVI and NDRE indi-
+work of volunteer growers who sign up via the interface              ces (Ampatzidis et al. 2019). Specifically, as shown in Fig. 4,
+in Fig. 1 and provide data around the land’s intended use,           growth metrics like canopy area and volume from identified
+planned planting and management practices, pest/disease              trees sourced from UAV flights can be linked back to plant
+management used, cost analysis, etc. With this information,          nutrition and diagnostics collected from FDACS.
+researchers can approve applications based on scientific                While UAV flights provide the necessary spectral, tem-
+merit and begin the experimental design process for tree             poral, and spatial resolution for the on-farm network, they
+planting using GIS tools in AgCROS. Because the system               are too cost prohibitive when viewing HLB from a national
+is public, growers can monitor the results of other growers’         and global scale. As suggested in Lu et al. (2015), satellite
+practices to quickly improve their own results. These design         data from WorldView-3 can be used at scale through the
+patterns shown in Fig. 2 are created to test a variety of poten-     use of Machine Learning (ML) techniques applied to tree
+tial remedies for psyllid control including reflective mulch,        identification because of its high spatial, spectral, and tem-
+individual protective covering (IPC), and Kaolin Clay                poral resolution. In the CRAFT example in Fig. 4, identi-
+Spray as opposed to traditional uses of chemical control.            fied trees with associated ground truth can be fed into the
+With the ability to capture data continuously from growers           ML models as training data for later application to other
+via a mobile application, collected data can be aggregated           parts of the world. As an example of this approach, USDA
+and correlated to treatment outcomes as displayed in Fig. 3.         Crop Data Layer (CDL) from CropScape (Han et al. 2012)
+While correlating treatments to outcomes at the field level          can be used to identify areas of the country where citrus
+
+
+
+
+Fig. 1  The CRAFT Growers Application is used to sign up growers to participate in the community of scientists and government personnel
+around eradicating Citrus Greening
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                     297
+
+
+
+
+Fig. 2  Field designs used to test farm management practices for potential HLB remedies
+
+
+
+
+Fig. 3  Survey Dashboard for displaying field collected data from growers and inspectors
+
+
+                                                                                           13
+298                                                                                                       Indian Phytopathology (2021) 74:287–305
+
+
+
+
+Fig. 4  Map of test plots (colored areas) and individual trees (dots) associated with health metrics (e.g., NDVI shades of green)
+
+
+
+
+Fig. 5  Orange and Citrus areas in Florida derived from USDA’s Crop interface
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                         299
+
+or orange groves exist. These areas identified in Fig. 5 are            in Fig. 7 with an accuracy of greater than 90% over 10
+potential candidates for testing the ML models, sources of              epochs of training. Additionally, NDVI can be used on the
+further ground truth or training data beyond the CRAFT                  selected trees from the previous object identification pro-
+sites, and potential future CRAFT partners or test sites for            cess as an indirect indicator of health as shown in Esri’s
+the on-farm network. Once field sites are identified, a data            ArcGIS Pro in Fig. 8 where green shows high values of
+science environment using Jupyter Notebooks on AgCROS                   NDVI and red low values.
+is constructed as shown in Fig. 6 to train an ML model                     From a ML perspective, the CRAFT project provides
+based on training data that is defined by examining and                 a mechanism for modelers to continuously collect train-
+identifying trees in the multispectral imagery using poly-              ing data for improving detection accuracy, leading to the
+gons around the known tree area. In this example, using                 opportunity to further quantify at tree level an accuracy
+a similar approach to Ampatzidis et al. (2019), 4-band                  beyond the CDL’s focus on quantifying Citrus cropland.
+NAIP imagery was used from USDA and object detection                    In other words, the symbiotic collaboration between the
+in ArcGIS Pro was applied to train a Convolutional Neural               growers and scientists operating on a common geoinfor-
+Network (CNN) to extract the precise location of the trees              matics platform like AgCROS not only improves the sci-
+in the grove. Once trained, spectral indices were extracted             ence, but it also provides a practical environment for rap-
+that indicate certain metrics on tree health at the tree loca-          idly deploying and monitoring solutions to HLB. Given
+tion, resulting in a map of the relative health of the trees.           the cloud’s ability to scale to a national and global level,
+As a result of applying Esri ArcGIS Pro’s ML framework,                 these techniques can provide a more accurate and wholistic
+individual trees were identified and shown as red circles               view of the global citrus industry.
+
+
+
+
+Fig. 6  Jupyter Notebook showing code used to prepare data for Esri’s machine learning framework
+
+
+                                                                                                                         13
+300                                                                                                      Indian Phytopathology (2021) 74:287–305
+
+
+
+
+Fig. 7  Results from running machine learning algorithms against NAIP imagery to identify individual trees represented by red circles
+
+
+
+
+Fig. 8  By combining the individual trees shown in Fig. 7 with NDVI, individual tree health is indicated by color
+
+
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                               301
+
+
+Going forward: collaboration                                    Consultative Group on International Agricultural Research
+amongst the agricultural community on a global                  (CGIAR) to help transfer technology and knowledge from
+scale                                                           food-secure nations to national agricultural programs located
+                                                                across the developing world for subsequent dissemination
+Of course, the citrus industry does not operate in a vacuum,    and regional adaptation. Adoption of modern germplasm
+as there are complex interactions amongst many agroecosys-      reached the majority of croplands. This resulted in poverty
+tems at a variety of scales. To model these interactions in a   reduction and lower staple food prices allowing food diver-
+virtual world, the WebGIS pattern or framework can con-         sification to micronutrient dense foods, resulting in better
+nect the agricultural community at the global scale allow-      nutrition for many (Eveson and Gollin 2003; Pingali 2012;
+ing regional applications, like the HLB example presented,      Renkow and Byerlee 2010).
+to provide food security in underserved areas of the world.         As with the first Green Revolution, spillover of technol-
+Simultaneously, remote data repositories and remote mod-        ogy from food-secure nations to regions of the world with-
+els operating in the cloud can be pushed to the edge and        out food security is needed going forward. Here the digital
+made available to farm advisors, farmers, etc. with devices     revolution can have a tremendous impact on solving world
+that can access the cloud. Just as in the case of the Florida   food security and environmental problems by augmenting
+growers, these devices can provide critical ground truth back   transfer of information from not only institutions such as
+to the cloud for analysis by scientists from any part of the    CGIAR but, as illustrated with the above HLB example,
+world. Acting as a “Digital Twin”, AgCROS in this context       also from platforms such as AgCROS located anywhere in
+moves from being a multi-tenant data repository to being an     the world. Geoinformatic decision support tools can aide
+automated ML environment that adapts in alignment with          in agricultural management decisions, and help sustainably
+changes in the real world.                                      increase crop yield, in lesser developed regions of the world
+                                                                without the considerable infrastructure needed for precision
+                                                                agricultural approaches. It can be envisaged that information
+Conclusions                                                     from models hosted on another continent; using local inputs
+                                                                regarding soils, weather, crop genetics, etc.; can be pushed
+A second Green Revolution is needed that is broadened           back to the edge via cloud-hosted services, accessed over
+in scope to include not only increasing crop yield but also     the network from a Web browser running on a mobile phone
+sustainable, regenerative cropping systems that yield plant     or tablet; to provide best practices to local farmers (Janssen
+foodstuffs with a higher nutritional dose. Included in this     et al. 2017). Thus, the digital revolution, can contribute to
+are more sustainable approaches for plant disease control       sustainably feeding the future world population in many dif-
+compatible with this improved crop germplasm and these          ferent, regionally-specific ways. All of which will be needed
+cropping systems. The digital revolution will be key as it      to sustainably feed the world population.
+provides new opportunities for smarter use of agricultural
+resources (Pingali 2012). As outlined above, GIS as the         Acknowledgements This researh includes collaborative contributions
+                                                                from the USDA Agricultural Research Service Partnerships for Data
+organizing principle, coupled with big data management and      Innovations (PDI). PDI is supported by the United States Department
+analytics will contribute not only as component parts of new    of Agriculture.
+plant disease management and cropping system approaches
+but as infrastructure aiding in speeding the development and    Authors’ contributions DPR and NMS were primary authors of the
+adoption of needed new technology and approaches. Impor-        manuscript. JS, DKL, XH, and MB contributed sections of the man-
+                                                                uscript. All authors edited and contributed to the final draft of the
+tantly, adoption by the farmer will be driven not only by       manuscript.
+geospatial tools to decrease complexity of disease manage-
+ment and cropping system management, but also by GIS and        Funding Funding during writing of the manuscript was from in-
+other information technologies enabling involvement of the      house USDA-Agricultural Research Projects 8042 12120 001 00 D
+farmer in the development of these technologies.                and 8042–21220-181-00D.
+   The first Green Revolution (1965–1985) and the post          Conflicts of interest None.
+Green Revolution period (1985≈2005) resulted in tremen-
+dous yield growth in staple crops, helping to feed the world    Open Access This article is licensed under a Creative Commons Attri-
+despite large population increases and decreasing land          bution 4.0 International License, which permits use, sharing, adapta-
+availability for agriculture. Yield increases in developing     tion, distribution and reproduction in any medium or format, as long
+                                                                as you give appropriate credit to the original author(s) and the source,
+countries were 208% for wheat, 109% for rice, 157% for          provide a link to the Creative Commons licence, and indicate if changes
+maize, 78% for potatoes, and 36% for cassava (Pingali 2012).    were made. The images or other third party material in this article are
+Contributing to the success of the Green Revolution and         included in the article’s Creative Commons licence, unless indicated
+post Green Revolution periods was the establishment of          otherwise in a credit line to the material. If material is not included in
+
+
+                                                                                                                             13
+302                                                                                                         Indian Phytopathology (2021) 74:287–305
+
+the article’s Creative Commons licence and your intended use is not                  diseases: Principles, mechanisms, of action, and future pros-
+permitted by statutory regulation or exceeds the permitted use, you will             pects. Appl Environ Microbiol 71:4951–4959
+need to obtain permission directly from the copyright holder. To view a        Cook CG, Escobar DE, Everitt JH (2001) Utilizing airborne video
+copy of this licence, visit http://creat​iveco​mmons​.org/licen​ses/by/4.0/.         imagery in kenaf management and production. Ind Crops Prod
+                                                                                     9:205–210
+                                                                               Cook RJ, Papendick RI (1972) Influence of water potential of soils
+References                                                                           and plants on root disease. Annu Rev Phytopathol 10:349–374
+                                                                               Delgado JA, Short NM Jr, Roberts DP, Vandenberg B (2019) Big
+Abawi GS, Grogan RG (1979) Epidemiology of diseases caused by                        data analysis for sustainable agriculture on a geospatial
+     Sclerotinia species. Phytopathology 69:899–904                                  cloud framework. Front Sustain Food Syst 3:54. https​://doi.
+Abawi GS, Widmer TL (2000) Impact of soil health management                          org/10.3389/fsufs​.2019.00054​
+     practices on soilborne pathogens, nematodes and root disease of           de Vrije T, Antoine N, Buitelaar RM, Bruckner S, Dissevelt M,
+     vegetable crops. Appl Soil Ecol 15:37–47                                        Durand A, Gerlagh M, Jones EE, Luth P, Oostra J, Ravensberg
+Abdul-Baki AA, Teasdale JR (1993) A no-tillage tomato production                     WJ, Renaud R, Rinzema A, Weber FJ, Whipps JM (2001) The
+     system using hairy vetch and subterranean clover mulches.                       fungal biocontrol agent Coniothyrium minitans: production
+     HortSci 28:106–108                                                              by solid-state fermentation, application and marketing. Appl
+Abdul-Baki AA, Teasdale JR, Korcak RF (1997) Nitrogen require-                       Microbiol Biotechnol 56:58–68
+     ments of fresh-market tomatoes on hairy vetch and block poly-             Dicks LV, Walsh J, Sutherland WJ (2014) Organising evidence for
+     ethylene mulch. HortSci 32:217–221                                              environmental management decisions: a ‘4S’ hierarchy. Trends
+Abdul-Baki AA, Teasdale JR, Korcak RF, Chitwood DJ, Huettel RN                       Ecol Evol 29:607–613
+     (1996) Fresh-market tomato production in a low-input alternative          Dimpka CO, Bindraban PS (2016) Fortification of micronutrients
+     system using cover-crop mulch. J Amer Soc Hort Sci 31:65–69                     for efficient agronomic production: a review. Agron Sust Dev
+Adeyemi O, Grove I, Peets S, Norton T (2017) Advanced monitoring                     36:7. https​://doi.org/10.1007/s1359​3-015-0346-6
+     and management systems for improving sustainability in pre-               Ditzler L, Klerkx L, Chan-Dentoni J, Posthumus H, Krupnik TJ,
+     cision irrigation. Sustainability 9:353. https​://doi.org/10.3390/              López Ridaura S, Andersson JA, Baudron F, Groot JCJ (2018)
+     su903​0353                                                                      Affordances of agricultural systems analysis tools: a review
+Albetis J, Duthoit S, Guttler F, Jacquin A, Goulard M, Poilvé H,                     and framework to enhance tool design and implementation.
+     Féret JB, Dedieu G (2017) Detection of flavescence dorée                        Agric Sys 164:200–230
+     grapevine disease using unmanned aerial vehicle (UAV) mul-                Eveson RE, Gollin D (2003) Assessing the impact of the green revolu-
+     tispectral imagery. Remote Sens 9:308                                           tion, 1960 to 2000. Science 300:758–762
+Ampatzidis Y, Partel V, Meyeiring B, Albrecht U (2019) Citrus                  Fatima T, Sobolev AP, Teasdale JR, Kramer M, Bunce J, Handa AK,
+     rootstock evaluation utilizing UAV-based remote sensing and                     Mattoo AK (2016) Fruit metabolite networks in engineered and
+     artificial intelligence. Comput Electron Agricult 164:104900.                   non-engineered tomato genotypes reveal fluidity in a hormone
+     https​://doi.org/10.1016/j.compa​g.2019.10490​0                                 and agroecosystem specific manner. Metabolomics 12:103. https​
+Araus JL, Kefauver SC, Zaman-Allah M, Olsen MS, Cairns JE                            ://doi.org/10.1007/s1130​6-016-1037-2
+     (2018) Translating high-throughput phenotyping into genetic               Fedoroff NV, Battisti DS, Beachy RN, Cooper PJM, Fischoff DA,
+     gain. Trends Plant Sci 23:451–466                                               Hodges CN, Knauf VC, Lobell D, Mazur BJ, Molden D, Reyn-
+Bardin SD, Huang HC (2001) Research on biology and control of                        olds MP, Ronald PC, Rosegrant MW, Sanchez PA, Vonshak A,
+     Sclerotinia diseases in Canada. Can J Plant Pathol 23:88–98                     Zhu J-K (2010) Radically rethinking agriculture for the 21st Cen-
+Barratt BIP, Moran VC, Bigler F, van Lenteren JC (2018) The sta-                     tury. Science 327:833–834
+     tus of biological control and recommendations for improving               Finney DM, White CM, Kaye JP (2016) Biomass production and car-
+     uptake for the future. Biocontrol 63:155–167                                    bon/nitrogen ratio influence ecosystem services from cover crop
+Berg G (2009) Plant-microbe interactions promoting plant growth                      mixtures. Agron J 108:39–52
+     and health: perspectives for controlled use of microorganisms             Foley JA, DeFries R, Asner GP, Barford C, Bonan G, Carpenter SR,
+     in agriculture. Appl Microbiol Biotechnol 84:11–18                              Chapin FS, Coe MT, Daily GC, Gibbs HK, Helkowski JH, Hollo-
+Bestelmeyer BT, Marcillo G, McCord SE, Mirsky SB, Boglen GE,                         way T, Howard EA, Kucharik CJ, Monfreda C, Patz JA, Prentice
+     Neven LG, Peters DC, Sohoulande Djebou DC, Wakie T                              IC, Ramankutty N, Snyder PK (2005) Global consequences of
+     (2020) Scaling up agricultural research with artificial intel-                  land use. Science 309:570–574
+     ligence. IEEE IT Profess 22:32–38                                         Foley JA, Ramankutty N, Brauman KA, Cassidy ES, Gerber JS, John-
+Boland GJ (2004) Fungal viruses, hypovirulence, and biological con-                  ston M, Mueller ND, O’Connel C, Ray DK, West PC, Balzer
+     trol of Sclerotinia species. Can J Plant Pathol 26:6–18                         C, Bennett EM, Carpenter SR, Hill J, Monfreda C, Polasky S,
+Browning JA, Frey KJ (1969) Multiline cultivars as a means of dis-                   Rockström J, Sheehan J, Siebert S, Tilman D, Zaks DPM (2011)
+     ease control. Annu Rev Phytopathol 7:355–382                                    Solutions for a cultivated planet. Nature 478:337–342
+Cerf M, Jeuffroy M-H, Prost L, Meynard J-M (2012) Participatory                Fravel DR (2005) Commercialization and implementation of biocon-
+     design of agricultural decision support tools: taking account of                trol. Annu Rev Phytopathol 43:337–359
+     the use situations. Agron Sustain Dev 32:899–910                          Garrett KA, Mundt CC (1999) Epidemiology in mixed host popula-
+Chandler D, Bailey AS, Tatchell GM, Davidson G, Greaves J, Grant                     tions. Phytopathology 89:984–990
+     WP (2011) The development, regulation and use of biopes-                  Gebbers R, Adamchuk VI (2010) Precision agriculture and food secu-
+     ticides for integrated pest management. Phil Trans R Soc B                      rity. Science 327:828–831
+     366:1987–1998                                                             Glare T, Caradus J, Gelernter W, Jackson T, Keyhani N, Köhl J, Mar-
+Chen X, Ma J, Qiao H, Cheng D, Xu Y, Zhao Y (2007) Detecting                         rone P, Morin L, Stewart A (2012) Have biopesticides come of
+     infestation of take-all disease in wheat using Landsat Ther-                    age? Trends Biotechnol 30:250–258
+     matic Mapper imagery. Int J Remote Sens 28:5183–5189                      Gold KM, Townsend PA, Chlus A, Herrmann I, Couture JJ, Larson
+Compant S, Duffy B, Nowak J, Clément C, Barka E (2005) Use                           ER, Gevens AJ (2020) Hyperspectral measurements enable
+     of plant growth-promoting bacteria for biocontrol of plant                      pre-symptomatic detection and differentiation of contrasting
+
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                                         303
+
+      physiological effects of late blight and early blight in potato.      Ji P, Campbell HL, Kloepper JW, Jones JB, Suslow TV, Wilson M
+      Remote Sensing 12:286. https​://doi.org/10.3390/rs120​20286​                (2006) Integrated biological control of bacterial speck and spot
+Goldberger JR, Lehrer N (2016) Biological control adoption in western             of tomato under field conditions using foliar biological control
+      U.S. orchard systems: results from grower surveys. Biol Contrl              agents and plant growth-promoting rhizobacteria. Biol Contr
+      102:101–111                                                                 36:358–367
+Gottwald T, Poole G, McCollum T, Hall D, Hartung J, Bai J, Luo W,           Kanatas P, Travlos IS, Gazoulis I, Tataridas A, Tsekoura A, Antono-
+      Posny D, Duan Y, Taylor E, Da Graça J, Polek M, Louws F,                    poulos N (2020) Benefits and limitations of decision support
+      Schneider W (2020) Canine olfactory detection of a vectored                 systems (DSS) with a special emphasis on weeds. Agronomy
+      phytobacterial pathogen, Liberibacter asiaticus, and integration            10:548. https​://doi.org/10.3390/agron​omy10​04054​8
+      with disease control. Proc Nat’l Acad Sci USA 117:3492–3501           Kelly TC, Lu Y-C, Abdul-Baki AA, Teasdale JR (1995) Economics of
+Han W, Yang Z, Di L (2012) CropScape: A web service-based applica-                a hairy vetch mulch system for producing fresh-market tomatoes
+      tion for exploring and disseminating US conterminous geospa-                in the mid-Atlantic region. J Amer Soc Hort Sci 120:854–860
+      tial cropland data products for decision support. Comp Electron       Köhl J, Kolnaar R, Ravensberg WJ (2019) Mode of action of micro-
+      Agricult 84:111–123                                                         bial biological control agents against plant diseases: relevance
+Hayden ZD, Brainard DC, Henshaw B, Ngouajio M (2012) Winter                       beyond efficacy. Front Plant Sci 10:385. https​://doi.org/10.3389/
+      annual weed suppression in rye-vetch cover crop mixtures. Weed              fpls.2019.00845​
+      Technol 26:818–824                                                    Kumar V, Abdul-Baki AA, Anderson JD, Mattoo AK (2005) Cover crop
+Hayden ZD, Ngouajio M, Brainard D (2014) Rye-vetch mixture pro-                   residues enhance growth, improve yield, and delay leaf senes-
+      portion tradeoffs: cover crop productivity, nitrogen accumulation,          cence in greenhouse-grown tomatoes. HortSci 40:1307–1311
+      and weed suppression. Agron J 106:904–914                             Kumar V, Mills DJ, Anderson JD, Mattoo AK (2004) An alternative
+Hededus DD, Rimmer SR (2005) Sclerotinia sclerotiorum: When ‘to                   agriculture system is defined by a distinct expression profile of
+      be or not to be’ a pathogen? FEMS Microbiol Lett 251:177–184                select gene transcripts and proteins. Proc Natl Acad Sci USA
+Hively WM, Lang M, McCarty G, Keppler J, Sadeghi A, McConnell                     101:10535–10540
+      L (2009) Using satellite remote sensing to estimate winter cover      Larkin RP (2015) Soil health paradigms and implications for disease
+      crop nutrient uptake efficiency. J Soil Water Cons 64:303–313               management. Annu Rev Phytopathol 53:199–221
+Hu X, Roberts DP, Jiang M, Zhang Y (2005) Decreased incidence of            Larkin RP (2013) Green manures and plant disease management. CAB
+      disease caused by Sclerotinia sclerotiorum and improved plant               Rev 8:37. https​://doi.org/10.1079/PAVSN​NR201​38037​
+      vigor of oilseed rape with Bacillus subtilis Tu-100. Appl Micro-      Lechenet M, Dessaint F, Py G, Makowski D, Munier-Jolain N (2017)
+      biol Biotechnol 68:802–807                                                  Reducing pesticide use while preserving crop productivity and
+Hu X, Roberts DP, Maul JE, Emche SE, Liao X, Guo X, Liu Y, McK-                   profitability on arable farms. Nat Plants 3:17008. https​://doi.
+      enna LF, Buyer J, Liu S (2011) Formulations of the endophytic               org/10.1038/nplan​ts201​7.8
+      bacterium Bacillus subtilis Tu-100 suppress Sclerotinia sclero-       Lemanceau P, Alabouvette C (1991) Biological control of Fusarium
+      tiorum on oilseed rape and improve plant vigor in field trials              diseases by fluorescent Pseudomonas and non-pathogenic Fusar-
+      conducted at separate locations. Can J Microbiol 57:539–546                 ium. Crop Prot 10:29–286
+Hu X, Roberts DP, Xie L, Maul JE, Yu C, Li Y, Zhang S, Xing L (2013)        Lindblom J, Lundström C, Ljung J, Jonsson A (2017) Promoting sus-
+      Bacillus megaterium A6 suppresses Sclerotinia sclerotiorum on               tainable intensification in precision agriculture: review of deci-
+      oilseed rape in the field and promotes oilseed rape growth. Crop            sion support systems development and strategies. Prec Agric
+      Protection 52:151–158                                                       18:309–331
+Hu X, Roberts DP, Xie L, Maul JE, Yu C, Li Y, Jing M, Liao X, Zhe           Long SP, Ainsworth EA, Leakey ADB, Nösberger J, Ort DR (2006)
+      C, Liao X (2014) Formulations of Bacillus subtilis BY-2 sup-                Food for thought: lower-than-expected crop yield stimulation
+      press Sclerotinia sclerotiorum on oilseed rape in the field. Biol           with rising CO2 concentrations. Science 312:1918–1921
+      Contr 70:54–64                                                        Lu X, Lee W, Minzan L, Ehsani R, Mishra A, Yang C, Mangan R
+Hu X, Roberts DP, Xie L, Maul JE, Yu C, Li Y, Zhang Y, Qin L, Liao                (2015) Feasibility study on huanglongbing (citrus greening)
+      X (2015) Components of a rice-oilseed rape production system                detection based on worldview-2 satellite imagery. Biosyst
+      augmented with Trichoderma sp. Tri-1 control Sclerotinia scle-              Eng 132(2015):28–38. https​://doi.org/10.1016/j.biosy ​stems​
+      rotiorum on oilseed rape. Phytopathology 105:1325–1333                      eng.2015.01.009
+Hu X, Roberts DP, Xie L, Yu C, Li Y, Qin L, Hu L, Zhang Y, Liao X           Mahini RA, Kumar A, Elias EM, Fiedler JD, Porter LD, McPhee
+      (2016) Use of formulated Trichoderma sp. Tri-1 in combination               KE (2020) Analysis and identification of QTL for resistance to
+      with reduced rates of chemical pesticide for control of Sclerotinia         Sclerotinia sclerotiorum in pea (Pisum sativum L). Front Gen
+      sclerotiorium on oilseed rape. Crop Protect 79:124–127                      11:587968. https​://doi.org/10.3380/fgene​.2020.58796​8
+Hu X, Qin L, Roberts DP, Lakshman DK, Gong Y, Maul JE, Xie L,               Mahlein A-K (2016) Plant disease detection by imaging sensors—par-
+      Yu C, Li Y, Hu L, Liao X, Liao X (2017) Characterization of                 allels and specific demands for precision agriculture and plant
+      mechanisms underlying degradation of sclerotia of Sclerotinia               phenotyping. Plant Dis 100:241–251
+      sclerotiorum by Aspergillus sp. Asp-4 using a combined qRT-           Mahlein A-K, Kuska MT, Behmann J, Polder G, Walter A (2018)
+      PCR and proteomic approach. BMC Genomics 18:674. https​://                  Hyperspectral sensors and imaging technologies in phytopathol-
+      doi.org/10.1186/s1286​4-017-4016-8                                          ogy: State of the art. Annu Rev Phytopathol 56:535–558
+Hu X, Roberts DP, Xie L, Qin L, Li Y, Liao X, Gu C, Han P, Liao X           Mahlein A-K, Kuska MT, Thomas S, Wahabzada M, Behmann J,
+      (2019) Seed treatment containing Bacillus subtilis BY-2 in com-             Rascher U, Kersting K (2019) Quantitative and qualitative phe-
+      bination with other Bacillus isolates for control of Sclerotinia            notyping of disease resistance of crops by hyperspectral sensors:
+      sclerotiorum on oilseed rape. Biol Contr 133:50–57                          seamless interlocking of phytopathology, sensors, and machine
+Janssen SJC, Porter CH, Moore AD, Athanasiadis IN, Foster I, Jones                learning is needed! Curr Opin Plant Biol 50:156–162
+      JW, Antle JM (2017) Towards a new generation of agricultural          Marrone PG (2007) Barriers to adoption of biological control agents
+      system data, models, and knowledge products: information and                and biological pesticides. CAB Rev. https​://doi.org/10.1079/
+      communication technology. Agric Sys 155:200–212                             PAVSN​NR200​72051​
+Jayarman K, Jia H (2012) GM phobia spreads in south Asia. Nature
+      30:1017–1019
+
+
+                                                                                                                                       13
+304                                                                                                        Indian Phytopathology (2021) 74:287–305
+
+Martin C, Li J (2017) Medicine is not health care, food is health care:     Parker P, Jakeman LA, Beck MB, Harris G, Argent RM, Hare M, Pahl-
+      plant metabolic engineering, diet and human health. N Phytol                Wostl C, Voinov A, Janssen M, Sullivan P et al (2002) Progress
+      216:699–719                                                                 in integrated assessment and modelling. Environ Model Software
+Martinelli F, Scalenghe R, Davino S, Panno S, Scuderi G, Ruisi P, Villa           17:209–217
+      P, Stroppiana D, Boschetti M, Goulart LR, Davis CE, Dandekar          Pierson EA, Weller DM (1994) Use of mixtures of fluorescent pseu-
+      AM (2015) Advanced methods of plant disease detection. A                    domonads to suppress take-all and improve the growth of wheat.
+      review. Agron Sustain Dev 35:1–25                                           Phytopathology 84:940–947
+Matson PA, Parton WJ, Power AG, Smith MJ (1997) Agricultural                Pingali PL (2012) Green revolution: Impacts, limits, and the path
+      intensification and ecosystem properties. Science 277:504–509               ahead. Proc Natl Acad Sci USA 109:12302–12308
+Mattoo AK (2014) Translational research in agricultural biotechnol-         Poffenbarger HJ, Mirsky SB, Weil RR, Maul JE, Kramer M, Spargo
+      ogy—enhancing crop resistivity against environmental stress                 JT, Cavigelli MA (2015) Biomass and nitrogen content of hairy
+      alongside nutritional quality. Front Chem 2:30. https​://doi.               vetch-cereal rye cover crop mixtures as influenced by species
+      org/10.3389/fchem​.2014.00030​                                              proportions. Agron J 107:2069–2082
+Mattoo AK, Abdul-Baki AA (2006) Crop genetic responses to manage-           Prabhakara K, Hively WD, McCarty GW (2015) Evaluating the rela-
+      ment: evidence of root-to-shoot communication. In: Fernandes                tionship between biomass, percent groundcover and remote
+      E, Ball AS, Herren H, Uphoff N (eds) Biological approaches to               sensing indices across six winter cover crop fields in Maryland,
+      sustainable soil systems. Taylor and Francis, Boca Raton, FL,               United States. Int J Appl Earth Obs Geoinform 39:88–102
+      pp 221–330                                                            Ray D, Gerber JS, MacDonald GK, West PC (2015) Climate varia-
+Mattoo AK, Teasdale JR (2010) Ecological and genetic systems under-               tion explains a third of global crop yield variability. Nat Comms
+      lying sustainable horticulture. Hort Rev 37:331–362                         6:5989. https​://doi.org/10.1038/ncomm​s6989​
+Mattupalli C, Moffet CA, Shan KN, Young CA (2018) Supervised                Ray D, West PC, Clark M, Gerber JS, Prishchepov AV, Chatterjee S
+      classification of RGB aerial imagery to evaluate the impact of a            (2019) Climate change has likely already affected global food
+      root rot disease. Remote Sens 10:917                                        production. PLoS ONE 14(5):e0217148. https:​ //doi.org/10.1371/
+Melkonian J, Poffenbarger H, Mirsky SB, Ryan M, Bianca M-C (2017)                 journ​al.pone.02171​48
+      Estimating nitrogen mineralization from cover crop mixtures           Reganold JP, Wachter JM (2016) Organic agriculture in the twenty-
+      using the precision nitrogen management model. Agronomy J.                  first century. Nat Plants 2:15221. https​://doi.org/10.1038/nplan​
+      https​://doi.org/10.2134/agron​j2016​.06.0330                               ts.2015.221
+Mills DJ, Coffman B, Teasdale JR, Everts KL, Abdul-Baki AA, Lydon           Renkow M, Byerlee D (2010) The impacts of CGIAR research: a
+      J, Anderson JD (2002a) Foliar disease in fresh-market tomato                review of recent evidence. Food Pol 35:391–402
+      grown in differing bed strategies and fungicide spray programs.       Rice PJ, McConnell LL, Heighton LP, Sadeghi AM, Isensee AR,
+      Plant Dis 86:955–959                                                        Teasdale JR, Abdul-Baki AA, Harman-Tetcho JA, Hapeman CJ
+Mills DJ, Coffman B, Teasdale JR, Everts KL, Anderson JD (2002b)                  (2001) Runoff loss of pesticides and soil: a comparison between
+      Factors associated with foliar disease of staked fresh mar-                 vegetative mulch and plastic mulch in vegetable production sys-
+      ket tomatoes grown under differing bed strategies. Plant Dis                tems. J Environ Qual 30:1808–1821
+      86:356–361                                                            Rice PJ, McConnell LL, Heighton LP, Sadeghi AM, Isensee AR,
+Mirsky SB, Ackroyd V, Cordeau S, Curran WS, Hashemi M, Reberg-                    Teasdale JR, Abdul-Baki AA, Harman-Fetcho JA, Hapeman CJ
+      Horton SC, Ryan MR, Spargo JT (2017a) Hairy vetch biomass                   (2002) Comparison of copper levels in runoff from freshmarket
+      across the eastern United States: effects of latitude, seeding              vegetable production using polyethylene mulch or a vegetative
+      rate and date, and termination timing. Agron J. https​://doi.               mulch. Environ Tox Chem 21:24–30
+      org/10.2134/agron​j2016​.09.0556                                      Roberts DP, Mattoo AK (2018) Sustainable agriculture – enhancing
+Mirsky SB, Ryan MR, Teasdale JR, Curran WS, Reberg-Horten CS,                     environmental benefits, food nutritional quality and building crop
+      Spargo JT, Wells MS, Keene CL, Moyer JW (2013) Overcom-                     resilience to abiotic and biotic stresses. Agriculture 8:8. https​://
+      ing weed management challenges in cover crop-based organic                  doi.org/10.3390/agric​ultur​e8010​008
+      rotational no-till soybean production in the eastern United States.   Roberts DP, Mattoo AK (2019) Sustainable crop production systems
+      Weed Technol 27:31–40                                                       and human nutrition. Front Sustain Food Syst 3:72. https​://doi.
+Mirsky SB, Spargo JT, Curran WS, Reberg-Horton CS, Ryan MR,                       org/10.3389/fsufs​.2019.00072​
+      Schomberg HH, Ackroyd VJ (2017b) Characterizing cereal                Roberts DP, Kobayashi DY (2011) Impact of spatial heterogeneity
+      rye biomass and allometric relationships across a range of fall             within spermosphere and rhizosphere environments on perfor-
+      available nitrogen rates in the eastern United States. Agron J              mance of bacterial biological control agents. In: Maheshwari DK
+      109:1520–1531                                                               (ed) Bacteria in agrobiology: crop ecosystems. Springer, Berlin
+Morrissey JP, Dow JM, Mark GL, O’Gara F (2004) Are microbes at              Roberts DP, Vandenberg B, Mirsky SB, Buser M, Reberg-Horton C,
+      the root of a solution to world food production? EMBO Rep                   Short NM Jr, Shrestha S (2020) How to feed the world. GIS for
+      5:922–926                                                                   science, applying mapping and spatial analytics, vol 2. Esri Press,
+Myers SS, Zanobetti A, Kloog I, Huybers P, Leakey ADB, Bloom AJ,                  Redland, CA, pp 110–123
+      Carlisle E, Dietterich LH, Fitzgerald G, Hasegawawa T, Hol-           Rose DC, Sutherland WJ, Parker C, Lobley M, Winter M, Morris C,
+      brook NM, Nelson RL, Ottman MJ, Raboy V, Sakai H, Sartor                    Twining S, Ffoulkes C, Amano T, Dicks LV (2016) Decision sup-
+      KA, Schwartz J, Seneweera S, Tausz M, Usui Y (2014) Increas-                port tools for agriculture: towards effective design and delivery.
+      ing ­CO2 threatens human nutrition. Nature 510:139–143                      Agric Sys 149:165–174
+Nelson B (1998) Biology of Sclerotinia. In: Proceedings of the 10th         Rosegrant MW, Cline SA (2003) Global food security: challenges and
+      International Sclerotinia Workshop, p 1–5, 21 January 1998,                 policies. Science 302:1917–1919
+      Fargo, North Dakota, USA. North Dakota State University               Rossi V, Salinari F, Poni S, Caffi T, Bettati T (2014) Addressing
+      Department of Plant Pathology, Fargo, N.D.                                  the implementation problem in agricultural decision support
+Oerke E-C (2020) Remote sensing of diseases. Annu Rev Phytopathol                 systems: the example of vite.net®. Comput Electron Agric
+      58:225–252                                                                  100:88–99
+O’Grady MJ, O’Hare GMP (2017) Modelling the smart farm. Inform              Rotem J, Palti J (1969) Irrigation and plant diseases. Annu Rev Phy-
+      Process Agric 4:179–187                                                     topathol 7:267–288
+
+
+13
+Indian Phytopathology (2021) 74:287–305                                                                                                              305
+
+Rumpf T, Mahlein A-K, Steiner U, Oerke E-C, Dehne H-W, Plümer L               Vukicevich E, Lowery T, Bowen P, Úrbez-Torres JR, Hart M (2016)
+      (2010) Early detection and classification of plant diseases with             Cover crops to increase soil microbial diversity and mitigate
+      support vector machines based on hyperspectral reflectance.                  decline in perennial agriculture. A review. Agon Sust Devel
+      Comput Electron Agric 74:91–99                                               36:48. https​://doi.org/10.1007/s1359​3-016-0385-7
+Saha U, Vann R, Reberg-Horton CS, Castillo M, Mirsky SB, McGee R,             Wallace JM, Williams A, Liebert JA, Ackroyd JJ, Vann RA, Curran
+      Sonon L (2018) Near-infrared spectroscopic models for analysis                WS, Keene CL, VanGessel MJ, Ryan MR, Mirsky SB (2017)
+      of winter pea (Pisum sativum L.) quality constituents. J Sci Food             Cover crop-based, organic rotational no-till corn and soybean
+      Agricult. https​://doi.org/10.1002/jsfa.8947                                  production systems in the mid-Atlantic United States. Agricul-
+Savary S, Willocquet L, Pethybridge SJ, Esker P, McRoberts N, Nelson                ture 7:34. https​://doi.org/10.3390/agric​ultur​e7040​034
+      A (2019) The global burden of pathogens and pests on major              Walters DR, Bingham IJ (2007) Influence of nutrition on disease devel-
+      food crops. Nat Ecol Evol 3:430–439                                           opment cause by fungal pathogens: implications for plant disease
+Schlenker W, Roberts MJ (2009) Nonlinear termperature effects indi-                 control. Ann Appl Biol 151:307–324
+      cate severe damages to U.S. crop yields under climate change.           Wolfe MS (1985) The current status and prospects of multiline culti-
+      Proc Natl Acad Sci USA 106:15594–15598                                        vars and variety mixtures for disease resistance. Annu Rev Phy-
+Siegwart M, Graillot B, Lopez CB, Besse S, Bardin M, Nicot PC,                      topathol 23:251–273
+      Lopez-Ferber M (2015) Resistance to bioinsecticides or how to           Wu J, Cai G, Tu J, Li L, Liu S, Luo X, Zhou L, Fan C, Zhou Y (2013)
+      enhance their sustainability: a review. Front Plant Sci 6:381. https​         Identification of QTLs for resistance to Sclerotinia Stem Rot
+      ://doi.org/10.3389/fpls.2015.00381​                                           and BnaC.IGMT5.a as a candidate gene of the major resistant
+Snapp SS, Swinton S, Labarta R, Mutch D, Black J, Leep R, Nyiraneza                 QTL SRC6 in Brassica napus. PLoS ONE 8(7):e67740. https​://
+      J, O’Neil K (2005) Evaluating cover crops for benefits, costs and             doi.org/10.1371/journ​al.pone.00677​40
+      performance within cropping system niches. Agron J 97:322–332           Wu H, Wiesner-Hanks T, Stewart EL, DeChant C, Kaczmar N, Gore
+Suzuki N, Rivero RM, Shulaev V, Blumwald E, Mittler R (2014) Abi-                   MA, Nelson RJ, Lipson H (2019) Autonomous detection of plant
+      otic and biotic stress combinations. New Phytol 203:32–43                     disease symptoms directly from aerial imagery. Plant Phen J
+Taranto F, Nicolia A, Pavan S, De Vita P, D’Agostino N (2018) Bio-                  2:190006. https​://doi.org/10.2135/tppj2​019.03.0006
+      technological and digital revolution for climate-smart plant            Xu X-M, Jeffries P, Pautasso M, Jeger MJ (2011) Combined use of
+      breeding. Agronomy 8:277                                                      biocontrol agents to manage plant diseases in theory and practice.
+Teasdale JR, Abdul-Baki AA, Mills DJ, Thorpe KW (2004) Enhanced                     Phytopathology 101:1024–1031
+      pest management with cover crop mulches. Acta Hort                      Yang C (2020) Remote sensing and precision agriculture technolo-
+      638:135–140                                                                   gies for crop disease detection and management with a practical
+Tester M, Langridge P (2010) Breeding technologies to increase crop                 application example. Engineering 6:528–532
+      production in a changing world. Science 327:818–822                     Zarco-Tajeda PJ, Camino C, Beck PSA, Calderon R, Hornero A,
+Tilman D, Fargione J, Wolff B, D’Antonio C, Dobson A, Howarth                       Hernández-Clemente R, Kattenborn T, Montes-Borrego M,
+      R, Schindler D, Schlesinger WH, Simberloff D, Swackhamer D                    Susca L, Morelli M, Gonzalez-Dugo V, North PRJ, Landa BB,
+      (2001) Forecasting agriculturally driven global environmental                 Boscia D, Saponari M, Navas-Cortex JA (2018) Previsual symp-
+      change. Science 292:281–284                                                   toms of Xylella fastidiosa infection revealed in spectral plant-trait
+Tilman D, Cassman KG, Matson PA, Naylor R, Polasky S (2002) Agri-                   alterations. Nature Plants 4:432–439
+      cultural sustainability and intensive production practices. Nature      Zhang M, Qin Z, Liu X (2005) Remote sensed spectral imagery to
+      418:671–676                                                                   detect late blight in field tomatoes. Precis Agric 6:489–508
+Tomasetto F, Tylianakis JS, Reale M, Wratten S, Goldson SL (2017)             Zhao C, Liu B, Piao S, Wang X, Lobell DB, Huang Y, Huang M, Yao
+      Intensified agriculture favors evolved resistance to biological               Y, Bassu S, Ciais P et al (2017) Temperature increase reduces
+      control. Proc Natl Acad Sci USA 114:3885–3890                                 global yields of major crops in four independent estimates. Proc
+Triplett GB Jr, Dick WA (2008) No-tillage crop production: a revo-                  Natl Acad Sci USA 114:9326–9331
+      lution in agriculture. Agron J 100:S153–S165. https​: //doi.            Zhu Y, Chen H, Fan J, Wang Y, Li Y, Chen J, Fan J, Yang S, Hu
+      org/10.2134/agron​j2007​.0005c​                                               L, Leung H, Mew TW, Teng PS, Wang Z, Mundt CC (2002)
+Van Acker R, Rahman M, Cici SZ (2017) Pros and cons of GMO                          Genetic diversity and disease control in rice. Nature 406:718–722
+      crop farming. Oxford Res Encyc. https​://doi.org/10.1093/acref​
+      ore/97801​99389​414.013.217                                             Publisher’s Note Springer Nature remains neutral with regard to
+Vassilev N, Vassileva M, Nikolaeva I (2016) Simultaneous P-solubi-            jurisdictional claims in published maps and institutional affiliations.
+      lizing and biocontrol activity of microorganisms: potentials and
+      future trends. Appl Microbiol Biotechnol 71:137–144
+Veresoglou SD, Barto EK, Menexes G, Rillig MC (2000) Fertiliza-
+      tion affects severity of disease caused by fungal plant pathogens.
+      Plant Pathol 62:961–969
+
+
+
+
+                                                                                                                                            13
+

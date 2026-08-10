@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛰️ FarmHealth — Satellite Crop Monitor
+# 🛰️ Crafty GIS — Satellite Crop Monitor
 
 ### *Advanced Satellite Vision for Precision Agriculture*
 
@@ -95,8 +95,8 @@
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/virahitvin8/farmhealth.git
-cd farmhealth
+git clone https://github.com/virahitvin8/crafty_gis.git
+cd crafty_gis
 
 # Install server dependencies (required)
 cd server && npm install && cd ..
@@ -130,7 +130,7 @@ Log in as **Admin**, open **Settings**, and add:
 
 ## 🆓 100% Open-Source Stack (Primary) + Legacy Fallbacks
 
-FarmHealth runs on a **primary → fallback** architecture: the free open-source services are used first, and the legacy cloud services only kick in if a new service is unreachable. **Nothing is broken — everything is additive.**
+Crafty GIS runs on a **primary → fallback** architecture: the free open-source services are used first, and the legacy cloud services only kick in if a new service is unreachable. **Nothing is broken — everything is additive.**
 
 | Feature | 🆓 New (PRIMARY) | Legacy (FALLBACK) |
 |---|---|---|
@@ -191,38 +191,38 @@ PORT=8080 node server/server.js
 
 #### Build the image
 ```bash
-docker build -t farmhealth:latest .
+docker build -t crafty_gis:latest .
 ```
 
 #### Run locally
 ```bash
-docker run -p 8080:8080 farmhealth:latest
+docker run -p 8080:8080 crafty_gis:latest
 # → http://localhost:8080
 ```
 
 #### Push to container registry
 ```bash
 # Docker Hub
-docker tag farmhealth:latest yourusername/farmhealth:latest
-docker push yourusername/farmhealth:latest
+docker tag crafty_gis:latest yourusername/crafty_gis:latest
+docker push yourusername/crafty_gis:latest
 
 # Google Container Registry
-docker tag farmhealth:latest gcr.io/your-project/farmhealth:latest
-docker push gcr.io/your-project/farmhealth:latest
+docker tag crafty_gis:latest gcr.io/your-project/crafty_gis:latest
+docker push gcr.io/your-project/crafty_gis:latest
 
 # AWS ECR
-docker tag farmhealth:latest your-account.dkr.ecr.region.amazonaws.com/farmhealth:latest
-docker push your-account.dkr.ecr.region.amazonaws.com/farmhealth:latest
+docker tag crafty_gis:latest your-account.dkr.ecr.region.amazonaws.com/crafty_gis:latest
+docker push your-account.dkr.ecr.region.amazonaws.com/crafty_gis:latest
 ```
 
 #### Deploy to any container platform
 ```bash
 # AWS ECS (via CLI)
-aws ecs run-task --cluster your-cluster --task-definition farmhealth
+aws ecs run-task --cluster your-cluster --task-definition crafty_gis
 
 # Azure Container Instances
-az container create --resource-group your-rg --name farmhealth \
-  --image your-registry/farmhealth:latest --ports 8080
+az container create --resource-group your-rg --name crafty_gis \
+  --image your-registry/crafty_gis:latest --ports 8080
 
 # DigitalOcean App Platform
 # → Point to your container registry via the dashboard
@@ -258,12 +258,12 @@ gcloud config set project your-project-id
 gcloud auth configure-docker
 
 # 2. Build & push image
-docker build -t gcr.io/your-project-id/farmhealth:latest .
-docker push gcr.io/your-project-id/farmhealth:latest
+docker build -t gcr.io/your-project-id/crafty_gis:latest .
+docker push gcr.io/your-project-id/crafty_gis:latest
 
 # 3. Deploy to Cloud Run
-gcloud run deploy farmhealth \
-  --image gcr.io/your-project-id/farmhealth:latest \
+gcloud run deploy crafty_gis \
+  --image gcr.io/your-project-id/crafty_gis:latest \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
@@ -279,15 +279,15 @@ gcloud run deploy farmhealth \
 #### After deployment
 ```bash
 # Get the URL
-gcloud run services describe farmhealth --region us-central1 \
+gcloud run services describe crafty_gis --region us-central1 \
   --format 'value(status.url)'
 
 # View logs
 gcloud logging read "resource.type=cloud_run_revision AND \
-  resource.labels.service_name=farmhealth" --limit 20
+  resource.labels.service_name=crafty_gis" --limit 20
 
 # Check health
-curl https://farmhealth-xxxxx-uc.a.run.app/api/gee/health
+curl https://crafty_gis-xxxxx-uc.a.run.app/api/gee/health
 ```
 
 **Cloud Run advantages:**
@@ -332,7 +332,7 @@ The included `netlify.toml` handles the build command, SPA redirects, API proxyi
 
 #### Deploy to Vercel (fully serverless — no separate backend needed)
 
-FarmHealth ships with **Vercel serverless functions** so the whole app runs on
+Crafty GIS ships with **Vercel serverless functions** so the whole app runs on
 Vercel alone — no Render server required for satellite auth or AI advice.
 
 ```bash
@@ -428,8 +428,8 @@ npx cap run android
 The `capacitor.config.json` is already configured:
 ```json
 {
-  "appId": "com.farmhealth.app",
-  "appName": "FarmHealth",
+  "appId": "com.crafty_gis.app",
+  "appName": "Crafty GIS",
   "webDir": "www"
 }
 ```
@@ -506,7 +506,7 @@ After you draw/select a field boundary, the **Land Info** card:
 2. **Deep-links to the correct official state portal** — all **36 Indian states/UTs are mapped** (UP Bhulekh, MP Bhulekh, MahaBhumi, Dharani, Mee Bhoomi, BanglarBhumi, Jamabandi, …)
 3. Guides you through the official **khatauni/jamabandi** lookup flow (District → Tehsil → Village → Khata/Khasra)
 
-> ⚠️ **Honest note:** Owner names are legally protected — official portals require **OTP from the registered mobile** before showing them. FarmHealth **never invents** survey/khata/owner records. You enter what you verified, it saves locally, and it auto-fills for that field next time.
+> ⚠️ **Honest note:** Owner names are legally protected — official portals require **OTP from the registered mobile** before showing them. Crafty GIS **never invents** survey/khata/owner records. You enter what you verified, it saves locally, and it auto-fills for that field next time.
 
 Supported portals (subset):
 
@@ -548,7 +548,7 @@ Supported portals (subset):
 ## 📁 Project Structure
 
 ```
-farmhealth/
+crafty_gis/
 ├── index.html              # Main application
 ├── manifest.json           # PWA manifest
 ├── sw.js                   # Service worker (offline)
@@ -726,13 +726,13 @@ cd ../crafty-gis-server && python main.py  # Python backend
 
 ```bash
 # Build the Docker image
-docker build -t farmhealth:latest .
+docker build -t crafty_gis:latest .
 
 # Run locally
-docker run -p 8080:8080 farmhealth:latest
+docker run -p 8080:8080 crafty_gis:latest
 
 # Or deploy to a cloud platform
-docker run -p 3001:8080 farmhealth:latest
+docker run -p 3001:8080 crafty_gis:latest
 ```
 
 ### Android App (Capacitor)
@@ -900,8 +900,8 @@ The build produces the following outputs:
 
 **Made with ❤️ for Global Agriculture** 🌾🛰️
 
-**FarmHealth v2.0** — *Satellite Vision for Every Field*
+**Crafty GIS v2.0** — *Satellite Vision for Every Field*
 
-[⬆ Back to Top](#-farmhealth--satellite-crop-monitor)
+[⬆ Back to Top](#-crafty_gis--satellite-crop-monitor)
 
 </div>

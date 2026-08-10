@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════
-#  FarmHealth — One-command Dokploy setup
+#  Crafty GIS — One-command Dokploy setup
 #
 #  Runs ON the VPS (Ubuntu 22.04/24.04 or Debian 12) as root or via sudo.
 #  It:
 #    1. Provisions the box  (apt update/upgrade, base packages, swap if low RAM)
 #    2. Installs Dokploy    (official installer, installs Docker + Nginx + certbot)
 #    3. Waits for Dokploy   (UI comes up on :3000)
-#    4. Pre-creates the `farmhealth` project — via API when a token is given,
+#    4. Pre-creates the `crafty_gis` project — via API when a token is given,
 #       otherwise prints the exact 30-second manual steps.
 #
 #  Usage:
@@ -64,7 +64,7 @@ fi
 
 say ""
 say "${C_BOLD}╔══════════════════════════════════════════════════════════╗${C_NC}"
-say "${C_BOLD}║   FarmHealth × Dokploy — one-command setup                ║${C_NC}"
+say "${C_BOLD}║   Crafty GIS × Dokploy — one-command setup                ║${C_NC}"
 say "${C_BOLD}╚══════════════════════════════════════════════════════════╝${C_NC}"
 say ""
 
@@ -108,14 +108,14 @@ if [[ -f /var/run/reboot-required ]]; then
   warn "A reboot is pending (kernel upgraded). Reboot before deploying for best stability."
 fi
 
-# UFW: open the ports Dokploy + FarmHealth need.
+# UFW: open the ports Dokploy + Crafty GIS need.
 # Port 22 MUST succeed — otherwise enabling UFW could lock you out of SSH.
 if command -v ufw &>/dev/null; then
   ufw allow 22/tcp || die "Could not open port 22 — refusing to enable UFW (SSH lockout risk)."
   ufw allow 80/tcp  || true
   ufw allow 443/tcp || true
   ufw allow 3000/tcp || true   # Dokploy UI
-  ufw allow 8080/tcp || true   # FarmHealth app
+  ufw allow 8080/tcp || true   # Crafty GIS app
   ufw allow 3002/tcp || true   # Uptime Kuma (monitoring)
   ufw --force enable || warn "Could not enable UFW — check manually."
   ok "Firewall: ports 22, 80, 443, 3000, 8080, 3002 opened"
@@ -164,13 +164,13 @@ if [[ $waited -lt $UI_WAIT ]]; then
   ok "Dokploy UI is up on :3000"
 fi
 
-# ── 5. Pre-create the farmhealth project ──
+# ── 5. Pre-create the crafty_gis project ──
 say ""
-say "${C_BOLD}Step 4/4 — Creating the farmhealth project${C_NC}"
+say "${C_BOLD}Step 4/4 — Creating the crafty_gis project${C_NC}"
 if [[ -z "$API_TOKEN" ]]; then
   warn "No API token given — create the project manually (30 seconds):"
   say "   1. Open  ${C_BOLD}http://<YOUR-SERVER-IP>:3000${C_NC}  and finish the admin setup wizard."
-  say "   2. Projects → Create Project → name it  ${C_BOLD}farmhealth${C_NC}"
+  say "   2. Projects → Create Project → name it  ${C_BOLD}crafty_gis${C_NC}"
   say "   3. Inside it: Add Resource → Docker Compose → paste docker-compose.dokploy.yml"
   say "   4. Optional automation: Settings → API Tokens → Create, then re-run:"
   say "        bash install-dokploy.sh --api-token <TOKEN>"
@@ -181,8 +181,8 @@ else
   # REST shape. Success is judged by HTTP 2xx, NOT by grepping the body
   # (bodies vary and may be empty on success).
   for PAYLOAD in \
-    '{"json":{"name":"farmhealth"}}' \
-    '{"name":"farmhealth"}'; do
+    '{"json":{"name":"crafty_gis"}}' \
+    '{"name":"crafty_gis"}'; do
     for ENDPOINT in \
       "${DOKPLOY_URL%/}/api/trpc/project.create" \
       "${DOKPLOY_URL%/}/api/projects"; do
@@ -204,7 +204,7 @@ else
   if [[ $CREATED -eq 0 ]]; then
     warn "API call did not succeed (HTTP ${HTTP_CODE:-unknown}; token/endpoint may differ by Dokploy version)."
     warn "The install itself is complete — create the project manually:"
-    say "   Projects → Create Project → ${C_BOLD}farmhealth${C_NC}"
+    say "   Projects → Create Project → ${C_BOLD}crafty_gis${C_NC}"
     say "   Then: Add Resource → Docker Compose → docker-compose.dokploy.yml"
   fi
 fi
@@ -214,7 +214,7 @@ say ""
 say "${C_GREEN}════════════════════════════════════════════════════════════${C_NC}"
 say "${C_GREEN} Done! Next steps${C_NC}"
 say "  • Dokploy UI:  ${C_BOLD}http://<YOUR-SERVER-IP>:3000${C_NC}  (first run: create admin user)"
-say "  • Deploy:      add the farmhealth project → Docker Compose resource"
+say "  • Deploy:      add the crafty_gis project → Docker Compose resource"
 say "  • Compose:     docker-compose.dokploy.yml  (in this repo)"
 say "  • Secrets:     GEE_SERVICE_ACCOUNT / GEE_PRIVATE_KEY / OLLAMA_MODEL / …"
 say "  • CI/CD:       .github/workflows/deploy-dokploy.yml  + DOKPLOY_DEPLOY_URL secret"

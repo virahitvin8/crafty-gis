@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FarmHealth — Precision Satellite Crop Monitor</title>
+<title>Crafty GIS — Precision Satellite Crop Monitor</title>
 <meta name="description" content="Professional satellite-based crop health monitoring with REAL Sentinel Hub API data, live weather, terrain, soil analysis, and AI-powered advice. For farmers, students, and researchers.">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f1a12">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FarmHealth">
+<meta name="apple-mobile-web-app-title" content="Crafty GIS">
 
 <!-- External Libraries -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -40,7 +40,7 @@
       <span class="logo-icon">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
       </span>
-      <h1>FarmHealth</h1>
+      <h1>Crafty GIS</h1>
     </div>
     <div class="tagline">Precision Satellite Intelligence • Sentinel-2 L2A • Live Weather • Soil Analytics • AI Advisory</div>
 
@@ -145,7 +145,7 @@
       </ol>
       <div style="font-size:0.68rem;color:var(--text-faint);margin-top:6px;border-top:1px dashed rgba(255,255,255,0.15);padding-top:6px">
         हिंदी: आधिकारिक पोर्टल खोलें → ज़िला → तहसील → गाँव चुनें → खतौनी खोलें → खाता नंबर व खसरा नंबर देखें → यहाँ भरकर सेव करें।
-        <br>🔒 Government portals require OTP from the registered mobile to show owner names — FarmHealth never invents records.
+        <br>🔒 Government portals require OTP from the registered mobile to show owner names — Crafty GIS never invents records.
       </div>
     </div>
     
@@ -343,6 +343,12 @@
       <div id="statYield" style="font-size:1.1rem;font-weight:700;color:var(--text)">Calculating...</div>
     </div>
 
+    <!-- Senior GIS: Geospatial metadata panel -->
+    <div id="gisMetadata" style="margin-top:10px; display:none; background:var(--bg-input); border-radius:8px; padding:10px; font-size:0.72rem; line-height:1.6; border-left:3px solid #3498db">
+      <div style="font-weight:700; color:#3498db; margin-bottom:4px; font-size:0.8rem">🌐 Geospatial Metadata</div>
+      <div id="gisMetadataContent"></div>
+    </div>
+
     <div style="margin-top:10px" id="bars"></div>
     <div id="adviceBox"></div>
     <div class="row" style="margin-top:8px">
@@ -350,6 +356,7 @@
       <button class="btn-secondary btn-sm" onclick="FH.exportCSV()">CSV (TS)</button>
       <button class="btn-secondary btn-sm" onclick="FH.exportGeoJSON()">GeoJSON</button>
       <button class="btn-secondary btn-sm" onclick="FH.showFullReport()">Full Report</button>
+      <button class="btn-accent btn-sm" onclick="FH.exportPDFReport()">📄 PDF Report</button>
     </div>
   </div>
 
@@ -417,6 +424,81 @@
         <div id="gtCount" style="font-size:0.62rem;color:var(--text-faint)"></div>
       </div>
     </div>
+  </div>
+
+  <!-- ─── RESEARCH METHODOLOGY KNOWLEDGE BASE ─── -->
+  <div class="card" id="researchCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      📚 Research Methodology <span class="badge badge-new">12 papers</span>
+    </h3>
+    <div class="card-body" id="researchBody"></div>
+  </div>
+
+  <!-- ─── DISEASE OUTBREAK SURVEILLANCE (GIS) ─── -->
+  <div class="card" id="diseaseCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      🦠 Disease Outbreak GIS <span class="badge badge-live">SURVEILLANCE</span>
+    </h3>
+    <div class="card-body" id="diseaseBody">
+      <div class="hint" style="font-size:0.65rem;margin-bottom:8px">Geotag disease detections onto the map, track them over time, and model weather-driven spread risk (Maged et al. 2026 — s44163). Photo-analysis detections are geotagged automatically.</div>
+      <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+        <select id="diseaseType" style="flex:1;min-width:120px">
+          <option value="late-blight">🥔 Late Blight</option>
+          <option value="early-blight">🍂 Early Blight</option>
+          <option value="rust">🦠 Rust</option>
+          <option value="powdery-mildew">🌫️ Powdery Mildew</option>
+          <option value="leaf-spot">🍃 Leaf Spot</option>
+          <option value="wilt">🥀 Wilt / Stem Rot</option>
+        </select>
+        <input type="number" id="diseaseConf" value="70" min="10" max="100" placeholder="Confidence %" style="width:90px;font-size:0.7rem">
+        <button class="btn-primary btn-sm" onclick="FH.recordDiseaseOutbreak()">📍 Geotag Detection</button>
+      </div>
+      <textarea id="diseaseNotes" rows="1" placeholder="Notes (e.g. spots on lower leaves, seen on west boundary…)" style="width:100%;box-sizing:border-box;font-size:0.7rem;margin-bottom:6px;resize:vertical"></textarea>
+      <button class="btn-secondary btn-sm" onclick="FH.computeSpreadRisk()" style="margin-bottom:8px">🌡️ Compute Spread Risk</button>
+      <button class="btn-danger btn-sm" onclick="FH.clearOutbreaks()" style="margin-bottom:8px">🗑️ Clear</button>
+
+      <div style="font-weight:700;font-size:0.72rem;color:var(--green-light);margin:4px 0 4px">⚠️ Spread Risk (weather-driven)</div>
+      <div id="diseaseRisk" style="background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.7rem;line-height:1.7;margin-bottom:8px"><span style="color:var(--text-muted);font-size:0.7rem">Run Full Analysis first (weather telemetry needed).</span></div>
+
+      <div style="font-weight:700;font-size:0.72rem;color:var(--green-light);margin:4px 0 4px">🕐 Temporal Tracking</div>
+      <div id="diseaseTimeline" style="font-size:0.7rem"></div>
+    </div>
+  </div>
+
+  <!-- ─── DISEASE EARLY WARNING (weather-based EWS) ─── -->
+  <div class="card" id="ewsCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      🌡️ Disease Early Warning <span class="badge badge-live">EWS</span>
+    </h3>
+    <div class="card-body" id="ewsBody"></div>
+  </div>
+
+  <!-- ─── IOT SENSOR FUSION ─── -->
+  <div class="card" id="sensorCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      📡 IoT Sensor Fusion <span class="badge badge-new">MULTI-MODAL</span>
+    </h3>
+    <div class="card-body" id="sensorBody">
+      <div class="hint" style="font-size:0.65rem;margin-bottom:8px">Enter in-field sensor readings (DHT11 / moisture probe / field kit) to fuse with the satellite NDVI composite — per 09119071 (Shafi 2020) &amp; pone.0324347.</div>
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);gap:6px">
+        <div><label style="font-size:0.62rem">Soil moisture %</label><input type="number" id="sensorMoisture" value="22" step="0.1" min="0" max="100" style="width:100%;box-sizing:border-box;font-size:0.7rem"></div>
+        <div><label style="font-size:0.62rem">Soil temp °C</label><input type="number" id="sensorSoilTemp" value="25" step="0.1" style="width:100%;box-sizing:border-box;font-size:0.7rem"></div>
+        <div><label style="font-size:0.62rem">Air temp °C</label><input type="number" id="sensorAirTemp" value="29" step="0.1" style="width:100%;box-sizing:border-box;font-size:0.7rem"></div>
+        <div><label style="font-size:0.62rem">Humidity %</label><input type="number" id="sensorHumidity" value="62" step="0.1" min="0" max="100" style="width:100%;box-sizing:border-box;font-size:0.7rem"></div>
+        <div><label style="font-size:0.62rem">Soil pH</label><input type="number" id="sensorPh" value="6.8" step="0.1" min="0" max="14" style="width:100%;box-sizing:border-box;font-size:0.7rem"></div>
+        <div><label style="font-size:0.62rem">NPK (kg/ha)</label><input type="text" id="sensorNPK" value="40-20-20" placeholder="N-P-K" style="width:100%;box-sizing:border-box;font-size:0.7rem"></div>
+      </div>
+      <button class="btn-primary btn-sm" onclick="FH.saveSensorReading()" style="margin-top:8px">📡 Save Reading &amp; Fuse</button>
+      <div id="sensorResult" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- ─── SITE-SPECIFIC MANAGEMENT ZONES ─── -->
+  <div class="card" id="mgmtCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      🗺️ Management Zones <span class="badge badge-new">SSMZ</span>
+    </h3>
+    <div class="card-body" id="mgmtBody"></div>
   </div>
 
   <!-- ─── WEATHER ─── -->
@@ -541,6 +623,7 @@
     <h3>Learning Module</h3>
     <button class="btn-secondary" onclick="FH.openLearning()">Open Lessons (8 Topics)</button>
     <button class="btn-accent" onclick="FH.openQuiz()" style="margin-top:4px">Take Quiz (10 Questions)</button>
+    <button class="btn-secondary" onclick="FH.toggleResearchCard()" style="margin-top:6px;background:rgba(46,204,113,0.15);border-color:var(--green)">📚 Research Methodology (12 papers)</button>
   </div>
 
   <!-- ─── SETTINGS ─── -->
@@ -755,7 +838,7 @@
 <div class="modal-overlay" id="loginModal" style="display:none; z-index:9999; background:rgba(0,0,0,0.85)">
   <div class="modal" style="max-width:350px; text-align:center; padding: 20px;">
     <h2>Secure Login</h2>
-    <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:15px">FarmHealth Platform Access</p>
+    <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:15px">Crafty GIS Platform Access</p>
     <input type="text" id="loginUser" placeholder="Username or Email" style="width:100%; margin-bottom:10px; text-align:center">
     <input type="password" id="loginPass" placeholder="Password" style="width:100%; margin-bottom:15px; text-align:center">
     <button class="btn-primary" onclick="FH.handleLogin()" style="width:100%">Login</button>
@@ -789,7 +872,7 @@
   <div class="modal" style="max-width:360px; text-align:center; padding: 24px; background: #fff; color: #3c4043; border-radius: 8px;">
     <svg width="24" height="24" viewBox="0 0 24 24" style="margin-bottom:12px;"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 1.56-1.56 2.95-3.24 3.75v3.08h5.27c3.08-2.85 4.88-7.06 4.88-11.9 0-.62-.06-1.21-.15-1.82z" fill="#4285F4"/><path d="M12.18 21.43c2.75 0 5.06-.92 6.75-2.5l-5.27-3.08c-.76.51-1.78.83-3.18.83-3.07 0-5.66-2.11-6.59-4.94H1.3v3.19c1.9 3.79 5.8 6.5 10.88 6.5z" fill="#34A853"/><path d="M5.59 11.74c-.13-.42-.2-.86-.2-1.3s.07-.88.2-1.3V5.95H1.3A11.89 11.89 0 000 10.44c0 1.63.33 3.19.92 4.6l4.67-3.3z" fill="#FBBC05"/><path d="M12.18 2.87c1.78 0 3.2.62 4.3 1.64l3.24-3.24C17.72.63 15.22 0 12.18 0 7.1 0 3.2 2.71 1.3 6.5l4.67 3.3c.93-2.83 3.52-4.93 6.59-4.93z" fill="#EA4335"/></svg>
     <h3 style="margin: 0 0 8px; font-size:1.2rem; color:#202124; font-family: 'Google Sans',Roboto,Arial,sans-serif;">Choose an account</h3>
-    <p style="font-size:0.85rem; color:#5f6368; margin-bottom:20px; font-family: Roboto,Arial,sans-serif;">to continue to <span style="color:#1e7d32; font-weight:600;">FarmHealth</span></p>
+    <p style="font-size:0.85rem; color:#5f6368; margin-bottom:20px; font-family: Roboto,Arial,sans-serif;">to continue to <span style="color:#1e7d32; font-weight:600;">Crafty GIS</span></p>
     
     <div id="googleAccountsList" style="display:flex; flex-direction:column; gap:4px; margin-bottom:24px; text-align:left;">
       <!-- Accounts will be injected dynamically -->
@@ -866,9 +949,14 @@
      ═══════════════════════════════════════════════════════ -->
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/gis_utils.js"></script>
 <script src="js/api.js"></script>
 <script src="js/map.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/ml_client.js"></script>
+<script src="js/ml_enhanced.js"></script>
+<script src="js/research.js"></script>
+<script src="js/intel.js"></script>
 <script src="js/analysis.js"></script>
 <script src="js/firebase.js"></script>
 <script src="js/authentik.js"></script>

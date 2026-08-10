@@ -1,17 +1,17 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════
-# FarmHealth — Google Cloud Run Deployment Script
+# Crafty GIS — Google Cloud Run Deployment Script
 # ═══════════════════════════════════════════════════════════
 set -e
 
 echo ""
-echo "  🛰️  FarmHealth — Google Cloud Run Deployment"
+echo "  🛰️  Crafty GIS — Google Cloud Run Deployment"
 echo "  ──────────────────────────────────────────────"
 echo ""
 
 # Configuration
-PROJECT_ID="${GCP_PROJECT_ID:-farmhealth-$(date +%s)}"
-SERVICE_NAME="farmhealth"
+PROJECT_ID="${GCP_PROJECT_ID:-crafty_gis-$(date +%s)}"
+SERVICE_NAME="crafty_gis"
 REGION="us-central1"
 IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
 

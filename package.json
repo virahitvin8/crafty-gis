@@ -1,7 +1,7 @@
 {
-  "name": "farmhealth-web",
+  "name": "crafty_gis-web",
   "version": "2.0.0",
-  "description": "🛰️ FarmHealth — Satellite Crop Monitor. Real-time crop health monitoring using Sentinel-2, Sentinel-1 SAR, Landsat-8, with AI-powered agronomist advice.",
+  "description": "🛰️ Crafty GIS — Satellite Crop Monitor. Real-time crop health monitoring using Sentinel-2, Sentinel-1 SAR, Landsat-8, with AI-powered agronomist advice.",
   "private": true,
   "scripts": {
     "start": "node server/server.js",
@@ -21,7 +21,7 @@
     "farm-health",
     "gis"
   ],
-  "author": "FarmHealth Team",
+  "author": "Crafty GIS Team",
   "license": "MIT",
   "dependencies": {
     "@google/earthengine": "^1.0.0",

@@ -1,8 +1,8 @@
-# 🏗️ FarmHealth Architecture — Primary vs Secondary
+# 🏗️ Crafty GIS Architecture — Primary vs Secondary
 
 ## Overview
 
-FarmHealth uses a **Primary → Secondary** fallback architecture:
+Crafty GIS uses a **Primary → Secondary** fallback architecture:
 - **Primary (✅):** Open-source, self-hosted, free, recommended
 - **Secondary (⚠️):** Legacy/optional, still supported for backward compatibility
 
@@ -38,9 +38,9 @@ Is authentik configured?
 # Deploy authentik
 docker compose -f authentik/docker-compose.yml up -d
 
-# Configure in FarmHealth
+# Configure in Crafty GIS
 localStorage.setItem('fh_authentik_issuer', 'https://your-authentik-domain:9443');
-localStorage.setItem('fh_authentik_client_id', 'farmhealth');
+localStorage.setItem('fh_authentik_client_id', 'crafty_gis');
 ```
 
 ### Firebase Setup (SECONDARY)
@@ -166,7 +166,7 @@ GEE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
 
 ### Flow
 ```
-Deploy FarmHealth
+Deploy Crafty GIS
     ↓
 Use Coolify/Dokploy (PRIMARY)
     ├─ SUCCESS → Deployed ✅
@@ -193,7 +193,7 @@ docker run -d -p 3001:3001 -v uptime-kuma:/app/data \
   --name uptime-kuma --restart unless-stopped louislam/uptime-kuma:1
 
 # Add monitors:
-# - FarmHealth Backend: http://localhost:3001/api/health
+# - Crafty GIS Backend: http://localhost:3001/api/health
 # - Ollama AI: http://localhost:3001/api/ai/health
 # - GEE: http://localhost:3001/api/gee/health
 ```

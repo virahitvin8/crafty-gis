@@ -1,8 +1,8 @@
-# 🛰️ FarmHealth — Project Summary
+# 🛰️ Crafty GIS — Project Summary
 
 ## 📊 What We Built
 
-**FarmHealth** is a production-ready, web-based satellite crop health monitoring system that runs 24x7 in the cloud.
+**Crafty GIS** is a production-ready, web-based satellite crop health monitoring system that runs 24x7 in the cloud.
 
 ### Core Capabilities
 
@@ -22,7 +22,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    FARMHEALTH WEB APPLICATION                │
+│                    CRAFTY GIS WEB APPLICATION                │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌──────────────┐         ┌──────────────┐                │
@@ -248,9 +248,9 @@ docker-compose logs -f
 ## 🌐 Live Deployment URLs
 
 After deployment, you'll get URLs like:
-- **Netlify**: `https://farmhealth.netlify.app`
-- **Render**: `https://farmhealth-backend.onrender.com`
-- **Cloud Run**: `https://farmhealth-xyz.a.run.app`
+- **Netlify**: `https://crafty_gis.netlify.app`
+- **Render**: `https://crafty_gis-backend.onrender.com`
+- **Cloud Run**: `https://crafty_gis-xyz.a.run.app`
 
 ## 🎯 Next Steps
 
@@ -266,7 +266,7 @@ After deployment, you'll get URLs like:
 ## 📚 Documentation
 
 - `README.md` — Project overview and features
-- `FARMHEALTH_VISION.md` — Complete architecture vision
+- `CRAFTY GIS_VISION.md` — Complete architecture vision
 - `DEPLOY.md` — Detailed deployment guide
 - `AD.md` — Marketing copy and ad scripts
 - `LICENSE` — MIT License
@@ -282,7 +282,7 @@ After deployment, you'll get URLs like:
 
 ## 🎉 Status: READY FOR DEPLOYMENT
 
-**FarmHealth is production-ready and can be deployed in 15 minutes!**
+**Crafty GIS is production-ready and can be deployed in 15 minutes!**
 
 The application:
 - ✅ Runs 24x7 in the cloud

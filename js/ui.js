@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — UI Rendering Module
+   Crafty GIS — UI Rendering Module
    ═══════════════════════════════════════════════════════════ */
 
 const FH_UI = (function() {
@@ -53,7 +53,7 @@ const FH_UI = (function() {
       toast('Welcome back, Admin Akshit!');
     } else if (user.toLowerCase() === 'user' && (pass === 'user' || pass === '')) {
       localStorage.setItem('fh_auth_role', 'user');
-      localStorage.setItem('fh_auth_email', 'user@farmhealth.com');
+      localStorage.setItem('fh_auth_email', 'user@crafty_gis.com');
       localStorage.setItem('fh_auth_name', 'Standard User');
       err.style.display = 'none';
       document.getElementById('loginModal').classList.remove('show');
@@ -309,7 +309,7 @@ const FH_UI = (function() {
 
   // ═══════════ RESULTS RENDER ═══════════
   function renderResults(analysisData) {
-    const { crop, stage, seed, meanNdvi, cnt, cc, dataSource } = analysisData;
+    const { crop, stage, seed, meanNdvi, cnt, cc, dataSource, mlLabel, mlColor, mlBadge, mlConfidence, mlAgreement, gis } = analysisData;
     const indexType = _state.currentIndex || 'ndvi';
     const activeClasses = FH_CONFIG.getActiveClasses(indexType);
     
@@ -336,10 +336,22 @@ const FH_UI = (function() {
       if (!badgeContainer) {
         badgeContainer = document.createElement('div');
         badgeContainer.id = 'sourceBadge';
-        badgeContainer.style.cssText = 'margin-bottom:8px;display:flex;align-items:center;gap:6px';
+        badgeContainer.style.cssText = 'margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap';
         statGrid.parentNode.insertBefore(badgeContainer, statGrid);
       }
-      badgeContainer.innerHTML = sourceBadge + (isReal ? '' : '<span style="font-size:0.6rem;color:var(--text-faint)">Satellite telemetry active</span>');
+      // G2: show ML stress badge alongside data source badge
+      const mlBadgeHtml = mlLabel
+        ? `<span class="badge" style="font-size:0.65rem;background:${mlColor || '#888'};color:#000">${mlBadge || ''} ${mlLabel}${mlConfidence !== undefined ? ' (' + Math.round(mlConfidence * 100) + '%)' : ''}</span>`
+        : '';
+      // Senior GIS: CRS and coordinate info
+      const gisBadge = gis?.crs 
+        ? `<span class="badge badge-info" style="font-size:0.6rem" title="Coordinate Reference System">🌐 ${gis.crs}${gis.utmZone ? ' · ' + gis.utmZone : ''}</span>`
+        : '';
+      const qualityBadge = gis?.coordValid === false 
+        ? `<span class="badge badge-warn" style="font-size:0.6rem" title="Coordinate validation issues">⚠️ Coords</span>`
+        : (gis?.coordValid === true ? `<span class="badge badge-live" style="font-size:0.6rem" title="Coordinates validated">✓ Valid</span>` : '');
+      
+      badgeContainer.innerHTML = sourceBadge + gisBadge + qualityBadge + mlBadgeHtml + (isReal ? '' : '<span style="font-size:0.6rem;color:var(--text-faint)">Satellite telemetry active</span>');
     }
     
     // Dynamic label for the Average Index stats card
@@ -354,7 +366,8 @@ const FH_UI = (function() {
 
     $('statScore').textContent = score + '%';
     $('statScore').className = 'val' + (score < 50 ? ' bad' : score < 70 ? ' warn' : '');
-    const area = areaHa(_state.fieldLL);
+    // Senior GIS: Use precise area from FH_GIS if available
+    const area = gis?.areaHa || areaHa(_state.fieldLL);
     $('statArea').textContent = area.toFixed(2);
     $('statProblem').textContent = prob.toFixed(1) + '%';
     $('statProblem').className = 'val' + (prob > 30 ? ' bad' : prob > 15 ? ' warn' : '');
@@ -370,6 +383,32 @@ const FH_UI = (function() {
       const p = (cc[i] || 0) / cnt * 100;
       return `<div class="bar-row"><div class="bar-name">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${c.col}"></div></div><div class="bar-pct">${p.toFixed(1)}%</div></div>`;
     }).join('');
+  }
+
+  // ─── Senior GIS: Geospatial Metadata Panel ───
+  function renderGISMetadata(analysisData) {
+    const gis = analysisData?.gis;
+    const container = $('gisMetadata');
+    const content = $('gisMetadataContent');
+    if (!container || !content || !gis) return;
+
+    const centroid = gis.centroid ? FH_GIS.formatCoord(gis.centroid[0], gis.centroid[1], 'dms') : 'N/A';
+    const bbox = gis.bbox ? `${gis.bbox.south.toFixed(4)}°S → ${gis.bbox.north.toFixed(4)}°N, ${gis.bbox.west.toFixed(4)}°E → ${gis.bbox.east.toFixed(4)}°E` : 'N/A';
+
+    content.innerHTML = `
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px 12px;">
+        <div><b>CRS:</b> ${gis.crs || 'WGS 84'}</div>
+        <div><b>UTM:</b> ${gis.utmZone || 'Auto-detected'}</div>
+        <div><b>Area:</b> ${gis.areaHa?.toFixed(2) || '—'} ha (${gis.areaM2?.toFixed(0) || '—'} m²)</div>
+        <div><b>Perimeter:</b> ${gis.perimeterKm?.toFixed(3) || '—'} km</div>
+        <div><b>Centroid:</b> ${centroid}</div>
+        <div><b>Vertices:</b> ${gis.coordCount || 0} points</div>
+        <div style="grid-column: 1 / -1"><b>BBox:</b> ${bbox}</div>
+        <div style="grid-column: 1 / -1"><b>Winding:</b> ${gis.windingOrder || 'N/A'}</div>
+        ${gis.coordValid === false ? `<div style="grid-column: 1 / -1; color: #e74c3c"><b>⚠ Validation:</b> ${gis.coordErrors?.join(', ') || 'Issues detected'}</div>` : ''}
+      </div>
+    `;
+    container.style.display = '';
   }
 
   // ═══════════ ADVICE RENDER ═══════════
@@ -523,7 +562,7 @@ const FH_UI = (function() {
   // of the crop peak for Poor / Below avg / Moderate / Healthy / Very healthy.
   const LESSONS = [
     { title: 'Remote Sensing Basics', content: '<h4>What is Remote Sensing?</h4><p>Remote sensing is the science of obtaining information about objects from a distance using satellites or aircraft. In agriculture, we use satellite imagery to monitor crop health without visiting every field.</p><h4>Sentinel-2 Mission</h4><p>Sentinel-2 is a European Space Agency mission with two satellites providing free, open-access imagery globally every 5 days at 10m resolution.</p>' },
-    { title: 'Understanding NDVI', content: '<h4>What is NDVI?</h4><p>The Normalized Difference Vegetation Index quantifies vegetation greenness by comparing near-infrared (NIR) and red light reflectance.</p><div class="formula">NDVI = (NIR − Red) / (NIR + Red)</div><h4>The colour scale FarmHealth uses</h4><p>These are the <b>exact same colours</b> the app paints on the map, the report bars, the doughnut chart and the sidebar legend — so what you learn here is what you see in your field analysis:</p>' + healthScaleHTML() + '<h4>NDVI ranges (generic crop, peak 0.80)</h4><ul><li><b>Bare soil / water (brown):</b> NDVI &lt; 0.15 — no crop cover yet</li><li><b>Poor / stressed (red):</b> 0.15 – 0.32 — urgent check needed</li><li><b>Below average (orange):</b> 0.32 – 0.44 — needs nutrients or irrigation</li><li><b>Moderate (yellow):</b> 0.44 – 0.58 — growing, keep monitoring</li><li><b>Healthy (green):</b> 0.58 – 0.70 — good growth, maintain care</li><li><b>Very healthy (dark green):</b> 0.70+ — excellent vigour</li></ul><p>Thresholds scale with your crop\u0027s peak NDVI (wheat 0.80, rice 0.78, sugarcane 0.88), which is why the same map can look different across crops.</p>' },
+    { title: 'Understanding NDVI', content: '<h4>What is NDVI?</h4><p>The Normalized Difference Vegetation Index quantifies vegetation greenness by comparing near-infrared (NIR) and red light reflectance.</p><div class="formula">NDVI = (NIR − Red) / (NIR + Red)</div><h4>The colour scale Crafty GIS uses</h4><p>These are the <b>exact same colours</b> the app paints on the map, the report bars, the doughnut chart and the sidebar legend — so what you learn here is what you see in your field analysis:</p>' + healthScaleHTML() + '<h4>NDVI ranges (generic crop, peak 0.80)</h4><ul><li><b>Bare soil / water (brown):</b> NDVI &lt; 0.15 — no crop cover yet</li><li><b>Poor / stressed (red):</b> 0.15 – 0.32 — urgent check needed</li><li><b>Below average (orange):</b> 0.32 – 0.44 — needs nutrients or irrigation</li><li><b>Moderate (yellow):</b> 0.44 – 0.58 — growing, keep monitoring</li><li><b>Healthy (green):</b> 0.58 – 0.70 — good growth, maintain care</li><li><b>Very healthy (dark green):</b> 0.70+ — excellent vigour</li></ul><p>Thresholds scale with your crop\u0027s peak NDVI (wheat 0.80, rice 0.78, sugarcane 0.88), which is why the same map can look different across crops.</p>' },
     { title: 'Vegetation Indices', content: '<h4>Beyond NDVI</h4><p><b>EVI</b> — Better for dense canopies. Uses blue band for atmospheric correction.<br><b>SAVI</b> — Soil-adjusted. Best for sparse vegetation.<br><b>GNDVI</b> — Chlorophyll-sensitive. Great for nitrogen assessment.<br><b>NDMI</b> — Measures leaf water content. Critical for drought detection.<br><b>NDRE</b> — Uses red edge band. Best for mid-to-late season monitoring.</p>' },
     { title: 'Sentinel-2 Bands', content: '<h4>13 Spectral Bands</h4><p><b>B2 (Blue, 490nm):</b> Atmospheric correction<br><b>B3 (Green, 560nm):</b> Chlorophyll assessment<br><b>B4 (Red, 665nm):</b> Chlorophyll absorption — key for NDVI<br><b>B5-7 (Red Edge, 705-783nm):</b> Canopy structure, LAI<br><b>B8 (NIR, 842nm):</b> Biomass, vegetation vigour<br><b>B11-12 (SWIR):</b> Moisture content</p><p><b>Resolution:</b> 10m (B2-4, B8), 20m (red edge, SWIR), 60m (atmospheric)</p>' },
     { title: 'Terrain in Agriculture', content: '<h4>Why Terrain Matters</h4><ul><li><b>Slope <2°:</b> Flat — water stagnation risk</li><li><b>Slope 2-5°:</b> Ideal for most crops</li><li><b>Slope >5°:</b> Erosion risk — consider contour farming</li></ul><p>Terrain affects water distribution, sunlight exposure, and microclimates across your field.</p>' },

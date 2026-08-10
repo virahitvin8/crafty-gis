@@ -1,0 +1,722 @@
+                                     Agricultural Research Reports
+                                                    https://journals.pagepal.org/index.php/ARR
+                                                        ISSN (Online), 3106-003X; (Print), 3106-0021
+                                                   https://doi.org/10.54219/arr.03.2.2025.465
+
+
+
+Geo-Intelligent Agriculture: Integrating GIS, Remote Sensing, and IoT
+for Real-Time Soil and Crop Health Monitoring and Predictive Farm
+Management
+Muhammad Wassay1, Burhan Khalid1, Muhammad Atiq Ashraf2, Talha Riaz3, Nazma Khan4, Rizwan Maqbool1*
+
+1
+  Department of Agronomy, University of Agriculture, Faisalabad, 38000, Pakistan
+2
+  College of Horticulture and Forestry Sciences, Huazhong Agricultural University, Wuhan, 430070, China
+3
+  College of Food Science and Technology, Huazhong Agricultural University, Wuhan,430070, China
+4
+  Department of Botany, University of Agriculture, Faisalabad, 38000, Pakistan
+
+
+Article Info                                             Abstract
+Keywords:                                                Global agriculture is undergoing rapid technological transformation amid escalating
+remote sensing, soil health, precision                   environmental and systemic challenges, including soil degradation, climate
+agriculture, climate change, smart                       variability, and declining resource efficiency. The convergence of Geographic
+farming, farm management                                 Information Systems (GIS), Remote Sensing (RS), and the Internet of Things (IoT) has
+                                                         given rise to geo-intelligent agriculture, a data-driven framework that integrates
+Date:                                                    spatial analytics, real-time sensing, and predictive modeling for sustainable farm
+Received: 5 September 2025                               management. This study synthesizes recent advances in spatially explicit decision-
+Accepted: 12 October 2025                                making, highlighting how multisource data fusion enables real-time monitoring of soil
+Published: 31 December 2025                              and crop health, early anomaly detection, and predictive diagnostics. GIS-based
+                                                         geostatistical modeling delineates site-specific management zones, while UAV and
+Volume: 03 (02), 2025                                    satellite-based remote sensing deliver continuous spectral and thermal insights into
+                                                         crop vigor and stress dynamics. Simultaneously, IoT-enabled sensor networks provide
+                                                         in-situ soil and microclimatic data streams that enhance adaptive irrigation, nutrient
+Copyright: © 2025 by the authors. This article is        optimization, and pest management. The integration of these systems through cloud
+distributed under the Creative Commons                   and edge computing creates a hyperconnected, self-learning agroecosystem capable
+Attribution (CC BY) license, allowing for open access
+and sharing under specified terms and conditions.
+                                                         of real-time diagnostics and localized decision support. Emerging frameworks such
+(https://creativecommons.org/licenses/by/4.0/).          as Geo-Conscious Agriculture extend this paradigm by incorporating ethical data
+                                                         governance, explainable AI, and digital twin simulations to promote climate resilience
+                                                         and transparency. Overall, the fusion of geospatial intelligence, IoT, and AI
+                                                         represents a transformative pathway toward predictive, site-specific, and sustainable
+                                                         agriculture, redefining the relationship between technology, ecology, and food
+                                                         security.
+                                                                                 developed and developing regions, often exceeding 50% in
+1.    Introduction
+                                                                                 rain-fed systems, mainly due to a lack of spatial knowledge
+     Global agriculture is experiencing unprecedented                            of soil variability and delayed identification of crop stress
+convergence of environmental and systemic stressors. Rapid                       (Gorai et al., 2021). These challenges, coupled with the
+soil degradation due to over-cultivation, soil erosion,                          impacts of climate change and water scarcity, have
+salinization, and nutrient depletion poses a significant threat                  underlined the need for data-driven, site-specific
+to nearly one-third of the world's arable land, with knock-on                    management frameworks to provide real-time knowledge and
+effects on food productivity and sustainability (Shaheb et al.,                  intelligence into the health of both soil and crops. The
+2022; Patel et al., 2023). Yield gaps still exist in both
+Corresponding Author: Rizwan Maqbool                         Email: rizwan.maqbool@uaf.edu.pk
+                                          ©2025, PagePal Pvt. Ltd. (https://journals.pagepal.org/index.php/ARR)
+                                                                                                                                           58
+Agricultural Research Reports                                                                                                       Review Article
+
+
+
+
+   introduction of geo-located and real-time monitoring systems            each is an essential pillar of the data-driven, sustainable
+   has created a paradigm shift in precision agriculture.                  revolution in farming. GIS provides a spatial framework for
+   Traditional field scouting and post-harvest analysis are being          storing, analyzing, and visualizing georeferenced data,
+   increasingly replaced by a continuous flow of data collected            enabling accurate delineation of field zones and the
+   through sensors, satellites, and unmanned aircraft. Real-time           distribution of resources. Remote sensing, including
+   georeferencing of soil and crop parameters for spatially                satellites, UAVs, and hyperspectral imaging, extends this
+   explicit decision making to reduce input wastage and                    spatial intelligence by providing continuous, comprehensive
+   improve productivity while mitigating environmental risks               coverage of vegetation, soil, and hydrological dynamics
+   (Sabir et al., 2024). Such systems not only help farmers act            (Kavitha, Srinivasan, and Kavitha, 2022). In addition to
+   on their learnings but can also serve as the basis for predictive       these, sensor networks in the Internet of Things provide real-
+   analytics in large-scale agricultural policy and sustainability         time in-situ information on soil moisture, temperature, and
+   planning.                                                               air, enabling high-resolution feedback loops to manage them
+                                                                           accurately (Karada et al., 2024). These technologies can be
+        The intersection of Geographic Information Systems
+                                                                           combined to create actionable intelligence for promoting
+   (GIS), Remote Sensing (RS), and the Internet of Things (IoT)
+                                                                           adaptive irrigation, nutrient optimization, and pest control
+   is a revolutionary trio for contemporary agro-intelligence.
+                                                                           when integrated with cloud-based geospatial platforms (Patel
+   GIS can be used to structure, analyze, and visualize
+                                                                           et al., 2025). A convergence of GIS, RS, and IoT, therefore,
+   georeferenced information, whereas remote sensing can
+                                                                           creates the digital nervous system of smart agriculture, in
+   provide a synoptic, time-based view of vegetation activity
+                                                                           which spatial data analytics, AI-based prediction, and real-
+   and soil characteristics. In addition, IoT systems provide fine-
+                                                                           time sensing come together to enable location-specific,
+   grained, real-time field-level observations that build a multi-
+                                                                           predictive decisions for sustainable intensification.
+   resolution ecosystem between ground-truth sensing and
+   large-scale modeling (Kavitha et al., 2022). When these                 2.1. GIS as a Decision Engine: Spatial Analytics, Geo-
+   technologies are combined into a single decision-support                      statistics, and Site-Specific Zoning for Precision
+   system, they enable round-the-clock monitoring, early                         Farming
+   detection of abnormalities, and responsive management                         Geographic Information Systems (GIS) are the
+   optimization tailored to the location's conditions. However,            analytical backbone of precision agriculture, converting
+   even though spatial analytics and smart farming have made               spatial information (soil texture, topography, and yield
+   great strides, one of the most basic research questions                 variability) into functional layers for decision-making. These
+   remains unanswered: Can geospatial integration indeed                   spatial layers demarcate site-specific management zones
+   enable the realization of predictive, site-specific crop                (SSMZs), which enable effective distribution of resources to
+   management that is scalable and sustainable? The question is            meet localized crop demand, such as water and fertilizers
+   at the cross-point of computational modeling, environmental             (Oshunsanya and Oluwasemire, 2017). GIS can interpolate
+   sensing, and socio-economic scalability. Only a synthesis of            spatial data, especially using geostatistical methods such as
+   data governance, agronomy, and geoinformatics, along with               kriging and inverse distance weighting, to reveal hidden
+   transformative technological innovation, can address it. In             relationships in soil fertility and potential productivity
+   this sense, the new field of geo-intelligent agriculture is not         (Youseif et al., 2024). When adopted in the broader context
+   only about data collection but also about converting                    of the Geo-Intelligence Triad that includes GIS, Remote
+   unrefined spatial data into actionable intelligence that can            Sensing (RS), and the Internet of Things (IoT), GIS becomes
+   change the future of food systems worldwide.                            a cyber-physical decision engine (Figure 1). In this case, IoT
+                                                                           sensor data are constantly self-calibrated in real time, and
+   2.   Technological           Foundations   of   Geo-Intelligent         GIS combines spatial and spectral data to manage areas of
+        Agriculture                                                        management adaptively. The core components of this triad
+       Geo-intelligent agriculture is based on the seamless                are AI and cloud analytics, where real-time data fusion,
+   convergence of Geographic Information Systems (GIS),                    predictive modeling, and sustainability assessment are
+   Remote Sensing (RS), and the Internet of Things (IoT), as               performed. It is this integration that creates a decision
+
+
+
+
+   Agricultural Research Reports                                                           Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2
+
+                                                          ©PagePal. All Rights Reserved.
+                                                                                                                                                59
+                                                     Geo-Intelligent Precision Agriculture
+
+
+
+
+feedback loop, in which field observations are translated into           the way for autonomous, data-driven agro-monitoring
+adaptive farm management and quantifiable sustainability                 systems (Srivastava and Jain, 2025).
+metrics. A predictive decision layer drives precision
+                                                                         2.3. IoT-Enabled Agroecosystems
+intervention (Kavitha et al., 2022).
+                                                                               Modern agroecosystems have changed with the
+                                                                         integration of Internet of Things (IoT) technologies, which
+                                                                         enable continuous monitoring and decision-making based on
+                                                                         these results. Soil moisture, temperature, nutrient levels, and
+                                                                         microclimatic variables are now measured using distributed
+                                                                         wireless sensor networks and transmitted in real time using
+                                                                         low-power protocols such as LoRaWAN and Zigbee (Singh
+                                                                         et al., 2020; Akhtar et al., 2021). Together with edge
+                                                                         computing, such networks operate on local data, reducing
+                                                                         latency and enhancing system reliability in rural areas with
+                                                                         limited connectivity (Hoque et al., 2024). Cloud-based
+                                                                         analytics solutions further complement this ecosystem by
+                                                                         consolidating data from multiple sources, including IoT
+                                                                         sensors, UAVs, and weather data, into a single dashboard.
+                                                                         Such systems use artificial intelligence and predictive
+                                                                         algorithms to optimize irrigation, predict yields, and monitor
+ Figure 1. The Geo-Intelligence Triad Model for
+                                                                         crop stress (Ficili et al., 2025). Combinations of IoT, edge
+ Sustainable Smart Agriculture
+                                                                         computing, and cloud analytics provide hyperconnected
+                                                                         architecture that supports sustainable, data-driven, and
+2.2. Advances in Remote Sensing                                          adaptive agricultural management.
+      Recent advances in satellite- and UAV-based remote
+sensing have transformed agricultural monitoring, providing              3.    Real-Time Soil Health Monitoring
+high-resolution, multi-temporal insights into soil and crop
+health. Sentinel-2, Landsat-8, and WorldView offer spectral                   Real-time soil health monitoring has emerged as a
+data for analyzing vegetation vigor and soil moisture. In                cornerstone of precision agriculture, integrating the Internet
+contrast, UAVs have multispectral and LiDAR sensors that                 of Things (IoT), artificial intelligence (AI), and remote
+capture field-level changes in mound canopy and fertility                sensing to provide continuous insights into soil conditions.
+with sub-meter accuracy (Awais et al., 2023). Combining                  Through in-situ sensors and satellite-assisted analytics,
+UAVs with satellite data optimizes spatial resolution. It                farmers can now track moisture, pH, temperature, and
+enables mapping of biophysical features, including                       nutrient dynamics with unprecedented accuracy. The fusion
+chlorophyll content and leaf area index (Sishodia et al.,                of IoT data with AI-driven modeling enables early detection
+2020). Hyperspectral and thermal imaging also enhance                    of soil degradation, irrigation inefficiencies, and nutrient
+initial stress detection by capturing subtle physiological               imbalances, facilitating predictive and adaptive soil
+alterations associated with water or nutrient deficiencies               management strategies (Shivandu et al., 2024; Sharafat et al.,
+(Table 1). Specifically, thermal infrared imagery provides               2025).
+canopy temperature data, which is used as a proxy for                    3.1. From Sampling to Sensing
+evapotranspiration and plant water status (Zhou et al., 2021).                The transition from traditional soil sampling to IoT-
+Research has shown that UAV-mounted thermal sensors can                  based sensing has revolutionized soil health assessment in
+be used to map water stress in crops such as rice, maize, and            precision agriculture. While conventional testing provided
+vineyards (Khanal et al., 2017). Even more recently,                     reliable but infrequent data, it often failed to capture dynamic
+predictive stress modeling has been enhanced by combining                spatial and temporal variations in soil properties. Modern
+hyperspectral and thermal data with AI algorithms, paving                IoT-enabled sensors now offer continuous, real-time
+                                                                         monitoring of key parameters such as moisture, pH, and
+
+
+
+Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2                                       https://journals.pagepal.org/index.php/ARR
+
+                                                        ©PagePal. All Rights Reserved.
+                                                                                                                                      60
+Agricultural Research Reports                                                                                                             Review Article
+
+
+
+
+   temperature, transmitting data via low-power networks to                    3.2.1. Procedure for recording observations
+   cloud platforms for analysis. This shift from static to live                     The physical characteristics, such as soil moisture
+   sensing enables proactive soil management and enhances                      content and temperature, regulate the association between
+   decision-making for sustainable farming (Sishodia et al.,                   plants and water and microbial functions. Now, continuous
+   2020; Mamabolo et al., 2025).                                               monitoring of these parameters is possible through IoT-based
+
+   Table 1. Comparison of Remote Sensing Platforms and Their Agricultural Applications
+    Platform                    Sensor Type         Spatial             Key Parameters                Agricultural              References
+                                                    Resolution          Measured                      Applications
+    Sentinel-2 (ESA)            Multispectral (13   10–20 m             NDVI, EVI, chlorophyll,       Crop stress               (Surendran et al.,
+                                bands)                                  soil moisture                 assessment,               2024; Sabir et al.,
+                                                                                                      vegetation                2024)
+                                                                                                      monitoring, land
+                                                                                                      cover mapping
+    Landsat-8                   Multispectral &     30 m (optical), Surface temperature,              Long-term          (Sishodia et al.,
+    (NASA/USGS)                 Thermal             100 m           vegetation vigor, soil            monitoring of crop 2020)
+                                                    (thermal)       moisture                          health and
+                                                                                                      irrigation
+                                                                                                      scheduling
+    WorldView-3                 Hyperspectral /     0.3–1.2 m           Fine-scale canopy             High-resolution           (Awais et al.,
+    (Maxar)                     Multispectral                           structure, chlorophyll        crop classification       2023)
+                                                                        content                       and disease
+                                                                                                      detection
+    UAV (Drone)                 Multispectral /     <1 m                Canopy height, LAI,       Field-scale                   (Vaidya et al.,
+                                LiDAR / RGB                             biomass, spectral indices mapping of crop               2022; Khanal et
+                                                                                                  variability and               al., 2017)
+                                                                                                  nutrient stress
+    Thermal UAV                 Thermal Infrared    <1 m                Canopy temperature,           Early detection of        (Zhou et al.,
+                                                                        evapotranspiration            crop water stress         2021)
+                                                                                                      and irrigation
+                                                                                                      inefficiency
+    Hyperspectral               Hyperspectral       1–30 m              Pigment content,              Detection of              (Srivastava and
+    Imaging Systems             (hundreds of                            biochemical properties,       nutrient                  Jain, 2025;
+                                narrow bands)                           disease markers               deficiencies and          Khanna et al.,
+                                                                                                      disease onset             2019)
+    SAR (Synthetic              Microwave (Active 10–100 m              Soil moisture, surface        Cloud-penetrating (Devi et al., 2023)
+    Aperture Radar)             Sensor)                                 roughness, biomass            soil moisture and
+                                                                                                      crop structure
+                                                                                                      analysis
+
+                                                                               sensors and remote sensing technologies that optimize
+   3.2. Key Soil Parameters
+                                                                               irrigation and measure thermal dynamics that affect root
+        The primary soil parameters are essential indicators of
+                                                                               growth and evapotranspiration (Khanal et al., 2017).
+   farming capacity and ecosystem stability. These parameters
+   can be divided into physical, chemical, and biological                      3.2.2. Chemical Parameters
+   components, each with a distinct role in the soil functionality                  Chemical signals such as soil salinity, pH, and organic
+   and real-time monitoring of health.                                         carbon content are essential to nutrient availability and soil
+
+
+
+
+   Agricultural Research Reports                                                                 Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2
+
+                                                              ©PagePal. All Rights Reserved.
+                                                                                                                                                      61
+                                                        Geo-Intelligent Precision Agriculture
+
+
+
+
+fertility (Table 2). Rapid, non-destructive measuring of these              3.3. Challenges in Real-Time Monitoring
+properties is becoming more common using electrical                               Although it has the potential to transform soil
+conductivity and near-infrared spectroscopy, which are very                 monitoring, real-time monitoring is associated with issues of
+useful in adaptive nutrient and salinity management (Sabir et               sensor calibration, spatial variability, and data reliability.
+al., 2024).                                                                 Incorrect calibration due to environmental exposure and soil
+                                                                            interaction may necessitate periodic recalibration or the use
+3.2.3. Biological Parameters
+                                                                            of AI-based correction models (Sayyad et al., 2024). The
+      The health of the soil is indicated by biological
+                                                                            spatial heterogeneity of soil texture and soil moisture makes
+parameters such as microbial and enzyme activities. Current
+                                                                            the measurement process more problematic, and to achieve
+biosensors and AI-based models can now predict microbial
+                                                                            spatial validation, a high-density sensor network must be
+respiration rates and carbon fluxes and provide real-time
+                                                                            employed, with results combined with remote sensing data
+information on soil biological activity (Mamabolo et al.,
+                                                                            (Sabir et al., 2024). In addition, unstable data transmission
+2025).
+                                                                            and power outages in remote areas reduce the system's long-
+      These parameters, when combined, form a
+                                                                            term reliability, underscoring the need for hybrid edge-cloud
+multidimensional, data-rich framework for accuracy in soil
+                                                                            systems to maintain high-quality, streamlined soil data
+management and sustainable agricultural decision-making.
+                                                                            (Mamabolo et al., 2025).
+
+ Table 2. Key Soil Parameters and Their Role in Precision Agriculture
+  Parameter          Parameter               Monitoring Method Indicator of                      Management               Reference
+  Type                                       / Technology                                        Implication
+  Physical           Soil Moisture           IoT soil moisture       Water availability;         Optimizes irrigation (Khanal et al.,
+                                             sensors; UAV/Satellite- root-zone dynamics          scheduling and       2017; Sabir et al.,
+                                             based NDWI and                                      water-use efficiency 2024)
+                                             thermal imaging
+  Physical           Soil Temperature Thermistor-based                 Soil heat flux; microbial Guides planting          (Sishodia et al.,
+                                      probes; UAV thermal              activity                  time and root            2020)
+                                      sensors                                                    development
+                                                                                                 management
+  Chemical           Soil pH                 pH sensors; optical       Soil acidity/alkalinity   Supports lime or      (Sayyad et al.,
+                                             spectroscopy; EC          affects nutrient          sulfur application to 2024)
+                                             probes                    solubility                balance pH
+  Chemical           Electrical        In-situ EC sensors;             Salinity and nutrient     Enables salinity         (Sabir et al.,
+                     Conductivity (EC) EM38 electromagnetic            ion concentration         mitigation and           2024)
+                     / Salinity        induction                                                 irrigation water
+                                                                                                 quality assessment
+  Chemical           Organic Carbon          Near-infrared (NIR)       Soil fertility and carbon Informs fertilizer       (Mamabolo et
+                     Content                 spectroscopy; lab         sequestration potential and organic                al., 2025)
+                                             calibration                                         amendment
+                                                                                                 practices
+  Biological         Microbial Activity Biosensors; CO₂ flux    Soil biological vitality Indicates soil                   (Mamabolo et
+                                        and respiration sensors and enzymatic function recovery and                       al., 2025)
+                                                                                         organic matter
+                                                                                         balance
+  Biological         Enzyme                  AI-based biosensor     Nutrient cycling             Monitors soil            (Shivandu et al.,
+                     Dynamics                networks;              (phosphatase, urease         biological response      2024, Sharafat et
+                                             microelectrode systems activity)                    to fertilizers           al., 2025)
+
+
+
+
+Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2                                          https://journals.pagepal.org/index.php/ARR
+
+                                                           ©PagePal. All Rights Reserved.
+                                                                                                                                              62
+Agricultural Research Reports                                                                                                      Review Article
+
+
+
+
+   4.   Crop Health Monitoring through Spatio-Temporal                    crop management. Emerging research emphasizes combining
+        Intelligence                                                      hyperspectral signatures with thermal and LiDAR data to
+                                                                          model plant function holistically, paving the way for a shift
+         Spatio-temporal intelligence monitors crop health by
+                                                                          from visual monitoring to functional crop intelligence
+   combining remote sensing, spectral analysis, and artificial
+                                                                          (Vaidya et al., 2022).
+   intelligence to provide dynamic information on crop growth,
+   stress, and productivity. These systems can identify                   4.2. Integration with Weather and Phenology Models:
+   physiological stress well before it is physically manifested,                Understanding Crop Growth Cycles and Climatic
+   using evidence from changes in vegetation indices and                        Responses
+   spectral reflectance over time (Allu and Mesapam, 2025).                     Coupling weather prediction with crop models based on
+   Combining satellite, UAV, and IoT data enables tracking                phenology is a significant advance in predictive agriculture,
+   crop health with the highest level of accuracy. At the same            enabling dynamic integration of environmental variability
+   time, machine learning algorithms detect trends in nutrient            and crop growth. Phenological events, including
+   deficiency, pest infestation, and water stress (Noroozi and            germination, flowering, and maturation, are controlled by
+   Shah-Hosseini, 2024). In combination with weather and                  temperature, solar radiation, humidity, and precipitation,
+   phenology models, they can be used to predict crop                     respectively, and each of these factors leaves a trace in the
+   performance under varying climatic and developmental                   spectral reflectance of remote sensors. When integrated with
+   conditions, promoting adaptive and sustainable agricultural            vegetation indices (NDVI and EVI), these climatic datasets
+   management (Devi et al., 2023).                                        provide temporally resolved information on trends in crop
+                                                                          stress and productivity. This type of fusion will enable the
+   4.1. Spectral Indicators of Crop Stress: NDVI, EVI,
+                                                                          construction of spectral baselines during the growth stage,
+         SAVI, and Hyperspectral Biomarkers
+                                                                          enhancing the precision of stress detection across different
+         Spectral indicators remain the cornerstone of precision
+                                                                          agroecological regions (Xiao et al., 2023). Recent trends are
+   crop monitoring, providing quantifiable measures of
+                                                                          shifting towards active observation, driven by climate-
+   vegetation health through remote sensing. The Normalized
+                                                                          responsive crop intelligence systems, rather than passive
+   Difference Vegetation Index (NDVI), Enhanced Vegetation
+                                                                          observation. Integrating real-time UAV and satellite images
+   Index (EVI), and Soil-Adjusted Vegetation Index (SAVI)
+                                                                          with weather predictions and phenological models enables
+   collectively capture variations in canopy greenness,
+                                                                          researchers to simulate future growth patterns and assess
+   photosynthetic activity, and soil background influence (Table
+                                                                          stress potential across a variety of climate conditions. The
+   3). These indices allow continuous assessment of crop vigor,
+                                                                          integration supports early warning systems to detect
+   leaf chlorophyll content, and stress response across temporal
+                                                                          reductions in yield, pest development, and water shortages,
+   and spatial scales. With the integration of multi-sensor data
+                                                                          helping farmers implement proactive management
+   ranging from satellites to UAV-mounted optical systems,
+                                                                          interventions. In addition, integrating AI-based phenology
+   farmers can monitor growth dynamics in real time,
+                                                                          modeling would allow adjusting the timing of crop growth
+   facilitating adaptive decisions on irrigation, nutrient
+                                                                          stages across genotypes and microclimates, representing a
+   management, and pest control (Lebrini et al., 2020). Beyond
+                                                                          new step toward shifting from descriptive monitoring to
+   traditional indices, hyperspectral imaging has introduced a
+                                                                          predictive agroecosystem modeling (Pham et al., 2022). This
+   new era of biochemical precision in crop diagnostics. Unlike
+                                                                          holistic framework provides a way to achieve climate-
+   multispectral imagery, hyperspectral sensors record hundreds
+                                                                          resilient agriculture, in which crop performance is forecast
+   of contiguous, narrow spectral bands, enabling the detection
+                                                                          rather than observed.
+   of subtle physiological and molecular-level changes in plants.
+   This allows early identification of nutrient deficiencies,             4.3. Machine Learning for Anomaly Detection:
+   disease outbreaks, and water stress well before visible                      Identifying Nutrient Stress, Disease, or Water
+   symptoms appear. The novel fusion of hyperspectral                           Deficit from Time-Series Data
+   biomarkers with machine learning and deep neural networks                    Machine learning has transformed the diagnosis of crop
+   has further enhanced the predictive accuracy of stress                 stress by revealing hidden patterns in consecutive
+   detection, offering site-specific, data-driven prescriptions for
+
+
+
+   Agricultural Research Reports                                                          Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2
+
+                                                         ©PagePal. All Rights Reserved.
+                                                                                                                                               63
+                                                          Geo-Intelligent Precision Agriculture
+
+
+
+
+ Table 3. Major Vegetation Indices Used in Crop Stress Detection
+ Vegetation Index              Formula               Spectral             Primary                Agricultural                  References
+ (VI)                                                Bands Used           Sensitivity /          Application
+                                                                          Indicator
+ NDVI (Normalized              (NIR − Red) /         NIR, Red             Chlorophyll content, Assessing crop vigor,           (Lebrini et al.,
+ Difference                    (NIR + Red)                                canopy greenness     biomass, and                    2020; Sishodia et
+ Vegetation Index)                                                                             photosynthetic activity         al., 2020)
+ EVI (Enhanced                 2.5 × (NIR −          NIR, Red, Blue       Photosynthetic         Distinguishing high-    (Devi et al.,
+ Vegetation Index)             Red) / (NIR +                              activity in dense      biomass areas and       2023)
+                               6×Red −                                    vegetation             improving NDVI in dense
+                               7.5×Blue + 1)                                                     canopies
+ SAVI (Soil Adjusted (NIR − Red) × NIR, Red                               Vegetation under      Correcting soil brightness (Khanna et al.,
+ Vegetation Index)   (1 + L) / (NIR +                                     high soil reflectance effects in sparse          2019)
+                     Red + L), L =                                                              vegetation zones
+                     0.5
+ GCI (Green                    (NIR / Green) − NIR, Green                 Chlorophyll and        Detecting nutrient            (Vaidya et al.,
+ Chlorophyll Index)            1                                          nitrogen               deficiencies and canopy       2022)
+                                                                          concentration          chlorosis
+ NDWI (Normalized              (NIR − SWIR) / NIR, SWIR                   Plant water content, Early detection of              (Zhou et al.,
+ Difference Water              (NIR + SWIR)                               leaf moisture        drought stress and              2021)
+ Index)                                                                                        irrigation management
+ MSI (Moisture Stress SWIR / NIR                     SWIR, NIR            Leaf water potential Quantifying water stress        (Khanal et al.,
+ Index)                                                                   and drought          and evapotranspiration          2017)
+                                                                          severity             variability
+ PRI (Photochemical            (R531 − R570) / Narrow visible             Photosynthetic         Detecting stress before       (Awais et al.,
+ Reflectance Index)            (R531 + R570) bands                        efficiency,            visible canopy changes        2023)
+                                                                          xanthophyll cycle
+                                                                          activity
+ Hyperspectral Stress          Variable (based 400–2500 nm                Subtle biochemical     Predictive modeling of        (Srivastava and
+ Indices (Custom AI-           on ML feature (contiguous)                 and structural         nutrient and disease          Jain, 2025;
+ derived)                      extraction)                                changes                stress via machine            Noroozi and
+                                                                                                 learning                      Shah-Hosseini,
+                                                                                                                               2024)
+
+spatiotemporal data that conventional analysis cannot                            a reactive observation and a proactive management,
+capture. Neural networks such as convolutional neural                            significantly improving the accuracy and responsiveness of
+networks (CNNs), random forests, and autoencoders have                           field operations. The latest developments focus on
+been applied to continuous streams of spectral and thermal                       explainable AI (XAI) and hybrid modeling as new frontiers
+images to identify early signs of nutrient stress, disease                       for agricultural anomaly detection. Modern approaches are
+infestation, and water shortages. The researchers can                            moving toward using biophysical knowledge, including leaf
+differentiate between natural phenological variation and                         chlorophyll dynamics and soil moisture correlations, to
+abnormal responses to stress using multi-temporal UAV and                        enhance the interpretability and robustness of deep learning
+satellite imagery to train models, enabling early intervention                   architectures, rather than relying solely on opaque predictive
+before yield is harmed (Noroozi and Shah-Hosseini, 2024).                        models. New hybrid models integrate machine learning with
+Such a data-driven platform will turn anomaly detection into                     process-based models to model the cause and expression of
+
+
+
+
+Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2                                               https://journals.pagepal.org/index.php/ARR
+
+                                                                ©PagePal. All Rights Reserved.
+                                                                                                                                                 64
+Agricultural Research Reports                                                                                                      Review Article
+
+
+
+
+   stress, closing the data analytics-agronomic reasoning gap.            5.    Predictive Diagnostics and Geo-Locating Trouble
+   Moreover, edge AI algorithms are being automated in real                     Zones
+   time to detect anomalies in UAVs and IoT nodes, providing
+                                                                               Predictive diagnostics and geo-locating trouble zones
+   instant stress alerts without relying on the cloud. This kind of
+                                                                          represent a new paradigm in precision agriculture, combining
+   innovation can be viewed as a significant advancement in
+                                                                          geospatial intelligence, IoT sensing, and artificial intelligence
+   self-education agro-intelligence models, which can respond
+                                                                          to identify and forecast spatial hotspots of crop stress, pest
+   to changes in environmental and biological trends (Zhu et al.,
+                                                                          incidence, and resource inefficiencies (Figure 2). These
+   2022).
+                                                                          systems integrate multisource data from soil sensors, satellite
+   4.4. Open Challenge: Translating Spectral Signals into                 imagery, and climate models to generate dynamic maps that
+         Actionable Agronomic Insights                                    highlight potential problem areas before they escalate into
+         While recent developments in spectral sensing and AI-            yield losses (Chen et al., 2025). By leveraging predictive
+   based analytics have greatly enhanced our ability to assess            analytics, farmers and policymakers can move beyond
+   crop health, there remains a challenge in converting complex           reactive interventions to proactive management, enhancing
+   spectral data into actionable agronomic insights. Vegetation           both productivity and environmental sustainability.
+   indices and hyperspectral biomarkers are sensitive to detailed
+                                                                          5.1. Concept of Trouble Zones: Spatial Hotspots for Pest
+   canopy responses. However, they are commonly biased by
+                                                                                Attack, Irrigation Failure, or Nutrient Stress
+   extraneous factors such as soil reflectance, atmospheric
+                                                                                Trouble zones are spatially defined regions within
+   interference, and vegetation structure. This confusion makes
+                                                                          agricultural landscapes where biotic or abiotic stress factors
+   it difficult to determine the causes of stress. A person can
+                                                                          converge, leading to yield instability. These zones often
+   hardly be sure whether the nutrient deficiency, water stress,
+                                                                          emerge due to nutrient imbalances, pest infestation, or
+   or pest damage is the cause of the problem (Khanna et al.,
+                                                                          localized irrigation inefficiencies that conventional
+   2019). Additionally, most predictive models do not scale
+                                                                          monitoring methods fail to detect early (De Caires et al.,
+   spatially or temporally, because algorithms trained on a
+                                                                          2025). Advanced GIS and remote sensing systems, when
+   single crop or location may not perform as well in a new
+                                                                          combined with UAV and IoT data, allow for early
+   location due to variation in local soil structure, crop
+                                                                          identification of such hotspots by visualizing variations in
+   phenology, and sensor adjustments.
+                                                                          spectral indices, soil parameters, and canopy temperature.
+         To address such barriers, studies are turning to context-
+                                                                          Through continuous spatio-temporal monitoring, these tools
+   aware, explainable AI models that reduce the gap between
+                                                                          enable precision targeting of inputs and reduce resource
+   information and decision-making. These systems are
+                                                                          wastage (Dustmohamadi & Houshmand, 2025).
+   multisource, combining inputs such as spectral, soil, weather,
+   and management information to generate a comprehensive                 5.2. Predictive Analytics Frameworks: Deep Learning
+   understanding of field conditions. To ensure agronomic                      and Spatio-Temporal Kriging for Hotspot
+   relevance, novel hybrid methods are currently being                         Prediction; Edge Computing for Real-Time
+   developed that couple machine learning with mechanistic                     Diagnostics
+   crop models, thereby providing causal explanations rather                   The current predictive models also use deep learning
+   than statistical correlations. Moreover, new developments in           and geostatistical algorithms, such as spatio-temporal
+   semantic interoperability and digital twin agriculture are             kriging, to map and predict trouble areas in agriculture with
+   expected to bring field-level measurements into simulation             high precision. Multi-temporal images and sensor
+   worlds, allowing a farmer to see the world through a lens of           measurements can be analyzed through deep neural networks
+   what could happen next before introducing an intervention              to detect early instances of pest outbreaks or water stress by
+   (Devi et al., 2023). These innovations mark a paradigm shift           analyzing multi-temporal patterns (Gkountakos et al., 2024)
+   from descriptive analytics to prescriptive agronomy,                   and interpolating irregular sensor measurements with kriging
+   converting spectral information into intelligent agronomy for          to create a continuous surface map to assess nutrient or
+   specific sites.                                                        moisture variability (De Caires et al., 2025). Spatio-temporal
+                                                                          kriging can capture both spatial and temporal dependencies
+                                                                          and provide localized predictions at sub-field scales (Hlal et
+
+
+   Agricultural Research Reports                                                          Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2
+
+                                                         ©PagePal. All Rights Reserved.
+                                                                                                                                               65
+                                                       Geo-Intelligent Precision Agriculture
+
+
+
+
+al., 2025). To complement such approaches, edge computing                  each agronomic choice contributes to productivity and
+can process IoT data locally, reducing latency and enabling                ecological sustainability (Awais et al., 2025).
+timely decision-making, particularly in remote rural                            In the future, new technologies such as quantum sensors,
+environments with limited connectivity (Seong et al., 2025).               nanosensors, and digital twins could transform agricultural
+                                                                           intelligence to new heights. Quantum and nanoscale sensors
+6.   Future    Directions:             Toward        Geo-Conscious         can detect subtle variations in soil chemistry and plant
+     Agriculture                                                           physiology. In contrast, digital twin systems can simulate the
+     The future of precision agriculture is quickly becoming               entire farm ecosystem, enabling predictions of outcomes
+a new paradigm in Geo-Conscious Agriculture, a data-driven,                before an intervention. Combined with explainable AI
+spatially sensitive, and ethically regulated approach. It is a             systems and blockchain-traced provenance, these solutions
+new model that combines artificial intelligence (AI),                      form entirely transparent and morally responsible food
+geographic information systems (GIS), and the Internet of                  systems. Nevertheless, to achieve this vision, regulatory
+Things (IoT) to create an adaptive agricultural ecosystem                  frameworks that address who owns data, how to avoid biased
+capable of autonomously responding to both environmental                   algorithms, and a fair distribution of technology will be
+and agronomic processes. Over time, IoT sensors provide                    needed. Geo-Conscious Agriculture is, therefore, a
+real-time data that, with the help of geospatial analytics and             technological innovation as well as an ethical obligation to
+machine learning, can be used to predict crop stress, pest                 make agriculture geo-conscious (adapted to planethood) and
+activity, and water use, turning the decision-making process               humanist (Ashique et al., 2025).
+in agriculture into anticipatory rather than a reactive one. A
+                                                                           7.    Conclusion
+combination of AI and GIS will enable farmers to access
+spatially context-sensitive information that connects field-                    The agricultural paradigm is shifting toward geo-
+level variability to sustainability outcomes, ensuring that                intelligent, data-driven agriculture, integrating geospatial
+
+
+
+
+  Figure 2. Sensor Network for Real-Time Soil Status and Irrigation Feedback
+
+
+
+Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2                                         https://journals.pagepal.org/index.php/ARR
+
+                                                          ©PagePal. All Rights Reserved.
+                                                                                                                                        66
+Agricultural Research Reports                                                                                                     Review Article
+
+
+
+
+   technologies, IoT networks, artificial intelligence, and              (Climate Action) by optimizing resource use, reducing
+   predictive analytics to create a sustainable production system.       environmental footprints, and improving climate resilience
+   No matter the real-time monitoring of soil and crops, or the          through predictive and site-specific agricultural practices.
+   spatio-temporal modeling and predictive diagnostics, every
+   technological layer is a step towards a more flexible and             References
+   proactive form of agriculture. All these innovations enable           Akhtar, M. N., Shaikh, A. J., Khan, A., Awais, H., Bakar, E.
+   more accurate interventions, more efficient resource use, and           A., & Othman, A. R. (2021). Smart Sensing with Edge
+   reduced environmental degradation. As challenges in                     Computing in Precision Agriculture for Soil Assessment
+   agriculture due to global warming, soil erosion, and food               and Heavy Metal Monitoring: A
+   security grow, the integration of GIS, remote sensing, and              Review. Agriculture, 11(6), 475.
+   IoT is revolutionizing farm management through evidence-                https://doi.org/10.3390/agriculture11060475
+   based approaches and ecological sustainability.
+        However, the potential of geo-intelligent systems lies not       Ficili, I., Giacobbe, M., Tricomi, G., & Puliafito, A. (2025).
+   only in technological development but also in their moral and             From sensors to data intelligence: Leveraging IoT,
+   integrative aspects. The Geo-Conscious principles must be                 cloud, and edge computing with AI. Sensors, 25(6),
+   adopted in future agriculture, where all innovations are                  1763. https://doi.org/10.3390/s25061763
+   informed by data transparency, the inclusion of farmers, and          Gorai, T., Yadav, P. K., Choudhary, G. L., & Kumar, A.
+   environmental responsibility. The advent of quantum                      (2021). Site-specific crop nutrient management for
+   sensors, digital twins, and explainable AI frameworks will               precision agriculture: A review. Current Journal of
+   further close the divide between observation and intelligent             Applied Science and Technology, 40(10), 37–52.
+   decision-making and open the pathway to climate-resilient,               https://doi.org/10.9734/cjast/2021/v40i1031357
+   equitable, and regenerative food systems. With this vision,
+   each byte of data, each pixel of satellite imagery, each sensor       Hoque, M. J., Islam, M. S., Ahmed, I., & Nurullah, M.
+   signal will contribute to a common global challenge:                    (2024). Enhancing Precision Agriculture Efficiency
+   sustainable, thoughtful agriculture that will help feed the             Through Edge Computing-Enabled Wireless Sensor
+   world and take care of the planet.                                      Networks: A Data Aggregation Perspective.
+                                                                         Kavitha, M., Srinivasan, R., & Kavitha, R. (2022). GIS
+   8.   Funding                                                             systems for precision agriculture and site-specific
+        This research received no external funding.                         farming. In Precision agriculture: Advances and
+                                                                            challenges (pp. 125–142). Taylor & Francis.
+   9.   Conflict of Interest
+                                                                         Khanal, S., Fulton, J., & Shearer, S. (2017). An overview of
+        The authors declared no potential conflicts of interest            current and potential applications of thermal remote
+   w.r.t this article's research, authorship, and publication.             sensing in precision agriculture. Computers and
+                                                                           Electronics in Agriculture, 139, 22–32.
+   10. Authors’ Contribution
+                                                                           https://doi.org/10.1016/j.compag.2017.05.001
+        Muhammad Wassay and Burhan Khalid collected review
+                                                                         Mamabolo, E., Mashala, M. J., Mugari, E., & Mogale, T. E.
+   related to the article, Muhammad Atiq Ashraf, Talha Riaz,
+                                                                           (2025). Application of precision agriculture technologies
+   and Nazma Khan along with Rizwan Maqbool wrote review
+                                                                           for crop protection and soil health. Smart Agricultural
+   paper section-wise.
+                                                                           Technology, 10, 101270.
+                                                                           https://doi.org/10.1016/j.atech.2025.101270
+   11. SDGs Addressed
+                                                                         Oshunsanya, S. O., Oluwasemire, K. O., & Taiwo, O. J.
+       This study primarily supports SDG 2 (Zero Hunger) by
+                                                                            (2017). Use of GIS to Delineate Site-Specific
+   enhancing sustainable food production through precision,
+                                                                            Management Zone for Precision Agriculture.
+   data-driven farm management. It also advances SDG 12
+                                                                            Communications in Soil Science and Plant Analysis,
+   (Responsible Consumption and Production) and SDG 13
+
+
+
+   Agricultural Research Reports                                                         Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2
+
+                                                        ©PagePal. All Rights Reserved.
+                                                                                                                                              67
+                                                     Geo-Intelligent Precision Agriculture
+
+
+
+
+    48(5), 565–575.                                                      Singh, R. K., Aernouts, M., De Meyer, M., & Weyn, M.
+    https://doi.org/10.1080/00103624.2016.1270298                           (2020). Leveraging LoRaWAN technology for precision
+                                                                            agriculture in greenhouses. Sensors, 20(7), 1827.
+Patel, A., Shukla, C., Trivedi, A., Balasaheb, K. S., & Sinha,
+                                                                            https://doi.org/10.3390/s20071827
+   M. K. (2025). Smart farming: Utilization of robotics,
+   drones, remote sensing, GIS, AI, and IoT tools in                     Sishodia, R. P., Ray, R. L., & Singh, S. K. (2020).
+   agricultural operations and water management. In                         Applications of remote sensing in precision agriculture:
+   Integrated Land and Water Resource Management for                        A review. Remote Sensing, 12(19), 3136.
+   Sustainable Agriculture (Vol. 1, pp. 127–151). Springer,                 https://doi.org/10.3390/rs12193136
+   Singapore. https://doi.org/10.1007/978-981-97-9796-7_8
+                                                                         Srivastava, A., & Jain, S. (2025). Remote Sensing for
+Sabir, R. M., Mehmood, K., Sarwar, A., Safdar, M.,                           environment assessment: Multispectral, hyperspectral,
+   Muhammad, N. E., Gul, N., Athar, F., Majeed, M. D.,                       and thermal imaging applications. In V. Saritha, C. B.
+   Sattar, J., Khan, Z., Fatima, M., Hussain, M. A., &                       Pande, R. Singh, & M. Shahid (Eds.), Remote sensing
+   Akram, H. M. B. (2024). Remote sensing and precision                      for environmental monitoring (pp. 1–28). Springer.
+   agriculture: A sustainable future. In Transforming                        https://doi.org/10.1007/978-981-96-5546-5_1
+   Agricultural Management for a Sustainable Future (pp.
+                                                                         Surendran, U., Nagakumar, K. C. V., & Samuel, M. P.
+   71–98). Springer, Cham. https://doi.org/10.1007/978-3-
+                                                                            (2024). Remote sensing in precision agriculture. In
+   031-63430-7_4
+                                                                            Digital agriculture: A solution for sustainable food and
+Sayyad, S. B., Shaikh, M. A., Anpat, S. M., & Kolapkar, M.                  nutritional security (pp. 201–223). Springer, Cham.
+   M. (2024). IoT based soil monitoring for precision                       10.1007/978-3-031-43548-5_7
+   agriculture. In Remote Sensing in Precision
+                                                                         Yousif, I. A. H., Sayed, A. S. A., Abdelsamie, E. A.,
+   Agriculture (pp. 43-59). Academic Press.
+                                                                           Ahmed, A. A. R. S., Saeed, M., Mohamed, E. S.,
+Shaheb, M. R., Sarker, A., & Shearer, S. A. (2022).                        Rebouh, N. Y., & Shokr, M. S. (2024). Efficiency of
+   Precision agriculture for sustainable soil and crop                     Geostatistical Approach for Mapping and Modeling Soil
+   management. In Soil Science: Emerging Technologies,                     Site-Specific Management Zones for Sustainable
+   Global Perspectives and Applications. IntechOpen.                       Agriculture Management in Drylands. Agronomy,
+   https://doi.org/10.5772/intechopen.101759                               14(11), 2681.
+                                                                           https://doi.org/10.3390/agronomy14112681
+Sharafat, M. D. S., Kabya, N. D., Emu, R. I., Ahmed, M. U.,
+   Onik, J. C., Islam, M. A., & Khan, R. (2025). An IoT-                 Zhou, Z., Majeed, Y., & Naranjo, G. D. (2021). Assessment
+   enabled AI system for real-time crop prediction using                    for crop water stress with infrared thermal imagery in
+   soil and weather data in precision agriculture. Smart                    precision agriculture: A review and future prospects for
+   Agricultural Technology, 12, Article 101263.                             deep learning applications. Computers and Electronics
+   https://doi.org/10.1016/j.atech.2025.101263                              in Agriculture, 182, 105991.
+                                                                            https://doi.org/10.1016/j.compag.2021.106019
+Shivandu, S. K., Sharma, K., Bilal, M., & Kumar, S. (2024).
+   Integrating artificial intelligence and Internet of Things
+   (IoT) for enhanced crop monitoring and management in
+   precision agriculture. Sensors International, 5, 100292.
+   https://doi.org/10.1016/j.sintl.2024.100292
+
+
+
+
+Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2                                       https://journals.pagepal.org/index.php/ARR
+
+                                                        ©PagePal. All Rights Reserved.
+                                                                                                                                      68
+Agricultural Research Reports                                                                                        Review Article
+
+
+
+
+Disclaimer/Publisher's Note: The views, opinions, and data presented in all publications are exclusively those of the
+respective author(s) and contributor(s) and do not reflect the stance of Pagepal or its editorial team. Pagepal and the editor(s)
+disclaim any responsibility for harm to individuals or damage to property resulting from the use of any ideas, techniques,
+instructions, or products mentioned in the content.
+
+
+
+
+Agricultural Research Reports                                                         Wassay et al. | DECEMBER 2025 | VOLUME 3 | ISSUE 2
+
+                                                     ©PagePal. All Rights Reserved.
+                                                                                                                                           69
+

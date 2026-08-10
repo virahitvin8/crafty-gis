@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Backend Server
+   Crafty GIS — Backend Server
    ═══════════════════════════════════════════════════════════
    Serves the static frontend and provides API endpoints.
    Google Earth Engine integration is optional — if the
@@ -174,7 +174,7 @@ if (geeAvailable) {
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
-    message: 'FarmHealth API Backend is running',
+    message: 'Crafty GIS API Backend is running',
     geeStatus: geeInitialized ? 'connected' : 'disconnected',
     endpoints: {
       health: '/api/gee/health',
@@ -245,7 +245,7 @@ app.post('/api/infrastructure', express.json(), async (req, res) => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         // Overpass rejects requests without a proper User-Agent (HTTP 406)
-        'User-Agent': 'FarmHealthApp/1.0 (precision-agriculture; contact: farmhealth@localhost)'
+        'User-Agent': 'Crafty GISApp/1.0 (precision-agriculture; contact: crafty_gis@localhost)'
       },
       body: 'data=' + encodeURIComponent(query)
     });
@@ -794,7 +794,7 @@ app.post('/api/ml/zones.csv', withGEE(async (req, res) => {
   req.body.withTrends = false; // CSV only needs the feature table — skip 4-window sampling
   const zoneRows = await zoneRowsWithTrends(ee, coords, req);
   res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename="farmhealth_zone_features.csv"');
+  res.setHeader('Content-Disposition', 'attachment; filename="crafty_gis_zone_features.csv"');
   res.send(mlModel.zonesToCSV(zoneRows));
 }));
 
@@ -862,7 +862,7 @@ app.post('/api/sentinel/token', async (req, res) => {
 
     const authRes = await fetch('https://services.sentinel-hub.com/oauth/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'FarmHealth/1.0 (contact: akshitvinay4636@gmail.com)' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'Crafty GIS/1.0 (contact: akshitvinay4636@gmail.com)' },
       body: body
     });
 
@@ -980,7 +980,7 @@ async function ollamaPing() {
 // ─── Build the agronomist prompt (shared by Ollama and Gemini) ───
 function buildAgronomistPrompt(fieldName, crop, ndvi, soilPh, soilNitrogen, soilOrganicCarbon, growthStage, weather) {
   return `
-    You are FarmHealth's Lead Agronomist AI, powered by satellite and soil telemetry.
+    You are Crafty GIS's Lead Agronomist AI, powered by satellite and soil telemetry.
     Analyze the following crop and field telemetry:
     
     - Field Name: ${fieldName || "Unknown"}
@@ -1336,7 +1336,7 @@ app.post('/api/stac/ndvi', async (req, res) => {
 
 // ─── Start Server ───
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n  🛰️  FarmHealth Server is running!`);
+  console.log(`\n  🛰️  Crafty GIS Server is running!`);
   console.log(`  ─────────────────────────────`);
   console.log(`  🌐  http://0.0.0.0:${PORT}`);
   console.log(`  🔌  Endpoints:`);

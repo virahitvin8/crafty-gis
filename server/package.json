@@ -1,7 +1,7 @@
 {
-  "name": "farmhealth-gee-proxy",
+  "name": "crafty-gis-gee-proxy",
   "version": "1.0.0",
-  "description": "Google Earth Engine proxy server for FarmHealth crop monitoring app",
+  "description": "Google Earth Engine proxy server for Crafty GIS crop monitoring app",
   "private": true,
   "main": "server.js",
   "engines": {

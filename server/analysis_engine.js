@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — GEE Analysis Engine (continuous + clipped)
+   Crafty GIS — GEE Analysis Engine (continuous + clipped)
    ═══════════════════════════════════════════════════════════
    Professional-grade analysis pipeline:
      • Cloud-free MEDIAN composite over a date range (no more

@@ -1,4 +1,4 @@
-# ✅ FarmHealth Open-Source Migration — COMPLETE
+# ✅ Crafty GIS Open-Source Migration — COMPLETE
 
 ## 🎯 What You Asked For
 
@@ -167,7 +167,7 @@ Return JSON with diagnosis ✅
 
 ---
 
-**Result:** FarmHealth now runs completely free, forever, with 99.9% uptime.
+**Result:** Crafty GIS now runs completely free, forever, with 99.9% uptime.
 
 **Ready?** → See `QUICKSTART_OPENSOURCE.md`
 EOF"]

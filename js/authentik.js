@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   FarmHealth — Authentik OIDC Authentication (PRIMARY)
+   Crafty GIS — Authentik OIDC Authentication (PRIMARY)
    Self-hosted OpenID Connect provider
    ═══════════════════════════════════════════════════════════ */
 
@@ -11,7 +11,7 @@ const FH_AUTH = (function() {
     return (localStorage.getItem('fh_authentik_issuer') || '').replace(/\/+$/, '');
   }
   function getClientId() {
-    return localStorage.getItem('fh_authentik_client_id') || 'farmhealth';
+    return localStorage.getItem('fh_authentik_client_id') || 'crafty_gis';
   }
   const REDIRECT_URI = () => window.location.origin + '/callback';
   

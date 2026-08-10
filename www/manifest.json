@@ -1,6 +1,6 @@
 {
-  "name": "FarmHealth — Satellite Crop Monitor",
-  "short_name": "FarmHealth",
+  "name": "Crafty GIS — Satellite Crop Monitor",
+  "short_name": "Crafty GIS",
   "description": "Professional satellite-based crop health monitoring. Real Sentinel-2 NDVI, live weather, terrain, soil analysis, and AI-powered advice for farmers, students, and researchers.",
   "start_url": "./index.html",
   "display": "standalone",
