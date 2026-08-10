@@ -1022,6 +1022,22 @@ const FH_MAP = (function() {
     if (_biomassLayer) { _biomassLayer.clearLayers(); }
   }
 
+  // ═══════════ IRRIGATION SCHEDULE LAYER (FAO-56) ═══════════
+  // Blue-intensity per-zone patches showing the weekly water need.
+  let _irrLayer = null;
+
+  function getIrrLayer() {
+    if (!_state.map) return null;
+    if (!_irrLayer) {
+      _irrLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _irrLayer;
+  }
+
+  function clearIrrOverlay() {
+    if (_irrLayer) { _irrLayer.clearLayers(); }
+  }
+
   return {
     setStateRef,
     findSavedField,
@@ -1065,6 +1081,8 @@ const FH_MAP = (function() {
     clearYieldOverlay,
     getBiomassLayer,
     clearBiomassOverlay,
+    getIrrLayer,
+    clearIrrOverlay,
     // Disease outbreak layer
     getOutbreakLayer,
     clearOutbreakLayer,

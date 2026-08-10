@@ -550,6 +550,26 @@
     </div>
   </div>
 
+  <!-- ─── IRRIGATION SCHEDULER (FAO-56 water balance) ─── -->
+  <div class="card" id="irrCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      💧 Irrigation Scheduler <span class="badge badge-live">FAO-56</span>
+    </h3>
+    <div class="card-body" id="irrBody">
+      <div class="row" style="align-items:center;gap:6px;margin-bottom:8px">
+        <label style="font-size:0.7rem;color:var(--text-muted)">Crop:</label>
+        <select id="irrCrop" style="min-width:110px"></select>
+        <button class="btn-primary btn-sm" onclick="FH.computeIrrigationSchedule()">💧 Compute Schedule</button>
+      </div>
+      <div class="hint" style="font-size:0.62rem">
+        FAO-56 water balance: ETc = ET₀ × crop Kc, effective rainfall (CHIRPS + 7-day forecast), soil-moisture sensor fusion,
+        TAW = (FC − WP) × root depth — irrigate when depletion crosses 50% MAD. Per-zone NDWI wetness + slope drainage
+        adjust water need. Runs automatically after Management Zones.
+      </div>
+      <div id="irrResult"></div>
+    </div>
+  </div>
+
   <!-- ─── WEATHER ─── -->
   <div class="card" id="weatherCard" style="display:none">
     <h3 class="card-collapse" onclick="FH.toggleCard(this)">

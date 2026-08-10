@@ -169,6 +169,10 @@ const FH = (function() {
     runBiomassEstimate: FH_INTEL.runBiomassEstimate,
     renderBiomass: FH_INTEL.renderBiomass,
     exportBiomassCSV: FH_INTEL.exportBiomassCSV,
+    // Irrigation scheduler (FAO-56 water balance)
+    computeIrrigationSchedule: FH_INTEL.computeIrrigationSchedule,
+    renderIrrigation: FH_INTEL.renderIrrigation,
+    exportIrrigationCSV: FH_INTEL.exportIrrigationCSV,
     // Crop health surveillance (pone.0324347 / 09119071)
     renderSurveillance: FH_INTEL.renderSurveillance,
     refreshSurveillance: FH_INTEL.refreshSurveillance,

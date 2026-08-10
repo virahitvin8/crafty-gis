@@ -464,6 +464,7 @@ const FH_INTEL = (function() {
       // forecast + GEDI biomass silently so both cards fill in immediately.
       try { runZoneYieldPrediction({ silent: true }); } catch (e) { console.warn('Yield chain skipped:', e.message); }
       try { runBiomassEstimate({ silent: true }); } catch (e) { console.warn('Biomass chain skipped:', e.message); }
+      try { computeIrrigationSchedule({ silent: true }); } catch (e) { console.warn('Irrigation chain skipped:', e.message); }
     } catch (e) {
       hideLoading();
       toast('⚠️ Zone clustering failed: ' + e.message, 'err');
@@ -963,6 +964,255 @@ const FH_INTEL = (function() {
   }
 
   // ═══════════════════════════════════════════════════════════
+  // 5d. IRRIGATION SCHEDULER (FAO-56 water balance, per zone)
+  //     Automated water management per management zone from:
+  //       • ET₀ evapotranspiration (Open-Meteo current + 7-day)
+  //       • CHIRPS rainfall (window total) + 7-day forecast rain
+  //       • soil-moisture sensor fusion (IoT reading / SAR / NDWI)
+  //     FAO-56: ETc = ET₀·Kc, effective rain ≈ 70% of gross,
+  //     TAW = (FC − WP)·root depth, irrigate when depletion
+  //     crosses Management Allowed Depletion (MAD) → per-zone
+  //     net irrigation requirement (mm) + volume (m³).
+  //     (Geo-Intelligent 2025 · 09119071 IoT loop · FAO-56)
+  // ═══════════════════════════════════════════════════════════
+  // Crop water parameters: Kc (crop coefficient, peak) + root depth m.
+  const IRRIGATION_CROPS = {
+    wheat:      { kc: 1.15, rootM: 1.2, name: 'Wheat' },
+    rice:       { kc: 1.20, rootM: 0.6, name: 'Rice' },
+    maize:      { kc: 1.20, rootM: 1.0, name: 'Maize' },
+    cotton:     { kc: 1.15, rootM: 1.0, name: 'Cotton' },
+    sugarcane:  { kc: 1.25, rootM: 1.5, name: 'Sugarcane' },
+    mustard:    { kc: 1.05, rootM: 1.0, name: 'Mustard' },
+    soybean:    { kc: 1.10, rootM: 0.9, name: 'Soybean' },
+    potato:     { kc: 1.10, rootM: 0.6, name: 'Potato' },
+    pulses:     { kc: 1.00, rootM: 0.8, name: 'Pulses' },
+    vegetables: { kc: 1.00, rootM: 0.5, name: 'Vegetables' },
+    orchards:   { kc: 1.15, rootM: 1.2, name: 'Orchards' },
+    generic:    { kc: 1.10, rootM: 0.8, name: 'Crop' }
+  };
+  // Soil water constants (FAO-56 defaults, volumetric fraction).
+  const SOIL_WATER = {
+    fc: 0.30,   // field capacity (v/v)
+    wp: 0.12,   // wilting point (v/v)
+    mad: 0.50,  // management allowed depletion (fraction of TAW)
+    rainEff: 0.70 // effective rainfall coefficient
+  };
+
+  function _populateIrrigationCrop() {
+    const sel = $('irrCrop');
+    if (!sel || sel.options.length > 1) return;
+    const crops = (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.CROPS) || {};
+    const current = ($('cropSelect') && $('cropSelect').value) || 'generic';
+    sel.innerHTML = Object.keys(crops).map(id =>
+      `<option value="${id}" ${id === current ? 'selected' : ''}>${crops[id].icon} ${crops[id].name}</option>`
+    ).join('');
+  }
+
+  // Current soil-moisture fraction + source label: IoT reading if
+  // present, else SAR moistureIndex, else a 0.24 baseline.
+  function _currentSM() {
+    const s1 = _lastSensor();
+    if (s1 && s1.soilMoisture > 0) return { value: Math.min(0.5, Math.max(0.05, s1.soilMoisture / 100)), source: 'sensor' };
+    const sar = _state.proAnalysis?.soilMoisture;
+    if (sar && sar.moistureIndex !== null && sar.moistureIndex !== undefined) return { value: Math.min(0.5, Math.max(0.05, sar.moistureIndex)), source: 'SAR' };
+    return { value: 0.24, source: 'baseline' };
+  }
+
+  // Main runner — computes the 7-day water balance + per-zone irrigation.
+  function computeIrrigationSchedule(opts) {
+    const el = $('irrResult');
+    if (!el) return;
+    const silent = !!(opts && opts.silent);
+    const clusters = _state.mgmtZones;
+    if (!clusters || !clusters.length) {
+      el.innerHTML = `<div class="hint">Run <b>Management Zones</b> first — irrigation is scheduled per delineated zone from its water balance.</div>`;
+      return;
+    }
+    const w = _state.weatherData?.forecast;
+    if (!w || !w.daily) {
+      el.innerHTML = `<div class="hint">Run <b>Full Analysis</b> first — the scheduler needs ET₀ evapotranspiration + rainfall telemetry.</div>`;
+      return;
+    }
+    _populateIrrigationCrop();
+    const cropId = ($('irrCrop') && $('irrCrop').value) || 'generic';
+    const crop = IRRIGATION_CROPS[cropId] || IRRIGATION_CROPS.generic;
+    const full = _state.proAnalysis || _state.proData?.full;
+    const fieldHa = (full && full.areaHa) || _state.fieldAreaHa || FH_UTILS.areaHa(_state.fieldLL) || 1;
+
+    if (!silent) showLoading('Computing irrigation schedule…', 35);
+    try {
+      // ── 7-day inputs ──
+      const days = w.daily.time || Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(); d.setDate(d.getDate() + i); return d.toISOString().split('T')[0];
+      });
+      const et0Daily = (w.daily.et0_fao_evapotranspiration || Array(7).fill(w.current?.et0_fao_evapotranspiration || 4.5));
+      const rainDaily = (w.daily.precipitation_sum || Array(7).fill(0)).map(r => r || 0);
+      // CHIRPS window mean daily rain (mm/day) as the base expectation.
+      const chirps = full?.rainfall;
+      const chirpsDaily = chirps && chirps.total_mm ? chirps.total_mm / Math.max(1, chirps.days || 30) : 0;
+      // Use the forecast rain as-is; only fall back to the CHIRPS daily
+      // expectation when the forecast reports zero AND we have no signal
+      // either way — capped so climatology never overrides a dry forecast.
+      const blendedRain = rainDaily.map((r, i) => {
+        if (r > 0) return r;
+        return Math.min(2.5, chirpsDaily * 0.3); // small precautionary floor
+      });
+
+      // ── Soil water budget ──
+      const rootM = crop.rootM;
+      const taw = (SOIL_WATER.fc - SOIL_WATER.wp) * rootM * 1000;      // mm available
+      const allowedDepletion = taw * SOIL_WATER.mad;                     // mm trigger
+      const sm = _currentSM();
+      const sm0 = sm.value;
+      const initialDepletion = Math.max(0, (SOIL_WATER.fc - sm0) * rootM * 1000);
+
+      // Per-day balance (assume irrigation refills to FC when triggered).
+      const schedule = days.map((date, i) => {
+        const etc = (et0Daily[i] || 0) * crop.kc;
+        const effRain = blendedRain[i] * SOIL_WATER.rainEff;
+        const net = etc - effRain;
+        return { date, et0: et0Daily[i] || 0, rain: blendedRain[i], etc, effRain, net };
+      });
+      let depletion = initialDepletion;
+      let irrDay = 0;
+      const forecast = schedule.map(s => {
+        depletion += s.net;
+        let irrigate = false, amount = 0;
+        if (depletion >= allowedDepletion) { irrigate = true; amount = taw; depletion -= taw; irrDay++; }
+        s.irrigate = irrigate; s.amount = amount;
+        s.depletion = Math.max(0, depletion);
+        return s;
+      });
+
+      // ── Per-zone allocation (NDWI wetness + slope drainage adjust water need) ──
+      const zoneRows = clusters.map(z => {
+        const ndwiAdj = Math.max(0.75, Math.min(1.25, 1 - (z.avgNdwi ?? 0) * 1.2));
+        const slopeAdj = Math.max(0.85, Math.min(1.2, 1 + (z.avgSlope ?? 0) * 0.02));
+        const zoneEtc7 = schedule.reduce((a, s) => a + s.etc, 0) * ndwiAdj * slopeAdj;
+        const zoneRainEff7 = schedule.reduce((a, s) => a + s.effRain, 0);
+        const need7 = Math.max(0, zoneEtc7 - zoneRainEff7);   // mm over the week
+        const zoneArea = fieldHa * (parseFloat(z.pct) || 0) / 100;
+        const volumeM3 = need7 / 1000 * zoneArea * 10000;      // mm→m³ per ha
+        const level = need7 <= 5 ? 'Low' : need7 <= 25 ? 'Moderate' : need7 <= 45 ? 'High' : 'Critical';
+        const col = need7 <= 5 ? 'var(--green)' : need7 <= 25 ? 'var(--orange)' : need7 <= 45 ? 'var(--moderate)' : 'var(--red)';
+        return {
+          label: z.label, color: z.color, pct: z.pct, zoneCount: z.zoneCount,
+          avgNdwi: z.avgNdwi ?? 0, avgSlope: z.avgSlope ?? 0,
+          ndwiAdj, slopeAdj, zoneEtc7, zoneRainEff7, need7, zoneArea, volumeM3, level, col,
+          cells: z.zones || []
+        };
+      });
+      const totalVolume = zoneRows.reduce((a, z) => a + z.volumeM3, 0);
+      const irrDays = forecast.filter(f => f.irrigate).length;
+
+      _state.irrigation = {
+        zones: zoneRows, forecast, cropId, cropName: crop.name, fieldHa, taw, allowedDepletion,
+        initialDepletion, sm0, totalVolume, irrDays, chirpsDaily, smSource: sm.source,
+        ts: Date.now()
+      };
+      renderIrrigation();
+      _drawIrrigationOverlay(zoneRows);
+      if (!silent) hideLoading();
+      if (!silent) toast(`💧 Irrigation schedule: ${totalVolume.toFixed(0)} m³ needed this week${irrDays ? ' · ' + irrDays + ' irrigation day(s) triggered' : ''}`);
+    } catch (e) {
+      if (!silent) hideLoading();
+      if (!silent) toast('⚠️ Irrigation scheduler failed: ' + e.message, 'err');
+    }
+  }
+
+  function renderIrrigation() {
+    const el = $('irrResult');
+    if (!el || !_state.irrigation) return;
+    const ir = _state.irrigation;
+    const card = $('irrCard');
+    if (card) card.style.display = '';
+    const maxVol = Math.max(...ir.zones.map(z => z.volumeM3), 1);
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-input);border-radius:10px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:0.9rem">💧 ${ir.cropName}: <span style="color:var(--blue-light,#5dade2)">${ir.totalVolume.toFixed(0)} m³</span> needed this week</div>
+          <div style="color:var(--text-muted);font-size:0.64rem">Field ${ir.fieldHa.toFixed(2)} ha · ET₀ ${(ir.forecast[0]?.et0 ?? 4.5).toFixed(1)} mm/d · CHIRPS ${ir.chirpsDaily.toFixed(1)} mm/d · soil ${(ir.sm0 * 100).toFixed(0)}% (${ir.smSource}) · TAW ${ir.taw.toFixed(0)} mm · trigger at ${ir.allowedDepletion.toFixed(0)} mm depletion · ${ir.irrDays} irrigation day(s) in forecast</div>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="FH.exportIrrigationCSV()">⬇️ CSV</button>
+      </div>
+      ${ir.zones.map(z => `
+        <div style="border-left:3px solid ${z.color};background:var(--bg-input);border-radius:8px;padding:8px;margin-bottom:6px;font-size:0.7rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:800;color:${z.color}">${z.label} zone (${z.pct}% of field)</span>
+            <span style="font-weight:800;color:${z.col}">${z.level} — ${z.volumeM3.toFixed(0)} m³</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;margin:4px 0;overflow:hidden">
+            <div style="width:${(z.volumeM3 / maxVol * 100).toFixed(0)}%;height:100%;background:${z.col}"></div>
+          </div>
+          <div style="color:var(--text-muted);font-size:0.62rem">
+            ETc ${z.zoneEtc7.toFixed(0)} mm vs rain ${z.zoneRainEff7.toFixed(0)} mm (eff.) · need <b>${z.need7.toFixed(0)} mm</b> · NDWI adj ×${z.ndwiAdj.toFixed(2)} · slope adj ×${z.slopeAdj.toFixed(2)} · ${z.zoneArea.toFixed(2)} ha
+          </div>
+        </div>`).join('')}
+      <div style="font-weight:700;font-size:0.72rem;color:var(--blue-light,#5dade2);margin:8px 0 4px">📅 7-day schedule (ETc = ET₀ × Kc)</div>
+      <div style="overflow-x:auto">
+      <table style="width:100%;font-size:0.62rem;border-collapse:collapse">
+        <tr style="color:var(--text-muted)"><th style="text-align:left;padding:3px">Date</th><th>ET₀</th><th>Rain</th><th>ETc</th><th>Eff.rain</th><th>Net</th><th>Depletion</th><th>Irrigate</th></tr>
+        ${ir.forecast.map(f => `
+        <tr style="border-top:1px solid rgba(255,255,255,0.08)">
+          <td style="padding:3px">${f.date.slice(5)}</td>
+          <td style="text-align:center">${f.et0.toFixed(1)}</td>
+          <td style="text-align:center">${f.rain.toFixed(1)}</td>
+          <td style="text-align:center">${f.etc.toFixed(1)}</td>
+          <td style="text-align:center">${f.effRain.toFixed(1)}</td>
+          <td style="text-align:center;color:${f.net > 0 ? 'var(--orange)' : 'var(--green)'}">${f.net.toFixed(1)}</td>
+          <td style="text-align:center">${f.depletion.toFixed(0)}</td>
+          <td style="text-align:center">${f.irrigate ? '<b style="color:var(--blue-light,#5dade2)">💧 ' + f.amount.toFixed(0) + ' mm</b>' : '—'}</td>
+        </tr>`).join('')}
+      </table>
+      </div>
+      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">FAO-56 water balance: ETc = ET₀ × crop Kc; effective rain = 70% of gross; TAW = (FC − WP) × root depth; irrigate when depletion ≥ MAD × TAW. Per-zone NDWI (wetness) and slope (drainage) adjust water need (Geo-Intelligent 2025 · IoT loop).</div>`;
+  }
+
+  // Colour the map by weekly irrigation need per management-zone patch.
+  function _drawIrrigationOverlay(zoneRows) {
+    if (!_state.map || !window.FH_MAP || !FH_MAP.getIrrLayer) return;
+    const layer = FH_MAP.getIrrLayer();
+    if (!layer) return;
+    layer.clearLayers();
+    const maxVol = Math.max(...zoneRows.map(z => z.volumeM3), 1);
+    zoneRows.forEach(z => {
+      (z.cells || []).forEach(cell => {
+        if (cell.ndvi === null || cell.ndvi === undefined) return;
+        const halfLat = (cell.cellH || 0.003) / 2;
+        const halfLng = (cell.cellW || 0.003) / 2;
+        const rel = z.volumeM3 / maxVol;
+        const col = rel > 0.8 ? '#1f618d' : rel > 0.5 ? '#2e86c1' : rel > 0.2 ? '#5dade2' : '#85c1e9';
+        L.rectangle([
+          [cell.lat - halfLat, cell.lng - halfLng],
+          [cell.lat + halfLat, cell.lng + halfLng]
+        ], {
+          color: col, weight: 0.6, opacity: 0.8,
+          fillColor: col, fillOpacity: 0.45
+        }).bindTooltip(
+          `<b style="color:${col}">${z.label} zone — ${z.level} water need</b><br>${z.volumeM3.toFixed(0)} m³ / week (${z.need7.toFixed(0)} mm)<br>NDWI ${z.avgNdwi.toFixed(3)} · slope ${z.avgSlope.toFixed(1)}°`,
+          { sticky: true }
+        ).addTo(layer);
+      });
+    });
+  }
+
+  function exportIrrigationCSV() {
+    const ir = _state.irrigation;
+    if (!ir) return toast('Run Irrigation Scheduler first', 'err');
+    const rows = ['zone_label,pct_of_field,area_ha,mean_ndwi,mean_slope_deg,etc_7d_mm,eff_rain_7d_mm,need_mm,volume_m3,level'];
+    ir.zones.forEach(z => rows.push(
+      [z.label, z.pct, z.zoneArea.toFixed(4), z.avgNdwi.toFixed(4), z.avgSlope.toFixed(2), z.zoneEtc7.toFixed(1), z.zoneRainEff7.toFixed(1), z.need7.toFixed(1), z.volumeM3.toFixed(1), z.level].join(',')
+    ));
+    rows.push(['FIELD_TOTAL', '', ir.fieldHa.toFixed(4), '', '', '', '', '', ir.totalVolume.toFixed(1), '']);
+    // Schedule block
+    rows.push('');
+    rows.push('date,et0_mm,rain_mm,etc_mm,eff_rain_mm,net_mm,depletion_mm,irrigate_mm');
+    ir.forecast.forEach(f => rows.push([f.date, f.et0.toFixed(1), f.rain.toFixed(1), f.etc.toFixed(1), f.effRain.toFixed(1), f.net.toFixed(1), f.depletion.toFixed(0), f.irrigate ? f.amount.toFixed(0) : ''].join(',')));
+    downloadBlob(rows.join('\n'), 'crafty_gis_irrigation_schedule.csv', 'text/csv');
+    toast('Irrigation schedule CSV exported');
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // 6. CROP HEALTH SURVEILLANCE
   //    Unified multi-dimensional health score combining all
   //    telemetry into one at-a-glance view. Based on:
@@ -1227,6 +1477,10 @@ const FH_INTEL = (function() {
     runBiomassEstimate,
     renderBiomass,
     exportBiomassCSV,
+    // Irrigation scheduler (FAO-56 water balance)
+    computeIrrigationSchedule,
+    renderIrrigation,
+    exportIrrigationCSV,
     // Crop health surveillance
     renderSurveillance,
     refreshSurveillance,

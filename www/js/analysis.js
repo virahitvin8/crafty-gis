@@ -1090,6 +1090,8 @@ const FH_ANALYSIS = (function() {
           if (zoneYieldCard) zoneYieldCard.style.display = '';
           const biomassCard = $('biomassCard');
           if (biomassCard) biomassCard.style.display = '';
+          const irrCard = $('irrCard');
+          if (irrCard) irrCard.style.display = '';
           const researchCard = $('researchCard');
           if (researchCard) researchCard.style.display = '';
           // Crop health surveillance (pone.0324347)

@@ -18,6 +18,7 @@ const FH_RESEARCH = (function() {
     srtm:        { label: 'SRTM DEM 30 m (elevation / slope / aspect / hillshade)',  status: 'built' },
     chirps:      { label: 'CHIRPS rainfall (0.05° daily → field + regional sums)',   status: 'built' },
     meteo:       { label: 'Open-Meteo (temp, humidity, wind, ET₀, soil probe)',      status: 'built' },
+    irrigation:  { label: 'Automated irrigation scheduler (FAO-56 ET₀ × Kc, per zone)', status: 'built' },
     mlRf:        { label: 'Random Forest stress classifier + merged advisory',       status: 'built' },
     groundTruth: { label: 'Ground-truth label store (farmer-verified retraining)',   status: 'built' },
     trends:      { label: 'Per-zone time-windowed NDVI/NDWI trend slopes',           status: 'built' },
@@ -82,7 +83,7 @@ const FH_RESEARCH = (function() {
       ],
       dataPulls: ['sentinel2', 'landsat', 'iotFusion', 'mgmtZones', 'srtm', 'meteo'],
       requiredPulls: ['UAV/aircraft multispectral + thermal', 'IoT soil-moisture/temp/humidity nodes', 'Soil + yield variability surveys', 'Geostatistical clustering engine'],
-      craftyBuild: 'Management Zones card clusters the GEE zone grid into site-specific zones; IoT Sensor Fusion card combines in-field sensor readings with satellite NDVI for the multi-modal health score.'
+      craftyBuild: 'Management Zones card clusters the GEE zone grid into site-specific zones; IoT Sensor Fusion combines in-field readings with satellite NDVI; the Irrigation Scheduler automates water management per zone from ET₀ × Kc, CHIRPS rainfall and soil-moisture fusion (FAO-56) — the paper\'s adaptive irrigation feedback loop.'
     },
     {
       id: '09119071',
