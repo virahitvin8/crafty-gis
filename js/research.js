@@ -29,6 +29,7 @@ const FH_RESEARCH = (function() {
     diseaseEWS:  { label: 'Weather-based disease early warning (blight/rust risk)',  status: 'built' },
     mgmtZones:   { label: 'Site-specific management zones (geostatistical clusters)', status: 'built' },
     zoneYield:   { label: 'Per-zone yield forecast (crop coefficients × zone vectors)', status: 'built' },
+    yieldHistory: { label: 'Yield history timeline (per-zone snapshots + trend sparkline)', status: 'built' },
     cnnVision:   { label: 'CNN / vision disease detection (Ollama LLaVA photo)',     status: 'built' },
     sarPulse:    { label: 'Polarimetric SAR (full PolSAR decomposition)',            status: 'roadmap' },
     gediBiomass: { label: 'GEDI-style biomass / carbon stock (allometric × zones)', status: 'built' },
@@ -131,9 +132,9 @@ const FH_RESEARCH = (function() {
         { name: 'XGBoost / LightGBM / CatBoost (soil)', accuracy: '90%+' },
         { name: 'LSTM / RNN (time series)', accuracy: '—' }
       ],
-      dataPulls: ['sentinel2', 'landsat', 'mlRf', 'trends', 'cnnVision'],
+      dataPulls: ['sentinel2', 'landsat', 'mlRf', 'trends', 'cnnVision', 'zoneYield', 'yieldHistory'],
       requiredPulls: ['Hyperspectral + UAV imagery (optional)', 'Multispectral time series', 'Soil sample spectra for classification'],
-      craftyBuild: 'The app already ships the review\'s core stack — Random Forest stress model, Sentinel-2/Landsat composites, per-zone trends and CNN-style photo diagnosis — plus CHIRPS rainfall, SAR soil moisture, and a per-zone Yield Forecast card that applies crop-specific coefficients to each management zone\'s feature vector (NDVI · NDWI · slope · trend).'
+      craftyBuild: 'The app already ships the review\'s core stack — Random Forest stress model, Sentinel-2/Landsat composites, per-zone trends and CNN-style photo diagnosis — plus CHIRPS rainfall, SAR soil moisture, and a per-zone Yield Forecast card that applies crop-specific coefficients to each management zone\'s feature vector (NDVI · NDWI · slope · trend). A yield-history timeline snapshots every zone\'s forecast per analysis and renders a trend sparkline, mirroring the health-surveillance card.'
     },
     {
       id: 'remotesensing-13-02486',

@@ -24,9 +24,9 @@ export const metadata: Metadata = {
     url: "https://github.com/virahitvin8/crafty-gis",
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
-    apple: "/icons/icon-192x192.png",
-    shortcut: "/icons/icon-192x192.png",
+    icon: "/icons/favicon.svg",
+    apple: "/icons/icon-192x192.svg",
+    shortcut: "/icons/favicon.svg",
   },
 };
 

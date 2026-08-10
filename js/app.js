@@ -165,6 +165,9 @@ const FH = (function() {
     runZoneYieldPrediction: FH_INTEL.runZoneYieldPrediction,
     renderZoneYield: FH_INTEL.renderZoneYield,
     exportZoneYieldCSV: FH_INTEL.exportZoneYieldCSV,
+    // Yield history timeline
+    renderYieldHistory: FH_INTEL.renderYieldHistory,
+    exportYieldHistoryCSV: FH_INTEL.exportYieldHistoryCSV,
     // Server Random Forest yield (POST /api/ml/yield)
     runServerYieldPrediction: FH_INTEL.runServerYieldPrediction,
     renderServerYield: FH_INTEL.renderServerYield,

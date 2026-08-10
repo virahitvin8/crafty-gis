@@ -705,6 +705,7 @@ const FH_INTEL = (function() {
         zones, fieldTotal, weightedPerHa, cropId, cropName: base.name, unit: base.unit,
         fieldHa, confidence, ts: Date.now()
       };
+      _pushYieldSnapshot(_state.zoneYield);   // yield-history timeline (per field)
       renderZoneYield();
       _drawYieldOverlay(zones, base);
       if (!silent) hideLoading();
@@ -746,7 +747,8 @@ const FH_INTEL = (function() {
             → <b>${z.total.toFixed(1)} ${y.unit}</b> on ${z.zoneArea.toFixed(2)} ha
           </div>
         </div>`).join('')}
-      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">Yield model: potential × (NDVI/peak)<sup>power</sup> × water (NDWI) × slope × trend factors per zone — RS-ML yield stack per agronomy-14-01975 (Wang et al. 2024).</div>`;
+      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">Yield model: potential × (NDVI/peak)<sup>power</sup> × water (NDWI) × slope × trend factors per zone — RS-ML yield stack per agronomy-14-01975 (Wang et al. 2024).</div>` +
+    renderYieldHistory();
   }
 
   // Colour the map by predicted yield per management-zone patch.
@@ -784,6 +786,133 @@ const FH_INTEL = (function() {
     rows.push(['FIELD_TOTAL', '', '', '', '', '', '', y.weightedPerHa.toFixed(2), y.fieldTotal.toFixed(2)].join(','));
     downloadBlob(rows.join('\n'), 'crafty_gis_zone_yield_forecast.csv', 'text/csv');
     toast('Zone yield forecast CSV exported');
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 5b-2. YIELD HISTORY TIMELINE
+  //     Snapshots per-zone yield every time the model runs (per field,
+  //     keyed by field centre like the health surveillance log) and
+  //     renders a trend sparkline — the yield counterpart of the crop
+  //     health timeline (pone.0324347 · agronomy-14-01975).
+  // ═══════════════════════════════════════════════════════════
+  function _yieldLogKey() {
+    if (!_state.fieldCenter) return null;
+    return 'crafty_gis_yield_' + _state.fieldCenter[0].toFixed(4) + '_' + _state.fieldCenter[1].toFixed(4);
+  }
+
+  function _loadYieldLog() {
+    const key = _yieldLogKey();
+    if (!key) return [];
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; }
+  }
+
+  // Persist a per-zone yield snapshot for the current field. Dedupes
+  // near-identical re-runs (e.g. the silent auto-chain) so the timeline
+  // shows real analyses, not repeats. Scoped to the client coefficient
+  // model (server-RF runs are transient and have no zone labels).
+  function _pushYieldSnapshot(y) {
+    const key = _yieldLogKey();
+    if (!key || !y) return;
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+    const last = log[log.length - 1];
+    if (last && (Date.now() - last.ts) < 30 * 60 * 1000 &&
+        Math.abs(last.fieldTotal - y.fieldTotal) < 0.05 && last.cropId === y.cropId) {
+      return log; // same analysis re-run within 30 min — keep the first snapshot
+    }
+    log.push({
+      ts: Date.now(),
+      cropId: y.cropId, cropName: y.cropName, unit: y.unit,
+      fieldHa: y.fieldHa, fieldTotal: y.fieldTotal, weightedPerHa: y.weightedPerHa,
+      confidence: y.confidence,
+      zones: (y.zones || []).map(z => ({ label: z.label, color: z.color, rank: z.rank, pct: z.pct, perHa: z.perHa, total: z.total }))
+    });
+    if (log.length > 30) log = log.slice(-30);
+    try { localStorage.setItem(key, JSON.stringify(log)); } catch (e) {}
+    return log;
+  }
+
+  // Sparkline renderer shared by the field-level and per-zone series.
+  // Bars are coloured by value (green ≥ 85% of max, orange ≥ 60%, red
+  // below) so a declining series reads as declining — like the health card.
+  function _barSparkline(values, labels, maxBar, barW, color) {
+    const max = Math.max(...values.filter(v => v !== null && v !== undefined), 0.001);
+    return values.map((v, i) => {
+      const hp = v === null || v === undefined ? 0 : Math.max(3, v / max * maxBar);
+      const c = v === null || v === undefined ? 'rgba(255,255,255,0.12)'
+        : (v / max >= 0.85 ? 'var(--green)' : v / max >= 0.6 ? 'var(--orange)' : 'var(--red)');
+      return '<div style="flex:1;display:flex;align-items:flex-end;justify-content:center">' +
+        '<div title="' + (labels[i] || '') + ' — ' + (v === null || v === undefined ? 'n/a' : v.toFixed(1)) + '" ' +
+        'style="width:' + barW + ';height:' + hp + 'px;background:' + c + ';border-radius:2px 2px 0 0"></div></div>';
+    }).join('');
+  }
+
+  // Render the yield history timeline block (appended to the yield card).
+  function renderYieldHistory() {
+    const y = _state.zoneYield;
+    const log = _loadYieldLog();
+    const hist = log.slice(-14);
+    if (!y || !hist.length) return '';
+
+    // Trend arrow: weighted yield/ha vs the previous snapshot.
+    let arrow = '';
+    if (hist.length >= 2) {
+      const prev = hist[hist.length - 2].weightedPerHa;
+      const cur = hist[hist.length - 1].weightedPerHa;
+      const d = cur - prev;
+      arrow = d > 0.02 ? '<span style="color:var(--green)">▲ improving</span>'
+        : d < -0.02 ? '<span style="color:var(--red)">▼ declining</span>'
+        : '<span style="color:var(--orange)">→ stable</span>';
+    }
+
+    // Field-level sparkline of weighted yield per ha.
+    const labels = hist.map(h => new Date(h.ts).toLocaleDateString() + (h.confidence ? ' (' + h.confidence + ' conf)' : ''));
+    const spark = '<div style="display:flex;align-items:flex-end;height:44px;gap:2px;margin-top:6px">' +
+      _barSparkline(hist.map(h => h.weightedPerHa), labels, 44, '70%', 'var(--green)') + '</div>';
+
+    // Per-zone mini trends: match zones by label across snapshots.
+    const zoneRows = (y.zones || []).map(z => {
+      const series = hist.map(h => {
+        const m = (h.zones || []).find(x => x.label === z.label);
+        return m ? m.perHa : null;
+      });
+      const prev = series.slice(0, -1).reverse().find(v => v !== null && v !== undefined);
+      const delta = (prev !== undefined && prev !== null && z.perHa !== null)
+        ? Math.round((z.perHa - prev) / prev * 100) : null;
+      const deltaCol = delta === null ? 'var(--text-muted)' : delta >= 0 ? 'var(--green)' : 'var(--red)';
+      const deltaTxt = delta === null ? '—' : (delta >= 0 ? '+' : '') + delta + '%';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,0.08)">' +
+        '<span style="width:58px;font-weight:800;color:' + z.color + ';font-size:0.66rem">' + z.label + '</span>' +
+        '<div style="flex:1;display:flex;align-items:flex-end;height:26px;gap:2px">' +
+        _barSparkline(series, labels, 26, '70%', z.color) + '</div>' +
+        '<span style="width:44px;text-align:right;font-weight:700;font-size:0.68rem">' + z.perHa.toFixed(1) + '</span>' +
+        '<span style="width:38px;text-align:right;font-size:0.62rem;font-weight:700;color:' + deltaCol + '">' + deltaTxt + '</span></div>';
+    }).join('');
+
+    return '<div style="font-weight:700;font-size:0.72rem;color:var(--green-light);margin:12px 0 4px">📈 Yield history (' + log.length + ' scans) ' + arrow + '</div>' +
+      '<div style="background:var(--bg-input);border-radius:10px;padding:8px">' +
+      '<div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:2px">Field weighted avg (' + y.unit + '/ha) — last ' + hist.length + ' analyses</div>' +
+      spark +
+      (zoneRows ? '<div style="margin-top:8px">' + zoneRows + '</div>' : '') +
+      '</div>' +
+      '<button class="btn-secondary btn-sm" style="margin-top:6px" onclick="FH.exportYieldHistoryCSV()">⬇️ History CSV</button>';
+  }
+
+  function exportYieldHistoryCSV() {
+    const log = _loadYieldLog();
+    if (!log.length) return toast('No yield history yet — run Zone Yield Forecast first', 'err');
+    const rows = ['timestamp,crop,unit,field_ha,weighted_yield_per_ha,field_total,zone_label,zone_rank,pct_of_field,yield_per_ha,zone_total'];
+    log.forEach(h => {
+      const base = [new Date(h.ts).toISOString(), h.cropName, h.unit,
+        h.fieldHa !== undefined ? h.fieldHa.toFixed(2) : '',
+        h.weightedPerHa !== undefined ? h.weightedPerHa.toFixed(2) : '',
+        h.fieldTotal !== undefined ? h.fieldTotal.toFixed(2) : ''];
+      (h.zones || []).forEach(z => rows.push(
+        base.concat([z.label, z.rank, z.pct, z.perHa.toFixed(2), z.total.toFixed(2)]).join(',')
+      ));
+    });
+    downloadBlob(rows.join('\n'), 'crafty_gis_yield_history.csv', 'text/csv');
+    toast('Yield history CSV exported');
   }
 
   // Server-side Random Forest yield (POST /api/ml/yield): trains a
@@ -1545,6 +1674,9 @@ const FH_INTEL = (function() {
     runZoneYieldPrediction,
     renderZoneYield,
     exportZoneYieldCSV,
+    // Yield history timeline
+    renderYieldHistory,
+    exportYieldHistoryCSV,
     // Server Random Forest yield (POST /api/ml/yield)
     runServerYieldPrediction,
     renderServerYield,

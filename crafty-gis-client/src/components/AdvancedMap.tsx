@@ -702,15 +702,17 @@ export default function AdvancedMap({
         );
         const data = await response.json();
 
-        setClickInfo((prev) => ({
-          ...prev,
+        setClickInfo({
+          lng,
+          lat,
           address: data.display_name || "Unknown location",
-        }));
+        });
       } catch {
-        setClickInfo((prev) => ({
-          ...prev,
+        setClickInfo({
+          lng,
+          lat,
           address: "Unable to fetch address",
-        }));
+        });
       }
 
       setLocationLoading(false);
