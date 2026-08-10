@@ -708,6 +708,8 @@ const FH_INTEL = (function() {
       _pushYieldSnapshot(_state.zoneYield);   // yield-history timeline (per field)
       renderZoneYield();
       _drawYieldOverlay(zones, base);
+      // Auto-chain the yield-loss heatmap so the economics fill in too.
+      try { runYieldLoss({ silent: true }); } catch (e) { console.warn('Loss heatmap chain skipped:', e.message); }
       if (!silent) hideLoading();
       if (!silent) toast(`🌾 Yield forecast: ${fieldTotal.toFixed(1)} ${base.unit} across ${zones.length} zones (${base.name})`);
     } catch (e) {
@@ -913,6 +915,137 @@ const FH_INTEL = (function() {
     });
     downloadBlob(rows.join('\n'), 'crafty_gis_yield_history.csv', 'text/csv');
     toast('Yield history CSV exported');
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 5b-3. YIELD-LOSS HEATMAP (economic value at risk per zone)
+  //     Yield gap = potential − predicted (t/ha); value lost =
+  //     gap × zone area × crop price. Red-intensity overlay shows
+  //     exactly where money is leaving the field (agronomy-14-01975
+  //     yield-gap economics).
+  // ═══════════════════════════════════════════════════════════
+  // Typical Indian wholesale / MSP prices per tonne (editable in the
+  // card — the input overrides this table).
+  const CROP_PRICES = {
+    wheat: 23000, rice: 22000, maize: 21000, cotton: 68000, sugarcane: 3400,
+    mustard: 56000, soybean: 46000, potato: 15000, pulses: 70000,
+    vegetables: 12000, orchards: 25000, generic: 20000
+  };
+
+  function _fmtINR(n) {
+    return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  }
+
+  function _currentLossPrice(cropId) {
+    const el = $('yieldLossPrice');
+    const v = el ? parseFloat(el.value) : NaN;
+    return (v > 0) ? v : (CROP_PRICES[cropId] || CROP_PRICES.generic);
+  }
+
+  function runYieldLoss(opts) {
+    const silent = !!(opts && opts.silent);
+    const y = _state.zoneYield;
+    if (!y) {
+      if (!silent) toast('Run Zone Yield Forecast first', 'err');
+      return;
+    }
+    const base = (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.YIELD_COEFFICIENTS[y.cropId]) || {};
+    const potential = base.yieldMax || 1;
+    const price = _currentLossPrice(y.cropId);
+
+    const zones = y.zones.map(z => {
+      const gap = Math.max(0, potential - z.perHa);
+      const valueLost = gap * z.zoneArea * price;
+      return { label: z.label, color: z.color, pct: z.pct, zoneArea: z.zoneArea,
+        perHa: z.perHa, potential, gap, price, valueLost, cells: z.cells || [] };
+    });
+    const fieldTotal = zones.reduce((a, z) => a + z.valueLost, 0);
+    const totalPotentialValue = y.fieldHa * potential * price;
+    const lossPct = totalPotentialValue > 0 ? (fieldTotal / totalPotentialValue * 100) : 0;
+
+    _state.yieldLoss = {
+      zones, fieldTotal, totalPotentialValue, lossPct,
+      cropId: y.cropId, cropName: y.cropName, price, potential, unit: y.unit, currency: '₹'
+    };
+    renderYieldLoss();
+    _drawLossOverlay();
+    if (!silent) {
+      toast(`🔥 Yield-loss heatmap: ₹${_fmtINR(fieldTotal)} at risk (${lossPct.toFixed(1)}% of potential value)`);
+    }
+  }
+
+  function renderYieldLoss() {
+    const el = $('yieldLossResult');
+    const L = _state.yieldLoss;
+    if (!el || !L) return;
+    const maxLost = Math.max(...L.zones.map(z => z.valueLost), 0.001);
+    el.innerHTML = `
+      <div style="border-left:3px solid var(--red);background:var(--bg-input);border-radius:8px;padding:8px;margin-top:8px;font-size:0.7rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:800;color:var(--red)">🔥 ${L.currency}${_fmtINR(L.fieldTotal)} of potential value at risk</span>
+          <button class="btn-secondary btn-sm" onclick="FH.exportYieldLossCSV()">⬇️ CSV</button>
+        </div>
+        <div style="color:var(--text-muted);margin:2px 0">${L.cropName} @ ${L.currency}${_fmtINR(L.price)}/t · ${L.lossPct.toFixed(1)}% of ${L.currency}${_fmtINR(L.totalPotentialValue)} potential · ${L.zones.filter(z => z.gap > 0).length} zone(s) under-performing</div>
+        ${L.zones.map(z => `
+        <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,0.08)">
+          <span style="width:62px;font-weight:700;color:${z.color};font-size:0.64rem">${z.label}</span>
+          <span style="width:52px;font-size:0.6rem;color:var(--text-muted)">${z.gap.toFixed(2)} t/ha gap</span>
+          <div style="flex:1;height:7px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
+            <div style="width:${(z.valueLost / maxLost * 100).toFixed(0)}%;height:100%;background:${z.valueLost / maxLost > 0.8 ? '#c0392b' : z.valueLost / maxLost > 0.5 ? '#e74c3c' : z.valueLost / maxLost > 0.25 ? '#f39c12' : '#f1c40f'}"></div>
+          </div>
+          <span style="width:78px;text-align:right;font-weight:700;color:var(--red)">${L.currency}${_fmtINR(z.valueLost)}</span>
+          <span style="width:36px;text-align:right;font-size:0.6rem;color:var(--text-muted)">${L.fieldTotal > 0 ? (z.valueLost / L.fieldTotal * 100).toFixed(0) : 0}%</span>
+        </div>`).join('')}
+        <div style="display:flex;align-items:center;gap:4px;margin-top:6px;font-size:0.6rem;color:var(--text-muted)">
+          <span>low</span>
+          <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#f1c40f,#f39c12,#e74c3c,#c0392b)"></div>
+          <span>high loss</span>
+        </div>
+        <div style="font-size:0.58rem;color:var(--text-faint);margin-top:4px">Value lost = (potential ${L.potential} − predicted) × zone area × price — recoverable by closing the yield gap in the worst zones (agronomy-14-01975).</div>
+      </div>`;
+  }
+
+  // Red-intensity heatmap of money leaving the field, per zone patch.
+  // Dedicated layer so the yield forecast colours stay visible alongside.
+  function _drawLossOverlay() {
+    if (!_state.map || !window.FH_MAP || !FH_MAP.getLossLayer) return;
+    const L = _state.yieldLoss;
+    if (!L) return;
+    const layer = FH_MAP.getLossLayer();
+    if (!layer) return;
+    layer.clearLayers();
+    const maxLost = Math.max(...L.zones.map(z => z.valueLost), 0.001);
+    L.zones.forEach(z => {
+      (z.cells || []).forEach(cell => {
+        if (cell.ndvi === null || cell.ndvi === undefined) return;
+        const r = z.valueLost / maxLost;
+        const col = r > 0.8 ? '#c0392b' : r > 0.5 ? '#e74c3c' : r > 0.25 ? '#f39c12' : '#f1c40f';
+        const halfLat = (cell.cellH || 0.003) / 2;
+        const halfLng = (cell.cellW || 0.003) / 2;
+        L.rectangle([
+          [cell.lat - halfLat, cell.lng - halfLng],
+          [cell.lat + halfLat, cell.lng + halfLng]
+        ], {
+          color: col, weight: 0.8, opacity: 0.9, fillColor: col, fillOpacity: 0.55
+        }).bindTooltip(
+          `<b style="color:${col}">${z.label} zone — ${L.currency}${_fmtINR(z.valueLost)} lost</b><br>` +
+          `gap ${z.gap.toFixed(2)} t/ha (potential ${z.potential}) · ${z.pct}% of field`,
+          { sticky: true }
+        ).addTo(layer);
+      });
+    });
+  }
+
+  function exportYieldLossCSV() {
+    const L = _state.yieldLoss;
+    if (!L) return toast('Run the Yield-Loss Heatmap first', 'err');
+    const rows = ['crop,currency,price_per_tonne,zone_label,pct_of_field,area_ha,potential_yield_per_ha,predicted_yield_per_ha,yield_gap_per_ha,value_lost,total_potential_value,loss_pct_of_potential'];
+    L.zones.forEach(z => rows.push(
+      [L.cropName, L.currency, L.price, z.label, z.pct, z.zoneArea.toFixed(2), z.potential, z.perHa.toFixed(2), z.gap.toFixed(2), Math.round(z.valueLost), Math.round(L.totalPotentialValue), L.lossPct.toFixed(2)].join(',')
+    ));
+    rows.push(['FIELD_TOTAL', L.currency, L.price, '', '', L.zones.reduce((a, z) => a + z.zoneArea, 0).toFixed(2), '', '', '', Math.round(L.fieldTotal), Math.round(L.totalPotentialValue), L.lossPct.toFixed(2)].join(','));
+    downloadBlob(rows.join('\n'), 'crafty_gis_yield_loss_heatmap.csv', 'text/csv');
+    toast('Yield-loss heatmap CSV exported');
   }
 
   // Server-side Random Forest yield (POST /api/ml/yield): trains a
@@ -1677,6 +1810,10 @@ const FH_INTEL = (function() {
     // Yield history timeline
     renderYieldHistory,
     exportYieldHistoryCSV,
+    // Yield-loss heatmap (value at risk per zone)
+    runYieldLoss,
+    renderYieldLoss,
+    exportYieldLossCSV,
     // Server Random Forest yield (POST /api/ml/yield)
     runServerYieldPrediction,
     renderServerYield,

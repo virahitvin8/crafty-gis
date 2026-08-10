@@ -1005,6 +1005,23 @@ const FH_MAP = (function() {
     if (_yieldLayer) { _yieldLayer.clearLayers(); }
   }
 
+  // ═══════════ YIELD-LOSS HEATMAP LAYER (research agronomy-14-01975) ═══════════
+  // Red-intensity per-zone patches showing the economic value at risk
+  // (yield gap × crop price) so the yield forecast stays visible alongside.
+  let _lossLayer = null;
+
+  function getLossLayer() {
+    if (!_state.map) return null;
+    if (!_lossLayer) {
+      _lossLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _lossLayer;
+  }
+
+  function clearLossOverlay() {
+    if (_lossLayer) { _lossLayer.clearLayers(); }
+  }
+
   // ═══════════ GEDI BIOMASS LAYER (research remotesensing-13-02486) ═══════════
   // Colored per-zone patches showing stored carbon / biomass per
   // management zone (GEDI-style allometric from zone feature vectors).
@@ -1079,6 +1096,9 @@ const FH_MAP = (function() {
     clearZoneOverlay,
     getYieldLayer,
     clearYieldOverlay,
+    // Yield-loss heatmap
+    getLossLayer,
+    clearLossOverlay,
     getBiomassLayer,
     clearBiomassOverlay,
     getIrrLayer,

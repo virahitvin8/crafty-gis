@@ -529,6 +529,12 @@
         <b>Server RF</b> retrains a Random Forest on this field's zone-feature table and predicts yield per zone (requires GEE backend).
       </div>
       <div id="zoneYieldResult"></div>
+      <div class="row" style="align-items:center;gap:6px;margin-top:8px">
+        <label style="font-size:0.68rem;color:var(--text-muted)">🔥 Price ₹/t:</label>
+        <input id="yieldLossPrice" type="number" min="0" step="100" style="width:96px" placeholder="e.g. 23000" title="Crop price in ₹ per tonne — defaults to the crop's typical market price">
+        <button class="btn-primary btn-sm" onclick="FH.runYieldLoss()">💰 Loss Heatmap</button>
+      </div>
+      <div id="yieldLossResult"></div>
       <div id="serverYieldResult" style="margin-top:8px"></div>
     </div>
   </div>

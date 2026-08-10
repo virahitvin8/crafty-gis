@@ -168,6 +168,10 @@ const FH = (function() {
     // Yield history timeline
     renderYieldHistory: FH_INTEL.renderYieldHistory,
     exportYieldHistoryCSV: FH_INTEL.exportYieldHistoryCSV,
+    // Yield-loss heatmap (value at risk per zone)
+    runYieldLoss: FH_INTEL.runYieldLoss,
+    renderYieldLoss: FH_INTEL.renderYieldLoss,
+    exportYieldLossCSV: FH_INTEL.exportYieldLossCSV,
     // Server Random Forest yield (POST /api/ml/yield)
     runServerYieldPrediction: FH_INTEL.runServerYieldPrediction,
     renderServerYield: FH_INTEL.renderServerYield,
