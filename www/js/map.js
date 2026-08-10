@@ -939,6 +939,23 @@ const FH_MAP = (function() {
     }));
   }
 
+  // ═══════════ ML ZONE OVERLAY (professional analysis patches) ═══════════
+  // A dedicated layer that shows the real per-zone patches of the field
+  // (NDVI-classified grid from the GEE zone features) on the map.
+  let _zoneLayer = null;
+
+  function getZoneLayer() {
+    if (!_state.map) return null;
+    if (!_zoneLayer) {
+      _zoneLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _zoneLayer;
+  }
+
+  function clearZoneOverlay() {
+    if (_zoneLayer) { _zoneLayer.clearLayers(); }
+  }
+
   return {
     setStateRef,
     findSavedField,
@@ -974,6 +991,9 @@ const FH_MAP = (function() {
     loadFieldFromSavedById,
     updateSavedFieldHealth,
     deleteSavedField,
-    mergeFromFirestore
+    mergeFromFirestore,
+    // ML zone overlay
+    getZoneLayer,
+    clearZoneOverlay
   };
 })();

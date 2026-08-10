@@ -15,6 +15,10 @@ interface OutputFile {
   name: string;
   type: string;
   size: string;
+  file_type: string;
+  file_size_display: string;
+  created_at: string;
+  is_downloadable: boolean;
   url?: string;
 }
 

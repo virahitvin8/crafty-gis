@@ -32,6 +32,13 @@ gcp-key.json
 firebase-adminsdk*.json
 *-credentials.json
 
+# ML runtime artifacts — regenerated live (trained model + farmer ground-truth labels)
+server/models/
+server/labels/
+
+# Python caches
+crafty-gis-server/app/__pycache__/
+
 # OS
 .DS_Store
 Thumbs.db

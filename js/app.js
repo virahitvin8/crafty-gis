@@ -125,6 +125,15 @@ const FH = (function() {
     getAIAdvice: FH_API.getAIAdvice,
     analyzeCropPhoto: FH_API.analyzeCropPhoto,
 
+    // Professional Analysis (GEE continuous + clipped terrain + ML)
+    runProfessionalAnalysis: FH_ANALYSIS.runProfessionalAnalysis,
+    exportProZoneCSV: FH_ANALYSIS.exportProZoneCSV,
+    exportProReportCSV: FH_ANALYSIS.exportProReportCSV,
+    retrainProModel: FH_ANALYSIS.retrainProModel,
+    submitGroundTruth: FH_ANALYSIS.submitGroundTruth,
+    refreshGroundTruthCount: FH_ANALYSIS.refreshGroundTruthCount,
+    exportPDFReport: FH_ANALYSIS.exportPDFReport,
+
     // UI
     setMode: FH_UI.setMode,
     toggleCard: FH_UI.toggleCard,

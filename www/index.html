@@ -15,6 +15,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Firebase SDK -->
@@ -348,6 +350,72 @@
       <button class="btn-secondary btn-sm" onclick="FH.exportCSV()">CSV (TS)</button>
       <button class="btn-secondary btn-sm" onclick="FH.exportGeoJSON()">GeoJSON</button>
       <button class="btn-secondary btn-sm" onclick="FH.showFullReport()">Full Report</button>
+    </div>
+  </div>
+
+  <!-- ─── PROFESSIONAL ANALYSIS (GEE CONTINUOUS + CLIPPED + ML) ─── -->
+  <div class="card" id="proCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      Professional Analysis <span class="badge badge-live">GEE</span>
+    </h3>
+    <div class="card-body" id="proBody">
+      <button class="btn-primary" id="proAnalyzeBtn" onclick="FH.runProfessionalAnalysis()">
+        🧪 Run Professional Analysis
+      </button>
+      <div class="hint">Continuous cloud-free composite (multi-date, no gaps) clipped to your exact field boundary + SRTM terrain + ML stress decision. <b>Run Full Analysis already triggers this automatically</b> — use this button to re-run it alone.</div>
+
+      <div id="proResults" style="display:none;margin-top:10px">
+        <div class="advice info" id="proSummary" style="font-size:0.75rem"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">🌿 Continuous Indices (cloud-free composite)</div>
+        <div class="stat-grid" id="proIndexStats"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">⛰️ Clipped Terrain (SRTM DEM)</div>
+        <div id="proTerrain" style="background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.72rem;line-height:1.7"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">🤖 ML Stress Decision</div>
+        <div id="proML" style="background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.75rem;line-height:1.6;border-left:3px solid var(--green)"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">📈 Trends (continuity)</div>
+        <div id="proTrends" style="font-size:0.72rem;color:var(--text-muted)"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">🌧️ Climate & Water (CHIRPS rain + SAR soil moisture)</div>
+        <div id="proClimate" style="background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.72rem;line-height:1.7"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">🌡️ Thermal Stress (Landsat LST + CWSI)</div>
+        <div id="proThermal" style="background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.72rem;line-height:1.7"></div>
+
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin:10px 0 4px">📊 Regional Comparison (field vs local area)</div>
+        <div id="proRegional" style="background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.72rem;line-height:1.7"></div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn-secondary btn-sm" onclick="FH.exportProZoneCSV()">⬇️ Zones CSV (ML table)</button>
+          <button class="btn-secondary btn-sm" onclick="FH.exportProReportCSV()">⬇️ Report CSV (Excel)</button>
+          <button class="btn-accent btn-sm" onclick="FH.exportPDFReport()">📄 PDF Report</button>
+          <button class="btn-secondary btn-sm" onclick="FH.retrainProModel()">🔁 Retrain ML</button>
+        </div>
+        <div class="hint">Zones CSV feeds the Random Forest model + your Excel/VBA report generator. Report CSV is the complete field analysis table. PDF Report is a professional in-browser report.</div>
+      </div>
+
+      <!-- ─── G5: GROUND-TRUTH LABEL COLLECTION ─── -->
+      <div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
+        <div style="font-weight:700;font-size:0.75rem;color:var(--green-light);margin-bottom:4px">🧑‍🌾 Ground-Truth Labels <span class="badge badge-new">Train the ML</span></div>
+        <div class="hint" style="font-size:0.65rem;margin-bottom:6px">You know your field best. Rate its actual observed condition below — your answer is stored with the satellite features and <b>retraining then uses real labels instead of rule thresholds</b>.</div>
+        <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+          <select id="gtClassSelect" style="flex:1;min-width:140px">
+            <option value="">— Observed condition —</option>
+            <option value="0">✅ Healthy</option>
+            <option value="1">🟢 Mild stress</option>
+            <option value="2">🟡 Moderate stress</option>
+            <option value="3">🟠 Severe stress</option>
+            <option value="4">🔴 Critical</option>
+          </select>
+          <button class="btn-primary btn-sm" id="gtSubmitBtn" onclick="FH.submitGroundTruth()" style="flex:0 0 auto">📝 Save Label</button>
+        </div>
+        <textarea id="gtNotes" rows="1" placeholder="Notes (e.g. wilting on west side, pest seen…)" style="width:100%;box-sizing:border-box;font-size:0.7rem;margin-bottom:4px;resize:vertical"></textarea>
+        <input type="text" id="gtReporter" placeholder="Your name / farmer ID (optional)" style="width:100%;box-sizing:border-box;font-size:0.7rem;margin-bottom:6px">
+        <div id="gtCount" style="font-size:0.62rem;color:var(--text-faint)"></div>
+      </div>
     </div>
   </div>
 

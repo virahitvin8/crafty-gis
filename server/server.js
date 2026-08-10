@@ -549,6 +549,303 @@ app.post('/api/gee/time-series', async (req, res) => {
   }
 });
 
+// ─── Analysis Engine + ML Stress Model ───
+const analysisEngine = require('./analysis_engine');
+const mlModel = require('./ml_model');
+
+// Safe wrapper: returns 503 when GEE unavailable, else runs the handler
+function withGEE(fn) {
+  return async (req, res) => {
+    if (!geeAvailable) {
+      return res.status(503).json({ success: false, error: 'Earth Engine not available on this server' });
+    }
+    try {
+      if (!(await initGEE())) {
+        return res.status(500).json({ success: false, error: 'GEE not initialized' });
+      }
+      await fn(req, res);
+    } catch (e) {
+      const msg = (e && (e.message || String(e))) || 'Unknown analysis error';
+      console.error('[Analysis] Error:', msg);
+      if (!res.headersSent) res.status(500).json({ success: false, error: msg });
+    }
+  };
+}
+
+const coordsFromBody = (body) => {
+  if (!body || !Array.isArray(body.coordinates) || !body.coordinates.length) return null;
+  const coords = body.coordinates;
+  // Validate: at least 3 [lat,lng] numeric pairs within valid ranges.
+  if (coords.length < 3) return null;
+  const valid = coords.every(c =>
+    Array.isArray(c) && c.length >= 2 &&
+    typeof c[0] === 'number' && typeof c[1] === 'number' &&
+    isFinite(c[0]) && isFinite(c[1]) &&
+    c[0] >= -90 && c[0] <= 90 &&
+    c[1] >= -180 && c[1] <= 180
+  );
+  if (!valid) return null;
+  return coords;
+};
+
+// Clamp client-supplied analysis parameters to sane bounds (prevents GEE
+// quota abuse: e.g. gridSize 1000 → 1M reduceRegions points).
+const clampInt = (v, lo, hi, def) => {
+  const n = parseInt(v, 10);
+  if (isNaN(n)) return def;
+  return Math.max(lo, Math.min(hi, n));
+};
+const clampNum = (v, lo, hi, def) => {
+  const n = parseFloat(v);
+  if (isNaN(n)) return def;
+  return Math.max(lo, Math.min(hi, n));
+};
+
+// ─── Continuous cloud-free composite + all indices ───
+app.post('/api/gee/composite', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const maxCloudPct = clampNum(req.body.maxCloudPct, 0, 100, 25);
+  const geometry = ee.Geometry.Polygon([analysisEngine.toClosedRing(coords)]);
+  const { composite, sceneCount } = analysisEngine.buildComposite(ee, geometry, req.body.startDate, req.body.endDate, maxCloudPct);
+  const idxStats = await analysisEngine.reduceRegion(ee, composite.select(['NDVI', 'NDWI', 'EVI', 'SAVI', 'NDMI']), geometry, 10);
+  let nScenes = null;
+  try { nScenes = await new Promise((r, j) => sceneCount.evaluate(v => r(v), j)); } catch (e) {}
+  res.json({
+    success: true,
+    source: 'google-earth-engine',
+    scenesUsed: nScenes,
+    continuous: true,
+    indices: {
+      ndvi: analysisEngine.summarizeStats(idxStats, 'NDVI'),
+      ndwi: analysisEngine.summarizeStats(idxStats, 'NDWI'),
+      evi: analysisEngine.summarizeStats(idxStats, 'EVI'),
+      savi: analysisEngine.summarizeStats(idxStats, 'SAVI'),
+      ndmi: analysisEngine.summarizeStats(idxStats, 'NDMI')
+    }
+  });
+}));
+
+// ─── Terrain: DEM/slope/aspect/hillshade clipped to exact field ───
+app.post('/api/gee/terrain', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const geometry = ee.Geometry.Polygon([analysisEngine.toClosedRing(coords)]);
+  const terrain = analysisEngine.buildTerrain(ee, geometry);
+  const tStats = await analysisEngine.reduceRegion(ee, terrain.select(['elevation', 'slope', 'aspect']), geometry, 30);
+  const hillshadeStats = await analysisEngine.reduceRegion(ee, terrain.select('hillshade'), geometry, 30);
+  res.json({
+    success: true,
+    source: 'google-earth-engine-srtm',
+    clipped: true,
+    elevation: analysisEngine.summarizeStats(tStats, 'elevation'),
+    slope: analysisEngine.summarizeStats(tStats, 'slope'),
+    aspect: analysisEngine.summarizeStats(tStats, 'aspect'),
+    hillshade: analysisEngine.summarizeStats(hillshadeStats, 'hillshade')
+  });
+}));
+
+// ─── FULL ANALYSIS PIPELINE (indices + terrain + zones + trends) ───
+app.post('/api/gee/analysis', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const result = await analysisEngine.fullAnalysis(ee, {
+    coordinates: coords,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    maxCloudPct: clampNum(req.body.maxCloudPct, 0, 100, 25),
+    gridSize: clampInt(req.body.gridSize, 3, 12, 8),
+    monthsBack: clampInt(req.body.monthsBack, 1, 24, 4)
+  });
+  res.json(result);
+}));
+
+// ── ML: compute real field-level trend features (shared by train/zones) ──
+// `withTrends:false` skips the expensive per-zone 4-window trend sampling
+// (used by /api/ml/zones.csv where only the feature table is needed).
+async function zoneRowsWithTrends(ee, coords, req) {
+  const geometry = ee.Geometry.Polygon([analysisEngine.toClosedRing(coords)]);
+  const { composite } = analysisEngine.buildComposite(ee, geometry, req.body.startDate, req.body.endDate, clampNum(req.body.maxCloudPct, 0, 100, 25));
+  const terrain = analysisEngine.buildTerrain(ee, geometry);
+  const gridSize = clampInt(req.body.gridSize, 3, 12, 8);
+  const { rows } = await analysisEngine.buildZoneFeatures(ee, composite, terrain, geometry, coords, gridSize);
+  // Field-level per-day NDVI/NDWI trends from the continuous time series.
+  const ts = await analysisEngine.buildTimeSeries(ee, geometry, req.body.startDate, req.body.endDate);
+  const ndviTrend = analysisEngine.trendOf(ts, 'ndvi');
+  const ndwiTrend = analysisEngine.trendOf(ts, 'ndwi');
+  // Per-zone temporal trends (G1/G4) — each zone gets its own slope.
+  // Skippable for the CSV export (perf: 4 windows of sampleRegions per call).
+  let zoneTrends = {};
+  if (req.body.withTrends !== false) {
+    try {
+      zoneTrends = (await analysisEngine.buildZoneTrends(ee, geometry, coords, req.body.startDate, req.body.endDate, gridSize, 4)).trends;
+    } catch (e) {
+      console.warn('[ML] Per-zone trends unavailable, using field-level:', e.message || String(e));
+    }
+  }
+  return rows
+    .map(r => ({
+      zone_id: r.id,
+      lat: r.lat, lng: r.lng,
+      ndvi: r.ndvi, ndwi: r.ndwi, evi: r.evi, ndmi: r.ndmi,
+      ndvi_trend: zoneTrends[r.id]?.ndvi_trend ?? ndviTrend,
+      ndwi_trend: zoneTrends[r.id]?.ndwi_trend ?? ndwiTrend,
+      elevation: r.elevation, slope: r.slope
+    }))
+    .filter(r => r.ndvi !== null && r.ndvi !== undefined && !isNaN(r.ndvi) && r.ndvi !== 0);
+}
+
+// ─── ML: train the stress model on the zone-feature table ───
+// G5: real ground-truth labels (farmer-verified) override bootstrap rules.
+app.post('/api/ml/train', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const zoneRows = await zoneRowsWithTrends(ee, coords, req);
+  const groundTruth = req.body.useGroundTruth === false ? [] : mlModel.loadGroundTruth();
+  const trained = mlModel.trainFromZones(zoneRows, groundTruth);
+  res.json({ success: true, zonesTrained: trained.nZones, samples: trained.nSamples, groundTruthUsed: trained.groundTruthUsed || 0, modelPath: mlModel.MODEL_PATH, trends: { ndviPerDay: zoneRows[0]?.ndvi_trend, ndwiPerDay: zoneRows[0]?.ndwi_trend } });
+}));
+
+// ─── ML: predict field-level stress (uses analysis stats) ───
+app.post('/api/ml/predict', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const maxCloudPct = clampNum(req.body.maxCloudPct, 0, 100, 25);
+  const geometry = ee.Geometry.Polygon([analysisEngine.toClosedRing(coords)]);
+  const { composite } = analysisEngine.buildComposite(ee, geometry, req.body.startDate, req.body.endDate, maxCloudPct);
+  const terrain = analysisEngine.buildTerrain(ee, geometry);
+  // FIXED: previously referenced undefined startDate/endDate → ReferenceError.
+  const [idxStats, tStats, tsData] = await Promise.all([
+    analysisEngine.reduceRegion(ee, composite.select(['NDVI', 'NDWI', 'EVI', 'SAVI', 'NDMI']), geometry, 10),
+    analysisEngine.reduceRegion(ee, terrain.select(['elevation', 'slope']), geometry, 30),
+    analysisEngine.buildTimeSeries(ee, geometry, req.body.startDate, req.body.endDate)
+  ]);
+  const s = {
+    ndvi_mean: idxStats.NDVI_mean, ndwi_mean: idxStats.NDWI_mean,
+    evi_mean: idxStats.EVI_mean, ndmi_mean: idxStats.NDMI_mean,
+    ndvi_trend: analysisEngine.trendOf(tsData, 'ndvi'),
+    ndwi_trend: analysisEngine.trendOf(tsData, 'ndwi'),
+    elevation: tStats.elevation_mean, slope: tStats.slope_mean
+  };
+  const model = mlModel.loadModel() || mlModel.defaultModel();
+  const pred = mlModel.predictField(s, model);
+  // G3: merged advisory already embedded in predictField.
+  res.json(Object.assign({ success: true, source: 'ml-rf', advisory: pred.advice, reasoning: pred.reasoning, rulesClass: pred.rulesClass, merged: pred.merged, agreement: pred.agreement }, pred));
+}));
+
+// ─── G5: ground-truth label collection ───
+// POST /api/ml/label — farmer verifies a zone's TRUE stress class in the field.
+// The observed class is stored with the zone's feature vector so future
+// retrains can fit the model to reality, not just rule thresholds.
+app.post('/api/ml/label', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const observedClass = parseInt(req.body.observedClass, 10);
+  if (isNaN(observedClass) || observedClass < 0 || observedClass > 4) {
+    return res.status(400).json({ success: false, error: 'observedClass must be an integer 0 (Healthy) – 4 (Critical)' });
+  }
+  const zoneRows = await zoneRowsWithTrends(ee, coords, req);
+  // Nearest zone to the clicked point (defaults to field centroid)
+  const lat = parseFloat(req.body.lat);
+  const lng = parseFloat(req.body.lng);
+  let target = zoneRows[0] || {};
+  if (isFinite(lat) && isFinite(lng)) {
+    let bestD = Infinity;
+    zoneRows.forEach(z => {
+      const d = Math.hypot(z.lat - lat, z.lng - lng);
+      if (d < bestD) { bestD = d; target = z; }
+    });
+  }
+  const record = {
+    zoneId: target.zone_id,
+    lat: target.lat, lng: target.lng,
+    observedClass,
+    label: mlModel.CLASS_NAMES[observedClass],
+    features: {
+      ndvi: target.ndvi, ndwi: target.ndwi, evi: target.evi, ndmi: target.ndmi,
+      ndvi_trend: target.ndvi_trend, ndwi_trend: target.ndwi_trend,
+      elevation: target.elevation, slope: target.slope
+    },
+    notes: String(req.body.notes || '').slice(0, 500),
+    reporter: String(req.body.reporter || '').slice(0, 80)
+  };
+  mlModel.addGroundTruth(record);
+  const all = mlModel.loadGroundTruth();
+  res.json({ success: true, saved: record, totalLabels: all.length, storePath: mlModel.LABELS_PATH });
+}));
+
+// GET /api/ml/labels — list all farmer-verified ground-truth observations
+app.get('/api/ml/labels', (req, res) => {
+  res.json({ success: true, count: mlModel.loadGroundTruth().length, labels: mlModel.loadGroundTruth() });
+});
+
+// GET /api/ml/health — model + label-store status (for Uptime Kuma / admin)
+app.get('/api/ml/health', (req, res) => {
+  const model = mlModel.loadModel();
+  res.json({
+    success: true,
+    model: model ? { trainedAt: model.trainedAt, nSamples: model.nSamples, isDefault: !!model.isDefault, trees: (model.trees || []).length } : null,
+    groundTruth: { count: mlModel.loadGroundTruth().length, path: mlModel.LABELS_PATH }
+  });
+});// ─── ML/analysis: zone-feature CSV export (the training table) ───
+app.post('/api/ml/zones.csv', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  req.body.withTrends = false; // CSV only needs the feature table — skip 4-window sampling
+  const zoneRows = await zoneRowsWithTrends(ee, coords, req);
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="farmhealth_zone_features.csv"');
+  res.send(mlModel.zonesToCSV(zoneRows));
+}));
+
+// ─── ML: serve the trained model JSON (for in-browser / offline RF) ───
+// Lets the frontend download the pre-trained Random Forest and run predictions
+// client-side even when the GEE backend is unreachable.
+app.get('/api/ml/model', (req, res) => {
+  try {
+    const model = mlModel.loadModel();
+    if (model) {
+      return res.json({ success: true, source: 'trained-model', isDefault: !!model.isDefault, model });
+    }
+    // No trained model on disk — ship the deterministic default (rule grid).
+    const def = mlModel.defaultModel();
+    def.isDefault = true;
+    return res.json({ success: true, source: 'default-model', isDefault: true, model: def });
+  } catch (e) {
+    console.error('[ML] model serve error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ─── ML: predict field-level stress WITHOUT GEE ───
+// Accepts a feature-vector/stats payload directly — no Earth Engine needed.
+// This wires the ML stress category into the *main* analysis flow so users
+// without GEE credentials still see "Moderate Stress" (not just raw NDVI).
+app.post('/api/ml/predict-simple', (req, res) => {
+  try {
+    const s = {
+      ndvi_mean: parseFloat(req.body.ndvi_mean) || 0.5,
+      ndwi_mean: parseFloat(req.body.ndwi_mean) || 0.3,
+      evi_mean: parseFloat(req.body.evi_mean) || 0.5,
+      ndmi_mean: parseFloat(req.body.ndmi_mean) || 0.3,
+      ndvi_trend: parseFloat(req.body.ndvi_trend) || 0,
+      ndwi_trend: parseFloat(req.body.ndwi_trend) || 0,
+      elevation: parseFloat(req.body.elevation) || 150,
+      slope: parseFloat(req.body.slope) || 1
+    };
+    const model = mlModel.loadModel() || mlModel.defaultModel();
+    const pred = mlModel.predictField(s, model);
+    // G3: merged advisory already embedded in predictField.
+    res.json(Object.assign(
+      { success: true, source: 'ml-rf', model: model.isDefault ? 'default-rules-model' : 'field-trained-rf' },
+      pred
+    ));
+  } catch (e) {
+    console.error('[ML] predict-simple error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 // ─── Sentinel Hub Token Proxy ───
 app.post('/api/sentinel/token', async (req, res) => {
   try {
@@ -1044,11 +1341,21 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`  🌐  http://0.0.0.0:${PORT}`);
   console.log(`  🔌  Endpoints:`);
   console.log(`        GET  /api/health         — General health (Docker/Uptime Kuma)`);
-  console.log(`        GET  /api/gee/health     — Connection status`);
+    console.log(`        GET  /api/gee/health     — Connection status`);
   console.log(`        POST /api/gee/init       — Initialize GEE`);
   console.log(`        POST /api/gee/ndvi       — Compute NDVI`);
   console.log(`        POST /api/stac/ndvi      — Free NDVI via Planetary Computer (no key)`);
   console.log(`        POST /api/gee/time-series — Time series`);
+  console.log(`        POST /api/gee/analysis    — FULL pipeline (indices+terrain+zones+climate+thermal+regional)`);
+  console.log(`        POST /api/gee/composite   — Continuous cloud-free composite`);
+  console.log(`        POST /api/gee/terrain     — Clipped SRTM terrain`);
+  console.log(`        POST /api/ml/predict-simple — ML stress (no GEE needed!)`);
+  console.log(`        GET  /api/ml/model       — Download trained RF model (for browser)`);
+  console.log(`        POST /api/ml/train        — Train stress RF (uses ground-truth labels)`);
+  console.log(`        POST /api/ml/predict      — ML stress decision + merged advisory`);
+  console.log(`        POST /api/ml/label        — Ground-truth label collection`);
+  console.log(`        GET  /api/ml/labels       — List stored ground-truth labels`);
+  console.log(`        GET  /api/ml/health       — ML model + label-store status`);
   console.log(`        POST /api/gemini-analysis — AI advice (Ollama → Gemini → expert fallback)`);
   console.log(`        POST /api/vision-analysis — Crop photo disease detection (LLaVA)`);
   console.log(`        GET  /api/ai/health       — AI/Ollama status (Uptime Kuma probe)`);

@@ -16,6 +16,7 @@ interface WorkflowTask {
   tool: string;
   status: "pending" | "running" | "completed" | "failed";
   progress: number;
+  description: string;
 }
 
 interface WorkflowPanelProps {

@@ -1400,6 +1400,220 @@ const FH_API = (function() {
     }
   }
 
+  // ═══════════ PROFESSIONAL ANALYSIS PIPELINE (GEE) ═══════════
+  // Continuous cloud-free composite + clipped terrain + ML stress decision.
+  // These calls go to the Node backend which authenticates GEE server-side.
+
+  // Full end-to-end analysis: continuous indices, clipped terrain, zones,
+  // time series, trends — one payload for the report generator.
+  async function fetchFullAnalysis(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      startDate: o.startDate || null,
+      endDate: o.endDate || null,
+      monthsBack: o.monthsBack || 4,
+      maxCloudPct: o.maxCloudPct || 25,
+      gridSize: o.gridSize || 8
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/gee/analysis'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(240000)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Analysis failed (HTTP ' + res.status + ')');
+      }
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] Full analysis failed:', e.message);
+      return null;
+    }
+  }
+
+  // Clipped SRTM terrain: elevation / slope / aspect / hillshade for the
+  // exact field boundary (fully delineated from the surrounding area).
+  async function fetchClippedTerrain(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]])
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/gee/terrain'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(120000)
+      });
+      if (!res.ok) throw new Error('Terrain failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] Clipped terrain failed:', e.message);
+      return null;
+    }
+  }
+
+  // ML stress decision: predicts field-level stress class + confidence.
+  async function fetchMLStress(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      startDate: o.startDate || null,
+      endDate: o.endDate || null
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/ml/predict'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(240000)
+      });
+      if (!res.ok) throw new Error('ML predict failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] ML stress prediction failed:', e.message);
+      return null;
+    }
+  }
+
+  // Train/retrain the stress model on this field's zone features.
+  async function fetchMLTrain(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      startDate: o.startDate || null,
+      endDate: o.endDate || null,
+      gridSize: o.gridSize || 8
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/ml/train'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(240000)
+      });
+      if (!res.ok) throw new Error('ML train failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] ML train failed:', e.message);
+      return null;
+    }
+  }
+
+  // Download the zone-feature CSV (ML training table / report table).
+  async function fetchZoneCSV(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      startDate: o.startDate || null,
+      endDate: o.endDate || null,
+      gridSize: o.gridSize || 8
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/ml/zones.csv'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(240000)
+      });
+      if (!res.ok) throw new Error('Zone CSV failed (HTTP ' + res.status + ')');
+      return await res.text();
+    } catch (e) {
+      console.warn('[Analysis] Zone CSV failed:', e.message);
+      return null;
+    }
+  }
+
+  // ═══════════ GROUND-TRUTH LABEL COLLECTION (G5) ═══════════
+  // POST a farmer-verified stress class for a zone — feeds real labels into
+  // the next model retrain instead of only the bootstrap rule thresholds.
+  async function submitGroundTruthLabel(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      observedClass: o.observedClass,
+      lat: o.lat, lng: o.lng,
+      notes: o.notes || '',
+      reporter: o.reporter || '',
+      gridSize: o.gridSize || 8
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/ml/label'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(180000)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Label submit failed (HTTP ' + res.status + ')');
+      }
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] Ground-truth submit failed:', e.message);
+      return null;
+    }
+  }
+
+    // GET the stored ground-truth labels (count + list)
+  async function fetchGroundTruthLabels() {
+    try {
+      const res = await fetch(getApiUrl('/api/ml/labels'), {
+        signal: AbortSignal.timeout(20000)
+      });
+      if (!res.ok) throw new Error('Labels fetch failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] Ground-truth fetch failed:', e.message);
+      return null;
+    }
+  }
+
+  // ═══════════ ML STRESS — no GEE required (G2/P0) ═══════════
+  // POST /api/ml/predict-simple — accepts raw feature stats directly so the
+  // ML stress category ("Moderate Stress") is visible even when the GEE
+  // backend is unreachable. Uses the pre-trained RF model on the server.
+  async function fetchMLStressSimple(stats) {
+    if (!stats || typeof stats !== 'object') return null;
+    try {
+      const res = await fetch(getApiUrl('/api/ml/predict-simple'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ndvi_mean: stats.ndvi_mean || stats.meanNdvi || stats.ndvi || 0.55,
+          ndwi_mean: stats.ndwi_mean || stats.meanNdwi || stats.ndwi || 0.3,
+          evi_mean:  stats.evi_mean || stats.evi || 0.5,
+          ndmi_mean: stats.ndmi_mean || stats.ndmi || 0.3,
+          ndvi_trend: stats.ndvi_trend || stats.trendSlope || 0,
+          ndwi_trend: stats.ndwi_trend || 0,
+          elevation:  stats.elevation || stats.avgElevation || 150,
+          slope:      stats.slope || stats.avgSlope || 1
+        }),
+        signal: AbortSignal.timeout(12000)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      console.warn('[ML] predict-simple failed, falling back to client:', e.message);
+      return null;
+    }
+  }
+
+  // GET the model health / status (for the ML health badge)
+  async function fetchMLHealth() {
+    try {
+      const res = await fetch(getApiUrl('/api/ml/health'), { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      console.warn('[ML] health check failed:', e.message);
+      return null;
+    }
+  }
+
   // ═══════════ EXPORTS ═══════════
   return {
     setStateRef,
@@ -1424,6 +1638,15 @@ const FH_API = (function() {
     fetchGEETimeSeries,
     setDataStatus,
     getFallbackAdvice,
-    fetchInfrastructure
+    fetchInfrastructure,
+    fetchFullAnalysis,
+    fetchClippedTerrain,
+    fetchMLStress,
+    fetchMLTrain,
+    fetchZoneCSV,
+        submitGroundTruthLabel,
+    fetchGroundTruthLabels,
+    fetchMLStressSimple,
+    fetchMLHealth
   };
 })();

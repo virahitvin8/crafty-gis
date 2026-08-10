@@ -69,44 +69,51 @@ else
   echo -e "  Flutter: ${GREEN}flutter${NC}"
 fi
 
-# ── Step 1: Build Next.js Frontend ──────────────────────────────────────────────────────
-print_step "1/5: Building Next.js frontend"
-cd "$CLIENT_DIR"
+# ── Step 1: Build Next.js Frontend (optional companion app) ─────────────────────────────
+# The PRIMARY served app is the vanilla JS SPA at the repo root (index.html + js/).
+# The Next.js client in crafty-gis-client is an optional companion; building it
+# is skipped when its deps are unavailable so the main build can't fail on it.
+print_step "1/5: Building Next.js frontend (optional)"
+if [ -d "$CLIENT_DIR" ]; then
+  cd "$CLIENT_DIR"
+  if npm install --silent >/dev/null 2>&1 && npm run build >/dev/null 2>&1; then
+    print_success "Next.js client build complete"
+  else
+    print_warning "Next.js client build skipped (deps unavailable) — not required for the main app."
+  fi
+  cd "$PROJECT_DIR"
+else
+  print_warning "crafty-gis-client not present — skipping."
+fi
 
-echo "  Installing frontend dependencies..."
-npm install --silent
-
-echo "  Building Next.js app..."
-npm run build
-print_success "Frontend build complete"
-
-# ── Step 2: Copy Frontend Artifacts to www ─────────────────────────────────────────────
-print_step "2/5: Copying frontend to www/"
+# ── Step 2: Build the ACTUAL served app into www ───────────────────────────────────────
+# www/ must contain the app the server actually serves: the vanilla JS SPA
+# (index.html, css/, js/, manifest, sw) plus the Node backend for deployment.
+print_step "2/5: Building the served app into www/"
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
-# Copy build output
-if [ -d "$CLIENT_DIR/.next" ]; then
-  cp -r "$CLIENT_DIR/.next" "$BUILD_DIR/.next" 2>/dev/null || true
-fi
+# Vanilla SPA — this is what server.js serves as static files
+cp index.html "$BUILD_DIR/index.html" 2>/dev/null || true
+cp manifest.json "$BUILD_DIR/manifest.json" 2>/dev/null || true
+cp sw.js "$BUILD_DIR/sw.js" 2>/dev/null || true
+cp -r css "$BUILD_DIR/css" 2>/dev/null || true
+cp -r js "$BUILD_DIR/js" 2>/dev/null || true
+cp -r assets "$BUILD_DIR/assets" 2>/dev/null || true
 
-# Copy public assets
-if [ -d "$CLIENT_DIR/public" ]; then
-  cp -r "$CLIENT_DIR/public" "$BUILD_DIR/public" 2>/dev/null || true
-fi
+# Node backend (deployable standalone)
+cp -r server "$BUILD_DIR/server" 2>/dev/null || true
+cp package.json "$BUILD_DIR/package.json" 2>/dev/null || true
+cp .env.example "$BUILD_DIR/.env.example" 2>/dev/null || true
 
-# Copy essential build configs
-cp "$CLIENT_DIR/package.json" "$BUILD_DIR/package.json" 2>/dev/null || true
-cp "$CLIENT_DIR/tsconfig.json" "$BUILD_DIR/tsconfig.json" 2>/dev/null || true
-cp "$CLIENT_DIR/eslint.config.mjs" "$BUILD_DIR/eslint.config.mjs" 2>/dev/null || true
-cp "$CLIENT_DIR/postcss.config.mjs" "$BUILD_DIR/postcss.config.mjs" 2>/dev/null || true
-cp "$CLIENT_DIR/vite.config.ts" "$BUILD_DIR/vite.config.ts" 2>/dev/null || true
+# Extra standalone demo/landing pages (optional)
+cp -r farmhealth_dashboard "$BUILD_DIR/farmhealth_dashboard" 2>/dev/null || true
+cp -r field_analytics_ai_advice "$BUILD_DIR/field_analytics_ai_advice" 2>/dev/null || true
+cp -r farmhealth_precision "$BUILD_DIR/farmhealth_precision" 2>/dev/null || true
+cp -r learning_module "$BUILD_DIR/learning_module" 2>/dev/null || true
+cp -r my_fields "$BUILD_DIR/my_fields" 2>/dev/null || true
 
-# Copy CSS and JS
-cp -r "$CLIENT_DIR/css" "$BUILD_DIR/css" 2>/dev/null || true
-cp -r "$CLIENT_DIR/js" "$BUILD_DIR/js" 2>/dev/null || true
-
-echo "  ✅ Frontend copied to www/ ($(find "$BUILD_DIR" -type f | wc -l) files)"
+echo "  ✅ Served app copied to www/ ($(find "$BUILD_DIR" -type f | wc -l) files)"
 
 # ── Step 3: Build Node.js Express Server ──────────────────────────────────────────────
 print_step "3/5: Building Node.js Express server"
