@@ -786,6 +786,78 @@ const FH_INTEL = (function() {
     toast('Zone yield forecast CSV exported');
   }
 
+  // Server-side Random Forest yield (POST /api/ml/yield): trains a
+  // regression RF on the field's zone-feature table and predicts yield
+  // per zone — the ML counterpart of the client coefficient model.
+  async function runServerYieldPrediction() {
+    const el = $('serverYieldResult');
+    if (!el) return;
+    if (!_state.fieldPoly) return toast('First select your field!', 'err');
+    const cropId = ($('zoneYieldCrop') && $('zoneYieldCrop').value) || 'generic';
+    el.innerHTML = '<div class="hint">⏳ Querying server Random Forest yield model… (trains on this field\'s zone table)</div>';
+    try {
+      if (typeof FH_API === 'undefined' || !FH_API.fetchMLYield) throw new Error('API client missing');
+      const res = await FH_API.fetchMLYield({ coordinates: _state.fieldLL.map(ll => [ll[0], ll[1]]), cropId });
+      if (!res || !res.success) {
+        el.innerHTML = '<div class="hint" style="color:var(--orange)">Server RF unavailable (backend / GEE down) — the client model above still works.</div>';
+        return;
+      }
+      _state.serverYield = res;
+      renderServerYield();
+      _drawServerYieldOverlay(res);
+      toast(`🤖 Server RF: ${res.fieldYieldPerHa} ${res.unit} avg · ${res.totalYield ?? '—'} total (${res.model})`);
+    } catch (e) {
+      el.innerHTML = '<div class="hint" style="color:var(--orange)">Server RF failed: ' + (e.message || String(e)) + '</div>';
+    }
+  }
+
+  function renderServerYield() {
+    const el = $('serverYieldResult');
+    if (!el || !_state.serverYield) return;
+    const y = _state.serverYield;
+    const maxY = Math.max(...y.zones.map(z => z.yieldPerHa), 0.001);
+    const diff = (c) => c ? Math.round(((y.fieldYieldPerHa - c) / c) * 100) : null;
+    const client = _state.zoneYield?.weightedPerHa ?? null;
+    el.innerHTML = `
+      <div style="border-left:3px solid var(--blue-light,#5dade2);background:var(--bg-input);border-radius:8px;padding:8px;font-size:0.7rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:800;color:var(--blue-light,#5dade2)">🤖 Server Random Forest — ${y.cropName}</span>
+          <span class="badge ${y.model === 'default-yield-model' ? 'badge-warn' : 'badge-live'}">${y.model === 'default-yield-model' ? 'default model' : 'field-trained RF'}</span>
+        </div>
+        <div style="color:var(--text-muted);margin:2px 0">Field avg <b>${y.fieldYieldPerHa} ${y.unit}</b> · potential ${y.potential} ${y.unit} · ${y.nZones} zones${y.areaHa ? ' · ' + y.areaHa + ' ha' : ''}${y.totalYield ? ' · total <b>' + y.totalYield + ' ' + y.unit + '</b>' : ''}${client ? ' · vs client model ' + diff(client) + '%' : ''}</div>
+        ${y.zones.slice(0, 8).map(z => `
+        <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,0.08)">
+          <span style="flex:1;color:var(--text)">Zone ${z.zone_id}</span>
+          <div style="width:60px;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden">
+            <div style="width:${(z.yieldPerHa / maxY * 100).toFixed(0)}%;height:100%;background:var(--blue-light,#5dade2)"></div>
+          </div>
+          <span style="width:52px;text-align:right;font-weight:700;color:var(--blue-light,#5dade2)">${z.yieldPerHa}</span>
+          <span style="width:30px;text-align:right;color:var(--text-muted);font-size:0.6rem">${z.ndvi.toFixed(2)}</span>
+        </div>`).join('')}
+        <div style="font-size:0.6rem;color:var(--text-muted);margin-top:5px">Regression Random Forest (60 trees) trained on this field's zone-feature table with crop-specific coefficients (agronomy-14-01975). Predictions returned by POST /api/ml/yield.</div>
+      </div>`;
+  }
+
+  // Blue-tinted overlay of the server RF per-zone yield on the map.
+  function _drawServerYieldOverlay(res) {
+    if (!_state.map || !window.FH_MAP || !FH_MAP.getYieldLayer) return;
+    const layer = FH_MAP.getYieldLayer();
+    if (!layer) return;
+    layer.clearLayers();   // replace any client-model rectangles first
+    const maxY = Math.max(...res.zones.map(z => z.yieldPerHa), 0.001);
+    res.zones.forEach(z => {
+      const halfLat = 0.0015, halfLng = 0.0015;
+      const rel = z.yieldPerHa / maxY;
+      const col = rel > 0.85 ? '#1e8449' : rel > 0.6 ? '#2ecc71' : rel > 0.35 ? '#f1c40f' : '#e74c3c';
+      L.circleMarker([z.lat, z.lng], {
+        radius: 6, color: col, weight: 1, fillColor: col, fillOpacity: 0.6
+      }).bindTooltip(
+        `<b>Zone ${z.zone_id}</b><br>Server RF yield: <b>${z.yieldPerHa} t/ha</b><br>empirical ${z.empirical} · NDVI ${z.ndvi.toFixed(2)}`,
+        { sticky: true }
+      ).addTo(layer);
+    });
+  }
+
   // ═══════════════════════════════════════════════════════════
   // 5c. GEDI LIDAR BIOMASS / CARBON STOCK (per management zone)
   //     Above-ground biomass estimated from GEDI-style allometric
@@ -1473,6 +1545,9 @@ const FH_INTEL = (function() {
     runZoneYieldPrediction,
     renderZoneYield,
     exportZoneYieldCSV,
+    // Server Random Forest yield (POST /api/ml/yield)
+    runServerYieldPrediction,
+    renderServerYield,
     // GEDI biomass / carbon stock (remotesensing-13-02486)
     runBiomassEstimate,
     renderBiomass,

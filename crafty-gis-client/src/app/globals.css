@@ -158,3 +158,154 @@ button, a, input, textarea {
   font-size: 12px;
 }
 .prose-crafty a { color: #36a9f5; text-decoration: underline; }
+
+/* ── Health Gauge ──────────────────────────────────────────────── */
+.gauge-ring {
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+/* ── Card Hover Effects ────────────────────────────────────────── */
+.card-hover {
+  transition: all 200ms ease-out;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4);
+  border-color: rgba(12, 142, 231, 0.3);
+}
+
+/* ── Progress Bar Animation ────────────────────────────────────── */
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: var(--progress); }
+}
+.progress-animated {
+  animation: progress-fill 1s ease-out forwards;
+}
+
+/* ── Shimmer Loading Effect ────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.03) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Map Layer Controls ────────────────────────────────────────── */
+.layer-toggle {
+  transition: all 150ms ease-out;
+}
+.layer-toggle.active {
+  background: rgba(12, 142, 231, 0.15);
+  border-color: rgba(12, 142, 231, 0.4);
+}
+
+/* ── Score Ring Colors ─────────────────────────────────────────── */
+.score-excellent { stroke: #22c55e; }
+.score-good { stroke: #3b82f6; }
+.score-fair { stroke: #f59e0b; }
+.score-poor { stroke: #ef4444; }
+
+/* ── Status Pulse Animation ────────────────────────────────────── */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.status-pulse {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* ── Tooltip Styles ────────────────────────────────────────────── */
+.tooltip {
+  position: relative;
+}
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: rgba(24, 24, 27, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 11px;
+  color: #e4e4e7;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms;
+  z-index: 50;
+}
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ── Tab Styles ────────────────────────────────────────────────── */
+.tab-active {
+  background: rgba(12, 142, 231, 0.15);
+  border-color: rgba(12, 142, 231, 0.4);
+  color: #36a9f5;
+}
+
+/* ── Scrollbar for Panels ──────────────────────────────────────── */
+.panel-scroll::-webkit-scrollbar { width: 4px; }
+.panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+}
+
+/* ── Map Popup Styles ──────────────────────────────────────────── */
+.maplibregl-popup-content {
+  background: rgba(24, 24, 27, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  color: #e4e4e7 !important;
+}
+.maplibregl-popup-tip {
+  border-top-color: rgba(24, 24, 27, 0.95) !important;
+}
+.maplibregl-popup-close-button {
+  color: #71717a !important;
+  font-size: 18px !important;
+}
+.maplibregl-popup-close-button:hover {
+  color: #e4e4e7 !important;
+}
+
+/* ── Weather Card Styles ───────────────────────────────────────── */
+.weather-card {
+  background: linear-gradient(135deg,
+    rgba(12, 142, 231, 0.1) 0%,
+    rgba(34, 197, 94, 0.05) 100%);
+  border: 1px solid rgba(12, 142, 231, 0.2);
+}
+
+/* ── Gradient Text ─────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #36a9f5, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Mobile Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar-collapsed {
+    width: 60px !important;
+  }
+  .sidebar-collapsed .sidebar-label {
+    display: none;
+  }
+}

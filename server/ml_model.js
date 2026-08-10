@@ -413,6 +413,253 @@ function predictField(stats, model) {
   });
 }
 
+/* ═══════════════════════════════════════════════════════════
+   YIELD REGRESSION RANDOM FOREST (server-side)
+   A second Random Forest that predicts crop YIELD (t/ha) per
+   zone from the SAME satellite/terrain feature vectors as the
+   stress classifier — trained on bootstrap yield labels from
+   crop-specific coefficients (agronomy-14-01975 RS+ML yield
+   stack): potential × (NDVI/peak)^power × water × slope ×
+   trend. Regression trees with SSE-reduction splits; leaves
+   store mean yield. Persisted to models/crop_yield_rf.json.
+   ═══════════════════════════════════════════════════════════ */
+const YIELD_MODEL_PATH = path.join(MODEL_DIR, 'crop_yield_rf.json');
+
+// Crop-specific yield coefficients (mirror the frontend YIELD_MODIFIERS
+// + FH_CONFIG.YIELD_COEFFICIENTS so client & server stay consistent).
+const YIELD_COEFFS = {
+  wheat:      { peak: 0.80, yieldMax: 5.5, power: 0.85, waterSens: 0.35, slopePen: 0.020, slopeTol: 5, trendGain: 50 },
+  rice:       { peak: 0.78, yieldMax: 6.5, power: 0.80, waterSens: 0.50, slopePen: 0.010, slopeTol: 3, trendGain: 40 },
+  maize:      { peak: 0.85, yieldMax: 8.0, power: 0.82, waterSens: 0.40, slopePen: 0.020, slopeTol: 5, trendGain: 45 },
+  cotton:     { peak: 0.75, yieldMax: 3.5, power: 0.85, waterSens: 0.30, slopePen: 0.020, slopeTol: 6, trendGain: 40 },
+  sugarcane:  { peak: 0.88, yieldMax: 80,  power: 0.78, waterSens: 0.45, slopePen: 0.010, slopeTol: 4, trendGain: 35 },
+  mustard:    { peak: 0.72, yieldMax: 2.5, power: 0.85, waterSens: 0.25, slopePen: 0.020, slopeTol: 6, trendGain: 45 },
+  soybean:    { peak: 0.82, yieldMax: 3.0, power: 0.82, waterSens: 0.35, slopePen: 0.020, slopeTol: 5, trendGain: 45 },
+  potato:     { peak: 0.76, yieldMax: 30,  power: 0.80, waterSens: 0.45, slopePen: 0.010, slopeTol: 4, trendGain: 40 },
+  pulses:     { peak: 0.74, yieldMax: 2.0, power: 0.85, waterSens: 0.25, slopePen: 0.020, slopeTol: 6, trendGain: 40 },
+  vegetables: { peak: 0.78, yieldMax: 25,  power: 0.80, waterSens: 0.40, slopePen: 0.010, slopeTol: 5, trendGain: 45 },
+  orchards:   { peak: 0.82, yieldMax: 15,  power: 0.82, waterSens: 0.35, slopePen: 0.010, slopeTol: 8, trendGain: 35 },
+  generic:    { peak: 0.80, yieldMax: 10,  power: 0.80, waterSens: 0.35, slopePen: 0.020, slopeTol: 5, trendGain: 45 }
+};
+
+// Deterministic yield label for a feature vector (bootstrap target).
+function yieldFromFeatures(f, cropId) {
+  const c = YIELD_COEFFS[cropId] || YIELD_COEFFS.generic;
+  const ndviRatio = Math.min(1, Math.max(0.05, safeVal(f.ndvi, 0.5) / c.peak));
+  const veg = Math.pow(ndviRatio, c.power);
+  const water = Math.min(1.25, Math.max(0.6, 1 + c.waterSens * Math.max(-0.6, Math.min(0.6, safeVal(f.ndwi, 0.3) - 0.1))));
+  const slope = Math.max(0.7, 1 - c.slopePen * Math.max(0, safeVal(f.slope, 1) - c.slopeTol));
+  const trend = Math.min(1.15, Math.max(0.85, 1 + c.trendGain * (safeVal(f.ndvi_trend, 0) || 0)));
+  return Math.min(c.yieldMax * 1.2, c.yieldMax * veg * water * slope * trend);
+}
+
+// Regression split: pick the split minimizing residual SSE (variance).
+function bestSplitReg(X, y, idx, mtry) {
+  let best = { gain: -Infinity, feat: -1, thr: 0 };
+  const n = idx.length;
+  if (n < 2) return best;
+  let mean = 0;
+  for (const i of idx) mean += y[i];
+  mean /= n;
+  let parentSse = 0;
+  for (const i of idx) parentSse += (y[i] - mean) * (y[i] - mean);
+  if (parentSse < 1e-9) return best;
+
+  const feats = [];
+  for (let f = 0; f < N_FEATURES; f++) feats.push(f);
+  for (let i = 0; i < feats.length; i++) { const j = randInt(feats.length); [feats[i], feats[j]] = [feats[j], feats[i]]; }
+  const subset = feats.slice(0, Math.max(1, Math.min(mtry, N_FEATURES)));
+
+  for (const f of subset) {
+    const vals = [];
+    for (let t = 0; t < Math.min(20, n); t++) vals.push(X[idx[randInt(n)]][f]);
+    for (const thr of vals) {
+      const left = [], right = [];
+      for (const i of idx) (X[i][f] <= thr ? left : right).push(i);
+      if (!left.length || !right.length) continue;
+      let mL = 0, mR = 0;
+      for (const i of left) mL += y[i];
+      for (const i of right) mR += y[i];
+      mL /= left.length; mR /= right.length;
+      let sse = 0;
+      for (const i of left) sse += (y[i] - mL) * (y[i] - mL);
+      for (const i of right) sse += (y[i] - mR) * (y[i] - mR);
+      const gain = parentSse - sse;
+      if (gain > best.gain) best = { gain, feat: f, thr };
+    }
+  }
+  return best;
+}
+
+function buildRegTree(X, y, idx, depth, maxDepth, minLeaf, mtry) {
+  const node = new Node();
+  let sum = 0;
+  for (const i of idx) sum += y[i];
+  node.mean = sum / idx.length;
+  node.count = idx.length;
+  if (depth >= maxDepth || idx.length < minLeaf) return node;
+
+  const s = bestSplitReg(X, y, idx, mtry);
+  if (s.feat < 0 || s.gain <= 0) return node;
+
+  const left = [], right = [];
+  for (const i of idx) (X[i][s.feat] <= s.thr ? left : right).push(i);
+  node.leaf = false;
+  node.feat = s.feat;
+  node.thr = s.thr;
+  node.left = buildRegTree(X, y, left, depth + 1, maxDepth, minLeaf, mtry);
+  node.right = buildRegTree(X, y, right, depth + 1, maxDepth, minLeaf, mtry);
+  return node;
+}
+
+function trainYieldForest(X, y, opts) {
+  const n = X.length;
+  const nTrees = opts.nTrees || 60;
+  const maxDepth = opts.maxDepth || 8;
+  const minLeaf = opts.minLeaf || 2;
+  const mtry = opts.mtry || Math.max(2, Math.floor(Math.sqrt(N_FEATURES)));
+  const trees = [];
+  for (let t = 0; t < nTrees; t++) {
+    const idx = [];
+    for (let i = 0; i < n; i++) idx.push(randInt(n));
+    trees.push(buildRegTree(X, y, idx, 0, maxDepth, minLeaf, mtry));
+  }
+  return { type: 'yield-regression', trees, nFeatures: N_FEATURES, features: FEATURES, trainedAt: new Date().toISOString(), nSamples: n };
+}
+
+// Predict: average leaf mean across trees.
+function predictYieldForest(model, features) {
+  const x = normalize(features);
+  let sum = 0;
+  for (const tree of model.trees) {
+    let node = tree;
+    while (!node.leaf) node = (x[node.feat] <= node.thr) ? node.left : node.right;
+    sum += node.mean;
+  }
+  return sum / model.trees.length;
+}
+
+function saveYieldModel(model) {
+  try {
+    if (!fs.existsSync(MODEL_DIR)) fs.mkdirSync(MODEL_DIR, { recursive: true });
+    fs.writeFileSync(YIELD_MODEL_PATH, JSON.stringify(model));
+    return YIELD_MODEL_PATH;
+  } catch (e) { console.warn('[ML] Could not persist yield model:', e.message); return null; }
+}
+
+function loadYieldModel() {
+  try {
+    if (fs.existsSync(YIELD_MODEL_PATH)) return JSON.parse(fs.readFileSync(YIELD_MODEL_PATH, 'utf8'));
+  } catch (e) { console.warn('[ML] Yield model load failed:', e.message); }
+  return null;
+}
+
+// Train the yield RF on a field's zone-feature table + crop coefficients.
+function trainFromZonesYield(zoneRows, cropId, opts) {
+  if (!zoneRows || zoneRows.length < 10) {
+    throw new Error('Need at least 10 zone rows to train the yield model');
+  }
+  const cid = YIELD_COEFFS[cropId] ? cropId : 'generic';
+  const X = [], y = [];
+  for (const z of zoneRows) {
+    const target = yieldFromFeatures(z, cid);
+    // NaN-safe feature vector (GEE may return null for a band).
+    const fv = () => [
+      safeVal(z.ndvi, 0.5), safeVal(z.ndwi, 0.3), safeVal(z.evi, 0.5), safeVal(z.ndmi, 0.3),
+      safeVal(z.ndvi_trend, 0), safeVal(z.ndwi_trend, 0),
+      safeVal(z.elevation, 150), safeVal(z.slope, 1)
+    ];
+    X.push(normalize(fv()));
+    y.push(target);
+    for (let k = 1; k <= 3; k++) {
+      const base = fv();
+      const eps = (v, salt) => v * (1 + (Math.sin(k * 7.13 + salt * 13.7) * 0.02));
+      X.push(normalize([
+        eps(base[0], 0.5), eps(base[1], 0.3), eps(base[2], 0.5), eps(base[3], 0.3),
+        base[4] * (1 + 0.1 * k), base[5] * (1 + 0.1 * k),
+        base[6] + Math.sin(k) * 2, base[7] + Math.cos(k) * 0.2
+      ]));
+      y.push(target);
+    }
+  }
+  const model = trainYieldForest(X, y, Object.assign({ nTrees: 60, maxDepth: 8, minLeaf: 2 }, opts || {}));
+  model.cropId = cid;
+  saveYieldModel(model);
+  return { model, nZones: zoneRows.length, nSamples: X.length, cropId: cid };
+}
+
+// A pre-trained default yield model (synthetic grid) so predictions ALWAYS
+// work even before real field data arrives.
+function defaultYieldModel() {
+  const rows = [];
+  const grid = [0.15, 0.3, 0.45, 0.6, 0.72, 0.85, 0.92];
+  for (const ndvi of grid)
+    for (const ndwi of [-0.3, 0, 0.2])
+      for (const slope of [1, 4, 8])
+        rows.push({
+          ndvi, ndwi,
+          evi: ndvi * 0.9,
+          ndmi: ndwi * 0.8 + 0.05,
+          ndvi_trend: (ndvi - 0.55) * 0.01,
+          ndwi_trend: 0,
+          elevation: 150 + slope * 5,
+          slope
+        });
+  const { model } = trainFromZonesYield(rows, 'generic');
+  model.isDefault = true;
+  return model;
+}
+
+// Predict per-zone yield (t/ha) from one zone's feature row.
+function predictZoneYield(featureRow, cropId, model) {
+  const m = model || loadYieldModel() || defaultYieldModel();
+  const cid = YIELD_COEFFS[cropId] ? cropId : (m.cropId || 'generic');
+  const features = [
+    safeVal(featureRow.ndvi, 0.5), safeVal(featureRow.ndwi, 0.3),
+    safeVal(featureRow.evi, 0.5), safeVal(featureRow.ndmi, 0.3),
+    safeVal(featureRow.ndvi_trend, 0), safeVal(featureRow.ndwi_trend, 0),
+    safeVal(featureRow.elevation, 150), safeVal(featureRow.slope, 1)
+  ];
+  const coeffs = YIELD_COEFFS[cid] || YIELD_COEFFS.generic;
+  // Cap the RF output to the crop's potential ceiling (×1.2), so a generic
+  // default model trained on yieldMax=10 can never overstate wheat (5.5).
+  let yieldPerHa = predictYieldForest(m, features);
+  yieldPerHa = Math.max(0, Math.min(coeffs.yieldMax * 1.2, yieldPerHa));
+  const empirical = yieldFromFeatures({
+    ndvi: features[0], ndwi: features[1], evi: features[2], ndmi: features[3],
+    ndvi_trend: features[4], ndwi_trend: features[5], slope: features[7]
+  }, cid);
+  return {
+    yieldPerHa: Math.round(yieldPerHa * 100) / 100,
+    empirical: Math.round(empirical * 100) / 100,
+    unit: 't/ha',
+    cropId: cid,
+    cropName: ({
+      wheat: 'Wheat', rice: 'Rice', maize: 'Maize', cotton: 'Cotton', sugarcane: 'Sugarcane',
+      mustard: 'Mustard', soybean: 'Soybean', potato: 'Potato', pulses: 'Pulses',
+      vegetables: 'Vegetables', orchards: 'Orchards', generic: 'Crop'
+    })[cid] || 'Crop',
+    potential: coeffs.yieldMax,
+    model: m.isDefault ? 'default-yield-model' : 'field-trained-yield-rf',
+    features
+  };
+}
+
+// Predict a field-level yield from composite stats (like predictField).
+function predictFieldYield(stats, cropId, model) {
+  const m = model || loadYieldModel() || defaultYieldModel();
+  return predictZoneYield({
+    ndvi: safeVal(stats.ndvi_mean, 0.5),
+    ndwi: safeVal(stats.ndwi_mean, 0.3),
+    evi: safeVal(stats.evi_mean, 0.5),
+    ndmi: safeVal(stats.ndmi_mean, 0.3),
+    ndvi_trend: safeVal(stats.ndvi_trend, 0),
+    ndwi_trend: safeVal(stats.ndwi_trend, 0),
+    elevation: safeVal(stats.elevation, 150),
+    slope: safeVal(stats.slope, 1)
+  }, cropId, m);
+}
+
 module.exports = {
   FEATURES, CLASS_NAMES, ADVISORY,
   normalize, normValue, labelFromRules,
@@ -420,5 +667,11 @@ module.exports = {
   mergedAdvisory, advisoryFor,
   loadGroundTruth, addGroundTruth, groundTruthLabelFor,
   saveModel, loadModel, defaultModel, zonesToCSV,
-  MODEL_PATH, LABELS_PATH
+  MODEL_PATH, LABELS_PATH,
+  // Yield regression RF
+  YIELD_COEFFS, yieldFromFeatures,
+  trainFromZonesYield, predictYieldForest,
+  saveYieldModel, loadYieldModel, defaultYieldModel,
+  predictZoneYield, predictFieldYield,
+  YIELD_MODEL_PATH
 };

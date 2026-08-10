@@ -1491,6 +1491,57 @@ const FH_API = (function() {
     }
   }
 
+  // Server-side Random Forest yield forecast (per-zone regression).
+  async function fetchMLYield(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      startDate: o.startDate || null,
+      endDate: o.endDate || null,
+      cropId: o.cropId || 'generic'
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/ml/yield'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(240000)
+      });
+      if (!res.ok) throw new Error('ML yield failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] ML yield forecast failed:', e.message);
+      return null;
+    }
+  }
+
+  // Server yield forecast from composite stats (no GEE needed).
+  async function fetchMLYieldSimple(stats, cropId, areaHa) {
+    try {
+      const res = await fetch(getApiUrl('/api/ml/yield-simple'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({
+          ndvi_mean: stats?.ndvi_mean ?? stats?.ndvi ?? 0.5,
+          ndwi_mean: stats?.ndwi_mean ?? stats?.ndwi ?? 0.3,
+          evi_mean: stats?.evi_mean ?? stats?.evi ?? 0.5,
+          ndmi_mean: stats?.ndmi_mean ?? stats?.ndmi ?? 0.3,
+          ndvi_trend: stats?.ndvi_trend ?? 0,
+          ndwi_trend: stats?.ndwi_trend ?? 0,
+          elevation: stats?.elevation ?? 150,
+          slope: stats?.slope ?? 1,
+          cropId: cropId || 'generic'
+        }, areaHa ? { areaHa } : {})),
+        signal: AbortSignal.timeout(60000)
+      });
+      if (!res.ok) throw new Error('ML yield-simple failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] ML yield-simple failed:', e.message);
+      return null;
+    }
+  }
+
   // Train/retrain the stress model on this field's zone features.
   async function fetchMLTrain(opts) {
     const o = opts || {};
@@ -1654,6 +1705,8 @@ const FH_API = (function() {
     fetchFullAnalysis,
     fetchClippedTerrain,
     fetchMLStress,
+    fetchMLYield,
+    fetchMLYieldSimple,
     fetchMLTrain,
     fetchZoneCSV,
         submitGroundTruthLabel,

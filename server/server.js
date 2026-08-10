@@ -733,6 +733,99 @@ app.post('/api/ml/predict', withGEE(async (req, res) => {
   res.json(Object.assign({ success: true, source: 'ml-rf', advisory: pred.advice, reasoning: pred.reasoning, rulesClass: pred.rulesClass, merged: pred.merged, agreement: pred.agreement }, pred));
 }));
 
+// ─── ML: predict per-zone yield (Random Forest regression) ───
+// Trains (or reuses) the yield RF on this field's zone-feature table and
+// predicts crop yield (t/ha) for every zone alongside the stress class.
+// Accepts optional cropId; defaults to the model's trained crop (generic).
+app.post('/api/ml/yield', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const cropId = String(req.body.cropId || 'generic');
+  const zoneRows = await zoneRowsWithTrends(ee, coords, req);
+  if (!zoneRows || !zoneRows.length) {
+    return res.status(422).json({ success: false, error: 'No usable zone rows for this field' });
+  }
+  // Load the persisted yield model only if it matches this crop, else train
+  // fresh on this field's zones (a maize-trained forest is wrong for wheat).
+  let model = mlModel.loadYieldModel();
+  if (!model || model.cropId !== (mlModel.YIELD_COEFFS[cropId] ? cropId : 'generic')) {
+    try {
+      const trained = mlModel.trainFromZonesYield(zoneRows, cropId, { nTrees: 60 });
+      model = trained.model;
+    } catch (trainErr) {
+      // Too few usable zones — fall back to the always-available default model.
+      console.warn('[ML-Yield] Field training skipped (' + trainErr.message + ') — using default yield model');
+      model = mlModel.defaultYieldModel();
+    }
+  }
+  // Per-zone predictions + field aggregate.
+  const zones = zoneRows.map(r => {
+    const p = mlModel.predictZoneYield(r, cropId, model);
+    return {
+      zone_id: r.zone_id, lat: r.lat, lng: r.lng,
+      ndvi: r.ndvi, ndwi: r.ndwi, slope: r.slope, ndvi_trend: r.ndvi_trend,
+      yieldPerHa: p.yieldPerHa, empirical: p.empirical
+    };
+  });
+  const meanYield = zones.reduce((a, z) => a + z.yieldPerHa, 0) / zones.length;
+  // Field area (ha) from the polygon so we can report total yield.
+  const geometry = ee.Geometry.Polygon([analysisEngine.toClosedRing(coords)]);
+  let areaHa = null;
+  try {
+    areaHa = await new Promise((resolve) => {
+      geometry.area(1).evaluate((v, err) => {
+        if (err || v === undefined || v === null) return resolve(null);
+        resolve(v / 10000);
+      });
+    });
+  } catch (e) { areaHa = null; }
+  const sample = mlModel.predictZoneYield(zoneRows[0], cropId, model);
+  res.json({
+    success: true,
+    source: 'ml-yield-rf',
+    cropId: sample.cropId,
+    cropName: sample.cropName,
+    unit: sample.unit,
+    potential: sample.potential,
+    model: sample.model,
+    nZones: zones.length,
+    areaHa: areaHa ? Math.round(areaHa * 100) / 100 : null,
+    fieldYieldPerHa: Math.round(meanYield * 100) / 100,
+    totalYield: areaHa ? Math.round(meanYield * areaHa * 100) / 100 : null,
+    zones
+  });
+}));
+
+// ─── ML: predict field-level yield WITHOUT GEE ───
+// Accepts composite stats + cropId directly — no Earth Engine needed, so the
+// main analysis flow can show the server RF yield even without GEE access.
+app.post('/api/ml/yield-simple', (req, res) => {
+  try {
+    const cropId = String(req.body.cropId || 'generic');
+    const s = {
+      ndvi_mean: parseFloat(req.body.ndvi_mean) || 0.5,
+      ndwi_mean: parseFloat(req.body.ndwi_mean) || 0.3,
+      evi_mean: parseFloat(req.body.evi_mean) || 0.5,
+      ndmi_mean: parseFloat(req.body.ndmi_mean) || 0.3,
+      ndvi_trend: parseFloat(req.body.ndvi_trend) || 0,
+      ndwi_trend: parseFloat(req.body.ndwi_trend) || 0,
+      elevation: parseFloat(req.body.elevation) || 150,
+      slope: parseFloat(req.body.slope) || 1
+    };
+    let model = mlModel.loadYieldModel();
+    if (!model || model.cropId !== (mlModel.YIELD_COEFFS[cropId] ? cropId : 'generic')) {
+      model = mlModel.defaultYieldModel();
+    }
+    const pred = mlModel.predictFieldYield(s, cropId, model);
+    res.json(Object.assign({ success: true, source: 'ml-yield-rf', model: pred.model, areaHa: req.body.areaHa ? parseFloat(req.body.areaHa) : null }, pred, {
+      totalYield: req.body.areaHa ? Math.round(pred.yieldPerHa * parseFloat(req.body.areaHa) * 100) / 100 : null
+    }));
+  } catch (e) {
+    console.error('[ML] yield-simple error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 // ─── G5: ground-truth label collection ───
 // POST /api/ml/label — farmer verifies a zone's TRUE stress class in the field.
 // The observed class is stored with the zone's feature vector so future
@@ -1353,6 +1446,8 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`        GET  /api/ml/model       — Download trained RF model (for browser)`);
   console.log(`        POST /api/ml/train        — Train stress RF (uses ground-truth labels)`);
   console.log(`        POST /api/ml/predict      — ML stress decision + merged advisory`);
+  console.log(`        POST /api/ml/yield       — Per-zone yield forecast (Random Forest regression)`);
+  console.log(`        POST /api/ml/yield-simple — Yield forecast from stats (no GEE needed!)`);
   console.log(`        POST /api/ml/label        — Ground-truth label collection`);
   console.log(`        GET  /api/ml/labels       — List stored ground-truth labels`);
   console.log(`        GET  /api/ml/health       — ML model + label-store status`);

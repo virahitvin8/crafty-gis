@@ -20,6 +20,7 @@ const FH_RESEARCH = (function() {
     meteo:       { label: 'Open-Meteo (temp, humidity, wind, ET₀, soil probe)',      status: 'built' },
     irrigation:  { label: 'Automated irrigation scheduler (FAO-56 ET₀ × Kc, per zone)', status: 'built' },
     mlRf:        { label: 'Random Forest stress classifier + merged advisory',       status: 'built' },
+    mlYield:     { label: 'Server-side Random Forest yield regression (per zone)',   status: 'built' },
     groundTruth: { label: 'Ground-truth label store (farmer-verified retraining)',   status: 'built' },
     trends:      { label: 'Per-zone time-windowed NDVI/NDWI trend slopes',           status: 'built' },
     pdfReport:   { label: 'In-browser PDF report generator (jsPDF)',                 status: 'built' },

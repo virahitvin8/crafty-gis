@@ -113,11 +113,25 @@ from app.api.analysis import router as analysis_router
 from app.api.chat import router as chat_router
 from app.api.projects import router as projects_router
 from app.api.data import router as data_router
+from app.api.vegetation import router as vegetation_router
+from app.api.soil import router as soil_router
+from app.api.terrain import router as terrain_router
+from app.api.weather import router as weather_router
+from app.api.crop_monitor import router as crop_monitor_router
+from app.api.field import router as field_router
+from app.api.report import router as report_router
 
 app.include_router(analysis_router)
 app.include_router(chat_router)
 app.include_router(projects_router)
 app.include_router(data_router)
+app.include_router(vegetation_router)
+app.include_router(soil_router)
+app.include_router(terrain_router)
+app.include_router(weather_router)
+app.include_router(crop_monitor_router)
+app.include_router(field_router)
+app.include_router(report_router)
 
 
 # ── Static Frontend (built Next.js) ─────────────────────────────────────────────

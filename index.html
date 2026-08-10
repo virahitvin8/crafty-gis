@@ -522,12 +522,14 @@
         <label style="font-size:0.7rem;color:var(--text-muted)">Crop:</label>
         <select id="zoneYieldCrop" style="min-width:110px"></select>
         <button class="btn-primary btn-sm" onclick="FH.runZoneYieldPrediction()">🌾 Predict Yield</button>
+        <button class="btn-secondary btn-sm" onclick="FH.runServerYieldPrediction()">🤖 Server RF</button>
       </div>
       <div class="hint" style="font-size:0.62rem">
-        Crop-specific yield coefficients (potential, NDVI power, water sensitivity, slope penalty, trend response) × each
-        management zone's feature vector (NDVI · NDWI · slope · trend). Runs automatically after Management Zones clustering.
+        Client model: crop coefficients × zone feature vectors (runs instantly after Management Zones).
+        <b>Server RF</b> retrains a Random Forest on this field's zone-feature table and predicts yield per zone (requires GEE backend).
       </div>
       <div id="zoneYieldResult"></div>
+      <div id="serverYieldResult" style="margin-top:8px"></div>
     </div>
   </div>
 

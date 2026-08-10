@@ -165,6 +165,9 @@ const FH = (function() {
     runZoneYieldPrediction: FH_INTEL.runZoneYieldPrediction,
     renderZoneYield: FH_INTEL.renderZoneYield,
     exportZoneYieldCSV: FH_INTEL.exportZoneYieldCSV,
+    // Server Random Forest yield (POST /api/ml/yield)
+    runServerYieldPrediction: FH_INTEL.runServerYieldPrediction,
+    renderServerYield: FH_INTEL.renderServerYield,
     // GEDI biomass / carbon stock (remotesensing-13-02486)
     runBiomassEstimate: FH_INTEL.runBiomassEstimate,
     renderBiomass: FH_INTEL.renderBiomass,

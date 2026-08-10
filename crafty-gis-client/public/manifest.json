@@ -1,7 +1,7 @@
 {
-  "name": "CRAFTY GIS — AI Geospatial Platform",
-  "short_name": "CRAFTY GIS",
-  "description": "Conversational Remote Analysis & Field Technology for GIS. Describe your geospatial problem — AI solves it.",
+  "name": "Crafty GIS — Agricultural Geospatial Intelligence",
+  "short_name": "Crafty GIS",
+  "description": "AI-Powered Precision Agriculture Platform. Monitor crop health, analyze soil, predict yields using satellite imagery and machine learning.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["productivity", "utilities", "education"],
+  "categories": ["agriculture", "education", "productivity", "utilities"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -62,19 +62,25 @@
   ],
   "shortcuts": [
     {
-      "name": "New Analysis",
-      "short_name": "Analyze",
-      "description": "Start a new geospatial analysis",
-      "url": "/?action=new",
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View farm overview and health metrics",
+      "url": "/",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    }
-  ],
-  "screenshots": [
+    },
     {
-      "src": "/screenshots/dashboard.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "label": "CRAFTY GIS Dashboard"
+      "name": "Map View",
+      "short_name": "Map",
+      "description": "Interactive satellite map with field boundaries",
+      "url": "/?view=map",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Analysis",
+      "short_name": "Analysis",
+      "description": "Run vegetation, soil, and terrain analysis",
+      "url": "/?view=analysis",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ]
 }
