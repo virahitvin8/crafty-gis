@@ -27,21 +27,21 @@ async def init_db(database_url: Optional[str] = None):
     """Initialize database connection with PostGIS support."""
     global engine, async_session_maker
     
-    db_url = database_url or settings.DATABASE_URL
+    db_url = database_url or settings.database_url
     
     if not db_url or db_url == "sqlite+aiosqlite:///./crafty_gis.db":
         # Use SQLite for development (no PostGIS)
         logger.info("Using SQLite database (development mode)")
         engine = create_async_engine(
             db_url or "sqlite+aiosqlite:///./crafty_gis.db",
-            echo=settings.DB_ECHO,
+            echo=settings.db_echo,
         )
     else:
         # Use PostgreSQL with PostGIS
         logger.info(f"Using PostgreSQL database")
         engine = create_async_engine(
             db_url,
-            echo=settings.DB_ECHO,
+            echo=settings.db_echo,
             pool_size=10,
             max_overflow=20,
         )
@@ -53,7 +53,7 @@ async def init_db(database_url: Optional[str] = None):
         await conn.run_sync(Base.metadata.create_all)
         
         # Enable PostGIS if using PostgreSQL
-        if "postgresql" in (database_url or settings.DATABASE_URL or ""):
+        if "postgresql" in (database_url or settings.database_url or ""):
             try:
                 await conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
                 await conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis_topology"))

@@ -1468,6 +1468,29 @@ const FH_API = (function() {
     }
   }
 
+  // Real GEDI LiDAR footprints (L2A RH98 canopy height + L4A AGBD biomass)
+  // sampled per zone over the field from Earth Engine.
+  async function fetchGEDIBiomass(opts) {
+    const o = opts || {};
+    const payload = {
+      coordinates: o.coordinates || _state.fieldLL.map(ll => [ll[0], ll[1]]),
+      gridSize: o.gridSize || 8
+    };
+    try {
+      const res = await fetch(getApiUrl('/api/gee/gedi'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(240000)
+      });
+      if (!res.ok) throw new Error('GEDI failed (HTTP ' + res.status + ')');
+      return await res.json();
+    } catch (e) {
+      console.warn('[Analysis] GEDI footprint fetch failed:', e.message);
+      return null;
+    }
+  }
+
   // ML stress decision: predicts field-level stress class + confidence.
   async function fetchMLStress(opts) {
     const o = opts || {};
@@ -1704,6 +1727,7 @@ const FH_API = (function() {
     fetchInfrastructure,
     fetchFullAnalysis,
     fetchClippedTerrain,
+    fetchGEDIBiomass,
     fetchMLStress,
     fetchMLYield,
     fetchMLYieldSimple,

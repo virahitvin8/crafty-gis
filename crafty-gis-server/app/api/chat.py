@@ -124,23 +124,24 @@ async def _handle_chat_message(session: Dict, request: ChatRequest, session_id: 
     if inv_state == "idle":
         # Start investigation
         session["investigation_state"] = "investigating"
-        result = await investigator.start_investigation(message, session.get("context", {}))
-        
-        if result.get("complete", False):
+        result = await investigator.start_investigation(session_id, message)
+
+        if result.get("type") == "plan_ready":
             # Investigation complete - generate workflow plan
             session["investigation_state"] = "complete"
-            session["intent"] = result.get("intent", {})
-            
+            plan = result.get("plan", {})
+            session["intent"] = plan
+
             reply = f"""✅ **Investigation Complete!** I understand your request.
 
-📋 **Summary:** {result.get('intent', {}).get('summary', 'Analysis ready')}
+📋 **Summary:** {plan.get('description', 'Analysis ready')}
 
-🎯 **Analysis Type:** {result.get('intent', {}).get('analysis_type', 'General')}
-📍 **Location:** {result.get('intent', {}).get('location', 'Specified area')}
-📅 **Time Period:** {result.get('intent', {}).get('time_period', 'Current')}
+🎯 **Analysis Type:** {plan.get('analysis_type', 'General')}
+📍 **Location:** {plan.get('location', 'Specified area')}
+📅 **Time Period:** {plan.get('time_period', 'Current')}
 
 Would you like me to proceed with the analysis? Or do you have any adjustments?"""
-            
+
             return ChatResponse(
                 session_id=session_id,
                 reply=reply,
@@ -151,74 +152,79 @@ Would you like me to proceed with the analysis? Or do you have any adjustments?"
                     "Add more details",
                 ],
                 investigation_complete=True,
-                intent=result.get("intent"),
+                intent=plan,
             )
         else:
             # More questions needed
-            session["context"] = result.get("context", {})
-            
-            reply = result.get("question", "")
-            suggestions = result.get("suggestions", [])
-            
-            if result.get("is_wizard_mode"):
+            wizard_progress = result.get("wizard_progress", {})
+            session["context"] = wizard_progress.get("collected_data", {})
+
+            reply = result.get("message", "")
+
+            if wizard_progress:
                 # Structured wizard mode with multiple questions
+                completed = wizard_progress.get("completed_fields", [])
+                current = wizard_progress.get("current_field", "")
+                total = len(completed) + len(wizard_progress.get("remaining_fields", [])) + (1 if current else 0)
+                done = len(completed) + (1 if current and current not in completed else 0)
+                progress_text = f"Progress: {done}/{total} fields collected"
+
                 reply = f"""📋 **Structured Investigation**
 
 I need a few details to understand exactly what you need. Let me guide you through this step by step.
 
-**{result.get('question', '')}**
+**{reply}**
 
-{result.get('progress_text', '')}"""
-                
+{progress_text}"""
+
                 return ChatResponse(
                     session_id=session_id,
                     reply=reply,
                     message_type="wizard_question",
-                    suggestions=suggestions,
+                    suggestions=[],
                     investigation_complete=False,
                 )
-            
+
             return ChatResponse(
                 session_id=session_id,
-                reply=f"🤔 **I'd like to understand better:**\n\n{result.get('question', '')}",
+                reply=f"🤔 **I'd like to understand better:**\n\n{reply}",
                 message_type="investigation_question",
-                suggestions=suggestions,
+                suggestions=[],
             )
     
     elif inv_state == "investigating":
         # Continue investigation with user's answer
-        result = await investigator.continue_investigation(
-            session.get("context", {}),
-            message,
-        )
-        
-        session["context"] = result.get("context", {})
-        
-        if result.get("complete", False):
+        result = await investigator.start_investigation(session_id, message)
+
+        wizard_progress = result.get("wizard_progress", {})
+        session["context"] = wizard_progress.get("collected_data", {})
+
+        if result.get("type") == "plan_ready":
             session["investigation_state"] = "complete"
-            session["intent"] = result.get("intent", {})
-            
+            plan = result.get("plan", {})
+            session["intent"] = plan
+
             reply = f"""✅ **Investigation Complete!**
 
-📋 **Summary:** {result.get('intent', {}).get('summary', 'Analysis ready')}
+📋 **Summary:** {plan.get('description', 'Analysis ready')}
 
 Would you like me to proceed?"""
-            
+
             return ChatResponse(
                 session_id=session_id,
                 reply=reply,
                 message_type="investigation_complete",
                 suggestions=["Proceed with analysis", "Adjust parameters"],
                 investigation_complete=True,
-                intent=result.get("intent"),
+                intent=plan,
             )
-        
-        suggestions = result.get("suggestions", [])
+
+        message_type = "wizard_question" if wizard_progress else "investigation_question"
         return ChatResponse(
             session_id=session_id,
-            reply=f"{result.get('question', '')}",
-            message_type="wizard_question" if result.get("is_wizard_mode") else "investigation_question",
-            suggestions=suggestions,
+            reply=result.get("message", ""),
+            message_type=message_type,
+            suggestions=[],
         )
     
     else:
@@ -233,31 +239,33 @@ Would you like me to proceed?"""
 
 async def _handle_wizard_answer(session: Dict, request: ChatRequest) -> ChatResponse:
     """Handle a structured wizard answer."""
-    result = await investigator.continue_investigation(
-        session.get("context", {}),
+    result = await investigator.start_investigation(
+        session.get("id", ""),
         request.message,
     )
-    
-    session["context"] = result.get("context", {})
-    
-    if result.get("complete", False):
+
+    wizard_progress = result.get("wizard_progress", {})
+    session["context"] = wizard_progress.get("collected_data", {})
+
+    if result.get("type") == "plan_ready":
         session["investigation_state"] = "complete"
-        session["intent"] = result.get("intent", {})
-        
+        plan = result.get("plan", {})
+        session["intent"] = plan
+
         return ChatResponse(
             session_id=session.get("id", ""),
-            reply=f"✅ **Investigation Complete!**\n\n{result.get('intent', {}).get('summary', 'Analysis ready')}",
+            reply=f"✅ **Investigation Complete!**\n\n{plan.get('description', 'Analysis ready')}",
             message_type="investigation_complete",
             suggestions=["Proceed with analysis", "Adjust parameters"],
             investigation_complete=True,
-            intent=result.get("intent"),
+            intent=plan,
         )
-    
+
     return ChatResponse(
         session_id=session.get("id", ""),
-        reply=result.get("question", ""),
+        reply=result.get("message", ""),
         message_type="wizard_question",
-        suggestions=result.get("suggestions", []),
+        suggestions=[],
     )
 
 

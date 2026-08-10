@@ -177,6 +177,7 @@ const FH = (function() {
     renderServerYield: FH_INTEL.renderServerYield,
     // GEDI biomass / carbon stock (remotesensing-13-02486)
     runBiomassEstimate: FH_INTEL.runBiomassEstimate,
+    runGEDILiDAR: FH_INTEL.runGEDILiDAR,
     renderBiomass: FH_INTEL.renderBiomass,
     exportBiomassCSV: FH_INTEL.exportBiomassCSV,
     // Irrigation scheduler (FAO-56 water balance)
@@ -278,3 +279,39 @@ const FH = (function() {
     exportFieldGeoJSON: FH_UI.exportFieldGeoJSON
   };
 })();
+
+// ═══════════════════════════════════════════════════════════
+// ADDITIONAL MODULE EXPORTS (Human-Mode Build)
+// ═══════════════════════════════════════════════════════════
+
+// Authentication
+if (typeof FH_AUTH !== 'undefined') {
+  window.FH_AUTH = FH_AUTH;
+}
+
+// Export system
+if (typeof FH_EXPORT !== 'undefined') {
+  window.FH_EXPORT = FH_EXPORT;
+}
+
+// Charts
+if (typeof FH_CHARTS !== 'undefined') {
+  window.FH_CHARTS = FH_CHARTS;
+}
+
+// AI Models
+if (typeof FH_AI !== 'undefined') {
+  window.FH_AI = FH_AI;
+}
+
+// GIS Utilities
+if (typeof FH_GIS !== 'undefined') {
+  window.FH_GIS = FH_GIS;
+}
+
+// Enhanced ML
+if (typeof FH_ML !== 'undefined') {
+  window.FH_ML = FH_ML;
+}
+
+console.log('✅ All modules loaded and exported');

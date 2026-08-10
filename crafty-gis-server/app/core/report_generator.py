@@ -24,7 +24,7 @@ class ReportGenerator:
     """
 
     def __init__(self, output_dir: str = None):
-        self.output_dir = output_dir or os.path.join(settings.DATA_DIR, "outputs", "reports")
+        self.output_dir = output_dir or os.path.join(settings.data_dir, "outputs", "reports")
         os.makedirs(self.output_dir, exist_ok=True)
 
     async def generate_report(

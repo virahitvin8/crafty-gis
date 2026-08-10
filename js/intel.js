@@ -1163,7 +1163,60 @@ const FH_INTEL = (function() {
     ).join('');
   }
 
-  // Main runner — GEDI-style biomass + carbon per management zone.
+  // Shared per-zone biomass computation. When `gedi` (real GEDI footprint
+  // data from the backend) is present, canopy height comes from the actual
+  // LiDAR RH98 and AGB from L4A AGBD where footprints exist; zones without
+  // a footprint fall back to the NDVI-proxy height. Returns the zone rows.
+  function _biomassZones(clusters, t, fieldHa, peak, gedi) {
+    // Lookup: gedi.zones is an array keyed by cell id → real values.
+    const gediMap = {};
+    (gedi && gedi.zones || []).forEach(gz => { gediMap[gz.id] = gz; });
+    const fieldRh98 = gedi && gedi.field ? gedi.field.rh98 : null;
+    const fieldAgbd = gedi && gedi.field ? gedi.field.agbd : null;
+
+    return clusters.map(z => {
+      const ndviRatio = Math.min(1, Math.max(0.02, (z.avgNdvi ?? 0) / peak));
+      // ── Real LiDAR (RH98/AGBD) over this zone's grid cells ──
+      let hReal = null, agbdReal = null, lidarHits = 0, agbdHits = 0;
+      (z.zones || []).forEach(cell => {
+        const g = gediMap[cell.id];
+        if (!g) return;
+        if (g.rh98 !== null && g.rh98 !== undefined) { hReal = (hReal || 0) + g.rh98; lidarHits++; }
+        if (g.agbd !== null && g.agbd !== undefined) { agbdReal = (agbdReal || 0) + g.agbd; agbdHits++; }
+      });
+      if (lidarHits) hReal = hReal / lidarHits;
+      if (agbdHits) agbdReal = agbdReal / agbdHits;
+      if (hReal === null && fieldRh98 !== null && fieldRh98 !== undefined) hReal = fieldRh98; // field-level fallback
+      if (agbdReal === null && fieldAgbd !== null && fieldAgbd !== undefined) agbdReal = fieldAgbd;
+
+      // Canopy height: real LiDAR RH98 when available, else NDVI proxy.
+      const h = (hReal !== null && hReal > 0) ? hReal : t.hMax * Math.pow(ndviRatio, 1.5);
+      // AGB: L4A AGBD (already t/ha) when available, else allometric a·h^b.
+      const agb = (agbdReal !== null && agbdReal > 0) ? agbdReal : t.a * Math.pow(h, t.b);
+      const bgb = agb * t.rs;
+      const totalBiomass = agb + bgb;
+      const carbonT = totalBiomass * t.cf;
+      const co2e = carbonT * CARBON_TO_CO2;
+      const trendAdj = Math.min(1.15, Math.max(0.7, 1 + (z.avgTrend ?? 0) * 60));
+      const carbonAdj = carbonT * trendAdj;
+      const zoneArea = fieldHa * (parseFloat(z.pct) || 0) / 100;
+      return {
+        label: z.label, color: z.color, rank: z.rank, pct: z.pct, zoneCount: z.zoneCount,
+        avgNdvi: z.avgNdvi ?? 0, avgTrend: z.avgTrend ?? 0, typeLabel: t.label,
+        h, agb, bgb, totalBiomass, carbonT, co2e, trendAdj, zoneArea,
+        carbonStock: carbonAdj * zoneArea,   // tC in zone
+        co2Stock: carbonAdj * zoneArea * CARBON_TO_CO2, // tCO2e in zone
+        source: hReal !== null && hReal > 0 ? 'lidar' : 'proxy',
+        rh98: hReal !== null && hReal > 0 ? hReal : null,
+        agbd: agbdReal !== null && agbdReal > 0 ? agbdReal : null,
+        lidarHits,
+        cells: z.zones || []
+      };
+    });
+  }
+
+  // Main runner — biomass + carbon per management zone. Uses real GEDI
+  // footprints when already fetched (_state.gediData), else NDVI proxy.
   // opts.silent skips the loading overlay + toast (auto-chain).
   function runBiomassEstimate(opts) {
     const el = $('biomassResult');
@@ -1171,7 +1224,7 @@ const FH_INTEL = (function() {
     const silent = !!(opts && opts.silent);
     const clusters = _state.mgmtZones;
     if (!clusters || !clusters.length) {
-      el.innerHTML = `<div class="hint">Run <b>Management Zones</b> first — biomass is estimated per delineated zone from its feature vector (NDVI → canopy height → allometric AGB).</div>`;
+      el.innerHTML = `<div class="hint">Run <b>Management Zones</b> first — biomass is estimated per delineated zone from its feature vector (NDVI → canopy height → allometric AGB, or real GEDI LiDAR when pulled).</div>`;
       return;
     }
     _populateBiomassType();
@@ -1183,38 +1236,22 @@ const FH_INTEL = (function() {
 
     if (!silent) showLoading('Estimating biomass & carbon (GEDI)…', 40);
     try {
-      const zones = clusters.map(z => {
-        const ndviRatio = Math.min(1, Math.max(0.02, (z.avgNdvi ?? 0) / peak));
-        // Canopy-height proxy (m): vigour scaled to the land-use ceiling.
-        const h = t.hMax * Math.pow(ndviRatio, 1.5);
-        // GEDI-style allometric: AGB = a·h^b (t/ha, above-ground only).
-        const agb = t.a * Math.pow(h, t.b);
-        // Below-ground biomass from root:shoot, total, then carbon + CO2e.
-        const bgb = agb * t.rs;
-        const totalBiomass = agb + bgb;
-        const carbonT = totalBiomass * t.cf;
-        const co2e = carbonT * CARBON_TO_CO2;
-        // Declining trend trims standing biomass (canopy loss signal).
-        const trendAdj = Math.min(1.15, Math.max(0.7, 1 + (z.avgTrend ?? 0) * 60));
-        const carbonAdj = carbonT * trendAdj;
-        const zoneArea = fieldHa * (parseFloat(z.pct) || 0) / 100;
-        return {
-          label: z.label, color: z.color, rank: z.rank, pct: z.pct, zoneCount: z.zoneCount,
-          avgNdvi: z.avgNdvi ?? 0, avgTrend: z.avgTrend ?? 0, typeLabel: t.label,
-          h, agb, bgb, totalBiomass, carbonT, co2e, trendAdj, zoneArea,
-          carbonStock: carbonAdj * zoneArea,   // tC in zone
-          co2Stock: carbonAdj * zoneArea * CARBON_TO_CO2, // tCO2e in zone
-          cells: z.zones || []
-        };
-      });
+      const gedi = _state.gediData || null;
+      const zones = _biomassZones(clusters, t, fieldHa, peak, gedi);
       const totalCarbon = zones.reduce((a, z) => a + z.carbonStock, 0);
       const totalCo2 = zones.reduce((a, z) => a + z.co2Stock, 0);
       const totalBiomass = zones.reduce((a, z) => a + z.totalBiomass * z.zoneArea, 0);
       const weightedCarbonHa = totalCarbon / fieldHa;
+      const lidarZones = zones.filter(z => z.source === 'lidar').length;
+      const footprintCount = gedi ? (gedi.footprintCount || 0) : 0;
 
       _state.biomass = {
         zones, typeId, typeLabel: t.label, icon: t.icon, fieldHa,
-        totalCarbon, totalCo2, totalBiomass, weightedCarbonHa, ts: Date.now()
+        totalCarbon, totalCo2, totalBiomass, weightedCarbonHa,
+        source: gedi ? 'gedi-lidar' : 'ndvi-proxy',
+        footprintCount, lidarZones, fieldRh98: gedi && gedi.field ? gedi.field.rh98 : null,
+        fieldAgbd: gedi && gedi.field ? gedi.field.agbd : null,
+        ts: Date.now()
       };
       renderBiomass();
       _drawBiomassOverlay(zones);
@@ -1226,6 +1263,38 @@ const FH_INTEL = (function() {
     }
   }
 
+  // Pull REAL GEDI LiDAR footprints (RH98 canopy height + L4A AGBD) from
+  // Earth Engine for this field, then re-run the biomass estimate with the
+  // measured heights — falling back to the NDVI proxy per zone where no
+  // footprint was recorded.
+  async function runGEDILiDAR(opts) {
+    const el = $('biomassResult');
+    if (!el) return;
+    const silent = !!(opts && opts.silent);
+    if (!_state.fieldPoly) return toast('First select your field!', 'err');
+    if (!_state.mgmtZones || !_state.mgmtZones.length) {
+      el.innerHTML = `<div class="hint">Run <b>Management Zones</b> first — the LiDAR footprints are merged into the delineated zones.</div>`;
+      return;
+    }
+    el.innerHTML = '<div class="hint">⏳ Pulling real GEDI LiDAR footprints from Earth Engine (RH98 canopy height + AGBD biomass)…</div>';
+    try {
+      if (typeof FH_API === 'undefined' || !FH_API.fetchGEDIBiomass) throw new Error('API client missing');
+      const res = await FH_API.fetchGEDIBiomass({ coordinates: _state.fieldLL.map(ll => [ll[0], ll[1]]), gridSize: 8 });
+      if (!res || !res.success) {
+        el.innerHTML = '<div class="hint" style="color:var(--orange)">GEDI unavailable (backend / GEE down) — the NDVI-proxy estimate above still works.</div>';
+        return;
+      }
+      _state.gediData = res;
+      runBiomassEstimate({ silent: true });
+      if (!silent) {
+        const fc = res.footprintCount || 0;
+        toast(`🛰️ Real GEDI: ${fc} LiDAR footprint${fc !== 1 ? 's' : ''} · field RH98 ${res.field && res.field.rh98 !== null ? res.field.rh98.toFixed(1) + ' m' : 'n/a'}`);
+      }
+    } catch (e) {
+      el.innerHTML = '<div class="hint" style="color:var(--orange)">GEDI fetch failed: ' + (e.message || String(e)) + '</div>';
+    }
+  }
+
   function renderBiomass() {
     const el = $('biomassResult');
     if (!el || !_state.biomass) return;
@@ -1233,11 +1302,15 @@ const FH_INTEL = (function() {
     const card = $('biomassCard');
     if (card) card.style.display = '';
     const maxCarbon = Math.max(...b.zones.map(z => z.carbonStock), 0.001);
+    const sourceBadge = b.source === 'gedi-lidar'
+      ? `<span class="badge badge-live">🛰️ real LiDAR ${b.footprintCount} footprints · RH98 ${b.fieldRh98 !== null ? b.fieldRh98.toFixed(1) + ' m' : 'n/a'}</span>`
+      : `<span class="badge badge-warn">🌿 NDVI proxy (pull real LiDAR above)</span>`;
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-input);border-radius:10px;margin-bottom:8px">
         <div style="flex:1">
           <div style="font-weight:800;font-size:0.9rem">🛰️ ${b.icon} ${b.typeLabel}: <span style="color:var(--green-light)">${b.totalCarbon.toFixed(1)} tC</span> stored</div>
           <div style="color:var(--text-muted);font-size:0.64rem">Field ${b.fieldHa.toFixed(2)} ha · ${b.totalBiomass.toFixed(1)} t biomass · <b>${b.totalCo2.toFixed(1)} tCO₂e</b> equivalent · avg ${b.weightedCarbonHa.toFixed(1)} tC/ha</div>
+          ${sourceBadge}
         </div>
         <button class="btn-secondary btn-sm" onclick="FH.exportBiomassCSV()">⬇️ CSV</button>
       </div>
@@ -1251,10 +1324,16 @@ const FH_INTEL = (function() {
             <div style="width:${(z.carbonStock / maxCarbon * 100).toFixed(0)}%;height:100%;background:${z.color}"></div>
           </div>
           <div style="color:var(--text-muted);font-size:0.62rem">
-            Canopy ${z.h.toFixed(1)} m (NDVI ${z.avgNdvi.toFixed(3)}) · AGB ${z.agb.toFixed(1)} + roots ${z.bgb.toFixed(1)} t/ha · ${z.co2e.toFixed(1)} tCO₂e/ha · <b>${z.carbonStock.toFixed(1)} tC</b> stored (${z.co2Stock.toFixed(1)} tCO₂e) · trend adj ×${z.trendAdj.toFixed(2)}
+            ${z.source === 'lidar'
+              ? `Canopy <b>${z.h.toFixed(1)} m</b> (real GEDI RH98${z.rh98 !== null ? ' · ' + z.lidarHits + ' footprint' + (z.lidarHits !== 1 ? 's' : '') : ''})`
+              : `Canopy ${z.h.toFixed(1)} m (NDVI proxy ${z.avgNdvi.toFixed(3)})`}
+            ${z.agbd !== null ? ` · AGB <b>${z.agbd.toFixed(1)} t/ha</b> (L4A AGBD)` : ` · AGB ${z.agb.toFixed(1)} t/ha`}
+            + roots ${z.bgb.toFixed(1)} t/ha · ${z.co2e.toFixed(1)} tCO₂e/ha · <b>${z.carbonStock.toFixed(1)} tC</b> stored (${z.co2Stock.toFixed(1)} tCO₂e) · trend adj ×${z.trendAdj.toFixed(2)}
           </div>
         </div>`).join('')}
-      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">GEDI-style allometric: AGB = a·h<sup>b</sup> (t/ha) with canopy height h derived from zone NDVI vigour × land-use ceiling; carbon = (AGB + roots) × 0.47 (IPCC); CO₂e = C × 3.67. Model per remotesensing-13-02486 data-fusion + GEDI biomass literature.</div>`;
+      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">${b.source === 'gedi-lidar'
+        ? 'Canopy height from <b>real GEDI L2A RH98 LiDAR footprints</b>; AGB from <b>L4A AGBD</b> where measured, allometric a·h<sup>b</sup> fallback; zones without a footprint use the NDVI proxy. Carbon = (AGB + roots) × 0.47 (IPCC); CO₂e = C × 3.67.'
+        : 'GEDI-style allometric: AGB = a·h<sup>b</sup> (t/ha) with canopy height h derived from zone NDVI vigour × land-use ceiling. Click <b>Pull Real LiDAR</b> to replace the proxy with measured GEDI RH98 heights. Model per remotesensing-13-02486.'}</div>`;
   }
 
   // Colour the map by stored carbon per management-zone patch.
@@ -1277,8 +1356,8 @@ const FH_INTEL = (function() {
         ], {
           color: col, weight: 0.6, opacity: 0.8,
           fillColor: col, fillOpacity: 0.45
-        }).bindTooltip(
-          `<b style="color:${col}">${z.label} zone</b><br>Carbon: <b>${z.carbonStock.toFixed(1)} tC</b> (${z.co2Stock.toFixed(1)} tCO₂e)<br>Canopy ${z.h.toFixed(1)} m · ${z.typeLabel}`,
+        }        ).bindTooltip(
+          `<b style="color:${col}">${z.label} zone</b><br>Carbon: <b>${z.carbonStock.toFixed(1)} tC</b> (${z.co2Stock.toFixed(1)} tCO₂e)<br>Canopy ${z.h.toFixed(1)} m ${z.source === 'lidar' ? '· real GEDI RH98' : '· NDVI proxy'} · ${z.typeLabel}${z.agbd !== null ? '<br>AGB ' + z.agbd.toFixed(1) + ' t/ha (L4A AGBD)' : ''}`,
           { sticky: true }
         ).addTo(layer);
       });
@@ -1288,11 +1367,13 @@ const FH_INTEL = (function() {
   function exportBiomassCSV() {
     const b = _state.biomass;
     if (!b) return toast('Run Biomass & Carbon first', 'err');
-    const rows = ['zone_label,pct_of_field,area_ha,mean_ndvi,canopy_height_m,agb_t_ha,bgb_t_ha,total_biomass_t_ha,carbon_tC,co2e_t'];
+    const rows = ['zone_label,pct_of_field,area_ha,mean_ndvi,source,canopy_height_m,rh98_m,agbd_t_ha,agb_t_ha,bgb_t_ha,total_biomass_t_ha,carbon_tC,co2e_t,lidar_footprints'];
     b.zones.forEach(z => rows.push(
-      [z.label, z.pct, z.zoneArea.toFixed(4), z.avgNdvi.toFixed(4), z.h.toFixed(2), z.agb.toFixed(3), z.bgb.toFixed(3), z.totalBiomass.toFixed(3), z.carbonStock.toFixed(3), z.co2Stock.toFixed(3)].join(',')
+      [z.label, z.pct, z.zoneArea.toFixed(4), z.avgNdvi.toFixed(4), z.source, z.h.toFixed(2),
+        z.rh98 !== null ? z.rh98.toFixed(2) : '', z.agbd !== null ? z.agbd.toFixed(2) : '',
+        z.agb.toFixed(3), z.bgb.toFixed(3), z.totalBiomass.toFixed(3), z.carbonStock.toFixed(3), z.co2Stock.toFixed(3), z.lidarHits || 0].join(',')
     ));
-    rows.push(['FIELD_TOTAL', '', b.fieldHa.toFixed(4), '', '', '', '', '', b.totalCarbon.toFixed(3), b.totalCo2.toFixed(3)].join(','));
+    rows.push(['FIELD_TOTAL', '', b.fieldHa.toFixed(4), '', b.source, b.fieldRh98 !== null ? b.fieldRh98.toFixed(2) : '', b.fieldRh98 !== null ? b.fieldRh98.toFixed(2) : '', b.fieldAgbd !== null ? b.fieldAgbd.toFixed(2) : '', '', '', '', b.totalCarbon.toFixed(3), b.totalCo2.toFixed(3), b.footprintCount || 0].join(','));
     downloadBlob(rows.join('\n'), 'crafty_gis_gedi_biomass_carbon.csv', 'text/csv');
     toast('GEDI biomass & carbon CSV exported');
   }
@@ -1819,6 +1900,7 @@ const FH_INTEL = (function() {
     renderServerYield,
     // GEDI biomass / carbon stock (remotesensing-13-02486)
     runBiomassEstimate,
+    runGEDILiDAR,
     renderBiomass,
     exportBiomassCSV,
     // Irrigation scheduler (FAO-56 water balance)

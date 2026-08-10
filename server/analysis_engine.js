@@ -528,6 +528,107 @@ async function buildRegionalComparison(ee, geometry, startDate, endDate, maxClou
   };
 }
 
+/* ═══════════════ GEDI REAL LIDAR FOOTPRINTS (RH98 + AGBD) ═══════════════
+   Pulls actual GEDI footprints over the field from Earth Engine so the
+   frontend's biomass estimate uses real LiDAR canopy height instead of the
+   NDVI proxy:
+     • L4A (GEDI04_A_002_MONTHLY) — above-ground biomass density agbd (Mg/ha)
+     • L2A (GEDI02_A_002_MONTHLY) — RH98 relative height (m), the LiDAR
+       canopy-top-height metric
+   GEDI footprints are sparse 25 m orbital shots, so every zone also gets a
+   footprint count; the frontend falls back to the NDVI-proxy height for any
+   zone without a footprint. Quality-masked via l4_quality_flag /
+   algorithm_run_flag / quality_flag / degrade_flag. */
+const GEDI_L4A_COLLECTION = 'LARSE/GEDI/GEDI04_A_002_MONTHLY';
+const GEDI_L2A_COLLECTION = 'LARSE/GEDI/GEDI02_A_002_MONTHLY';
+
+async function buildGEDIBiomass(ee, geometry, coords, gridSize) {
+  const zones = buildZoneGrid(coords, gridSize);
+  // GEDI archive spans Apr 2019 → mid 2025 — use the whole archive so small
+  // fields have the best chance of a footprint hit.
+  const start = '2019-04-01';
+  const end = '2025-07-01';
+
+  // L4A: above-ground biomass density (Mg/ha ≈ t/ha)
+  const l4a = ee.ImageCollection(GEDI_L4A_COLLECTION)
+    .filterBounds(geometry)
+    .filterDate(start, end)
+    .filter(ee.Filter.eq('l4_quality_flag', 1))
+    .filter(ee.Filter.eq('algorithm_run_flag', 1))
+    .filter(ee.Filter.eq('degrade_flag', 0));
+  // L2A: RH98 = relative height at the 98th percentile → canopy top height (m)
+  const l2a = ee.ImageCollection(GEDI_L2A_COLLECTION)
+    .filterBounds(geometry)
+    .filterDate(start, end)
+    .filter(ee.Filter.eq('quality_flag', 1))
+    .filter(ee.Filter.eq('degrade_flag', 0));
+
+  // Footprints are sparse → collapse the whole archive to one median image.
+  const l4aImg = l4a.select('agbd').median().clip(geometry);
+  const l2aImg = l2a.select('rh98').median().clip(geometry);
+
+  // Per-zone footprint sampling: mean + footprint count over each zone cell.
+  const feats = zones.map(z =>
+    ee.Feature(ee.Geometry.Rectangle([
+      z.lng - z.cellW / 2, z.lat - z.cellH / 2,
+      z.lng + z.cellW / 2, z.lat + z.cellH / 2
+    ]), { zone: z.id })
+  );
+  const fc = ee.FeatureCollection(feats);
+  const reducer = ee.Reducer.mean().combine(ee.Reducer.count(), null, true);
+
+  const sampleZones = (img) => new Promise((resolve, reject) => {
+    img.reduceRegions({ collection: fc, reducer, scale: 25, tileScale: 4 })
+      .evaluate((r, err) => (err ? reject(err) : resolve((r && r.features) || [])));
+  });
+
+  const [l4aSampled, l2aSampled] = await Promise.all([sampleZones(l4aImg), sampleZones(l2aImg)]);
+
+  const zoneMap = {};
+  zones.forEach(z => { zoneMap[z.id] = { agbd: null, agbd_n: 0, rh98: null, rh98_n: 0 }; });
+  l4aSampled.forEach(f => {
+    const p = f.properties;
+    if (zoneMap[p.zone]) {
+      zoneMap[p.zone].agbd = (p.agbd_mean === null || p.agbd_mean === undefined) ? null : +p.agbd_mean;
+      zoneMap[p.zone].agbd_n = p.count || 0;
+    }
+  });
+  l2aSampled.forEach(f => {
+    const p = f.properties;
+    if (zoneMap[p.zone]) {
+      zoneMap[p.zone].rh98 = (p.rh98_mean === null || p.rh98_mean === undefined) ? null : +p.rh98_mean;
+      zoneMap[p.zone].rh98_n = p.count || 0;
+    }
+  });
+
+  // Field-level summary (mean of whatever footprints hit the polygon)
+  const fieldStats = async (img) => {
+    try {
+      const r = img.reduceRegion({ reducer, geometry, scale: 25, bestEffort: true, maxPixels: 1e9 });
+      return await new Promise((res, rej) => r.evaluate((v, e) => (e ? rej(e) : res(v || {}))));
+    } catch (e) { return {}; }
+  };
+  const [l4aField, l2aField] = await Promise.all([fieldStats(l4aImg), fieldStats(l2aImg)]);
+
+  const field = {
+    rh98: (l2aField.rh98_mean === null || l2aField.rh98_mean === undefined) ? null : +l2aField.rh98_mean,
+    agbd: (l4aField.agbd_mean === null || l4aField.agbd_mean === undefined) ? null : +l4aField.agbd_mean,
+    footprints: (l4aField.count || l2aField.count || 0)
+  };
+
+  const footprintCount = zones.reduce(
+    (a, z) => a + (zoneMap[z.id].agbd_n || 0) + (zoneMap[z.id].rh98_n || 0), 0);
+
+  return {
+    source: 'gedi-lidar',
+    field,
+    zones: zones.map(z => Object.assign({}, z, zoneMap[z.id])),
+    footprintCount,
+    dateRange: { start, end },
+    note: 'GEDI L4A above-ground biomass density (agbd, t/ha) + L2A RH98 canopy height (m) from real LiDAR footprints'
+  };
+}
+
 /* ═══════════════════════════════════════════════════════════════
    MAIN: fullAnalysis — the complete end-to-end pipeline
    Returns one JSON payload with every parameter the report needs.
@@ -646,6 +747,7 @@ module.exports = {
   S2_COLLECTION, DEM_COLLECTION,
   CHIRPS_COLLECTION, S1_COLLECTION,
   L8_COLLECTION, L9_COLLECTION,
+  GEDI_L4A_COLLECTION, GEDI_L2A_COLLECTION,
   toClosedRing, cloudMask, addIndices,
   buildComposite, buildTerrain,
   reduceRegion, summarizeStats,
@@ -653,5 +755,6 @@ module.exports = {
   trendOf,
   buildRainfall, buildSoilMoisture, buildThermal,
   buildZoneTrends, buildRegionalComparison,
+  buildGEDIBiomass,
   fullAnalysis
 };

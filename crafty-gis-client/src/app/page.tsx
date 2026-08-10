@@ -19,6 +19,9 @@ import {
   ArrowDown, ArrowUp
 } from "lucide-react";
 
+// API client for backend communication
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 // Dynamic import for MapLibre
 const MapView = dynamic(() => import("./components/MapView"), {
   ssr: false,

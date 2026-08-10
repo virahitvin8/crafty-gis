@@ -1,5 +1,6 @@
 """CRAFTY GIS — Application Configuration."""
 
+import os
 from pydantic_settings import BaseSettings
 from pathlib import Path
 
@@ -103,6 +104,18 @@ class Settings(BaseSettings):
     @property
     def has_huggingface(self) -> bool:
         return bool(self.huggingface_token)
+
+    @property
+    def has_groq(self) -> bool:
+        return bool(os.getenv("GROQ_API_KEY"))
+
+    @property
+    def has_copernicus(self) -> bool:
+        return bool(self.copernicus_username)
+
+    @property
+    def has_nasa(self) -> bool:
+        return bool(self.nasa_earthdata_username)
 
 
 settings = Settings()

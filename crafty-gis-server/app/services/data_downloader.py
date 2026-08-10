@@ -43,7 +43,7 @@ class DataDownloader:
     """
 
     def __init__(self, download_dir: str = None):
-        self.download_dir = download_dir or os.path.join(settings.DATA_DIR, "downloads")
+        self.download_dir = download_dir or os.path.join(settings.data_dir, "downloads")
         os.makedirs(self.download_dir, exist_ok=True)
         self.client = httpx.AsyncClient(timeout=300.0, follow_redirects=True)
         self.downloads_in_progress: Dict[str, Dict[str, Any]] = {}
@@ -185,7 +185,7 @@ class DataDownloader:
         collection = params.get("collection", "landsat_ot_c2_l2")  # Landsat 8-9 C2 Level 2
 
         # USGS M2M API
-        api_key = settings.USGS_API_KEY or "CRAFTY_GIS"
+        api_key = settings.usgs_api_key or "CRAFTY_GIS"
         url = "https://m2m.cr.usgs.gov/api/api/json/stable/scene-search"
 
         payload = {

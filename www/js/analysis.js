@@ -1098,6 +1098,7 @@ const FH_ANALYSIS = (function() {
           FH_INTEL.renderSurveillance();
           const survCard = $('survCard');
           if (survCard) survCard.style.display = '';
+        }
       } catch (e2) {
         console.warn('Research cards skipped:', e2.message || String(e2));
       }

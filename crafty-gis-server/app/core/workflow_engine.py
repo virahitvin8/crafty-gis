@@ -224,7 +224,11 @@ Return a JSON with:
    - params: dict of parameters
    - depends_on: list of task indices this depends on (0-indexed)
 """
-            response = await self.ollama_service.chat(prompt, system="You are CRAFTY GIS workflow planner. Return ONLY valid JSON.")
+            messages = [
+                {"role": "system", "content": "You are CRAFTY GIS workflow planner. Return ONLY valid JSON."},
+                {"role": "user", "content": prompt},
+            ]
+            response = await self.ollama_service.chat(messages)
             try:
                 plan = json.loads(response)
                 return plan

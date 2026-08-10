@@ -645,6 +645,16 @@ app.post('/api/gee/terrain', withGEE(async (req, res) => {
   });
 }));
 
+// ─── REAL GEDI LIDAR FOOTPRINTS (RH98 canopy height + AGBD biomass) ───
+app.post('/api/gee/gedi', withGEE(async (req, res) => {
+  const coords = coordsFromBody(req.body);
+  if (!coords) return res.status(400).json({ success: false, error: 'No coordinates provided' });
+  const gridSize = clampInt(req.body.gridSize, 3, 12, 8);
+  const geometry = ee.Geometry.Polygon([analysisEngine.toClosedRing(coords)]);
+  const gedi = await analysisEngine.buildGEDIBiomass(ee, geometry, coords, gridSize);
+  res.json({ success: true, source: 'google-earth-engine', ...gedi });
+}));
+
 // ─── FULL ANALYSIS PIPELINE (indices + terrain + zones + trends) ───
 app.post('/api/gee/analysis', withGEE(async (req, res) => {
   const coords = coordsFromBody(req.body);

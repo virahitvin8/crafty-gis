@@ -33,7 +33,7 @@ const FH_RESEARCH = (function() {
     yieldLoss:   { label: 'Yield-loss heatmap (yield gap × crop price per zone)', status: 'built' },
     cnnVision:   { label: 'CNN / vision disease detection (Ollama LLaVA photo)',     status: 'built' },
     sarPulse:    { label: 'Polarimetric SAR (full PolSAR decomposition)',            status: 'roadmap' },
-    gediBiomass: { label: 'GEDI-style biomass / carbon stock (allometric × zones)', status: 'built' },
+    gediBiomass: { label: 'GEDI biomass / carbon — real L4A AGBD + L2A RH98 LiDAR footprints (EE)', status: 'built' },
     cropModel:   { label: 'Crop growth model (DSSAT-style phenology)',               status: 'roadmap' },
     digitalTwin: { label: 'Digital-twin farm simulation',                            status: 'roadmap' },
     hyperspec:   { label: 'Hyperspectral (HyspIRI / PRISMA) narrow-band indices',    status: 'roadmap' }
@@ -158,7 +158,7 @@ const FH_RESEARCH = (function() {
       ],
       dataPulls: ['cnnVision', 'iotFusion', 'diseaseGIS', 'sentinel2'],
       requiredPulls: ['Multi-modality sensor data', 'Fusion engine for heterogeneous sources', 'Disease ground-truth'],
-      craftyBuild: 'Disease Outbreak card fuses photo-diagnosis (vision), satellite stress (RF) and weather telemetry into a surveillance layer; the GEDI Biomass & Carbon card applies this data-fusion idea to LiDAR-style allometric biomass (AGB = a·hᵇ) per management zone, with carbon = 0.47×biomass and CO₂e = 3.67×C.'
+      craftyBuild: 'Disease Outbreak card fuses photo-diagnosis (vision), satellite stress (RF) and weather telemetry into a surveillance layer; the GEDI Biomass & Carbon card pulls real LiDAR footprints from Earth Engine (GEDI04_A L4A AGBD biomass density + GEDI02_A L2A RH98 canopy height, quality-masked) per management zone, with allometric fallback where footprints are sparse and carbon = 0.47×biomass / CO₂e = 3.67×C.'
     },
     {
       id: 's42360-021-00334-2',

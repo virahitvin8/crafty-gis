@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 import numpy as np
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -366,18 +366,15 @@ async def _get_simulated_soil(lat: float, lng: float) -> List[SoilProperty]:
 # Endpoints
 # ---------------------------------------------------------------------------
 
-@router.get("/properties", response_model=SoilPropertiesResponse)
-async def get_soil_properties(
-    lat: float = Query(..., ge=-90, le=90),
-    lng: float = Query(..., ge=-180, le=180),
-    depth: str = Query("0-5cm"),
-):
+@router.post("/properties", response_model=SoilPropertiesResponse)
+async def get_soil_properties(request: SoilPropertiesRequest):
     """
     Get **soil properties** for a location from ISRIC SoilGrids.
 
     Returns pH, texture (sand/silt/clay), organic carbon, nitrogen,
     CEC, bulk depth, and coarse fragments.
     """
+    lat, lng, depth = request.lat, request.lng, request.depth
     raw = await _fetch_soilgrids(lat, lng, depth)
     props = _parse_soilgrids_response(raw["data"], [
         "phh2o", "sand", "silt", "clay", "soc", "nitrogen", "cec", "bdod", "cfvo",
@@ -432,16 +429,13 @@ async def analyze_soil(request: SoilAnalyzeRequest):
     }
 
 
-@router.get("/health-score", response_model=SoilHealthScoreResponse)
-async def get_health_score(
-    lat: float = Query(..., ge=-90, le=90),
-    lng: float = Query(..., ge=-180, le=180),
-    depth: str = Query("0-5cm"),
-):
+@router.post("/health-score", response_model=SoilHealthScoreResponse)
+async def get_health_score(request: SoilHealthScoreRequest):
     """
     Calculate a **soil health score** (0-100) based on pH, organic
     carbon, CEC, bulk density, and texture.
     """
+    lat, lng, depth = request.lat, request.lng, request.depth
     raw = await _fetch_soilgrids(lat, lng, depth)
     props = _parse_soilgrids_response(raw["data"], [
         "phh2o", "sand", "silt", "clay", "soc", "cec", "bdod",

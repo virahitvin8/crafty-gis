@@ -180,7 +180,7 @@ async def upload_file(
     description: str = Form(""),
 ):
     """Upload a file (shapefile, raster, CSV, etc.) for analysis."""
-    upload_dir = os.path.join(settings.DATA_DIR, "uploads", project_id or "default")
+    upload_dir = os.path.join(settings.data_dir, "uploads", project_id or "default")
     os.makedirs(upload_dir, exist_ok=True)
 
     file_path = os.path.join(upload_dir, file.filename)
@@ -209,7 +209,7 @@ async def upload_file(
 @router.get("/files/{project_id}")
 async def list_project_files(project_id: str):
     """List files for a project."""
-    project_dir = os.path.join(settings.DATA_DIR, "uploads", project_id)
+    project_dir = os.path.join(settings.data_dir, "uploads", project_id)
     if not os.path.exists(project_dir):
         return {"files": []}
 
@@ -232,7 +232,7 @@ async def list_project_files(project_id: str):
 @router.get("/download/{file_path:path}")
 async def download_file(file_path: str):
     """Download a processed file."""
-    full_path = os.path.join(settings.DATA_DIR, file_path)
+    full_path = os.path.join(settings.data_dir, file_path)
     if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="File not found")
     
