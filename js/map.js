@@ -1005,6 +1005,23 @@ const FH_MAP = (function() {
     if (_yieldLayer) { _yieldLayer.clearLayers(); }
   }
 
+  // ═══════════ GEDI BIOMASS LAYER (research remotesensing-13-02486) ═══════════
+  // Colored per-zone patches showing stored carbon / biomass per
+  // management zone (GEDI-style allometric from zone feature vectors).
+  let _biomassLayer = null;
+
+  function getBiomassLayer() {
+    if (!_state.map) return null;
+    if (!_biomassLayer) {
+      _biomassLayer = L.layerGroup().addTo(_state.map);
+    }
+    return _biomassLayer;
+  }
+
+  function clearBiomassOverlay() {
+    if (_biomassLayer) { _biomassLayer.clearLayers(); }
+  }
+
   return {
     setStateRef,
     findSavedField,
@@ -1046,6 +1063,8 @@ const FH_MAP = (function() {
     clearZoneOverlay,
     getYieldLayer,
     clearYieldOverlay,
+    getBiomassLayer,
+    clearBiomassOverlay,
     // Disease outbreak layer
     getOutbreakLayer,
     clearOutbreakLayer,

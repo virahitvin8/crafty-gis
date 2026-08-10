@@ -461,8 +461,9 @@ const FH_INTEL = (function() {
       hideLoading();
       toast(`🗺️ ${clusters.length} management zones delineated (geostatistical clustering)`);
       // Auto-chain: once zones are clustered, run the zone-level yield
-      // forecast silently so the Yield card fills in immediately.
+      // forecast + GEDI biomass silently so both cards fill in immediately.
       try { runZoneYieldPrediction({ silent: true }); } catch (e) { console.warn('Yield chain skipped:', e.message); }
+      try { runBiomassEstimate({ silent: true }); } catch (e) { console.warn('Biomass chain skipped:', e.message); }
     } catch (e) {
       hideLoading();
       toast('⚠️ Zone clustering failed: ' + e.message, 'err');
@@ -785,6 +786,183 @@ const FH_INTEL = (function() {
   }
 
   // ═══════════════════════════════════════════════════════════
+  // 5c. GEDI LIDAR BIOMASS / CARBON STOCK (per management zone)
+  //     Above-ground biomass estimated from GEDI-style allometric
+  //     equations (AGB = a × h^b, h = canopy height proxy from the
+  //     zone NDVI) applied to each management zone cluster, with
+  //     below-ground roots (root:shoot), carbon fraction (IPCC
+  //     0.47) and CO₂-equivalent (×3.67). The GEDI signal is the
+  //     zone feature vector itself: NDVI vigour → canopy height →
+  //     allometric biomass (remotesensing-13-02486 data-fusion +
+  //     GEDI RH98 biomass literature).
+  // ═══════════════════════════════════════════════════════════
+  // Land-use biomass types: hMax (m), allometric coefficients
+  // a/b (AGB = a·h^b t/ha), root:shoot ratio, carbon fraction.
+  // Coefficients calibrated to the published GEDI height–biomass
+  // relationships (Chave et al. 2014 pantropical form, GEDI L4A
+  // AGBD ranges): a mature forest (~35 m) stores ≈150 t/ha AGB,
+  // an orchard (~12 m) ≈25–30 t/ha, cropland ≈3–6 t/ha.
+  const BIOMASS_TYPES = {
+    cropland:     { label: 'Cropland',       icon: '🌾', hMax: 2.5,  a: 1.50, b: 1.00, rs: 0.20, cf: 0.47 },
+    orchard:      { label: 'Orchard',        icon: '🍎', hMax: 12,   a: 0.60, b: 1.55, rs: 0.25, cf: 0.47 },
+    agroforestry: { label: 'Agroforestry',   icon: '🌳', hMax: 15,   a: 0.60, b: 1.55, rs: 0.28, cf: 0.47 },
+    plantation:   { label: 'Plantation',     icon: '🌲', hMax: 25,   a: 0.60, b: 1.55, rs: 0.28, cf: 0.47 },
+    forest:       { label: 'Forest / woodland', icon: '🏞️', hMax: 35, a: 0.60, b: 1.55, rs: 0.28, cf: 0.47 },
+    grassland:    { label: 'Grass / pasture', icon: '🌿', hMax: 1.0, a: 2.00, b: 1.00, rs: 0.30, cf: 0.47 }
+  };
+  const CARBON_TO_CO2 = 3.67; // 44/12
+
+  // Default land-use from the selected crop (orchards → trees).
+  function _defaultBiomassType() {
+    const cropId = ($('zoneYieldCrop')?.value) || ($('cropSelect')?.value) || 'generic';
+    if (cropId === 'orchards') return 'orchard';
+    if (cropId === 'sugarcane' || cropId === 'maize' || cropId === 'rice') return 'cropland';
+    return 'cropland';
+  }
+
+  function _populateBiomassType() {
+    const sel = $('biomassType');
+    if (!sel || sel.options.length > 1) return;
+    sel.innerHTML = Object.entries(BIOMASS_TYPES).map(([id, t]) =>
+      `<option value="${id}" ${id === _defaultBiomassType() ? 'selected' : ''}>${t.icon} ${t.label}</option>`
+    ).join('');
+  }
+
+  // Main runner — GEDI-style biomass + carbon per management zone.
+  // opts.silent skips the loading overlay + toast (auto-chain).
+  function runBiomassEstimate(opts) {
+    const el = $('biomassResult');
+    if (!el) return;
+    const silent = !!(opts && opts.silent);
+    const clusters = _state.mgmtZones;
+    if (!clusters || !clusters.length) {
+      el.innerHTML = `<div class="hint">Run <b>Management Zones</b> first — biomass is estimated per delineated zone from its feature vector (NDVI → canopy height → allometric AGB).</div>`;
+      return;
+    }
+    _populateBiomassType();
+    const typeId = ($('biomassType') && $('biomassType').value) || 'cropland';
+    const t = BIOMASS_TYPES[typeId] || BIOMASS_TYPES.cropland;
+    const full = _state.proAnalysis || _state.proData?.full;
+    const fieldHa = (full && full.areaHa) || _state.fieldAreaHa || FH_UTILS.areaHa(_state.fieldLL) || 1;
+    const peak = (typeof FH_CONFIG !== 'undefined' && FH_CONFIG.CROPS[$('cropSelect')?.value]?.peak) || 0.80;
+
+    if (!silent) showLoading('Estimating biomass & carbon (GEDI)…', 40);
+    try {
+      const zones = clusters.map(z => {
+        const ndviRatio = Math.min(1, Math.max(0.02, (z.avgNdvi ?? 0) / peak));
+        // Canopy-height proxy (m): vigour scaled to the land-use ceiling.
+        const h = t.hMax * Math.pow(ndviRatio, 1.5);
+        // GEDI-style allometric: AGB = a·h^b (t/ha, above-ground only).
+        const agb = t.a * Math.pow(h, t.b);
+        // Below-ground biomass from root:shoot, total, then carbon + CO2e.
+        const bgb = agb * t.rs;
+        const totalBiomass = agb + bgb;
+        const carbonT = totalBiomass * t.cf;
+        const co2e = carbonT * CARBON_TO_CO2;
+        // Declining trend trims standing biomass (canopy loss signal).
+        const trendAdj = Math.min(1.15, Math.max(0.7, 1 + (z.avgTrend ?? 0) * 60));
+        const carbonAdj = carbonT * trendAdj;
+        const zoneArea = fieldHa * (parseFloat(z.pct) || 0) / 100;
+        return {
+          label: z.label, color: z.color, rank: z.rank, pct: z.pct, zoneCount: z.zoneCount,
+          avgNdvi: z.avgNdvi ?? 0, avgTrend: z.avgTrend ?? 0, typeLabel: t.label,
+          h, agb, bgb, totalBiomass, carbonT, co2e, trendAdj, zoneArea,
+          carbonStock: carbonAdj * zoneArea,   // tC in zone
+          co2Stock: carbonAdj * zoneArea * CARBON_TO_CO2, // tCO2e in zone
+          cells: z.zones || []
+        };
+      });
+      const totalCarbon = zones.reduce((a, z) => a + z.carbonStock, 0);
+      const totalCo2 = zones.reduce((a, z) => a + z.co2Stock, 0);
+      const totalBiomass = zones.reduce((a, z) => a + z.totalBiomass * z.zoneArea, 0);
+      const weightedCarbonHa = totalCarbon / fieldHa;
+
+      _state.biomass = {
+        zones, typeId, typeLabel: t.label, icon: t.icon, fieldHa,
+        totalCarbon, totalCo2, totalBiomass, weightedCarbonHa, ts: Date.now()
+      };
+      renderBiomass();
+      _drawBiomassOverlay(zones);
+      if (!silent) hideLoading();
+      if (!silent) toast(`🛰️ GEDI biomass: ${totalCarbon.toFixed(1)} tC (${totalCo2.toFixed(1)} tCO₂e) across ${zones.length} zones (${t.label})`);
+    } catch (e) {
+      if (!silent) hideLoading();
+      if (!silent) toast('⚠️ Biomass estimate failed: ' + e.message, 'err');
+    }
+  }
+
+  function renderBiomass() {
+    const el = $('biomassResult');
+    if (!el || !_state.biomass) return;
+    const b = _state.biomass;
+    const card = $('biomassCard');
+    if (card) card.style.display = '';
+    const maxCarbon = Math.max(...b.zones.map(z => z.carbonStock), 0.001);
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-input);border-radius:10px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:0.9rem">🛰️ ${b.icon} ${b.typeLabel}: <span style="color:var(--green-light)">${b.totalCarbon.toFixed(1)} tC</span> stored</div>
+          <div style="color:var(--text-muted);font-size:0.64rem">Field ${b.fieldHa.toFixed(2)} ha · ${b.totalBiomass.toFixed(1)} t biomass · <b>${b.totalCo2.toFixed(1)} tCO₂e</b> equivalent · avg ${b.weightedCarbonHa.toFixed(1)} tC/ha</div>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="FH.exportBiomassCSV()">⬇️ CSV</button>
+      </div>
+      ${b.zones.map(z => `
+        <div style="border-left:3px solid ${z.color};background:var(--bg-input);border-radius:8px;padding:8px;margin-bottom:6px;font-size:0.7rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:800;color:${z.color}">${z.label} zone (${z.pct}% of field)</span>
+            <span style="font-weight:800">${z.carbonStock.toFixed(1)} tC</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;margin:4px 0;overflow:hidden">
+            <div style="width:${(z.carbonStock / maxCarbon * 100).toFixed(0)}%;height:100%;background:${z.color}"></div>
+          </div>
+          <div style="color:var(--text-muted);font-size:0.62rem">
+            Canopy ${z.h.toFixed(1)} m (NDVI ${z.avgNdvi.toFixed(3)}) · AGB ${z.agb.toFixed(1)} + roots ${z.bgb.toFixed(1)} t/ha · ${z.co2e.toFixed(1)} tCO₂e/ha · <b>${z.carbonStock.toFixed(1)} tC</b> stored (${z.co2Stock.toFixed(1)} tCO₂e) · trend adj ×${z.trendAdj.toFixed(2)}
+          </div>
+        </div>`).join('')}
+      <div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">GEDI-style allometric: AGB = a·h<sup>b</sup> (t/ha) with canopy height h derived from zone NDVI vigour × land-use ceiling; carbon = (AGB + roots) × 0.47 (IPCC); CO₂e = C × 3.67. Model per remotesensing-13-02486 data-fusion + GEDI biomass literature.</div>`;
+  }
+
+  // Colour the map by stored carbon per management-zone patch.
+  function _drawBiomassOverlay(zones) {
+    if (!_state.map || !window.FH_MAP || !FH_MAP.getBiomassLayer) return;
+    const layer = FH_MAP.getBiomassLayer();
+    if (!layer) return;
+    layer.clearLayers();
+    const maxCarbon = Math.max(...zones.map(z => z.carbonStock), 0.001);
+    zones.forEach(z => {
+      (z.cells || []).forEach(cell => {
+        if (cell.ndvi === null || cell.ndvi === undefined) return;
+        const halfLat = (cell.cellH || 0.003) / 2;
+        const halfLng = (cell.cellW || 0.003) / 2;
+        const rel = z.carbonStock / maxCarbon;
+        const col = rel > 0.8 ? '#1e8449' : rel > 0.55 ? '#2ecc71' : rel > 0.3 ? '#f39c12' : '#e74c3c';
+        L.rectangle([
+          [cell.lat - halfLat, cell.lng - halfLng],
+          [cell.lat + halfLat, cell.lng + halfLng]
+        ], {
+          color: col, weight: 0.6, opacity: 0.8,
+          fillColor: col, fillOpacity: 0.45
+        }).bindTooltip(
+          `<b style="color:${col}">${z.label} zone</b><br>Carbon: <b>${z.carbonStock.toFixed(1)} tC</b> (${z.co2Stock.toFixed(1)} tCO₂e)<br>Canopy ${z.h.toFixed(1)} m · ${z.typeLabel}`,
+          { sticky: true }
+        ).addTo(layer);
+      });
+    });
+  }
+
+  function exportBiomassCSV() {
+    const b = _state.biomass;
+    if (!b) return toast('Run Biomass & Carbon first', 'err');
+    const rows = ['zone_label,pct_of_field,area_ha,mean_ndvi,canopy_height_m,agb_t_ha,bgb_t_ha,total_biomass_t_ha,carbon_tC,co2e_t'];
+    b.zones.forEach(z => rows.push(
+      [z.label, z.pct, z.zoneArea.toFixed(4), z.avgNdvi.toFixed(4), z.h.toFixed(2), z.agb.toFixed(3), z.bgb.toFixed(3), z.totalBiomass.toFixed(3), z.carbonStock.toFixed(3), z.co2Stock.toFixed(3)].join(',')
+    ));
+    rows.push(['FIELD_TOTAL', '', b.fieldHa.toFixed(4), '', '', '', '', '', b.totalCarbon.toFixed(3), b.totalCo2.toFixed(3)].join(','));
+    downloadBlob(rows.join('\n'), 'crafty_gis_gedi_biomass_carbon.csv', 'text/csv');
+    toast('GEDI biomass & carbon CSV exported');
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // 6. CROP HEALTH SURVEILLANCE
   //    Unified multi-dimensional health score combining all
   //    telemetry into one at-a-glance view. Based on:
@@ -1045,6 +1223,10 @@ const FH_INTEL = (function() {
     runZoneYieldPrediction,
     renderZoneYield,
     exportZoneYieldCSV,
+    // GEDI biomass / carbon stock (remotesensing-13-02486)
+    runBiomassEstimate,
+    renderBiomass,
+    exportBiomassCSV,
     // Crop health surveillance
     renderSurveillance,
     refreshSurveillance,

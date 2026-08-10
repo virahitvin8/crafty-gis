@@ -531,6 +531,25 @@
     </div>
   </div>
 
+  <!-- ─── GEDI BIOMASS / CARBON STOCK (remotesensing-13-02486) ─── -->
+  <div class="card" id="biomassCard" style="display:none">
+    <h3 class="card-collapse" onclick="FH.toggleCard(this)">
+      🛰️ GEDI Biomass & Carbon <span class="badge badge-new">LiDAR</span>
+    </h3>
+    <div class="card-body" id="biomassBody">
+      <div class="row" style="align-items:center;gap:6px;margin-bottom:8px">
+        <label style="font-size:0.7rem;color:var(--text-muted)">Land use:</label>
+        <select id="biomassType" style="min-width:120px"></select>
+        <button class="btn-primary btn-sm" onclick="FH.runBiomassEstimate()">🛰️ Estimate Carbon</button>
+      </div>
+      <div class="hint" style="font-size:0.62rem">
+        GEDI-style allometric biomass per management zone: canopy height h derived from zone NDVI vigour × land-use ceiling,
+        AGB = a·h<sup>b</sup>, carbon = (AGB + roots) × 0.47 (IPCC), CO₂e = C × 3.67. Runs automatically after Management Zones.
+      </div>
+      <div id="biomassResult"></div>
+    </div>
+  </div>
+
   <!-- ─── WEATHER ─── -->
   <div class="card" id="weatherCard" style="display:none">
     <h3 class="card-collapse" onclick="FH.toggleCard(this)">

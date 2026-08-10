@@ -165,6 +165,10 @@ const FH = (function() {
     runZoneYieldPrediction: FH_INTEL.runZoneYieldPrediction,
     renderZoneYield: FH_INTEL.renderZoneYield,
     exportZoneYieldCSV: FH_INTEL.exportZoneYieldCSV,
+    // GEDI biomass / carbon stock (remotesensing-13-02486)
+    runBiomassEstimate: FH_INTEL.runBiomassEstimate,
+    renderBiomass: FH_INTEL.renderBiomass,
+    exportBiomassCSV: FH_INTEL.exportBiomassCSV,
     // Crop health surveillance (pone.0324347 / 09119071)
     renderSurveillance: FH_INTEL.renderSurveillance,
     refreshSurveillance: FH_INTEL.refreshSurveillance,
