@@ -1,7 +1,8 @@
 # ─── Netlify Configuration – Crafty GIS Satellite Crop Monitor ───
 
 [build]
-  publish = "."
+  command = "npm run build"
+  publish = "."  # Change to "public" or "dist" if bash build.sh outputs to a subfolder
 
 [dev]
   framework = "#static"
