@@ -161,6 +161,10 @@ const FH = (function() {
     runManagementZones: FH_INTEL.runManagementZones,
     renderManagementZones: FH_INTEL.renderManagementZones,
     exportMgmtZonesCSV: FH_INTEL.exportMgmtZonesCSV,
+    // Crop health surveillance (pone.0324347 / 09119071)
+    renderSurveillance: FH_INTEL.renderSurveillance,
+    refreshSurveillance: FH_INTEL.refreshSurveillance,
+    exportSurveillanceCSV: FH_INTEL.exportSurveillanceCSV,
 
     // UI
     setMode: FH_UI.setMode,

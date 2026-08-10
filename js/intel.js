@@ -414,6 +414,8 @@ const FH_INTEL = (function() {
 
     const top = rows.reduce((a, b) => b.risk > a.risk ? b : a);
     const worst = rows.filter(r => r.risk >= 0.7);
+    // Store the max EWS risk (0..1) so the Health Surveillance dimension can use it.
+    _state.ewsRisk = top ? top.risk : 0;
 
     el.innerHTML = `
       <div class="advice ${worst.length ? 'warn' : 'info'}" style="font-size:0.7rem;margin-bottom:8px">
@@ -607,6 +609,241 @@ const FH_INTEL = (function() {
     toast('Management zones CSV exported');
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // 6. CROP HEALTH SURVEILLANCE
+  //    Unified multi-dimensional health score combining all
+  //    telemetry into one at-a-glance view. Based on:
+  //      - pone.0324347 (Ayid 2025) — intelligent framework for
+  //        crop health surveillance & disease management
+  //      - 09119071 (Shafi 2020) — multi-modal crop health maps
+  //      - Geo-Intelligent (2025) — GIS+RS+IoT health fusion
+  //    Dimensions: Vegetation / Water / Temperature / Disease /
+  //    Soil-Nutrient / Trend — fused into overall score, with
+  //    history timeline stored per field.
+  // ═══════════════════════════════════════════════════════════
+  const HEALTH_DIMS = [
+    { id: 'veg',    label: 'Vegetation',   icon: '🌿', weight: 0.25 },
+    { id: 'water',  label: 'Water',        icon: '💧', weight: 0.20 },
+    { id: 'temp',   label: 'Temperature',  icon: '🌡️', weight: 0.15 },
+    { id: 'disease',label: 'Pest/Disease', icon: '🦠', weight: 0.15 },
+    { id: 'soil',   label: 'Soil/Nutrient',icon: '🧪', weight: 0.15 },
+    { id: 'trend',  label: 'Vigour Trend', icon: '📈', weight: 0.10 }
+  ];
+
+  function _clamp01(v) {
+    return Math.min(1, Math.max(0, v));
+  }
+
+  // Compute the 6 dimension scores (each 0..1) from all telemetry.
+  function healthDimensions() {
+    const full = _state.proAnalysis || _state.proData?.full || null;
+    const ad = _state.analysisData;
+    const ml = _state.mlStress;
+    const s = full?.stats || {};
+    const peak = ad?.crop?.peak || 0.80;
+
+    // Vegetation (NDVI normalized to crop peak)
+    const ndvi = s.ndvi?.mean ?? ad?.meanNdvi ?? null;
+    const veg = ndvi !== null && ndvi !== undefined ? _clamp01(ndvi / peak) : null;
+
+    // Water: NDWI + CWSI + SAR soil moisture + rainfall
+    const ndwi = s.ndwi?.mean ?? null;
+    const cwsi = full?.thermal?.cwsi ?? full?.thermal?.CWSI ?? null;
+    const rain = full?.rainfall?.totalMm ?? null;
+    const sensorWater = _lastSensor()?.soilMoisture ?? null;
+    let water = 0.5;
+    const parts = [];
+    if (ndwi !== null) { parts.push(_clamp01((ndwi + 0.4) / 0.8)); }
+    if (cwsi !== null) { parts.push(1 - _clamp01(cwsi)); }
+    if (rain !== null) { parts.push(_clamp01(rain / 80)); }
+    if (sensorWater !== null) { parts.push(_clamp01(sensorWater / 35)); }
+    if (parts.length) water = parts.reduce((a, b) => a + b, 0) / parts.length;
+
+    // Temperature: thermal LST + weather air temp vs comfort window
+    const lst = full?.thermal?.lstMean ?? null;
+    const airT = _state.weatherData?.forecast?.current?.temperature_2m ?? null;
+    const tempReading = lst !== null ? lst : airT;
+    let temp = 0.5;
+    if (tempReading !== null && tempReading !== undefined) {
+      temp = _clamp01(1 - Math.abs(tempReading - 26) / 22);
+    }
+
+    // Disease: ML stress class + EWS risk (inverse)
+    let disease = 0.7;
+    let ewsRisk = 0;
+    if (_state.ewsRisk !== undefined && _state.ewsRisk !== null) ewsRisk = _state.ewsRisk;
+    const mlClass = ml ? (ml.stressClass !== undefined ? ml.stressClass : (ml.label ? { 'Healthy': 0, 'Mild Stress': 1, 'Moderate Stress': 2, 'Severe Stress': 3, 'Critical': 4 }[ml.label] : null)) : null;
+    if (mlClass !== null) disease = 1 - _clamp01(mlClass / 4);
+    disease = _clamp01(disease * (1 - ewsRisk * 0.5));
+
+    // Soil / nutrient: IoT pH + NPK + terrain suitability
+    const s1 = _lastSensor();
+    let soil = 0.6;
+    const sparts = [];
+    if (s1) {
+      sparts.push(_clamp01(1 - Math.abs(s1.ph - 6.5) / 2.5));
+      const npk = s1.n + s1.p + s1.k;
+      sparts.push(_clamp01(npk / 120));
+    }
+    const slope = s.slope?.mean ?? null;
+    if (slope !== null) sparts.push(_clamp01(1 - slope / 15));
+    if (sparts.length) soil = sparts.reduce((a, b) => a + b, 0) / sparts.length;
+
+    // Vigour trend: NDVI per-day slope (positive = improving)
+    const trendVal = full?.trends?.ndviPerDay ?? ad?.meanNdviTrend ?? _state.mlStress?.trendData?.ndvi_trend ?? null;
+    let trend = 0.5;
+    if (trendVal !== null && trendVal !== undefined) {
+      trend = _clamp01(0.5 + trendVal * 800);
+    }
+
+    return {
+      veg, water, temp, disease, soil, trend,
+      _ndvi: ndvi, _cwsi: cwsi, _airT: airT, _rain: rain, _ewsRisk: ewsRisk
+    };
+  }
+
+  function _lastSensor() {
+    const list = _loadSensors();
+    return list[list.length - 1] || null;
+  }
+
+  // Overall fused health score (0..1) using dimension weights.
+  function _overallHealth(dims) {
+    let sum = 0, wt = 0;
+    HEALTH_DIMS.forEach(d => {
+      const v = dims[d.id];
+      if (v !== null && v !== undefined) { sum += v * d.weight; wt += d.weight; }
+    });
+    return wt ? sum / wt : null;
+  }
+
+  // Persist a health snapshot per field for the surveillance timeline.
+  function _pushHealthSnapshot(overall, dims) {
+    if (!_state.fieldCenter) return [];
+    const key = 'crafty_gis_health_' + _state.fieldCenter[0].toFixed(4) + '_' + _state.fieldCenter[1].toFixed(4);
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+    log.push({ ts: Date.now(), overall, dims: { veg: dims.veg, water: dims.water, temp: dims.temp, disease: dims.disease, soil: dims.soil, trend: dims.trend } });
+    if (log.length > 30) log = log.slice(-30);
+    try { localStorage.setItem(key, JSON.stringify(log)); } catch (e) {}
+    return log;
+  }
+
+  function _loadHealthLog() {
+    if (!_state.fieldCenter) return [];
+    const key = 'crafty_gis_health_' + _state.fieldCenter[0].toFixed(4) + '_' + _state.fieldCenter[1].toFixed(4);
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; }
+  }
+
+  // Main surveillance renderer — builds the full card UI.
+  function renderSurveillance() {
+    const el = $('survBody');
+    if (!el) return;
+    const dims = healthDimensions();
+    const overall = _overallHealth(dims);
+    const log = _pushHealthSnapshot(overall, dims);
+
+    const card = $('survCard');
+    if (card && (dims.veg !== null || dims.water !== null || dims._airT !== null)) card.style.display = '';
+
+    const pct = overall !== null ? Math.round(overall * 100) : null;
+    const level = pct === null ? 'NODATA' : pct >= 75 ? 'HEALTHY' : pct >= 50 ? 'MONITOR' : pct >= 35 ? 'STRESSED' : 'CRITICAL';
+    const col = pct === null ? '#888' : pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--orange)' : pct >= 35 ? 'var(--moderate)' : 'var(--red)';
+
+    // Trending arrow from history
+    let trendArrow = '';
+    if (log.length >= 2) {
+      const prev = log[log.length - 2].overall;
+      if (prev !== null && overall !== null && prev !== undefined) {
+        const d = overall - prev;
+        trendArrow = d > 0.02 ? '<span style="color:var(--green)">▲ improving</span>' : d < -0.02 ? '<span style="color:var(--red)">▼ declining</span>' : '<span style="color:var(--orange)">→ stable</span>';
+      }
+    }
+
+    // Dimension bars
+    const barHTML = HEALTH_DIMS.map(d => {
+      const v = dims[d.id];
+      const vp = v === null || v === undefined ? null : Math.round(v * 100);
+      const c = vp === null ? '#888' : vp >= 75 ? 'var(--green)' : vp >= 50 ? 'var(--orange)' : vp >= 35 ? 'var(--moderate)' : 'var(--red)';
+      const note = vp === null ? '—' : vp + '%';
+      return '<div style="margin-bottom:7px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.7rem">' +
+        '<span>' + d.icon + ' ' + d.label + '</span>' +
+        '<span style="font-weight:700;color:' + c + '">' + note + '</span></div>' +
+        '<div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">' +
+        '<div style="width:' + (vp === null ? 0 : vp) + '%;height:100%;background:' + c + ';transition:width .6s"></div></div></div>';
+    }).join('');
+
+    // Health timeline (sparkline of past snapshots)
+    const hist = log.slice(-14);
+    let spark = '';
+    if (hist.length >= 2) {
+      const maxBar = 40;
+      spark = '<div style="display:flex;align-items:flex-end;height:' + maxBar + 'px;gap:2px;margin-top:6px">' +
+        hist.map(h => {
+          const hp = h.overall !== null ? Math.round(h.overall * 100) : 0;
+          const col2 = hp >= 75 ? 'var(--green)' : hp >= 50 ? 'var(--orange)' : 'var(--red)';
+          return '<div style="flex:1;display:flex;align-items:flex-end;justify-content:center">' +
+            '<div title="' + new Date(h.ts).toLocaleString() + ' — ' + hp + '%" style="width:70%;height:' + Math.max(3, hp / 100 * maxBar) + 'px;background:' + col2 + ';border-radius:3px 3px 0 0"></div></div>';
+        }).join('') + '</div>';
+    }
+
+    // Top priority recommendation (lowest dimension)
+    let minDim = null, minV = 1;
+    HEALTH_DIMS.forEach(d => { if (dims[d.id] !== null && dims[d.id] < minV) { minV = dims[d.id]; minDim = d; } });
+    const rec = minDim ? _dimensionAdvice(minDim.id, dims) : 'Run a full analysis to begin surveillance.';
+
+    el.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-input);border-radius:12px;margin-bottom:10px">' +
+      '<div style="width:72px;height:72px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.15rem;color:#fff;background:conic-gradient(' + col + ' ' + (pct || 0) + '%, rgba(255,255,255,0.12) 0)"><span>' + (pct === null ? '—' : pct) + '</span></div>' +
+      '<div style="flex:1;font-size:0.75rem;line-height:1.5">' +
+      '<div style="font-weight:800;color:' + col + ';font-size:0.95rem">' + level + ' ' + trendArrow + '</div>' +
+      '<div style="color:var(--text-muted);font-size:0.66rem">Fused from satellite / IoT / weather / ML / disease EWS / ' + log.length + ' snapshot' + (log.length !== 1 ? 's' : '') + '</div>' +
+      '<div style="color:var(--text-muted);font-size:0.64rem">Last scan: ' + new Date().toLocaleString() + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:4px">' +
+      '<button class="btn-primary btn-sm" onclick="FH.refreshSurveillance()">Refresh</button>' +
+      '<button class="btn-secondary btn-sm" onclick="FH.exportSurveillanceCSV()">CSV</button></div></div>' +
+
+      '<div style="font-weight:700;font-size:0.72rem;color:var(--green-light);margin:4px 0 6px">Health dimensions</div>' +
+      '<div style="background:var(--bg-input);border-radius:10px;padding:10px">' + barHTML + '</div>' +
+
+      (hist.length >= 2 ? '<div style="font-weight:700;font-size:0.72rem;color:var(--green-light);margin:10px 0 4px">Health history (' + log.length + ' scans)</div><div style="background:var(--bg-input);border-radius:10px;padding:8px">' + spark + '</div>' : '') +
+
+      '<div class="advice ' + (level === 'CRITICAL' || level === 'STRESSED' ? 'warn' : 'info') + '" style="font-size:0.7rem;margin-top:10px">' +
+      '<b>Priority &mdash; ' + (minDim ? minDim.icon + ' ' + minDim.label : 'Setup') + ':</b> ' + rec + '</div>' +
+      '<div style="font-size:0.62rem;color:var(--text-muted);margin-top:6px">Crop health surveillance per Ayid et al. 2025 (pone.0324347) &amp; Shafi et al. 2020 (09119071) &mdash; multi-modal fusion for continuous monitoring.</div>';
+  }
+
+  function _dimensionAdvice(dimId, dims) {
+    switch (dimId) {
+      case 'veg': return 'Vegetation vigour low. Check for nutrient deficiency or disease; consider a foliar N split and scout the low-NDVI zones.';
+      case 'water': return 'Moisture balance suboptimal. Adjust irrigation &mdash; if NDWI/CWSI indicate stress, irrigate sooner with ~10% more volume; improve drainage if waterlogged.';
+      case 'temp': return 'Thermal stress detected. Use protective irrigation during heat, shade netting for sensitive crops, and schedule fieldwork during cooler hours.';
+      case 'disease': return 'Elevated pest/disease risk. Scout fields, apply preventive fungicide within 48h if EWS is HIGH, and rotate crops next season per pone.0324347.';
+      case 'soil': return 'Soil balance off. Correct pH toward 6.5&ndash;7.0, top-up NPK to target (100-60-40), and incorporate organic matter to improve structure.';
+      case 'trend': return 'Vigour trend declining. Monitor weekly; investigate the glide path early &mdash; declining NDVI slope often precedes visible stress.';
+      default: return 'Maintain routine surveillance and rescan weekly.';
+    }
+  }
+
+  function exportSurveillanceCSV() {
+    const dims = healthDimensions();
+    const overall = _overallHealth(dims);
+    const log = _loadHealthLog();
+    const rows = ['timestamp,overall_health,ndvi,ndwi,cwsi,air_temp_c,rainfall_mm,disease_ews_risk,soil_moisture,ph'];
+    const s1 = _lastSensor();
+    const cur = [new Date().toISOString(), overall !== null ? overall.toFixed(3) : '', dims._ndvi ?? '', (dims.water ?? ''), dims._cwsi ?? '', dims._airT ?? '', dims._rain ?? '', dims._ewsRisk ?? '', s1?.soilMoisture ?? '', s1?.ph ?? ''].join(',');
+    rows.push(cur);
+    log.forEach(h => rows.push([new Date(h.ts).toISOString(), h.overall !== null ? h.overall.toFixed(3) : '', '', '', '', '', '', '', '', ''].join(',')));
+    downloadBlob(rows.join('\n'), 'crafty_gis_health_surveillance.csv', 'text/csv');
+    toast('Health surveillance CSV exported');
+  }
+
+  function refreshSurveillance() {
+    renderSurveillance();
+    toast('Health surveillance refreshed');
+  }
+
   // ═══════════ EXPORTS ═══════════
   return {
     setStateRef,
@@ -628,6 +865,11 @@ const FH_INTEL = (function() {
     // Management zones
     runManagementZones,
     renderManagementZones,
-    exportMgmtZonesCSV
+    exportMgmtZonesCSV,
+    // Crop health surveillance
+    renderSurveillance,
+    refreshSurveillance,
+    exportSurveillanceCSV,
+    healthDimensions
   };
 })();

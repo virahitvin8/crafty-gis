@@ -248,9 +248,9 @@ const FH_ANALYSIS = (function() {
     try {
       if (window.FH_INTEL && window.FH_INTEL.computeDiseaseEWS) {
         FH_INTEL.computeDiseaseEWS();
+        FH_INTEL.renderSurveillance();
       }
     } catch (e) { console.warn('[ProAnalysis] EWS refresh skipped:', e.message); }
-
   }
 
   // G6 — rainfall (CHIRPS) + soil moisture (Sentinel-1 SAR)
@@ -1088,7 +1088,10 @@ const FH_ANALYSIS = (function() {
           if (mgmtCard) mgmtCard.style.display = '';
           const researchCard = $('researchCard');
           if (researchCard) researchCard.style.display = '';
-        }
+          // Crop health surveillance (pone.0324347)
+          FH_INTEL.renderSurveillance();
+          const survCard = $('survCard');
+          if (survCard) survCard.style.display = '';
       } catch (e2) {
         console.warn('Research cards skipped:', e2.message || String(e2));
       }
